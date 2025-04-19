@@ -1,0 +1,53 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 350px;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  color: var(--muted-foreground);
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.error {
+  color: var(--destructive);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.link {
+  text-decoration: underline;
+  color: var(--primary);
+}
