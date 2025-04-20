@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
 import { Building2 } from "lucide-react"
@@ -12,12 +13,26 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link 
+        <Link 
             href="/" 
-            className="flex items-center space-x-2 transition-colors hover:text-primary"
+            className="flex items-center space-x-2 transition-colors hover:opacity-90"
           >
-            <Building2 className="h-6 w-6" />
-            <span className="text-xl font-bold tracking-tight">SiteCraft</span>
+            <div className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="SiteCraft Logo" 
+                width={32} 
+                height={32} 
+                className="h-6 w-auto object-contain"
+              />
+              <Image 
+                src="/font.png" 
+                alt="SiteCraft" 
+                width={120} 
+                height={24} 
+                className="h-18 w-auto lg-2 object-contain"
+              />
+            </div>
           </Link>
           <nav className="hidden md:flex items-center space-x-6">
             <Link

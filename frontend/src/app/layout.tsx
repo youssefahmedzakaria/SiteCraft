@@ -8,9 +8,17 @@ import { Footer } from "@/components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SiteCraft - E-commerce Platform for Egyptian Businesses",
+  title: "SiteCraft",
   description: "Build and grow your online store with SiteCraft. Local payment integration, Arabic support, and powerful e-commerce tools.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icon32.png", sizes: "32x32", type: "image/png" }
+    ]
+  }
 };
+
 
 export default function RootLayout({
   children,

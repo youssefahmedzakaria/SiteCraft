@@ -5,32 +5,26 @@ import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Icons } from "../../components/icons"
-import { Alert, AlertDescription } from "../../components/ui/alert"
+import { Icons } from "../../icons"
+import { Alert, AlertDescription } from "../../ui/alert"
 import { AlertCircle } from "lucide-react"
 
+
 export function LoginForm() {
+  const { login, loginError } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const { login } = useAuth()
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
-    setError("")
+    
 
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-    try {
-      await login(email, password)
-    } catch (error) {
-      console.error("Login failed:", error)
-      setError("Invalid email or password. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+    await login(email, password)
+    setIsLoading(false)
   }
 
   return (
@@ -45,10 +39,10 @@ export function LoginForm() {
         </p>
       </div>
 
-      {error && (
+      {loginError && (
         <Alert variant="destructive" className="text-sm">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{loginError}</AlertDescription>
         </Alert>
       )}
       

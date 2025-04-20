@@ -1,6 +1,6 @@
 "use client"
 
-import { LoginForm } from "@/components/auth/login-form"
+import { LoginForm } from "@/components/auth/Login/login-form"
 import { Building2 } from "lucide-react"
 import Link from "next/link"
 

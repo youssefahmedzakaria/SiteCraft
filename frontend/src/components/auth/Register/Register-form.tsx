@@ -5,13 +5,14 @@ import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Icons } from "../../components/icons"
-import { Alert, AlertDescription } from "../../components/ui/alert"
+import { Icons } from "../../icons"
+import { Alert, AlertDescription } from "../../ui/alert"
 import { AlertCircle } from "lucide-react"
+import { sign } from "crypto"
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [signupError, setError] = useState("")
   const { signup } = useAuth()
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -32,8 +33,8 @@ export function SignupForm() {
 
     try {
       await signup(email, password)
-    } catch (error) {
-      console.error("Signup failed:", error)
+    } catch (signupError) {
+      console.error("Signup failed:", signupError)
       setError("Failed to create account. Please try again.")
     } finally {
       setIsLoading(false)
@@ -52,10 +53,10 @@ export function SignupForm() {
         </p>
       </div>
 
-      {error && (
+      {signupError && (
         <Alert variant="destructive" className="text-sm">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{signupError}</AlertDescription>
         </Alert>
       )}
       
