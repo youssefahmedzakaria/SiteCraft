@@ -55,7 +55,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000"></div>
             <div className="relative bg-background/90 backdrop-blur-sm p-12 rounded-lg border border-border/20">
-              <LoginForm />
+              <LoginForm/>
             </div>
           </div>
         </div>

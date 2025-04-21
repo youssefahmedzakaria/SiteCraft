@@ -59,6 +59,7 @@ const config: Config = {
           'dark-button-hover': '#a95d47e6', // 90% opacity
           'dark-button-active': '#a95d47cc', // 80% opacity
           'colored-bg': '#a95d470d', // 5% opacity
+          'left-nav': '#263238', // 100% opacity #455a64 #e0e0e0
         },
       },
       borderRadius: {

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname?.includes('/login') || pathname?.includes('/signup');
+  const isAuthPage = pathname?.includes('/login') || pathname?.includes('/signup') || pathname?.includes('/dashboard');
 
   return (
     <div className="relative flex min-h-screen flex-col">
