@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Icons } from "../../icons"
 import { Alert, AlertDescription } from "../../ui/alert"
 import { AlertCircle } from "lucide-react"
-
+import Link from "next/link"
 
 export function LoginForm() {
   const { login, loginError } = useAuth()
@@ -18,7 +18,6 @@ export function LoginForm() {
     event.preventDefault()
     setIsLoading(true)
     
-
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
@@ -30,7 +29,7 @@ export function LoginForm() {
   return (
     <form 
       onSubmit={onSubmit} 
-      className="w-full max-w-sm mx-auto space-y-8 bg-background/95 backdrop-blur-sm p-8 rounded-lg border border-border/20"
+      className="w-full space-y-6"
     >
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
@@ -114,6 +113,28 @@ export function LoginForm() {
           "Sign in"
         )}
       </Button>
+      
+      <div className="text-center text-sm">
+        <p className="text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/signup" className="text-primary hover:text-primary/90 font-medium hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </div>
+
+      <div className="text-center text-xs text-muted-foreground">
+        <p>
+          By continuing, you agree to our{" "}
+          <Button variant="link" className="text-primary hover:text-primary/90 px-1 h-auto text-xs">
+            Terms of Service
+          </Button>
+          {" "}and{" "}
+          <Button variant="link" className="text-primary hover:text-primary/90 px-1 h-auto text-xs">
+            Privacy Policy
+          </Button>
+        </p>
+      </div>
     </form>
   )
-} 
+}
