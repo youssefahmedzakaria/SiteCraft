@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Icons } from "../../icons"
 import { Alert, AlertDescription } from "../../ui/alert"
 import { AlertCircle } from "lucide-react"
-import { sign } from "crypto"
+import Link from "next/link"
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +44,7 @@ export function SignupForm() {
   return (
     <form 
       onSubmit={onSubmit} 
-      className="w-full max-w-sm mx-auto space-y-8 bg-background/95 backdrop-blur-sm p-8 rounded-lg border border-border/20"
+      className="w-full space-y-6"
     >
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
@@ -139,6 +139,15 @@ export function SignupForm() {
         )}
       </Button>
 
+      <div className="text-center text-sm">
+        <p className="text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:text-primary/90 font-medium hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
+
       <div className="text-center text-xs text-muted-foreground">
         <p>
           By creating an account, you agree to our{" "}
@@ -153,4 +162,4 @@ export function SignupForm() {
       </div>
     </form>
   )
-} 
+}

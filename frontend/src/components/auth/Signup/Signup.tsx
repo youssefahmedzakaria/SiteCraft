@@ -2,7 +2,7 @@
 
 import React from 'react'
 import styles from './Register.module.css'
-import { RegisterForm } from './RegisterForm'
+import { SignupForm } from './Signup-form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const Register = () => {
@@ -16,7 +16,7 @@ export const Register = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RegisterForm />
+          <SignupForm />
         </CardContent>
         <CardFooter className={styles.footer}>
           <div>
