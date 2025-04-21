@@ -37,24 +37,24 @@ export function Navbar() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/about"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary relative group"
+              className="text-sm font-medium text-[#cc7860]/95 transition-colors hover:opacity-90 relative group"
             >
               About
-              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-[#cc7860] opacity-100 transform scale-x-0 group-hover:scale-x-100 group-hover:opacity-90 transition-all"></span>
             </Link>
             <Link
               href="/features"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary relative group"
+              className="text-sm font-medium text-[#cc7860]/95 text-muted-foreground transition-colors hover:opacity-90 relative group"
             >
               Features
-              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-[#cc7860] opacity-100 transform scale-x-0 group-hover:scale-x-100 group-hover:opacity-90 transition-all"></span>
             </Link>
             <Link
               href="/pricing"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary relative group"
+              className="text-sm font-medium text-[#cc7860]/95 text-muted-foreground transition-colors hover:opacity-90 relative group"
             >
               Pricing
-              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-[#cc7860] opacity-100 transform scale-x-0 group-hover:scale-x-100 group-hover:opacity-90 transition-all"></span>
             </Link>
           </nav>
         </div>
@@ -72,14 +72,14 @@ export function Navbar() {
               <Link href="/login">
                 <Button 
                   variant="ghost"
-                  className="font-medium hover:bg-primary/10 transition-colors"
+                  className="font-medium text-[#cc7860]/95 hover:text-[#cc7860]/90 hover:bg-[#cc7860]/10 transition-colors"
                 >
                   Login
                 </Button>
               </Link>
               <Link href="/signup">
                 <Button
-                  className="font-medium bg-primary text-primary-foreground hover:bg-primary/90 
+                  className="font-medium bg-[#cc7860]/95 text-primary-foreground hover:bg-[#cc7860]/90 
                            shadow-lg hover:shadow-xl transition-all duration-200
                            transform hover:-translate-y-0.5 active:translate-y-0"
                 >
