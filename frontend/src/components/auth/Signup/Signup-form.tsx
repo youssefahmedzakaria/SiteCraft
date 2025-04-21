@@ -76,7 +76,7 @@ export function SignupForm() {
             autoComplete="email"
             required
             disabled={isLoading}
-            className="h-10 px-4 bg-background border border-input hover:border-input/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+            className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
 
@@ -95,7 +95,7 @@ export function SignupForm() {
             autoComplete="new-password"
             required
             disabled={isLoading}
-            className="h-10 px-4 bg-background border border-input hover:border-input/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+            className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
 
@@ -114,7 +114,7 @@ export function SignupForm() {
             autoComplete="new-password"
             required
             disabled={isLoading}
-            className="h-10 px-4 bg-background border border-input hover:border-input/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+            className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
       </div>
@@ -123,7 +123,7 @@ export function SignupForm() {
         type="submit"
         disabled={isLoading}
         className="w-full h-10 text-sm font-medium transition-all duration-200 
-                 bg-primary hover:bg-primary/90 active:bg-primary/80
+                 bg-logo-dark-button hover:bg-logo-dark-button-hover active:dark-button-active
                  text-primary-foreground
                  transform hover:-translate-y-0.5 active:translate-y-0
                  disabled:opacity-50 disabled:pointer-events-none

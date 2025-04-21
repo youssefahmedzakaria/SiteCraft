@@ -10,12 +10,12 @@ export function PricingCards() {
       <h2 className="text-3xl font-bold text-center mb-10">Choose Your Subscription Plan</h2>
       <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         {/* Basic Plan */}
-        <Card>
+        <Card className="border-logo-border">
           <CardHeader>
             <CardTitle>
               <h3 className="text-2xl font-bold">Basic</h3>
               <div className="text-3xl font-bold mt-2">
-                $10<span className="text-lg font-normal">/month</span>
+                100EGP<span className="text-lg font-normal">/month</span>
               </div>
             </CardTitle>
           </CardHeader>
@@ -46,20 +46,20 @@ export function PricingCards() {
                 <span className="text-muted-foreground">Multiple user accounts</span>
               </li>
             </ul>
-            <Button className="w-full">Select Plan</Button>
+            <Button className="w-full bg-logo-dark-button">Select Plan</Button>
           </CardContent>
         </Card>
 
         {/* Pro Plan */}
-        <Card className="relative">
-          <div className="absolute -top-4 right-4 bg-primary px-4 py-1 rounded-full text-sm text-white">
+        <Card className="relative border-logo-border">
+          <div className="absolute -top-4 right-4 bg-logo-dark-button px-4 py-1 rounded-full text-sm text-white">
             Most Popular
           </div>
           <CardHeader>
             <CardTitle>
               <h3 className="text-2xl font-bold">Pro</h3>
               <div className="text-3xl font-bold mt-2">
-                $25<span className="text-lg font-normal">/month</span>
+                300EGP<span className="text-lg font-normal">/month</span>
               </div>
             </CardTitle>
           </CardHeader>
@@ -90,7 +90,7 @@ export function PricingCards() {
                 <span className="text-muted-foreground">Unlimited products</span>
               </li>
             </ul>
-            <Button className="w-full">Select Plan</Button>
+            <Button className="w-full bg-logo-dark-button">Select Plan</Button>
           </CardContent>
         </Card>
       </div>

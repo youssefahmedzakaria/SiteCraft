@@ -13,7 +13,7 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <PricingCards />
+      <PricingCards/>
 
       <div className="mt-16">
         <h2 className="text-2xl font-bold text-center mb-8">All Plans Include</h2>

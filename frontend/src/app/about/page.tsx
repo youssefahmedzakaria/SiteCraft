@@ -34,9 +34,9 @@ export default function AboutPage() {
 
       <div className="grid md:grid-cols-3 gap-8 mb-16">
         {missions.map((mission, index) => (
-          <Card key={index}>
-            <CardContent className="pt-6">
-              <mission.icon className="h-12 w-12 text-primary mb-4" />
+          <Card key={index} className="border-logo-border">
+            <CardContent className="pt-6 ">
+              <mission.icon className="h-12 w-12 text-primary mb-4"/>
               <h3 className="text-xl font-semibold mb-2">{mission.title}</h3>
               <p className="text-muted-foreground">{mission.description}</p>
             </CardContent>

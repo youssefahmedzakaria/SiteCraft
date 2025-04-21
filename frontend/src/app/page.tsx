@@ -17,16 +17,16 @@ export default function HomePage() {
             </div>
             <div className="space-x-4">
               <Link href="/signup">
-                <Button size="lg">Get Started</Button>
+                <Button size="lg" className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">Get Started</Button>
               </Link>
               <Link href="/about">
-                <Button variant="outline" size="lg">Learn More</Button>
+                <Button variant="outline" size="lg" className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border">Learn More</Button>
               </Link>
             </div>
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-logo-colored-bg">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
             <div className="flex flex-col items-center space-y-4 text-center">
