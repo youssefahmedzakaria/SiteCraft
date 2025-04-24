@@ -25,7 +25,6 @@ interface NavbarProps {
   };
   logoText?: string;
 }
-
 const Navbar = ({
   height = "h-16",
   backgroundColor = "bg-white",
@@ -70,7 +69,7 @@ const Navbar = ({
   };
 
   return (
-    <nav className={`${height} ${backgroundColor} ${textColor} ${paddingX} ${fontFamily} w-full sticky top-0 z-50 shadow-md`}>
+    <nav className={`${height} ${backgroundColor} ${paddingX} ${fontFamily} w-full sticky top-0 z-50 shadow-md`}>
       {/* Mobile View */}
       {!hideOnMobile && (
         <div className="h-full flex items-center justify-between md:hidden">
@@ -96,7 +95,7 @@ const Navbar = ({
         {logoPosition === 'left' && (
           <>
             {/* Left Logo */}
-            <div className="flex items-center flex-shrink-0">
+            <div className={`flex items-center flex-shrink-0 ${textColor}`}>
               <Link href="/" className="flex items-center gap-2">
                 {logo?.src && (
                   <Image 
@@ -113,7 +112,7 @@ const Navbar = ({
             
             {/* Centered Search Bar */}
             <div className="flex-1 flex justify-center px-4">
-              <div className={`${searchBarWidth} max-w-xl`}>
+              <div className={`${searchBarWidth} max-w-xl$`}>
                 <SearchBar />
               </div>
             </div>
