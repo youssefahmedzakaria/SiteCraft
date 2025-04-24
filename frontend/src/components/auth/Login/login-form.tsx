@@ -40,9 +40,11 @@ export function LoginForm() {
 
       {loginError && (
         <Alert variant="destructive" className="text-sm">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{loginError}</AlertDescription>
-        </Alert>
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <AlertDescription>{loginError}</AlertDescription>
+          </div>
+        </Alert>  
       )}
       
       <div className="space-y-4">

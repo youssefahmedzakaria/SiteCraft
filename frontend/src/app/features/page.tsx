@@ -68,7 +68,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="container py-16">
+    <div className="container pt-24 pb-16">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Features</h1>
         <p className="text-xl text-muted-foreground">
