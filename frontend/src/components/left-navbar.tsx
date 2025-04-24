@@ -59,7 +59,7 @@ export function LeftNavbar() {
               Customize Template
             </Button>
           </Link>
-          <Link href="/login">
+          <Link href="/dashboard/categories">
             <Button 
               variant="ghost"
               className="w-full text-base text-primary-foreground hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-none flex justify-start pl-4"
@@ -73,7 +73,7 @@ export function LeftNavbar() {
               Categories
             </Button>
           </Link>
-          <Link href="/login">
+          <Link href="/dashboard/products">
             <Button 
               variant="ghost"
               className="w-full text-base text-primary-foreground hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-none flex justify-start pl-4"

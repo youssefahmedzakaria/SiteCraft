@@ -51,17 +51,17 @@ export default function DashboardPage() {
         </div>
         {/* hrizontal */}
         <div className="flex justify-between items-stretch gap-4 mt-4">
-            <div className="flex-1 p-6 border rounded-lg border-logo-border">
+            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
                 <p className="text-lg font-semibold">Total Products</p>
                 <h3 className="text-xl font-bold">245</h3>
                 <p className="text-lg font-semibold">+12 from last month</p>
             </div>
-            <div className="flex-1 p-6 border rounded-lg border-logo-border">
+            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
                 <p className="text-lg font-semibold">Low Stock Items</p>
                 <h3 className="text-xl font-bold">8</h3>
                 <p className="text-lg font-semibold">Needs attention</p>
             </div>
-            <div className="flex-1 p-6 border rounded-lg border-logo-border">
+            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
                 <p className="text-lg font-semibold">Out of Stock</p>
                 <h3 className="text-xl font-bold">3</h3>
                 <p className="text-lg font-semibold">Action required</p>
