@@ -5,7 +5,7 @@ import { Check } from "lucide-react"
 
 export default function PricingPage() {
   return (
-    <div className="container py-16">
+    <div className="container pt-24 pb-16">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
