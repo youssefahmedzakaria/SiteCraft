@@ -24,7 +24,7 @@ export default function CategoriesPage() {
             Manage your product categories and organization
           </h2>
           <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
-            <Link href="/dashboard/categories" className="w-full sm:w-auto">
+            <Link href="/dashboard/categories/add" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
                 <Image
                   src="/icons/plus.svg"
