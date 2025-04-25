@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LeftNavbar } from "@/components/left-navbar";
+import { Sidebar } from "@/components/sidebar/sidebar";
 import Image from "next/image";
 import { Input } from "@/components/ui/input"
 
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen">
-      <LeftNavbar />
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 p-6 ml-80 bg-gray-100">
