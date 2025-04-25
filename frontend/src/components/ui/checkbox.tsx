@@ -28,5 +28,5 @@ function Checkbox({
     </CheckboxPrimitive.Root>
   )
 }
-
 export { Checkbox }
+

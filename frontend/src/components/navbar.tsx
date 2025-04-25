@@ -1,10 +1,8 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
-import { Building2 } from "lucide-react"
+
 
 export function Navbar() {
   const { isAuthenticated, logout } = useAuth()
