@@ -24,7 +24,7 @@ export default function ProductPage() {
           Manage your product inventory and details
           </h2>
           <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
-            <Link href="/dashboard/products" className="w-full sm:w-auto">
+            <Link href="/dashboard/products/add" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
                 <Image
                   src="/icons/plus.svg"
@@ -46,7 +46,7 @@ export default function ProductPage() {
                 width={20}
                 height={20}
               />
-              <span className="ml-2">Import or Products</span>
+              <span className="ml-2">Import or Export</span>
             </Button>
           </div>
         </div>
