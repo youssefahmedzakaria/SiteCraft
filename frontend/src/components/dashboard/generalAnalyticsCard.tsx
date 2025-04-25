@@ -1,4 +1,4 @@
-import { GeneralAnalytic } from '@/lib/categories'
+import { GeneralAnalytic } from '@/lib/generalAnalytics'
 
 export function GeneralAnalyticsCard({ analytic }: { analytic: GeneralAnalytic }) {
     return (

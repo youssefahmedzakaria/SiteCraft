@@ -2,121 +2,107 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import Image from "next/image";
-import { Input } from "@/components/ui/input"
+import { products } from "@/lib/products";
+import { productAnalytics } from "@/lib/generalAnalytics";
+import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
+import { ProductRecord } from "@/components/dashboard/products/productRecord";
+import { SearchBar } from "@/components/ui/searchBar";
+import { ProductTableHeader } from "@/components/dashboard/products/productTableHeader";
 
-export default function DashboardPage() {
+export default function ProductPage() {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-1 p-6 ml-80 bg-gray-100">
-        <h1 className="text-4xl font-bold">
-            Products
-        </h1>
-        {/* hrizontal */}
-        <div className="flex justify-between items-center overflow-x-auto">
-            <h2 className="text-xl font-semibold">
-                Manage your product inventory and details
-            </h2>
-            <div className="space-x-2">
-                <Link href="/signup">
-                    <Button
-                        className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
-                    >
-                        <Image 
-                            src="/icons/plus.svg" 
-                            alt="Add Icon" 
-                            width={20} 
-                            height={20} 
-                        />
-                        Add New Product
-                    </Button>
-                </Link>
-                <Button 
-                    variant="outline"
-                    size="lg" 
-                    className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                >
-                    <Image 
-                        src="/icons/dropdown-colored.svg" 
-                        alt="Dropdown Icon" 
-                        width={20} 
-                        height={20} 
-                    />
-                    Import or Export Products
-                </Button>
-            </div>
-            
-        </div>
-        {/* hrizontal */}
-        <div className="flex justify-between items-stretch gap-4 mt-4">
-            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
-                <p className="text-lg font-semibold">Total Products</p>
-                <h3 className="text-xl font-bold">245</h3>
-                <p className="text-lg font-semibold">+12 from last month</p>
-            </div>
-            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
-                <p className="text-lg font-semibold">Low Stock Items</p>
-                <h3 className="text-xl font-bold">8</h3>
-                <p className="text-lg font-semibold">Needs attention</p>
-            </div>
-            <div className="flex-1 p-6 border rounded-lg border-logo-border bg-white">
-                <p className="text-lg font-semibold">Out of Stock</p>
-                <h3 className="text-xl font-bold">3</h3>
-                <p className="text-lg font-semibold">Action required</p>
-            </div>
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+        <h1 className="text-2xl md:text-3xl font-bold mt-2">Products</h1>
+        
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-4">
+          <h2 className="text-lg md:text-xl font-semibold">
+          Manage your product inventory and details
+          </h2>
+          <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
+            <Link href="/dashboard/products" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                <Image
+                  src="/icons/plus.svg"
+                  alt="Add Icon"
+                  width={20}
+                  height={20}
+                />
+                <span className="ml-2">Add New Product</span>
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="default"
+              className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <Image
+                src="/icons/dropdown-colored.svg"
+                alt="Dropdown Icon"
+                width={20}
+                height={20}
+              />
+              <span className="ml-2">Import or Products</span>
+            </Button>
+          </div>
         </div>
 
-        {/* vertical */}
-        <div className="border-t border-logo-border mt-4">
-            {/* hrizontal */}
-            <div className="flex justify-between items-stretch gap-4 mt-4">
-                {/* Search Bar */}
-                <div className="relative flex-1">
-                    <img 
-                    src="/icons/search-colored.svg" 
-                    alt="Search" 
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none opacity-70"
-                    />
+        {/* Stats cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+          {productAnalytics.map((product) => (
+                    <GeneralAnalyticsCard key={product.id} analytic={product}/>
+                  ))}
+        </div>
 
-                    <Input
-                    id="search"
-                    name="search"
-                    type="search"
-                    placeholder="Search: e.g. Watch"
-                    autoComplete="search"
-                    className="h-10 pl-10 pr-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
-                    />
-                </div>
-                <Button
-                    variant="outline"
-                    size="lg" 
-                    className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                >
-                    <Image 
-                    src="/icons/dropdown-colored.svg" 
-                    alt="Dropdown Icon" 
-                    width={20} 
-                    height={20} 
-                    />
-                    All Categories
-                </Button>
-                <Button 
-                    variant="outline"
-                    size="lg" 
-                    className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                >
-                    <Image 
-                    src="/icons/dropdown-colored.svg" 
-                    alt="Dropdown Icon" 
-                    width={20} 
-                    height={20} 
-                    />
-                    In Stock
-                </Button>
-            </div>
-
+        {/* Search and filters */}
+        <div className="border-t border-logo-border mt-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
+            {/* Search Bar */}
+            <SearchBar placeholder="Search: e.g. Watch"></SearchBar>
+            <Button
+              variant="outline"
+              size="lg" 
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <Image 
+              src="/icons/dropdown-colored.svg" 
+              alt="Dropdown Icon" 
+              width={20} 
+              height={20} 
+              />
+              All Categories
+            </Button>
+            <Button 
+              variant="outline"
+              size="lg" 
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <Image 
+              src="/icons/dropdown-colored.svg" 
+              alt="Dropdown Icon" 
+              width={20} 
+              height={20} 
+              />
+              In Stock
+            </Button>
+          </div>
+          
+          {/* Product listing table (responsive) */}
+          <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+            <table className="min-w-full divide-y divide-logo-border">
+              <ProductTableHeader/>
+              <tbody className="bg-white divide-y divide-logo-border">
+                {/* Sample product rows */}
+                {products.map((product) => (
+                  <ProductRecord key={product.id} product={product} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>

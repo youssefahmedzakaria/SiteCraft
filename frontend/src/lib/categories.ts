@@ -36,31 +36,3 @@ export const categories: Category[] = [
     status: 'Empty',
   },
 ]
-
-export interface GeneralAnalytic{
-    id: string
-    title: string
-    value: string
-    subtitle: string
-}
-
-export const categoryAnalytics: GeneralAnalytic[] = [
-  {
-    id: '1',
-    title: 'Total Categories',
-    value: '12',
-    subtitle: '+3 from last month',
-  },
-  {
-    id: '2',
-    title: 'Most Popular',
-    value: 'Electronics',
-    subtitle: '64 products',
-  },
-  {
-    id: '3',
-    title: 'Empty Categories',
-    value: '1',
-    subtitle: 'Action suggested',
-  },
-]

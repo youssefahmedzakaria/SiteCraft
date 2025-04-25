@@ -1,25 +1,32 @@
 import { Button } from '@/components/ui/button'
-import { Category } from '@/lib/categories'
+import { Product } from '@/lib/products'
 
-export function CategoryRecord({ category }: { category: Category }) {
+
+export function ProductRecord({ product }: { product: Product }) {
     return (
     <tr>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
             <div className="flex items-center">
             <div className="text-sm font-medium text-gray-900">
-                {category.title}
+                {product.id}
             </div>
             </div>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-500">{category.numOfProducts}</div>
+            <div className="text-sm text-gray-500">{product.name}</div>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-            <div className="text-sm text-gray-500">{category.numOfProducts}</div>
+            <div className="text-sm text-gray-500">{product.category}</div>
+        </td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+            <div className="text-sm text-gray-500">{product.price}</div>
+        </td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+            <div className="text-sm text-gray-500">{product.stock}</div>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${category.status === 'Active' ? 'bg-green-100 text-green-800' :"bg-yellow-100 text-yellow-800" }`}>
-            {category.status}
+            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' :"bg-yellow-100 text-yellow-800" }`}>
+            {product.status}
             </span>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">

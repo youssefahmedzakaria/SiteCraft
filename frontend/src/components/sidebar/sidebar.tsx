@@ -64,7 +64,7 @@ export function Sidebar() {
         {/* Navigation Links */}
         <nav className="flex flex-col space-y-2 mt-6">
           {sidebarElements.map((element) => (
-            <Link href="/login" onClick={() => setIsOpen(false)}>
+            <Link key={element.id} href={element.destination} onClick={() => setIsOpen(false)}>
               <SidebarElementComponent key={element.id} element={element}/>
             </Link>
           ))}

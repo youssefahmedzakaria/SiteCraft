@@ -2,10 +2,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import Image from "next/image";
-import { categories, categoryAnalytics } from "@/lib/categories";
+import { categories } from "@/lib/categories";
+import { categoryAnalytics } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
 import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord";
 import { SearchBar } from "@/components/ui/searchBar";
+import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader";
 
 export default function CategoriesPage() {
   return (
@@ -60,7 +62,7 @@ export default function CategoriesPage() {
         <div className="border-t border-logo-border mt-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
-            <SearchBar placeholder="Search categories..."></SearchBar>
+            <SearchBar placeholder="Search: e.g. Home & Kitchen"></SearchBar>
             <Button
               variant="outline"
               size="lg"
@@ -79,40 +81,7 @@ export default function CategoriesPage() {
           {/* Category listing table (responsive) */}
           <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
-              <thead className="bg-logo-light-button">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"
-                  >
-                    Category
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"
-                  >
-                    Products
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell"
-                  >
-                    Created At
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+              <CategoryTableHeader/>
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample category rows */}
                 {categories.map((category) => (
