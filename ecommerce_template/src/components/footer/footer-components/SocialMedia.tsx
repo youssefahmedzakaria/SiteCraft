@@ -22,7 +22,7 @@ export const SocialMedia = ({ socialMedia, styles, textColor }: SocialMediaProps
   };
 
   return (
-    <div className="flex gap-6">
+    <div className="flex gap-4 md:gap-6">
       {Object.entries(socialMedia).map(([platform, url]) => {
         if (!url) return null;
         

@@ -15,12 +15,12 @@ interface AboutLinksProps {
 
 export const AboutLinks = ({ links }: AboutLinksProps) => {
   return (
-    <div className="flex flex-none justify-center items-center gap-8 md:gap-8 w-full md:w-auto">
+    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8 w-full">
       {links.map((link, index) => (
         <Link 
           key={index} 
           href={link.href}
-          className={`hover:underline ${link.font} ${link.fontSize} ${link.fontWeight} ${link.fontColor} hover:${link.fontColor}/80`}
+          className={`hover:underline text-center ${link.font} ${link.fontSize} ${link.fontWeight} ${link.fontColor} hover:${link.fontColor}/80`}
         >
           {link.label}
         </Link>

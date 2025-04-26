@@ -1,8 +1,7 @@
-import { CompanyLogo } from "../components/footer/CompanyLogo";
-import { AboutLinks } from "../components/footer/AboutLinks";
-import { SocialMedia } from "../components/footer/SocialMedia";
-import { Copyright } from "../components/footer/Copyright";
-
+import { CompanyLogo } from "../footer/footer-components/CompanyLogo";
+import { AboutLinks } from"../footer/footer-components/AboutLinks";
+import { Copyright } from "../footer/footer-components/Copyright";
+import { SocialMedia } from "../footer/footer-components/SocialMedia";
 interface FooterProps {
   backgroundColor?: string;
   textColor?: string;
@@ -59,7 +58,7 @@ export const Footer = ({
       label: "Contact Us", 
       href: "/contact",
       font: "font-sans",
-      fontSize: "text-base",
+      fontSize: "text-sm md:text-base",
       fontWeight: "font-normal",
       fontColor: "text-gray-700"
     },
@@ -67,7 +66,7 @@ export const Footer = ({
       label: "About Us", 
       href: "/about",
       font: "font-sans",
-      fontSize: "text-base",
+      fontSize: "text-sm md:text-base",
       fontWeight: "font-normal",
       fontColor: "text-gray-700"
     },
@@ -75,7 +74,7 @@ export const Footer = ({
       label: "Policies", 
       href: "/policies",
       font: "font-sans",
-      fontSize: "text-base",
+      fontSize: "text-sm md:text-base",
       fontWeight: "font-normal",
       fontColor: "text-gray-700"
     }
@@ -95,28 +94,28 @@ export const Footer = ({
   },
   copyrightStyles = {
     font: "font-sans",
-    fontSize: "text-sm",
+    fontSize: "text-xs md:text-sm",
     fontWeight: "font-normal",
     fontColor: "text-gray-600"
   },
   copyrightText = `© ${new Date().getFullYear()} ${companyName}`
 }: FooterProps) => {
   return (
-    <div className={`py-12 px-4 md:px-8 lg:px-16 ${backgroundColor} mt-24`}>
+    <div className={`py-8 md:py-12 px-4 md:px-8 lg:px-16 ${backgroundColor} mt-12 md:mt-24`}>
       {/* Main content row */}
-      <div className="flex flex-col md:flex-row items-center justify-between w-full">
-        {/* Left - Logo */}
-        <div className="w-full md:w-auto md:flex-1 flex justify-start">
+      <div className="flex flex-col items-center md:flex-row justify-between w-full gap-6 md:gap-0">
+        {/* Left - Logo - Centered on mobile */}
+        <div className="w-full flex justify-center md:justify-start md:flex-1">
           <CompanyLogo logo={companyLogo} name={companyName} textColor={textColor} />
         </div>
         
-        {/* Center - Navigation Links */}
-        <div className="w-full md:w-auto md:flex-1 flex justify-center">
+        {/* Center - Navigation Links - Stacked on mobile */}
+        <div className="w-full flex justify-center md:flex-1">
           <AboutLinks links={aboutLinks} />
         </div>
         
-        {/* Right - Social Media */}
-        <div className="w-full md:w-auto md:flex-1 flex justify-end">
+        {/* Right - Social Media - Centered on mobile */}
+        <div className="w-full flex justify-center md:justify-end md:flex-1">
           <SocialMedia 
             socialMedia={socialMedia} 
             styles={{
@@ -129,12 +128,12 @@ export const Footer = ({
         </div>
       </div>
 
-      {/* Copyright */}
+      {/* Copyright - Adjusted for mobile */}
       <Copyright 
         text={copyrightText}
         styles={{
           font: copyrightStyles.font || "font-sans",
-          fontSize: copyrightStyles.fontSize || "text-sm",
+          fontSize: copyrightStyles.fontSize || "text-xs md:text-sm",
           fontWeight: copyrightStyles.fontWeight || "font-normal",
           fontColor: copyrightStyles.fontColor || "text-gray-600"
         }}
