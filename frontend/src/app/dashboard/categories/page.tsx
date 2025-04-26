@@ -15,9 +15,9 @@ export default function CategoriesPage() {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-6 bg-gray-100 min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold mt-2">Categories</h1>
-        
+
         {/* Header section */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-4">
           <h2 className="text-lg md:text-xl font-semibold">
@@ -54,8 +54,8 @@ export default function CategoriesPage() {
         {/* Stats cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
           {categoryAnalytics.map((category) => (
-                    <GeneralAnalyticsCard key={category.id} analytic={category}/>
-                  ))}
+            <GeneralAnalyticsCard key={category.id} analytic={category} />
+          ))}
         </div>
 
         {/* Search and filters */}
@@ -77,11 +77,11 @@ export default function CategoriesPage() {
               <span className="ml-2">Sort By: Newest</span>
             </Button>
           </div>
-          
+
           {/* Category listing table (responsive) */}
           <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
-              <CategoryTableHeader/>
+              <CategoryTableHeader />
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample category rows */}
                 {categories.map((category) => (

@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
@@ -12,7 +11,7 @@ import { SizeVariationSection } from "@/components/dashboard/products/add/sizeVa
 import { ColorVariationSection } from "@/components/dashboard/products/add/colorVariationSection";
 
 export default function AddProductPage() {
-    const [activeTab, setActiveTab] = useState<"Product's Overview" | "Product's Options and Variations">("Product's Options and Variations");
+    const [activeTab, setActiveTab] = useState<"Product's Overview" | "Product's Options and Variations">("Product's Overview");
     const tabs = ["Product's Overview", "Product's Options and Variations"];
 
   return (
