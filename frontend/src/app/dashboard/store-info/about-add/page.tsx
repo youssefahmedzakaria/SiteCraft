@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AddAboutSectionPage() {
   const router = useRouter();
@@ -15,8 +17,10 @@ export default function AddAboutSectionPage() {
     type: "Text",
     status: "Visible"
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -26,12 +30,29 @@ export default function AddAboutSectionPage() {
     }));
   };
 
+  const handleSelectClick = (field: string) => {
+    if (field === 'type') {
+      setTypeDropdownOpen(prev => !prev);
+    } else if (field === 'status') {
+      setStatusDropdownOpen(prev => !prev);
+    }
+  };
+
+  const handleSelectBlur = (field: string) => {
+    setTimeout(() => {
+      if (field === 'type') {
+        setTypeDropdownOpen(false);
+      } else if (field === 'status') {
+        setStatusDropdownOpen(false);
+      }
+    }, 200);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // API
       console.log("Submitting about section:", formData);
       router.push("/dashboard/store-info");
     } catch (error) {
@@ -45,15 +66,14 @@ export default function AddAboutSectionPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         <div className="flex items-center mb-6">
-          <Link href="/dashboard/store-info" className="mr-4">
+          {/* <Link href="/dashboard/store-info" className="mr-4">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-          </Link>
+          </Link> */}
           <h1 className="text-2xl md:text-3xl font-bold">Add About Section</h1>
         </div>
 
@@ -61,34 +81,37 @@ export default function AddAboutSectionPage() {
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                Title
+                Title <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
+              <Input
                 id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logo-dark-button focus:border-logo-dark-button"
                 placeholder="Section Title"
               />
+              <p className="text-xs text-gray-400 mt-1">
+                The title will be displayed to your customers.
+              </p>
             </div>
 
             <div className="mb-6">
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
-              <textarea
+              <Textarea
                 id="content"
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logo-dark-button focus:border-logo-dark-button"
                 placeholder="Section Content"
-              ></textarea>
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                A detailed description for this section that will appear on your store.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -96,53 +119,75 @@ export default function AddAboutSectionPage() {
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
                   Section Type
                 </label>
-                <select
-                  id="type"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logo-dark-button focus:border-logo-dark-button"
-                >
-                  <option value="Text">Text</option>
-                  <option value="Image">Image</option>
-                  <option value="Mission">Mission</option>
-                  <option value="Team">Team</option>
-                  <option value="History">History</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    onClick={() => handleSelectClick('type')}
+                    onBlur={() => handleSelectBlur('type')}
+                    required
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
+                  >
+                    <option value="Text">Text</option>
+                    <option value="Image">Image</option>
+                    <option value="Mission">Mission</option>
+                    <option value="Team">Team</option>
+                    <option value="History">History</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    {typeDropdownOpen ? (
+                      <ChevronUp className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                   Visibility Status
                 </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logo-dark-button focus:border-logo-dark-button"
-                >
-                  <option value="Visible">Visible</option>
-                  <option value="Hidden">Hidden</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    onClick={() => handleSelectClick('status')}
+                    onBlur={() => handleSelectBlur('status')}
+                    required
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
+                  >
+                    <option value="Visible">Visible</option>
+                    <option value="Hidden">Hidden</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    {statusDropdownOpen ? (
+                      <ChevronUp className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <Link href="/dashboard/store-info">
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </Link>
-              <Button 
-                type="submit" 
+            <div className="flex justify-start space-x-4">
+              <Button
+                type="submit"
                 className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : "Save Section"}
               </Button>
+              <Link href="/dashboard/store-info">
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
             </div>
           </form>
         </div>
