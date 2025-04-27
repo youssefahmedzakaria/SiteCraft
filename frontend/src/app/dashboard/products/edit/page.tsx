@@ -11,7 +11,7 @@ import { SizeVariationSection } from "@/components/dashboard/products/add/sizeVa
 import { ColorVariationSection } from "@/components/dashboard/products/add/colorVariationSection";
 import { StockManagementSection } from "@/components/dashboard/products/add/stockManagement";
 
-export default function AddProductPage() {
+export default function EditProductPage() {
     const [activeTab, setActiveTab] = useState<"Product's Overview" | "Product's Options and Variations" | "Stock Management">("Product's Overview");
     const tabs = ["Product's Overview", "Product's Options and Variations", "Stock Management"];
 
@@ -22,7 +22,7 @@ export default function AddProductPage() {
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
 
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">Add New Product</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mt-2">Edit Product</h1>
         <p className="text-gray-500 mt-2 mb-6">Create a new product for your store</p>
 
         <div className="flex mb-1 ml-3">
@@ -59,7 +59,7 @@ export default function AddProductPage() {
                     <>
                         <div className="mb-2">
                             <CardTitle className="font-bold text-2xl">Options and Variations</CardTitle>
-                            <p className="text-gray-500">Add product options that your customers can choose from on the product page.</p>
+                            <p className="text-gray-500">Edit product options that your customers can choose from on the product page.</p>
                         </div>
 
                         <SizeVariationSection/>

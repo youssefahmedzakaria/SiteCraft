@@ -4,17 +4,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
-import CategorysOverview from "@/components/dashboard/categories/add/categoriesOverview";
+import CategorysOverview from "@/components/dashboard/categories/edit/categoriesOverview";
 import AssignProducts from "@/components/dashboard/categories/add/assignProducts";
 
 
-export default function AddCategoryPage() {
+export default function EditCategoryPage() {
   const [activeTab, setActiveTab] = useState<
     "Category's Overview" | "Assign Products"
   >("Category's Overview");
   const tabs = ["Category's Overview", "Assign Products"];
-
-  
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -23,10 +21,10 @@ export default function AddCategoryPage() {
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         <h1 className="text-2xl md:text-3xl font-bold mt-2">
-          Add New Category
+          Edit Category
         </h1>
         <p className="text-gray-500 mt-2 mb-6">
-          Create a new product category for your store
+            Edit the details of the category and assign products to it.
         </p>
 
         <div className="flex mb-1 ml-3">
@@ -62,7 +60,7 @@ export default function AddCategoryPage() {
                   type="submit"
                   className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
                 >
-                  Save Category
+                  Save Changes
                 </Button>
                 <Link href="/dashboard/categories">
                   <Button
