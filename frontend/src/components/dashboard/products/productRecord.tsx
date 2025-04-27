@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Product } from '@/lib/products'
+import Link from 'next/link'
 
 
 export function ProductRecord({ product }: { product: Product }) {
@@ -30,12 +31,14 @@ export function ProductRecord({ product }: { product: Product }) {
             </span>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-            <Button
-            variant="ghost"
-            className="text-blue-600 hover:text-blue-900"
-            >
-            Edit
-            </Button>
+            <Link href="/dashboard/products/edit">
+                <Button
+                variant="ghost"
+                className="text-blue-600 hover:text-blue-900"
+                >
+                Edit
+                </Button>
+            </Link>
             <Button
             variant="ghost"
             className="text-red-600 hover:text-red-900"
