@@ -8,6 +8,7 @@ import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCar
 import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord";
 import { SearchBar } from "@/components/ui/searchBar";
 import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader";
+import { Dropdown } from "@/components/ui/dropdown";
 
 export default function CategoriesPage() {
   return (
@@ -63,19 +64,7 @@ export default function CategoriesPage() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
             <SearchBar placeholder="Search: e.g. Home & Kitchen"></SearchBar>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-            >
-              <Image
-                src="/icons/dropdown-colored.svg"
-                alt="Dropdown Icon"
-                width={20}
-                height={20}
-              />
-              <span className="ml-2">Sort By: Newest</span>
-            </Button>
+            <Dropdown dropdownName="Sort by" defaultValue="Newest" dropdownOptions={["Newest", "Oldest", "Name (A to Z)", "Name (Z to A)", "Products (Asc)", "Products (Desc)"]}></Dropdown>
           </div>
 
           {/* Category listing table (responsive) */}
