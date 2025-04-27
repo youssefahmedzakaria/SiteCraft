@@ -11,7 +11,7 @@ export interface Template {
 
 export function TemplateCard({ template }: { template: Template }) {
   return (
-    <div className="border border-logo-border rounded-lg overflow-hidden shadow-sm bg-background">
+    <div className="border border-logo-border rounded-lg overflow-hidden shadow-sm bg-background transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
       <div className="relative w-full h-40">
         <Image
           src={template.imageUrl}
