@@ -2,7 +2,7 @@ import { Input } from "./input";
 
 export function SearchBar({ placeholder }: { placeholder: string }) {
     return (
-        <div className="flex-1 relative">
+        <div className="relative flex-1">
             <img
             src="/icons/search-colored.svg"
             alt="Search"
