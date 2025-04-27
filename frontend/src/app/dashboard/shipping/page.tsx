@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
@@ -5,8 +6,25 @@ import Image from "next/image";
 import { shippingTableHeader as ShippingTableHeader } from "@/components/dashboard/shipping/shippingTableHeader";
 import { ShippingRecord } from "@/components/dashboard/shipping/shippingRecord";
 import { shippings } from "@/lib/shipping";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 export default function ShippingPage() {
+    const [file, setFile] = useState<File | null>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = event.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            console.log("File selected:", selectedFile.name);
+        }
+    };
+
     return (
         <div className="flex min-h-screen bg-gray-100">
             <Sidebar />
@@ -38,19 +56,40 @@ export default function ShippingPage() {
                                     <span className="ml-2">Add New Location</span>
                                 </Button>
                             </Link>
-                            <Button
-                                variant="outline"
-                                size="default"
-                                className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                            >
-                                <Image
-                                    src="/icons/upload (1).svg"
-                                    alt="Upload Icon"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className="ml-2">Import Shipping Data</span>
-                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                                    >
+                                        <span className="ml-2">Import or Export Categories</span>
+                                        <Image
+                                            src="/icons/dropdown-colored.svg"
+                                            alt="Dropdown Icon"
+                                            width={20}
+                                            height={20}
+                                        />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem>
+                                        <label htmlFor="import-file">
+                                            Import Shipping Locations from Excell Sheet
+                                        </label>
+                                        <input
+                                            id="import-file"
+                                            type="file"
+                                            accept=".xlsx,.xls,.csv"
+                                            onChange={handleFileChange}
+                                            style={{ display: "none" }}
+                                        />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => console.log(file)}>
+                                        Export All Shipping Locations
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                     <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">

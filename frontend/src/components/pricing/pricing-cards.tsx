@@ -129,7 +129,7 @@ export function PricingCards() {
           <Card className="border-logo-border h-full hover:border-primary/50 hover:shadow-md transition-all duration-300">
             <CardHeader>
               <CardTitle>
-                <div className="flex items-center">
+                <div className="flex justify-between items-center">
                   <h3 className="text-2xl font-bold">Pro</h3>
                   <div className="ml-3 bg-primary text-primary-foreground rounded-full px-3 py-0.5 text-xs font-medium shadow-sm flex items-center">
                     <Star className="h-3 w-3 mr-1 fill-current" />

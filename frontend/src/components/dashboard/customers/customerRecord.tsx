@@ -1,25 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Customer } from "@/lib/customers";
 import { useState } from "react";
-import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog";
+import { SuspendConfirmationDialog } from "@/components/ui/SuspendConfirmationDialog";
 import Link from "next/link";
 
 export function CustomerRecord({ customer }: { customer: Customer }) {
     const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
 
     const handleSuspendCustomer = () => {
-        // In a real app, this would make an API call
-        console.log("Suspending customer:", customer.id);
+        // Logic to suspend the customer goes here
+        console.log(`Suspending customer: ${customer.name}`);
         setSuspendDialogOpen(false);
     };
 
-    const getInitials = (name: string) => {
-        return name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase();
-    };
 
     return (
         <tr>
@@ -29,9 +22,6 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
 
             <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-2/12">
                 <div className="flex items-center justify-center">
-                    <div className="h-8 w-8 mr-2 rounded-full flex items-center justify-center bg-logo-light-button text-logo-txt">
-                        {getInitials(customer.name)}
-                    </div>
                     <div className="text-sm font-medium">{customer.name}</div>
                 </div>
             </td>
@@ -83,13 +73,12 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
             </td>
 
             {/* Suspend Confirmation Dialog */}
-            <DeleteConfirmationDialog
+            <SuspendConfirmationDialog
                 isOpen={suspendDialogOpen}
                 onClose={() => setSuspendDialogOpen(false)}
                 onConfirm={handleSuspendCustomer}
-                title="Suspend Customer"
-                description="Are you sure you want to suspend this customer? They will no longer be able to place orders or access their account."
-                itemName={`${customer.name} (${customer.email})`}
+                customerName={customer.name}
+                customerEmail={customer.email}
             />
         </tr>
     );
