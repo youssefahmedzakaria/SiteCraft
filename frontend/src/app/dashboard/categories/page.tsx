@@ -1,3 +1,5 @@
+// dropdown-menu.tsx
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
@@ -8,8 +10,59 @@ import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCar
 import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord";
 import { SearchBar } from "@/components/ui/searchBar";
 import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader";
-
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 export default function CategoriesPage() {
+  const [sortType, setSortType] = useState<
+    | "newest"
+    | "oldest"
+    | "nameAsc"
+    | "nameDesc"
+    | "productsAsc"
+    | "productsDesc"
+  >("newest");
+
+  const handleSortChange = (
+    type:
+      | "newest"
+      | "oldest"
+      | "nameAsc"
+      | "nameDesc"
+      | "productsAsc"
+      | "productsDesc"
+  ) => {
+    setSortType(type);
+  };
+
+  // sort categories based on the selected type
+  const sortedCategories = categories.sort((a, b) => {
+    switch (sortType) {
+      case "newest":
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case "nameAsc":
+        return a.title.localeCompare(b.title); // Sort by name A to Z
+      case "nameDesc":
+        return b.title.localeCompare(a.title); // Sort by name Z to A
+      case "productsAsc":
+        return a.numOfProducts - b.numOfProducts; // Sort by number of products ascending
+      case "productsDesc":
+        return b.numOfProducts - a.numOfProducts; // Sort by number of products descending
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
@@ -63,19 +116,61 @@ export default function CategoriesPage() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
             <SearchBar placeholder="Search: e.g. Home & Kitchen"></SearchBar>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-            >
-              <Image
-                src="/icons/dropdown-colored.svg"
-                alt="Dropdown Icon"
-                width={20}
-                height={20}
-              />
-              <span className="ml-2">Sort By: Newest</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                >
+                  <span className="ml-2">
+                    Sort By:{" "}
+                    {sortType === "newest"
+                      ? "Newest"
+                      : sortType === "oldest"
+                      ? "Oldest"
+                      : sortType === "nameAsc"
+                      ? "Name (A to Z)"
+                      : sortType === "nameDesc"
+                      ? "Name (Z to A)"
+                      : sortType === "productsAsc"
+                      ? "Products (Asc)"
+                      : "Products (Desc)"}
+                  </span>
+
+                  <Image
+                    src="/icons/dropdown-colored.svg"
+                    alt="Dropdown Icon"
+                    width={20}
+                    height={20}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleSortChange("newest")}>
+                  Newest
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("oldest")}>
+                  Oldest
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("nameAsc")}>
+                  Name (A to Z)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("nameDesc")}>
+                  Name (Z to A)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleSortChange("productsAsc")}
+                >
+                  Products (Asc)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleSortChange("productsDesc")}
+                >
+                  Products (Desc)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Category listing table (responsive) */}
@@ -84,7 +179,7 @@ export default function CategoriesPage() {
               <CategoryTableHeader />
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample category rows */}
-                {categories.map((category) => (
+                {sortedCategories.map((category) => (
                   <CategoryRecord key={category.id} category={category} />
                 ))}
               </tbody>
