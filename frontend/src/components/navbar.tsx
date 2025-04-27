@@ -3,15 +3,14 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
 
-
 export function Navbar() {
   const { isAuthenticated, logout } = useAuth()
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-8">
-        <Link 
+        <div className="flex items-center gap-4 sm:gap-8">
+          <Link 
             href="/" 
             className="flex items-center space-x-2 transition-colors hover:opacity-90"
           >
@@ -28,7 +27,7 @@ export function Navbar() {
                 alt="SiteCraft" 
                 width={120} 
                 height={24} 
-                className="h-18 w-auto lg-2 object-contain"
+                className="h-18 w-auto ml-2 object-contain hidden sm:block"
               />
             </div>
           </Link>
@@ -56,7 +55,7 @@ export function Navbar() {
             </Link>
           </nav>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center">
           {isAuthenticated ? (
             <Button 
               variant="ghost" 
@@ -66,16 +65,17 @@ export function Navbar() {
               Logout
             </Button>
           ) : (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Link href="/login">
                 <Button 
                   variant="ghost"
-                  className="font-medium text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover transition-colors"
+                  size="sm"
+                  className="font-medium text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover transition-colors sm:size-md"
                 >
                   Login
                 </Button>
               </Link>
-              <Link href="/signup">
+              <Link href="/signup" className="hidden sm:block">
                 <Button
                   className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
                 >
@@ -88,4 +88,4 @@ export function Navbar() {
       </div>
     </header>
   )
-} 
+}

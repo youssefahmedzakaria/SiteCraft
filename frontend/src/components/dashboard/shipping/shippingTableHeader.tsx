@@ -3,34 +3,34 @@ export function shippingTableHeader() {
         <thead className="bg-logo-light-button">
             <tr>
                 <th
-                scope="col"
-                className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider w-1/12"
+                    scope="col"
+                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-1/12"
                 >
-                ID
+                    ID
                 </th>
                 <th
-                scope="col"
-                className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
+                    scope="col"
+                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
                 >
-                Governorate Name
+                    Governorate Name
                 </th>
                 <th
-                scope="col"
-                className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell w-2/12"
+                    scope="col"
+                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell w-2/12"
                 >
-                Price
+                    Price
                 </th>
                 <th
-                scope="col"
-                className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell w-3/12"
+                    scope="col"
+                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell w-3/12"
                 >
-                Estimated Delivery Days
+                    Estimated Delivery Days
                 </th>
                 <th
-                scope="col"
-                className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
+                    scope="col"
+                    className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
                 >
-                Actions
+                    Actions
                 </th>
             </tr>
         </thead>
