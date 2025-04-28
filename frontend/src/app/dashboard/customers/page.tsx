@@ -33,8 +33,12 @@ export default function CustomersPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Customers</h1>
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 min-h-screen">
+        {/* Header section with title and subtitle */}
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">Customers</h1>
+          <h2 className="text-lg md:text-xl font-semibold mt-2 text-gray-600">Manage your customer relationships and accounts</h2>
+        </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -83,23 +87,29 @@ export default function CustomersPage() {
             </div>
             <div className="flex gap-2">
               <Button
-                variant={statusFilter === "All" ? "default" : "outline"}
+                variant="outline"
                 onClick={() => setStatusFilter("All")}
-                className={statusFilter === "All" ? "bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover" : ""}
+                className={statusFilter === "All" 
+                  ? "bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover" 
+                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
               >
                 All
               </Button>
               <Button
-                variant={statusFilter === "Active" ? "default" : "outline"}
+                variant="outline"
                 onClick={() => setStatusFilter("Active")}
-                className={statusFilter === "Active" ? "bg-green-600 hover:bg-green-700" : ""}
+                className={statusFilter === "Active" 
+                  ? "bg-green-600 text-white hover:bg-green-700" 
+                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
               >
                 Active
               </Button>
               <Button
-                variant={statusFilter === "Suspended" ? "default" : "outline"}
+                variant="outline"
                 onClick={() => setStatusFilter("Suspended")}
-                className={statusFilter === "Suspended" ? "bg-red-600 hover:bg-red-700" : ""}
+                className={statusFilter === "Suspended" 
+                  ? "bg-red-600 text-white hover:bg-red-700" 
+                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
               >
                 Suspended
               </Button>
@@ -107,29 +117,27 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        {/* Customers table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <CustomerTableHeader />
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCustomers.length > 0 ? (
-                  filteredCustomers.map((customer) => (
-                    <CustomerRecord key={customer.id} customer={customer} />
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-10 text-center text-gray-500"
-                    >
-                      No customers found matching your search criteria.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Customers table  */}
+        <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+          <table className="min-w-full divide-y divide-logo-border">
+            <CustomerTableHeader />
+            <tbody className="bg-white divide-y divide-logo-border">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer) => (
+                  <CustomerRecord key={customer.id} customer={customer} />
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-6 py-10 text-center text-gray-500"
+                  >
+                    No customers found matching your search criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>
