@@ -17,7 +17,7 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
     return (
         <tr>
             <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-1/12">
-                <div className="text-sm font-medium text-gray-900">#{customer.id}</div>
+                <div className="text-sm font-medium text-gray-900">{customer.id}</div>
             </td>
 
             <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-2/12">
