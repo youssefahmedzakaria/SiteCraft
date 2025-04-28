@@ -43,11 +43,14 @@ export function CategoryRecord({ category }: { category: Category }) {
           </span>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-        <Link href="/dashboard/categories/edit" className="w-full sm:w-auto">
-          <Button variant="ghost" className="text-blue-600 hover:text-blue-900">
-            Edit
-          </Button>
-        </Link>
+          <Link href="/dashboard/categories/edit" className="w-full sm:w-auto">
+            <Button
+              variant="ghost"
+              className="text-blue-600 hover:text-blue-900"
+            >
+              Edit
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             className="text-red-600 hover:text-red-900"

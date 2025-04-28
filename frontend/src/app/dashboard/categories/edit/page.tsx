@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import CategorysOverview from "@/components/dashboard/categories/edit/categoriesOverview";
 import AssignProducts from "@/components/dashboard/categories/add/assignProducts";
 
-
 export default function EditCategoryPage() {
   const [activeTab, setActiveTab] = useState<
     "Category's Overview" | "Assign Products"
@@ -20,11 +19,9 @@ export default function EditCategoryPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">
-          Edit Category
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold mt-2">Edit Category</h1>
         <p className="text-gray-500 mt-2 mb-6">
-            Edit the details of the category and assign products to it.
+          Edit the details of the category and assign products to it.
         </p>
 
         <div className="flex mb-1 ml-3">
@@ -46,13 +43,9 @@ export default function EditCategoryPage() {
         <Card className="bg-white">
           <CardContent className="py-2">
             <form className="space-y-6">
-              {activeTab === "Category's Overview" && (
-                  <CategorysOverview />
-              )}
+              {activeTab === "Category's Overview" && <CategorysOverview />}
 
-              {activeTab === "Assign Products" && (
-                  <AssignProducts />
-              )}
+              {activeTab === "Assign Products" && <AssignProducts />}
 
               {/* Form Actions */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
