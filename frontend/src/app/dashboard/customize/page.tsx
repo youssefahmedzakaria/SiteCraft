@@ -1,138 +1,16 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, DragEvent } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Paintbrush,
-} from "lucide-react";
+import { Paintbrush } from "lucide-react";
 import { Sidebar } from "@/components/dashboard/customize/sidebar";
 
+
 export default function CustomizeTemplatePage() {
-  const [selectedTab, setSelectedTab] = useState("desktop");
+  const [selectedTab, setSelectedTab] = useState<
+    "desktop" | "tablet" | "mobile"
+  >("desktop");
 
-  // Define sections in an array to make them orderable
-  const [sections, setSections] = useState([
-    {
-      id: "Header&Menu",
-      title: "Header & Menu",
-      icon: <Paintbrush size={18} />,
-      expanded: false,
-    },
-  ]);
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [draggedSectionIndex, setDraggedSectionIndex] = useState(null);
-
-  // New state for the detailed section view
-  const [detailedSection, setDetailedSection] = useState(null);
-  const [detailedSectionTab, setDetailedSectionTab] = useState("content");
-
-  // Reference for section DOM elements
-  const sectionRefs = useRef({});
-
-  // Modified section to make the entire section clickable
-  const toggleSection = (sectionId) => {
-    // For Header&Menu section, instead of toggling expansion, open the detailed view
-    if (sectionId === "Header&Menu") {
-      const section = sections.find((s) => s.id === sectionId);
-      openDetailedSection(section);
-      return;
-    }
-
-    // For other sections, keep the original toggle behavior
-    setSections(
-      sections.map((section) =>
-        section.id === sectionId
-          ? { ...section, expanded: !section.expanded }
-          : section
-      )
-    );
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // New function to open detailed section view
-  const openDetailedSection = (section) => {
-    setDetailedSection(section);
-    setDetailedSectionTab("content");
-  };
-
-  // New function to close detailed section view
-  const closeDetailedSection = () => {
-    setDetailedSection(null);
-  };
-
-  // Drag and drop handlers
-  const handleDragStart = (e, index) => {
-    setDraggedSectionIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = (e) => {
-    if (
-      draggedSectionIndex !== null &&
-      sectionRefs.current[sections[draggedSectionIndex].id]
-    ) {
-      sectionRefs.current[sections[draggedSectionIndex].id].classList.remove(
-        "opacity-50"
-      );
-    }
-    setDraggedSectionIndex(null);
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-
-    if (draggedSectionIndex === null) return;
-    if (draggedSectionIndex === dropIndex) return;
-
-    const newSections = [...sections];
-    const draggedSection = newSections[draggedSectionIndex];
-
-    // Remove the dragged item
-    newSections.splice(draggedSectionIndex, 1);
-
-    // Add it at the new position
-    newSections.splice(dropIndex, 0, draggedSection);
-
-    setSections(newSections);
-    setDraggedSectionIndex(null);
-  };
-
-  // Render section content based on section ID
-  const renderSectionContent = (section) => {
-    switch (section.id) {
-      case "Header&Menu":
-        return <></>;
-      default:
-        return null;
-    }
-  };
-
-  // Render detailed section content
-  const renderDetailedSectionContent = () => {
-    if (!detailedSection) return null;
-
-    if (detailedSectionTab === "content") {
-      return (
-        <div className="p-4">
-
-        </div>
-      );
-    } else if (detailedSectionTab === "design") {
-      return (
-        <div className="p-4">
-          
-        </div>
-      );
-    }
-  };
+  
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
@@ -204,9 +82,10 @@ export default function CustomizeTemplatePage() {
             <div className="text-center text-gray-500">
               <div className="mb-2">Preview Area</div>
               <div className="text-sm">
-                {detailedSection
-                  ? `Editing ${detailedSection.title}`
-                  : "Customize your template"}
+                {/* {detailedSection
+                  ? `Editing ${detailedSection.title}`: " */}
+                  Customize your template
+                {/* "} */}
               </div>
             </div>
           </div>

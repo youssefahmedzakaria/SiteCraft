@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, DragEvent } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -11,38 +11,75 @@ import {
 } from "lucide-react";
 import { Upload } from "lucide-react";
 
-export function Sidebar() {
+interface Section {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  expanded: boolean;
+}
 
+export function Sidebar() {
   // Define sections in an array to make them orderable
-  const [sections, setSections] = useState([
+  const [sections, setSections] = useState<Section[]>([
     {
       id: "Header&Menu",
       title: "Header & Menu",
       icon: <Paintbrush size={18} />,
       expanded: false,
     },
+    {
+      id: "Cover&Headline",
+      title: "Cover & Headline",
+      icon: <GripVertical size={18} />,
+      expanded: false,
+    },
   ]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [draggedSectionIndex, setDraggedSectionIndex] = useState(null);
+  const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(
+    null
+  );
 
   // New state for the detailed section view
-  const [detailedSection, setDetailedSection] = useState(null);
-  const [detailedSectionTab, setDetailedSectionTab] = useState("content");
+  const [detailedSection, setDetailedSection] = useState<Section | null>(null);
+  const [detailedSectionTab, setDetailedSectionTab] = useState<
+    "content" | "design"
+  >("content");
 
   // Reference for section DOM elements
-  const sectionRefs = useRef({});
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+
+  // New function to open detailed section view
+  const openDetailedSection = (section: Section) => {
+    setDetailedSection(section);
+    setDetailedSectionTab("content");
+  };
 
   // Modified section to make the entire section clickable
-  const toggleSection = (sectionId) => {
+  const toggleSection = (sectionId: string) => {
     // For Header&Menu section, instead of toggling expansion, open the detailed view
-    if (sectionId === "Header&Menu") {
-      const section = sections.find((s) => s.id === sectionId);
+    const section = sections.find((s) => s.id === sectionId);
+    if (section) {
+      // Toggle expansion
+      setSections(
+        sections.map((section) =>
+          section.id === sectionId
+            ? { ...section, expanded: !section.expanded }
+            : section
+        )
+      );
+      // Open detailed view
       openDetailedSection(section);
-      return;
     }
+    return;
+  };
 
-    // For other sections, keep the original toggle behavior
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  // New function to close detailed section view
+  const closeDetailedSection = (sectionId: string) => {
     setSections(
       sections.map((section) =>
         section.id === sectionId
@@ -50,47 +87,34 @@ export function Sidebar() {
           : section
       )
     );
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // New function to open detailed section view
-  const openDetailedSection = (section) => {
-    setDetailedSection(section);
-    setDetailedSectionTab("content");
-  };
-
-  // New function to close detailed section view
-  const closeDetailedSection = () => {
     setDetailedSection(null);
   };
 
   // Drag and drop handlers
-  const handleDragStart = (e, index) => {
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
     setDraggedSectionIndex(index);
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
     if (
       draggedSectionIndex !== null &&
       sectionRefs.current[sections[draggedSectionIndex].id]
     ) {
-      sectionRefs.current[sections[draggedSectionIndex].id].classList.remove(
-        "opacity-50"
-      );
+      const el = sectionRefs.current[sections[draggedSectionIndex].id];
+      if (el) {
+        el.classList.remove("opacity-50");
+      }
     }
     setDraggedSectionIndex(null);
   };
 
-  const handleDragOver = (e, index) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
     e.preventDefault();
     return false;
   };
 
-  const handleDrop = (e, dropIndex) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
     e.preventDefault();
 
     if (draggedSectionIndex === null) return;
@@ -109,18 +133,8 @@ export function Sidebar() {
     setDraggedSectionIndex(null);
   };
 
-  // Render section content based on section ID
-  const renderSectionContent = (section) => {
-    switch (section.id) {
-      case "Header&Menu":
-        return <></>;
-      default:
-        return null;
-    }
-  };
-
   // Render detailed section content
-  const renderDetailedSectionContent = () => {
+  const renderHeader = () => {
     if (!detailedSection) return null;
 
     if (detailedSectionTab === "content") {
@@ -162,20 +176,27 @@ export function Sidebar() {
           <div>
             <h3 className="font-medium mb-2">Menu Items</h3>
             <div className="space-y-2">
-              {['Home', 'About', 'Services', 'Contact'].map((item, index) => (
+              {["Home", "About", "Services", "Contact"].map((item, index) => (
                 <div
                   key={index}
                   className="flex items-center gap-2 p-2 border border-gray-200 rounded"
                   draggable
-                  onDragStart={(e) => e.dataTransfer.setData('text/plain', index.toString())}
+                  onDragStart={(e) =>
+                    e.dataTransfer.setData("text/plain", index.toString())
+                  }
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     e.preventDefault();
-                    const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const draggedIndex = parseInt(
+                      e.dataTransfer.getData("text/plain")
+                    );
                     // Handle menu item reordering here
                   }}
                 >
-                  <GripVertical size={16} className="text-gray-400 cursor-grab" />
+                  <GripVertical
+                    size={16}
+                    className="text-gray-400 cursor-grab"
+                  />
                   <input
                     type="text"
                     defaultValue={item}
@@ -219,7 +240,9 @@ export function Sidebar() {
           {/* Header */}
           <div className="p-4 border-b border-gray-200 h-16 flex items-center">
             <button
-              onClick={closeDetailedSection}
+              onClick={() => {
+                closeDetailedSection(detailedSection.id);
+              }}
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft size={18} />
@@ -252,7 +275,7 @@ export function Sidebar() {
           </div>
 
           {/* Detailed Section Content */}
-          {renderDetailedSectionContent()}
+          {detailedSection.id === "Header&Menu" ? renderHeader() : null}
         </div>
       ) : (
         // Main Sidebar
@@ -272,7 +295,9 @@ export function Sidebar() {
             {sections.map((section, index) => (
               <div
                 key={section.id}
-                ref={(el) => (sectionRefs.current[section.id] = el)}
+                ref={(el) => {
+                  sectionRefs.current[section.id] = el;
+                }}
                 className={`border-b border-gray-200 ${
                   draggedSectionIndex === index ? "opacity-50" : ""
                 }`}
@@ -305,8 +330,6 @@ export function Sidebar() {
                     )}
                   </button>
                 </div>
-
-                {section.expanded && renderSectionContent(section)}
               </div>
             ))}
           </div>
