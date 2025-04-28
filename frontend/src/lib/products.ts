@@ -11,7 +11,7 @@ export const products: Product[] = [
   {
     id: '1',
     name: 'Ergonomic Desk Chair',
-    category: 'Furniture',
+    category: 'Home & Kitchen',
     price: "15,000 EGP",
     stock: 45,
     status: 'In Stock',

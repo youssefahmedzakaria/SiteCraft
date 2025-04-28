@@ -54,7 +54,7 @@ export const HorizontalBarChartCard: FC<HorizontalBarChartCardProps> = ({
               type="category"
               stroke="rgb(107, 114, 128)"
               tick={{ fill: 'rgb(107, 114, 128)' }}
-              width={100}
+              width={90}
             />
             <Tooltip 
               contentStyle={{ 

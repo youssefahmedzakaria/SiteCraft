@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar/sidebar'
 import { dashboardAnalyticsByTimespan } from '@/lib/dashboardAnalytics'
 import { GeneralAnalyticsCard } from '@/components/dashboard/generalAnalyticsCard'
-import { TimeSpanDropdown } from '@/components/TimeSpanDropdown'
 import { AnimatedChartWrapper } from '@/components/dashboard/charts/AnimatedChartWrapper'
 import { chartDataByTimespan, Timespan } from '@/lib/chartData'
 
@@ -18,6 +17,15 @@ import {
   MultiLineChartCard
 } from '@/components/dashboard/charts'
 
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { ChevronDown } from 'lucide-react'
+
 export default function AnalyticsPage() {
   const [selectedSpan, setSelectedSpan] = useState<Timespan>('30')
   const currentCharts = chartDataByTimespan[selectedSpan]
@@ -28,11 +36,18 @@ export default function AnalyticsPage() {
     selectedSpan === '30' ? 'week' :
                             'month'
 
+  const labels: Record<Timespan, string> = {
+    '7':   'Last week',
+    '30':  'Last month',
+    '90':  'Last quarter',
+    '365': 'Last year',
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 bg-gray-100 pt-20 md:pt-20 lg:pt-6 lg:ml-80">
+      <main className="flex-1 min-h-screen bg-gray-100 pt-20 md:pt-20 lg:pt-6 lg:ml-80 overflow-auto">
         <div className="container mx-auto px-4 md:px-6">
 
           {/* Title */}
@@ -43,7 +58,32 @@ export default function AnalyticsPage() {
             <p className="text-gray-500">
               Track your store's performance and customer insights
             </p>
-            <TimeSpanDropdown value={selectedSpan} onChange={setSelectedSpan} />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-white border-logo-border text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover px-3 py-2 text-sm font-medium flex items-center"
+                >
+                  {labels[selectedSpan]}
+                  <ChevronDown className="ml-2 w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedSpan('7')}>
+                  Last week
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('30')}>
+                  Last month
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('90')}>
+                  Last quarter
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('365')}>
+                  Last year
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Metric cards */}

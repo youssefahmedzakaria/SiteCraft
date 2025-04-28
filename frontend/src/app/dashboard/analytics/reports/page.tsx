@@ -1,14 +1,30 @@
+// frontend/src/app/dashboard/analytics/reports/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar/sidebar'
-import Image from "next/image";
-import { reportsData } from '@/lib/reportsData';
-import { TimeSpanDropdown } from '@/components/TimeSpanDropdown'
+import Image from 'next/image'
+import { reportsData } from '@/lib/reportsData'
 import { Timespan } from '@/lib/chartData'
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { ChevronDown } from 'lucide-react'
 
 export default function ReportsPage() {
   const [selectedSpan, setSelectedSpan] = useState<Timespan>('30')
+
+  const labels: Record<Timespan, string> = {
+    '7':   'Last week',
+    '30':  'Last month',
+    '90':  'Last quarter',
+    '365': 'Last year',
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -24,7 +40,31 @@ export default function ReportsPage() {
             <p className="text-gray-500">
               View and download your store's reports
             </p>
-            <TimeSpanDropdown value={selectedSpan} onChange={setSelectedSpan} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-white border-logo-border text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover px-3 py-2 text-sm font-medium flex items-center"
+                >
+                  {labels[selectedSpan]}
+                  <ChevronDown className="ml-2 w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedSpan('7')}>
+                  Last week
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('30')}>
+                  Last month
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('90')}>
+                  Last quarter
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedSpan('365')}>
+                  Last year
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Table - styled like CategoryTable */}

@@ -9,19 +9,19 @@ export const shippings: Shipping[] = [
     {
         id: '1',
         governorate: 'Cairo',
-        price: "50 EGP",
+        price: "50",
         estimatedDeliveryDays: '1-2 Days',
     },
     {
         id: '2',
         governorate: 'Alexandria',
-        price: "100 EGP",
+        price: "100",
         estimatedDeliveryDays: '3-4 Days',
     },
     {
         id: '3',
         governorate: 'Aswan',
-        price: "150 EGP",
+        price: "150",
         estimatedDeliveryDays: '5-6 Days',
     },
 ]
