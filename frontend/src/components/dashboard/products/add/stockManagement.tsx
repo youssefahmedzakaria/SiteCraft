@@ -15,7 +15,7 @@ export function StockManagementSection() {
               className="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
             >
               {sizes.map((size) => (
-                <div className="flex-1 space-y-2">
+                <div key={size} className="flex-1 space-y-2">
                   <label
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700"

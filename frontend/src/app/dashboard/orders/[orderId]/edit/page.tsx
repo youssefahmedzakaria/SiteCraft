@@ -11,12 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Mock data for demonstration
-const mockOrder = {
-  id: "ORD-001",
-  status: "Pending",
-};
+import { mockOrders } from "@/lib/orders";
 
 const orderStatuses = [
   "Pending",
@@ -30,7 +25,8 @@ export default function EditOrderStatusPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params.orderId as string;
-  const [status, setStatus] = useState(mockOrder.status);
+  const mockOrder = mockOrders.find((order) => order.id === orderId);
+  const [status, setStatus] = useState(mockOrder!.status);
 
   const handleStatusChange = (value: string) => {
     setStatus(value);

@@ -10,6 +10,7 @@ import { mockOrders } from "@/lib/orders";
 export default function OrderDetailsPage() {
   const params = useParams();
   const orderId = params.orderId as string;
+  const mockOrder = mockOrders.find((order) => order.id === orderId);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -44,31 +45,31 @@ export default function OrderDetailsPage() {
                 <span className="text-gray-600">Order Status:</span>
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
-                    mockOrders[0].status === "Pending"
+                    mockOrder!.status === "Pending"
                       ? "bg-yellow-100 text-yellow-800"
-                      : mockOrders[0].status === "Processing"
+                      : mockOrder!.status === "Processing"
                       ? "bg-blue-100 text-blue-800"
-                      : mockOrders[0].status === "Shipped"
+                      : mockOrder!.status === "Shipped"
                       ? "bg-purple-100 text-purple-800"
-                      : mockOrders[0].status === "Delivered"
+                      : mockOrder!.status === "Delivered"
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {mockOrders[0].status}
+                  {mockOrder!.status}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Order Date:</span>
-                <span>{format(mockOrders[0].issueDate, "MMM dd, yyyy")}</span>
+                <span>{format(mockOrder!.issueDate, "MMM dd, yyyy")}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment Method:</span>
-                <span>{mockOrders[0].paymentMethod}</span>
+                <span>{mockOrder!.paymentMethod}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Tracking Number:</span>
-                <span>{mockOrders[0].trackingNumber}</span>
+                <span>{mockOrder!.trackingNumber}</span>
               </div>
             </div>
           </div>
@@ -79,19 +80,19 @@ export default function OrderDetailsPage() {
             <div className="space-y-4">
               <div className="flex gap-4">
                 <span className="text-gray-600">Name:</span>
-                <p>{mockOrders[0].customer.name}</p>
+                <p>{mockOrder!.customer.name}</p>
               </div>
               <div className="flex gap-4">
                 <span className="text-gray-600">Email:</span>
-                <p>{mockOrders[0].customer.email}</p>
+                <p>{mockOrder!.customer.email}</p>
               </div>
               <div className="flex gap-4">
                 <span className="text-gray-600">Phone:</span>
-                <p>{mockOrders[0].customer.phone}</p>
+                <p>{mockOrder!.customer.phone}</p>
               </div>
               <div className="flex gap-4">
                 <span className="text-gray-600">Address:</span>
-                <p>{mockOrders[0].customer.address}</p>
+                <p>{mockOrder!.customer.address}</p>
               </div>
             </div>
           </div>
@@ -110,15 +111,15 @@ export default function OrderDetailsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockOrders[0].items.map((item) => (
+                  {mockOrder!.items.map((item) => (
                     <tr key={item.id} className="border-b">
                       <td className="py-2">{item.name}</td>
                       <td className="text-right py-2">{item.quantity}</td>
                       <td className="text-right py-2">
-                        ${item.price.toFixed(2)}
+                        {item.price.toFixed(2)}EGP
                       </td>
                       <td className="text-right py-2">
-                        ${item.total.toFixed(2)}
+                        {item.total.toFixed(2)}EGP
                       </td>
                     </tr>
                   ))}
@@ -129,7 +130,7 @@ export default function OrderDetailsPage() {
                       Subtotal:
                     </td>
                     <td className="text-right py-2">
-                      ${mockOrders[0].subtotal.toFixed(2)}
+                      {mockOrder!.subtotal.toFixed(2)}EGP
                     </td>
                   </tr>
                   <tr>
@@ -137,7 +138,7 @@ export default function OrderDetailsPage() {
                       Shipping:
                     </td>
                     <td className="text-right py-2">
-                      ${mockOrders[0].shipping.toFixed(2)}
+                      {mockOrder!.shipping.toFixed(2)}EGP
                     </td>
                   </tr>
                   <tr className="font-semibold">
@@ -145,7 +146,7 @@ export default function OrderDetailsPage() {
                       Total:
                     </td>
                     <td className="text-right py-2">
-                      ${mockOrders[0].total.toFixed(2)}
+                      {mockOrder!.total.toFixed(2)}EGP
                     </td>
                   </tr>
                 </tfoot>

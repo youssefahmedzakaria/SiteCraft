@@ -1,20 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Button } from "@/components/ui/button";
-import { mockOrders, Order } from "@/lib/orders";
-import { use, useState } from "react";
-import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog";
+import { Order } from "@/lib/orders";
 import Link from "next/link";
-// import { format } from "date-fns";
+import { format } from "date-fns";
 
 export function OrderRecord({ order }: { order: Order }) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const handleDelete = () => {
-    // Implement actual delete logic here
-    console.log(`Deleting order: ${order.id}`);
-    setShowDeleteDialog(false);
-  };
 
   return (
     <>
@@ -24,10 +14,10 @@ export function OrderRecord({ order }: { order: Order }) {
           {order.customer.name}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {/* {format(order.issueDate, "MMM dd, yyyy")} */}
+          {format(order.issueDate, "MMM dd, yyyy")}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          ${order.total.toFixed(2)}
+          {order.total.toFixed(2)}EGP
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
           <span
@@ -65,15 +55,6 @@ export function OrderRecord({ order }: { order: Order }) {
           </Link>
         </td>
       </tr>
-
-      {/* <DeleteConfirmationDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-        title="Delete Category"
-        description="Are you sure you want to delete this order? All products in this order will be moved to 'Uncategorized'."
-        itemName={order.id}
-      /> */}
     </>
   );
 }
