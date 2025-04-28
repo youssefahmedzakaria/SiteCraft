@@ -1,36 +1,54 @@
 // dropdown-menu.tsx
-"use client"
-import Link from "next/link"
-import type React from "react"
+"use client";
+import Link from "next/link";
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar/sidebar"
-import Image from "next/image"
-import { categories } from "@/lib/categories"
-import { categoryAnalytics } from "@/lib/generalAnalytics"
-import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard"
-import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord"
-import { SearchBar } from "@/components/ui/searchBar"
-import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Sidebar } from "@/components/sidebar/sidebar";
+import Image from "next/image";
+import { categories } from "@/lib/categories";
+import { categoryAnalytics } from "@/lib/generalAnalytics";
+import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
+import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord";
+import { SearchBar } from "@/components/ui/searchBar";
+import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 export default function CategoriesPage() {
   const [sortType, setSortType] = useState<
-    "newest" | "oldest" | "nameAsc" | "nameDesc" | "productsAsc" | "productsDesc"
-  >("newest")
-  const [file, setFile] = useState<File | null>(null)
+    | "newest"
+    | "oldest"
+    | "nameAsc"
+    | "nameDesc"
+    | "productsAsc"
+    | "productsDesc"
+  >("newest");
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleSortChange = (type: "newest" | "oldest" | "nameAsc" | "nameDesc" | "productsAsc" | "productsDesc") => {
-    setSortType(type)
-  }
+  const handleSortChange = (
+    type:
+      | "newest"
+      | "oldest"
+      | "nameAsc"
+      | "nameDesc"
+      | "productsAsc"
+      | "productsDesc"
+  ) => {
+    setSortType(type);
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
+    const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile)
+      setFile(selectedFile);
       // You can add additional logic here to process the file
-      console.log("File selected:", selectedFile.name)
+      console.log("File selected:", selectedFile.name);
 
       // Optional: You could add file reading logic here
       // const reader = new FileReader();
@@ -40,26 +58,30 @@ export default function CategoriesPage() {
       // };
       // reader.readAsText(selectedFile);
     }
-  }
+  };
 
   const sortedCategories = categories.sort((a, b) => {
     switch (sortType) {
       case "newest":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       case "oldest":
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
       case "nameAsc":
-        return a.title.localeCompare(b.title) // Sort by name A to Z
+        return a.title.localeCompare(b.title); // Sort by name A to Z
       case "nameDesc":
-        return b.title.localeCompare(a.title) // Sort by name Z to A
+        return b.title.localeCompare(a.title); // Sort by name Z to A
       case "productsAsc":
-        return a.numOfProducts - b.numOfProducts // Sort by number of products ascending
+        return a.numOfProducts - b.numOfProducts; // Sort by number of products ascending
       case "productsDesc":
-        return b.numOfProducts - a.numOfProducts // Sort by number of products descending
+        return b.numOfProducts - a.numOfProducts; // Sort by number of products descending
       default:
-        return 0
+        return 0;
     }
-  })
+  });
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -71,11 +93,18 @@ export default function CategoriesPage() {
 
         {/* Header section */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-4">
-          <h2 className="text-lg md:text-xl font-semibold">Manage your product categories and organization</h2>
+          <h2 className="text-lg md:text-xl font-semibold">
+            Manage your product categories and organization
+          </h2>
           <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
             <Link href="/dashboard/categories/add" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                <Image src="/icons/plus.svg" alt="Add Icon" width={20} height={20} />
+                <Image
+                  src="/icons/plus.svg"
+                  alt="Add Icon"
+                  width={20}
+                  height={20}
+                />
                 <span className="ml-2">Add New Category</span>
               </Button>
             </Link>
@@ -87,12 +116,19 @@ export default function CategoriesPage() {
                   className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">Import or Export Categories</span>
-                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} />
+                  <Image
+                    src="/icons/dropdown-colored.svg"
+                    alt="Dropdown Icon"
+                    width={20}
+                    height={20}
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>
-                  <label htmlFor="import-file">Import Categories From Excel Sheet</label>
+                  <label htmlFor="import-file">
+                    Import Categories From Excel Sheet
+                  </label>
                   <input
                     id="import-file"
                     type="file"
@@ -101,7 +137,9 @@ export default function CategoriesPage() {
                     style={{ display: "none" }}
                   />
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log(file)}>Export All Categories</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log(file)}>
+                  Export All Categories
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -131,26 +169,47 @@ export default function CategoriesPage() {
                     {sortType === "newest"
                       ? "Newest"
                       : sortType === "oldest"
-                        ? "Oldest"
-                        : sortType === "nameAsc"
-                          ? "Name (A to Z)"
-                          : sortType === "nameDesc"
-                            ? "Name (Z to A)"
-                            : sortType === "productsAsc"
-                              ? "Products (Asc)"
-                              : "Products (Desc)"}
+                      ? "Oldest"
+                      : sortType === "nameAsc"
+                      ? "Name (A to Z)"
+                      : sortType === "nameDesc"
+                      ? "Name (Z to A)"
+                      : sortType === "productsAsc"
+                      ? "Products (Asc)"
+                      : "Products (Desc)"}
                   </span>
 
-                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} />
+                  <Image
+                    src="/icons/dropdown-colored.svg"
+                    alt="Dropdown Icon"
+                    width={20}
+                    height={20}
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => handleSortChange("newest")}>Newest</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange("oldest")}>Oldest</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange("nameAsc")}>Name (A to Z)</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange("nameDesc")}>Name (Z to A)</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange("productsAsc")}>Products (Asc)</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange("productsDesc")}>Products (Desc)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("newest")}>
+                  Newest
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("oldest")}>
+                  Oldest
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("nameAsc")}>
+                  Name (A to Z)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("nameDesc")}>
+                  Name (Z to A)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleSortChange("productsAsc")}
+                >
+                  Products (Asc)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleSortChange("productsDesc")}
+                >
+                  Products (Desc)
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -170,5 +229,5 @@ export default function CategoriesPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

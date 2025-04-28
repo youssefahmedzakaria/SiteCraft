@@ -1,0 +1,79 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import { Button } from "@/components/ui/button";
+import { mockOrders, Order } from "@/lib/orders";
+import { use, useState } from "react";
+import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog";
+import Link from "next/link";
+import { format } from "date-fns";
+
+export function OrderRecord({ order }: { order: Order }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDelete = () => {
+    // Implement actual delete logic here
+    console.log(`Deleting order: ${order.id}`);
+    setShowDeleteDialog(false);
+  };
+
+  return (
+    <>
+      <tr>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap">{order.id}</td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+          {order.customer.name}
+        </td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+          {format(order.issueDate, "MMM dd, yyyy")}
+        </td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+          ${order.total.toFixed(2)}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${
+              order.status === "Pending"
+                ? "bg-yellow-100 text-yellow-800"
+                : order.status === "Processing"
+                ? "bg-blue-100 text-blue-800"
+                : order.status === "Shipped"
+                ? "bg-purple-100 text-purple-800"
+                : order.status === "Delivered"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {order.status}
+          </span>
+        </td>
+        <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+          <Link href={`/dashboard/orders/${order.id}`}>
+            <Button
+              variant="ghost"
+              className="text-green-600 hover:text-green-900"
+            >
+              View
+            </Button>
+          </Link>
+          <Link href={`/dashboard/orders/${order.id}/edit`}>
+            <Button
+              variant="ghost"
+              className="text-blue-600 hover:text-blue-900"
+            >
+              Edit Status
+            </Button>
+          </Link>
+        </td>
+      </tr>
+
+      {/* <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title="Delete Category"
+        description="Are you sure you want to delete this order? All products in this order will be moved to 'Uncategorized'."
+        itemName={order.id}
+      /> */}
+    </>
+  );
+}
