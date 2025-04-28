@@ -5,7 +5,7 @@ import { mockOrders, Order } from "@/lib/orders";
 import { use, useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog";
 import Link from "next/link";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 
 export function OrderRecord({ order }: { order: Order }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -24,7 +24,7 @@ export function OrderRecord({ order }: { order: Order }) {
           {order.customer.name}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {format(order.issueDate, "MMM dd, yyyy")}
+          {/* {format(order.issueDate, "MMM dd, yyyy")} */}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
           ${order.total.toFixed(2)}

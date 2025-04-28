@@ -18,7 +18,7 @@ export const sidebarElements: SidebarElement[] = [
     id: '2',
     icon: '/icons/template.svg',
     title: 'Customize Template',
-    destination: '/dashboard/template',
+    destination: '/dashboard/customize',
     isOpen: false
   },
   {
