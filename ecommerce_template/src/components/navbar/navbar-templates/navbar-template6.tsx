@@ -59,7 +59,7 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`w-full ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav className={`fixed top-0 left-0 w-full z-30 ${backgroundColor} ${textColor} ${fontFamily}`}>
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16">

@@ -31,7 +31,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex ${position === 'left' ? 'flex-row-reverse' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex backdrop-blur ${position === 'left' ? 'flex-row-reverse' : ''}`}>
       <div
         className="flex-1 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
