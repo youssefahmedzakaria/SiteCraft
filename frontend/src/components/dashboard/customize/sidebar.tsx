@@ -10,6 +10,10 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Upload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RenderCoverSection } from "./renderCoverSection";
+import { RenderHeaderSection } from "./renderHeaderSection";
 
 interface Section {
   id: string;
@@ -133,92 +137,6 @@ export function Sidebar() {
     setDraggedSectionIndex(null);
   };
 
-  // Render detailed section content
-  const renderHeader = () => {
-    if (!detailedSection) return null;
-
-    if (detailedSectionTab === "content") {
-      return (
-        <div className="p-4 space-y-6">
-          {/* Site Logo Section */}
-          <div>
-            <h3 className="font-medium mb-2">Site Logo</h3>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 border border-dashed border-gray-300 rounded flex items-center justify-center">
-                {/* Logo preview will go here */}
-              </div>
-              <label className="cursor-pointer">
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm">
-                  <Upload size={16} />
-                  <span>Choose Logo</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        // Handle logo upload here
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          // Set logo preview
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* Navigation Menu Section */}
-          <div>
-            <h3 className="font-medium mb-2">Menu Items</h3>
-            <div className="space-y-2">
-              {["Home", "About", "Services", "Contact"].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 p-2 border border-gray-200 rounded"
-                  draggable
-                  onDragStart={(e) =>
-                    e.dataTransfer.setData("text/plain", index.toString())
-                  }
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const draggedIndex = parseInt(
-                      e.dataTransfer.getData("text/plain")
-                    );
-                    // Handle menu item reordering here
-                  }}
-                >
-                  <GripVertical
-                    size={16}
-                    className="text-gray-400 cursor-grab"
-                  />
-                  <input
-                    type="text"
-                    defaultValue={item}
-                    className="flex-1 border-none bg-transparent focus:outline-none"
-                    onChange={(e) => {
-                      // Handle menu item text change here
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-            <button className="mt-2 text-sm text-blue-600 hover:text-blue-800">
-              + Add New Menu Item
-            </button>
-          </div>
-        </div>
-      );
-    } else if (detailedSectionTab === "design") {
-      return <div className="p-4"></div>;
-    }
-  };
-
   return (
     <>
       {/* Mobile Sidebar Toggle */}
@@ -275,7 +193,11 @@ export function Sidebar() {
           </div>
 
           {/* Detailed Section Content */}
-          {detailedSection.id === "Header&Menu" ? renderHeader() : null}
+          {detailedSection.id === "Header&Menu" ? (
+            <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "Cover&Headline" ? (
+            <RenderCoverSection detailedSectionTab={detailedSectionTab} />
+          ) : null}
         </div>
       ) : (
         // Main Sidebar
