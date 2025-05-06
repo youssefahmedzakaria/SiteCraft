@@ -1,73 +1,74 @@
+export type IconName = 
+  | 'Home' 
+  | 'Layout' 
+  | 'Tags' 
+  | 'ShoppingBag' 
+  | 'ShoppingCart' 
+  | 'Users' 
+  | 'BarChart2' 
+  | 'Store' 
+  | 'Truck';
+
 export interface SidebarElement {
     id: string
-    icon: string
+    iconName: IconName 
     title: string
     destination: string
-    isOpen: boolean
 }
 
 export const sidebarElements: SidebarElement[] = [
   {
     id: '1',
-    icon: '/icons/home.svg',
+    iconName: 'Home',
     title: 'Overview',
     destination: '/dashboard/overview',
-    isOpen: false
   },
   {
     id: '2',
-    icon: '/icons/template.svg',
+    iconName: 'Layout',
     title: 'Customize Template',
     destination: '/dashboard/customize',
-    isOpen: false
   },
   {
     id: '3',
-    icon: '/icons/category.svg',
+    iconName: 'Tags',
     title: 'Categories',
     destination: '/dashboard/categories',
-    isOpen: false
   },
   {
     id: '4',
-    icon: '/icons/products.svg',
+    iconName: 'ShoppingBag',
     title: 'Products',
     destination: '/dashboard/products',
-    isOpen: false
   },
   {
     id: '5',
-    icon: '/icons/orders.svg',
+    iconName: 'ShoppingCart',
     title: 'Orders',
     destination: '/dashboard/orders',
-    isOpen: false
   },
   {
     id: '6',
-    icon: '/icons/customers.svg',
+    iconName: 'Users',
     title: 'Customers',
     destination: '/dashboard/customers',
-    isOpen: false
   },
   {
     id: '7',
-    icon: '/icons/analytics.svg',
+    iconName: 'BarChart2',
     title: 'Analytics',
     destination: '/dashboard/analytics',
-    isOpen: false
   },
   {
     id: '8',
-    icon: '/icons/info.svg',
+    iconName: 'Store',
     title: 'Store Info',
     destination: '/dashboard/store-info',
-    isOpen: false
   },
   {
     id: '9',
-    icon: '/icons/shipping.svg',
+    iconName: 'Truck',
     title: 'Shipping Info',
     destination: '/dashboard/shipping',
-    isOpen: false
   },
 ]
