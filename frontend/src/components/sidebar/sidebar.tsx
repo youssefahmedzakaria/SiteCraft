@@ -81,14 +81,16 @@ export function Sidebar() {
                   <Link
                     href="/dashboard/analytics/reports"
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center ml-8 mt-2 mr-2 text-sm font-medium text-primary-foreground hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded px-2 py-2 space-x-2 ${
+                    className={`flex items-center ml-8 mt-1 mr-1 py-2 text-sm font-medium hover:bg-logo-light-button-hover ${
                       isReportsActive
-                        ? "bg-logo-light-button-hover text-logo-txt-hover"
-                        : ""
-                    }`}
+                        ? " text-logo-txt-hover"
+                        : "text-primary-foreground hover:text-logo-txt-hover"
+                    } rounded px-2 py-1 space-x-2`}
                   >
-                    <CornerDownRight size={20} />
-                    <span>Reports</span>
+                    <div className="flex items-center space-x-2">
+                      <CornerDownRight size={18} />
+                      <span>Reports</span>
+                    </div>
                   </Link>
                 )}
             </div>
