@@ -1,18 +1,21 @@
 // frontend/src/components/sidebar/sidebar.tsx
-'use client'
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "../ui/button"
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
-import { usePathname } from "next/navigation"
-import { sidebarElements } from "@/lib/sidebarElements"
-import { SidebarElementComponent } from "./sidebarElementComponent"
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "../ui/button";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { sidebarElements } from "@/lib/sidebarElements";
+import { SidebarElementComponent } from "./sidebarElementComponent";
+import { CornerDownRight } from "lucide-react";
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isReportsActive = pathname === "/dashboard/analytics/reports";
 
   return (
     <div>
@@ -70,36 +73,28 @@ export function Sidebar() {
         <nav className="flex flex-col space-y-2 mt-6">
           {sidebarElements.map((element) => (
             <div key={element.id}>
-              <Link
-                href={element.destination}
-                onClick={() => setIsOpen(false)}
-              >
+              <Link href={element.destination} onClick={() => setIsOpen(false)}>
                 <SidebarElementComponent element={element} />
               </Link>
               {element.destination === "/dashboard/analytics" &&
-  pathname.startsWith("/dashboard/analytics") && (
-    <Link
-      href="/dashboard/analytics/reports"
-      onClick={() => setIsOpen(false)}
-      className="flex items-center ml-8 text-sm font-medium text-white hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded px-2 py-1 space-x-2"
-    >
-      <div className="flex items-center space-x-2">
-        <Image
-          src="/icons/report.svg"
-          alt="Reports"
-          width={20}
-          height={20}
-          className="filter invert"
-        />
-        <span>Reports</span>
-      </div>
-    </Link>
-  )
-}
+                pathname.startsWith("/dashboard/analytics") && (
+                  <Link
+                    href="/dashboard/analytics/reports"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center ml-8 mt-2 mr-2 text-sm font-medium text-primary-foreground hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded px-2 py-2 space-x-2 ${
+                      isReportsActive
+                        ? "bg-logo-light-button-hover text-logo-txt-hover"
+                        : ""
+                    }`}
+                  >
+                    <CornerDownRight size={20} />
+                    <span>Reports</span>
+                  </Link>
+                )}
             </div>
           ))}
         </nav>
       </aside>
     </div>
-  )
+  );
 }
