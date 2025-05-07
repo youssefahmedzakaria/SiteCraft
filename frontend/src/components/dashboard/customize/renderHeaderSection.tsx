@@ -1,6 +1,13 @@
 "use client";
-import { ChevronDown, ChevronRight, GripVertical, Upload } from "lucide-react";
-import { useState } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  GripVertical,
+  Upload,
+  Image as ImageIcon,
+} from "lucide-react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 
 type SectionName = "background" | "menuAndIcons";
 
@@ -11,6 +18,43 @@ interface RenderHeaderSectionProps {
 export function RenderHeaderSection({
   detailedSectionTab,
 }: RenderHeaderSectionProps) {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0] || null;
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
@@ -32,32 +76,49 @@ export function RenderHeaderSection({
           {/* Site Logo Section */}
           <div>
             <h3 className="font-medium mb-2">Site Logo</h3>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 border border-dashed border-gray-300 rounded flex items-center justify-center">
-                {/* Logo preview will go here */}
-              </div>
-              <label className="cursor-pointer">
-                <div className="flex h-16 items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm">
-                  <Upload size={16} />
-                  <span>Choose Logo</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        // Handle logo upload here
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          // Set logo preview
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
+            <div
+              className="flex flex-col items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <div
+                className={`relative w-16 h-16 rounded ${
+                  imagePreview ? "" : "bg-gray-100"
+                }  overflow-hidden`}
+              >
+                {imagePreview ? (
+                  <Image
+                    src={imagePreview}
+                    alt="Logo preview"
+                    fill
+                    className="object-contain rounded-md"
                   />
-                </div>
-              </label>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <ImageIcon />
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 rounded">
+                <p className="text-xs">
+                  Drag and drop your image here, or{" "}
+                  <span
+                    className="cursor-pointer underline"
+                    onClick={handleBrowseClick}
+                  >
+                    browse
+                  </span>
+                </p>
+              </div>
+              <input
+                ref={fileInputRef}
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
             </div>
           </div>
 
