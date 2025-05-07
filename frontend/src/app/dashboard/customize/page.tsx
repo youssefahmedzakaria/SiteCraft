@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useRef, DragEvent } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Paintbrush } from "lucide-react";
 import { Sidebar } from "@/components/dashboard/customize/sidebar";
 
 
@@ -70,7 +69,8 @@ export default function CustomizeTemplatePage() {
               </button>
             </div>
           </div>
-          <Button className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto">
+          {/* go to dashboard on saving  */}
+          <Button className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto" onClick ={()=>{ window.location.href="/dashboard/customers";}}>
             Save Changes
           </Button>
         </div>

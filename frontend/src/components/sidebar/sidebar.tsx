@@ -73,6 +73,9 @@ export function Sidebar() {
         <nav className="flex flex-col space-y-2 mt-6">
           {sidebarElements.map((element) => (
             <div key={element.id}>
+              {/* Add a divider before Account Settings */}
+              {element.id === '10' && <div className="border-t border-logo-border my-2 mx-4"></div>}
+              
               <Link href={element.destination} onClick={() => setIsOpen(false)}>
                 <SidebarElementComponent element={element} />
               </Link>
