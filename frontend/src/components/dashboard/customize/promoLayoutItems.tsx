@@ -58,17 +58,21 @@ export function PromoLayoutItems() {
               </div>
             )}
             {layoutId === 3 && (
-              <div className="w-12 h-6 bg-gray-300 flex flex-col items-center justify-center p-[2px]">
+              <div className="w-12 h-6 bg-gray-300 flex flex-col items-end justify-end p-[3px] space-y-0.5">
                 <div
-                  className={`w-full h-full flex flex-col items-center justify-end space-y-0.5 p-[2px] ${
+                  className={`w-5 h-0.5 bg-gray-300 ${
                     3 === layoutSelected
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
-                >
-                  <div className="w-5 h-0.5 bg-gray-300" />
-                  <div className="w-3 h-0.5 bg-gray-300" />
-                </div>
+                />
+                <div
+                  className={`w-3 h-0.5 bg-gray-300 ${
+                    3 === layoutSelected
+                      ? "bg-gray-800 border-gray-500"
+                      : "bg-white"
+                  }`}
+                />
               </div>
             )}
             {layoutId === 4 && (

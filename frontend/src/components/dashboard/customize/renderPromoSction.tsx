@@ -14,7 +14,7 @@ import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
 import { PromoLayoutItems } from "./promoLayoutItems";
 
-type SectionName = "mobileLayout" | "title" | "description";
+type SectionName = "image" | "title" | "description" | "button";
 
 interface PromoImage {
   id: string;
@@ -34,9 +34,10 @@ export function RenderPromoSection({
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
-    mobileLayout: false,
+    image: false,
     title: false,
     description: false,
+    button: false,
   });
 
   const toggleSection = (section: SectionName) => {
@@ -403,62 +404,41 @@ export function RenderPromoSection({
           {/* Layout Section */}
           <PromoLayoutItems />
 
-          {/* Mobile layout */}
+          {/* Image Section */}
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left pr-4"
-              onClick={() => toggleSection("mobileLayout")}
+              onClick={() => toggleSection("image")}
             >
               <div className="flex items-center gap-2">
-                <span className="font-medium">Mobile Layout</span>
+                <span className="font-medium">Image</span>
               </div>
-              {expandedSections["mobileLayout"] ? (
+              {expandedSections["image"] ? (
                 <ChevronDown size={18} />
               ) : (
                 <ChevronRight size={18} />
               )}
             </button>
           </div>
-          {expandedSections["mobileLayout"] && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2].map((layoutId) => (
-                  <button
-                    key={layoutId}
-                    className={`aspect-square p-2 rounded border border-gray-200 hover:border-blue-500 transition-colors ${
-                      layoutId === 1
-                        ? "bg-gray-900 border-blue-500"
-                        : "bg-white"
-                    }`}
-                    onClick={() => {
-                      // Handle layout selection
-                    }}
-                  >
-                    {layoutId === 1 && (
-                      <div className="w-full h-1.5 bg-gray-300 rounded mb-1" />
-                    )}
-                    {layoutId === 2 && (
-                      <div className="w-full h-1.5 bg-gray-300 rounded mt-2" />
-                    )}
-                  </button>
-                ))}
-              </div>
 
+          {expandedSections["image"] && (
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm mb-2">Background Style</label>
+                <label className="block text-sm mb-2">Font Family</label>
                 <select
                   className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={(e) => {
-                    // Handle background style change
+                    // Handle font change
                   }}
                 >
-                  <option value="default">Default</option>
-                  <option value="solid-color">Solid color</option>
-                  <option value="transparent">Gradiant</option>
+                  <option value="inter">Inter</option>
+                  <option value="roboto">Roboto</option>
+                  <option value="open-sans">Open Sans</option>
+                  <option value="poppins">Poppins</option>
+                  <option value="lato">Lato</option>
                 </select>
               </div>
 
-              {/* Color picker for Grayscale transparent and Solid color options */}
               <div className="color-picker-container">
                 <label className="block text-sm mb-2">Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
@@ -574,9 +554,55 @@ export function RenderPromoSection({
             </div>
           )}
 
-          {/* <div>
-            <h3 className="font-medium mb-4">Image</h3>
-          </div> */}
+          {/* Button */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left pr-4"
+              onClick={() => toggleSection("button")}
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Button</span>
+              </div>
+              {expandedSections["button"] ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+
+          {expandedSections["button"] && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <select
+                  className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => {
+                    // Handle font change
+                  }}
+                >
+                  <option value="inter">Inter</option>
+                  <option value="roboto">Roboto</option>
+                  <option value="open-sans">Open Sans</option>
+                  <option value="poppins">Poppins</option>
+                  <option value="lato">Lato</option>
+                </select>
+              </div>
+
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Handle menu color change
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
