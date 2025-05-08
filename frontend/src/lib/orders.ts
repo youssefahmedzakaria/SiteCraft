@@ -3,7 +3,6 @@ import { Product } from "@/lib/products";
 export interface Order {
   id: string;
   customer: Customer;
-  customerId: string; // Added customerId to link orders to customers
   issueDate: Date;
   status: string;
   subtotal: number;
@@ -15,6 +14,7 @@ export interface Order {
 }
 
 export interface Customer {
+  customerId: string; // Added customerId to link orders to customers
   name: string;
   email: string;
   phone: string;
@@ -35,12 +35,12 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-001",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-04-15"),
     status: "Delivered",
     items: [
@@ -61,14 +61,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-002",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-03-22"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-003",
@@ -81,20 +81,20 @@ export const mockOrders: Order[] = [
     subtotal: 150.0,
     shipping: 10.0,
     total: 160.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-789012"
   },
   {
     id: "ORD-003",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-03-10"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-005",
@@ -113,14 +113,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-004",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-02-28"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-007",
@@ -139,14 +139,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-005",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-02-15"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-009",
@@ -159,18 +159,18 @@ export const mockOrders: Order[] = [
     subtotal: 45.0,
     shipping: 5.0,
     total: 50.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-567890"
   },
   {
     id: "ORD-006",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2024-01-20"),
     status: "Delivered",
     items: [
@@ -191,12 +191,12 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-007",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2023-12-15"),
     status: "Delivered",
     items: [
@@ -211,18 +211,18 @@ export const mockOrders: Order[] = [
     subtotal: 40.0,
     shipping: 10.0,
     total: 50.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-456123"
   },
   {
     id: "ORD-008",
     customer: {
+      customerId: "1",
       name: "Aisha Mohamed",
       email: "aisha.mohamed@example.com",
       phone: "01123456789",
       address: "Cairo, Egypt"
     },
-    customerId: "1",
     issueDate: new Date("2023-11-30"),
     status: "Delivered",
     items: [
@@ -240,19 +240,19 @@ export const mockOrders: Order[] = [
     paymentMethod: "Credit Card",
     trackingNumber: "TRK-789456"
   },
-  
+
   // Orders for Omar Ahmed (id: "2", 4 orders)
   {
     id: "ORD-009",
     customer: {
+      customerId: "2",
       name: "Omar Ahmed",
       email: "omar.ahmed@example.com",
       phone: "01187654321",
       address: "Alexandria, Egypt"
     },
-    customerId: "2",
     issueDate: new Date("2024-04-05"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-017",
@@ -271,14 +271,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-010",
     customer: {
+      customerId: "2",
       name: "Omar Ahmed",
       email: "omar.ahmed@example.com",
       phone: "01187654321",
       address: "Alexandria, Egypt"
     },
-    customerId: "2",
     issueDate: new Date("2024-03-15"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-019",
@@ -291,18 +291,18 @@ export const mockOrders: Order[] = [
     subtotal: 250.0,
     shipping: 20.0,
     total: 270.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-678901"
   },
   {
     id: "ORD-011",
     customer: {
+      customerId: "2",
       name: "Omar Ahmed",
       email: "omar.ahmed@example.com",
       phone: "01187654321",
       address: "Alexandria, Egypt"
     },
-    customerId: "2",
     issueDate: new Date("2024-02-25"),
     status: "Delivered",
     items: [
@@ -323,14 +323,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-012",
     customer: {
+      customerId: "2",
       name: "Omar Ahmed",
       email: "omar.ahmed@example.com",
       phone: "01187654321",
       address: "Alexandria, Egypt"
     },
-    customerId: "2",
     issueDate: new Date("2024-01-20"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-023",
@@ -343,22 +343,22 @@ export const mockOrders: Order[] = [
     subtotal: 60.0,
     shipping: 10.0,
     total: 70.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-890123"
   },
-  
+
   // Orders for Sara Hassan (id: "3", 12 orders)
   {
     id: "ORD-013",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
-    customerId: "3",
     issueDate: new Date("2024-05-01"),
-    status: "Processing",
+    status: "Pending",
     items: [
       {
         id: "ITEM-025",
@@ -377,14 +377,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-014",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
-    customerId: "3",
     issueDate: new Date("2024-04-20"),
-    status: "Shipped",
+    status: "Processing",
     items: [
       {
         id: "ITEM-027",
@@ -403,14 +403,14 @@ export const mockOrders: Order[] = [
   {
     id: "ORD-015",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
-    customerId: "3",
     issueDate: new Date("2024-04-10"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-029",
@@ -423,14 +423,14 @@ export const mockOrders: Order[] = [
     subtotal: 120.0,
     shipping: 15.0,
     total: 135.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-345012"
   },
   // Additional 9 orders for Sara Hassan to match her total of 12 orders
   {
     id: "ORD-016",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
@@ -455,15 +455,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-017",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2025-03-15"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-033",
@@ -472,24 +472,23 @@ export const mockOrders: Order[] = [
         price: 35.0,
         total: 35.0
       }
-    ],
-    subtotal: 35.0,
+    ], subtotal: 35.0,
     shipping: 10.0,
     total: 45.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-901567"
   },
   {
     id: "ORD-018",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2024-03-01"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-035",
@@ -507,15 +506,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-019",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2024-02-15"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-037",
@@ -528,20 +527,20 @@ export const mockOrders: Order[] = [
     subtotal: 50.0,
     shipping: 10.0,
     total: 60.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-567123"
   },
   {
     id: "ORD-020",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2024-02-01"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-039",
@@ -559,8 +558,8 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-021",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
@@ -585,15 +584,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-022",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2024-01-10"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-043",
@@ -606,20 +605,20 @@ export const mockOrders: Order[] = [
     subtotal: 120.0,
     shipping: 15.0,
     total: 135.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-456789"
   },
   {
     id: "ORD-023",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2023-12-20"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-045",
@@ -637,15 +636,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-024",
-    customerId: "3",
     customer: {
+      customerId: "3",
       name: "Sara Hassan",
       email: "sara.hassan@example.com",
       phone: "01198765432",
       address: "Giza, Egypt"
     },
     issueDate: new Date("2023-12-05"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-047",
@@ -658,15 +657,15 @@ export const mockOrders: Order[] = [
     subtotal: 60.0,
     shipping: 10.0,
     total: 70.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-012345"
   },
-  
+
   // Orders for Nadia Ibrahim (id: "5", 6 orders)
   {
     id: "ORD-025",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
@@ -691,8 +690,8 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-026",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
@@ -712,20 +711,20 @@ export const mockOrders: Order[] = [
     subtotal: 350.0,
     shipping: 20.0,
     total: 370.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-678901"
   },
   {
     id: "ORD-027",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
       address: "Port Said, Egypt"
     },
     issueDate: new Date("2024-03-20"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-053",
@@ -743,15 +742,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-028",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
       address: "Port Said, Egypt"
     },
     issueDate: new Date("2024-03-05"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-055",
@@ -764,20 +763,20 @@ export const mockOrders: Order[] = [
     subtotal: 90.0,
     shipping: 10.0,
     total: 100.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-234567"
   },
   {
     id: "ORD-029",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
       address: "Port Said, Egypt"
     },
     issueDate: new Date("2024-02-15"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-057",
@@ -795,15 +794,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-030",
-    customerId: "5",
     customer: {
+      customerId: "5",
       name: "Nadia Ibrahim",
       email: "nadia.ibrahim@example.com",
       phone: "01112345678",
       address: "Port Said, Egypt"
     },
     issueDate: new Date("2024-01-20"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-059",
@@ -816,22 +815,22 @@ export const mockOrders: Order[] = [
     subtotal: 35.0,
     shipping: 10.0,
     total: 45.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-890123"
   },
-  
+
   // Orders for Khaled Hamdy (id: "6", 3 orders)
   {
     id: "ORD-031",
-    customerId: "6",
     customer: {
+      customerId: "6",
       name: "Khaled Hamdy",
       email: "khaled.hamdy@example.com",
       phone: "01167890123",
       address: "Luxor, Egypt"
     },
     issueDate: new Date("2024-04-20"),
-    status: "Shipped",
+    status: "Delivered",
     items: [
       {
         id: "ITEM-061",
@@ -849,15 +848,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-032",
-    customerId: "6",
     customer: {
+      customerId: "6",
       name: "Khaled Hamdy",
       email: "khaled.hamdy@example.com",
       phone: "01167890123",
       address: "Luxor, Egypt"
     },
     issueDate: new Date("2024-03-15"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-063",
@@ -870,20 +869,20 @@ export const mockOrders: Order[] = [
     subtotal: 120.0,
     shipping: 15.0,
     total: 135.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-789012"
   },
   {
     id: "ORD-033",
-    customerId: "6",
     customer: {
+      customerId: "6",
       name: "Khaled Hamdy",
       email: "khaled.hamdy@example.com",
       phone: "01167890123",
       address: "Luxor, Egypt"
     },
     issueDate: new Date("2024-02-10"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-065",
@@ -899,12 +898,12 @@ export const mockOrders: Order[] = [
     paymentMethod: "Credit Card",
     trackingNumber: "TRK-012345"
   },
-  
+
   // Orders for Layla Mostafa (id: "7", 9 orders)
   {
     id: "ORD-034",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
@@ -926,12 +925,10 @@ export const mockOrders: Order[] = [
     total: 70.0,
     paymentMethod: "Credit Card",
     trackingNumber: "TRK-234567"
-  },
-  // Add 8 more orders for Layla Mostafa to match her total of 9 orders
-  {
+  },{
     id: "ORD-035",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
@@ -951,13 +948,13 @@ export const mockOrders: Order[] = [
     subtotal: 65.0,
     shipping: 15.0,
     total: 80.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-567890"
   },
   {
     id: "ORD-036",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
@@ -982,15 +979,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-037",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
       address: "Aswan, Egypt"
     },
     issueDate: new Date("2024-03-15"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-073",
@@ -1003,20 +1000,20 @@ export const mockOrders: Order[] = [
     subtotal: 60.0,
     shipping: 15.0,
     total: 75.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-123456"
   },
   {
     id: "ORD-038",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
       address: "Aswan, Egypt"
     },
     issueDate: new Date("2024-03-01"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-075",
@@ -1034,15 +1031,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-039",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
       address: "Aswan, Egypt"
     },
     issueDate: new Date("2024-02-15"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-077",
@@ -1055,20 +1052,20 @@ export const mockOrders: Order[] = [
     subtotal: 45.0,
     shipping: 10.0,
     total: 55.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-789012"
   },
   {
     id: "ORD-040",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
       address: "Aswan, Egypt"
     },
     issueDate: new Date("2024-02-01"),
-    status: "Delivered",
+    status: "Shipped",
     items: [
       {
         id: "ITEM-079",
@@ -1086,8 +1083,8 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-041",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
@@ -1107,20 +1104,20 @@ export const mockOrders: Order[] = [
     subtotal: 65.0,
     shipping: 15.0,
     total: 80.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-345678"
   },
   {
     id: "ORD-042",
-    customerId: "7",
     customer: {
+      customerId: "7",
       name: "Layla Mostafa",
       email: "layla.mostafa@example.com",
       phone: "01190123456",
       address: "Aswan, Egypt"
     },
     issueDate: new Date("2024-01-01"),
-    status: "Delivered",
+    status: "Cancelled",
     items: [
       {
         id: "ITEM-083",
@@ -1136,19 +1133,19 @@ export const mockOrders: Order[] = [
     paymentMethod: "Credit Card",
     trackingNumber: "TRK-678901"
   },
-  
+
   // Orders for Youssef Kamal (id: "8", 2 orders)
   {
     id: "ORD-043",
-    customerId: "8",
     customer: {
+      customerId: "8",
       name: "Youssef Kamal",
       email: "youssef.kamal@example.com",
       phone: "01178901234",
       address: "Hurghada, Egypt"
     },
     issueDate: new Date("2024-02-10"),
-    status: "Delivered",
+    status: "Pending",
     items: [
       {
         id: "ITEM-085",
@@ -1166,15 +1163,15 @@ export const mockOrders: Order[] = [
   },
   {
     id: "ORD-044",
-    customerId: "8",
     customer: {
+      customerId: "8",
       name: "Youssef Kamal",
       email: "youssef.kamal@example.com",
       phone: "01178901234",
       address: "Hurghada, Egypt"
     },
     issueDate: new Date("2024-01-15"),
-    status: "Delivered",
+    status: "Processing",
     items: [
       {
         id: "ITEM-087",
@@ -1187,7 +1184,7 @@ export const mockOrders: Order[] = [
     subtotal: 350.0,
     shipping: 50.0,
     total: 400.0,
-    paymentMethod: "PayPal",
+    paymentMethod: "Cash on Delivery",
     trackingNumber: "TRK-234567"
   }
 ];
