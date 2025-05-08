@@ -1,6 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { ChevronDown, ChevronRight, GripVertical, Upload } from "lucide-react";
-import { useState } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  GripVertical,
+  Image as ImageIcon,
+} from "lucide-react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
+import { HeaderLayoutItems } from "./headerLayoutItems";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { setStyle } from "framer-motion";
 
 type SectionName = "background" | "menuAndIcons";
 
@@ -11,6 +27,49 @@ interface RenderHeaderSectionProps {
 export function RenderHeaderSection({
   detailedSectionTab,
 }: RenderHeaderSectionProps) {
+  {
+    /* For image selection in content */
+  }
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0] || null;
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  {
+    /* For expandable sections in design */
+  }
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
@@ -19,10 +78,50 @@ export function RenderHeaderSection({
   });
 
   const toggleSection = (section: SectionName) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+    setExpandedSections((prev) => {
+      const isCurrentlyOpen = prev[section];
+
+      // If it's already open, close all
+      if (isCurrentlyOpen) {
+        return {
+          background: false,
+          menuAndIcons: false,
+        };
+      }
+
+      // Otherwise, open the clicked section and close others
+      return {
+        background: false,
+        menuAndIcons: false,
+        [section]: true,
+      };
+    });
+  };
+
+  // Add a state for color values
+  const [colors, setColors] = useState({
+    background: "#ffffff",
+    menuAndIcons: "#000000",
+  });
+
+  const [style, setStyle] = useState<
+    "default" | "transparent" | "grayscale-transparent" | "solid-color"
+  >("default");
+
+  const handleStyleChange = (
+    type: "default" | "transparent" | "grayscale-transparent" | "solid-color"
+  ) => {
+    setStyle(type);
+  };
+
+  const [fontFamily, setFontFamily] = useState<
+    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  >("inter");
+
+  const handleFontFamilyChange = (
+    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  ) => {
+    setFontFamily(type);
   };
 
   return (
@@ -32,32 +131,61 @@ export function RenderHeaderSection({
           {/* Site Logo Section */}
           <div>
             <h3 className="font-medium mb-2">Site Logo</h3>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 border border-dashed border-gray-300 rounded flex items-center justify-center">
-                {/* Logo preview will go here */}
-              </div>
-              <label className="cursor-pointer">
-                <div className="flex h-16 items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm">
-                  <Upload size={16} />
-                  <span>Choose Logo</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        // Handle logo upload here
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          // Set logo preview
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
+            <div
+              className="flex flex-col items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <div
+                className={`relative w-16 h-16 rounded ${
+                  imagePreview ? "" : "bg-gray-100"
+                }  overflow-hidden`}
+              >
+                {imagePreview ? (
+                  <Image
+                    src={imagePreview}
+                    alt="Logo preview"
+                    fill
+                    className="object-contain rounded-md"
                   />
-                </div>
-              </label>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <ImageIcon />
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 rounded">
+                {imagePreview ? (
+                  <p className="text-xs">
+                    Drag and drop your image here to change logo, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-xs">
+                    Drag and drop your logo here, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
             </div>
           </div>
 
@@ -104,67 +232,12 @@ export function RenderHeaderSection({
       ) : (
         <div className="p-4 space-y-6">
           {/* Layout Section */}
-          <div>
-            <h3 className="font-medium mb-2">Layout</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((layoutId) => (
-                <button
-                  key={layoutId}
-                  className={`aspect-square p-2 rounded border border-gray-200 hover:border-blue-500 transition-colors ${
-                    layoutId === 1 ? "bg-gray-900 border-blue-500" : "bg-white"
-                  }`}
-                  onClick={() => {
-                    // Handle layout selection
-                  }}
-                >
-                  {layoutId === 1 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded mb-1" />
-                  )}
-                  {layoutId === 2 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded mt-2" />
-                  )}
-                  {layoutId === 3 && (
-                    <div className="flex justify-between">
-                      <div className="w-1/3 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/3 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 4 && (
-                    <div className="flex justify-between">
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 5 && (
-                    <div className="w-full flex justify-center">
-                      <div className="w-3/4 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 6 && (
-                    <div className="flex items-center justify-between">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                    </div>
-                  )}
-                  {layoutId === 7 && (
-                    <div className="flex items-center justify-between">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                    </div>
-                  )}
-                  {layoutId === 8 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+          <HeaderLayoutItems />
+
           {/* Background Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
+              className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("background")}
             >
               <div className="flex items-center gap-2">
@@ -182,19 +255,51 @@ export function RenderHeaderSection({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm mb-2">Style</label>
-                  <select
-                    className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => {
-                      // Handle background style change
-                    }}
-                  >
-                    <option value="default">Default</option>
-                    <option value="transparent">Transparent</option>
-                    <option value="grayscale-transparent">
-                      Grayscale transparent
-                    </option>
-                    <option value="solid-color">Solid color</option>
-                  </select>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {style === "default"
+                            ? "Default"
+                            : style === "transparent"
+                            ? "Transparent"
+                            : style === "grayscale-transparent"
+                            ? "Grayscale transparent"
+                            : "Solid color"}
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("default")}
+                      >
+                        Default
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("transparent")}
+                      >
+                        Transparent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleStyleChange("grayscale-transparent")
+                        }
+                      >
+                        Grayscale transparent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("solid-color")}
+                      >
+                        Solid color
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Color picker for Grayscale transparent and Solid color options */}
@@ -203,9 +308,24 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
+                      value={colors.background}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        // Handle menu color change
+                        setColors((prev) => ({
+                          ...prev,
+                          background: e.target.value,
+                        }));
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={colors.background}
+                      className="flex-1 border-none bg-transparent focus:outline-none"
+                      onChange={(e) => {
+                        setColors((prev) => ({
+                          ...prev,
+                          background: e.target.value,
+                        }));
                       }}
                     />
                   </div>
@@ -217,7 +337,7 @@ export function RenderHeaderSection({
           {/* Menu & Icons Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
+              className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("menuAndIcons")}
             >
               <div className="flex items-center gap-2">
@@ -235,18 +355,55 @@ export function RenderHeaderSection({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm mb-2">Font Family</label>
-                  <select
-                    className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => {
-                      // Handle font change
-                    }}
-                  >
-                    <option value="inter">Inter</option>
-                    <option value="roboto">Roboto</option>
-                    <option value="open-sans">Open Sans</option>
-                    <option value="poppins">Poppins</option>
-                    <option value="lato">Lato</option>
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {fontFamily === "inter"
+                            ? "Inter"
+                            : fontFamily === "roboto"
+                            ? "Roboto"
+                            : fontFamily === "open-sans"
+                            ? "Open Sans"
+                            : fontFamily === "poppins"
+                            ? "Poppins"
+                            : "Lato"}
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("inter")}
+                      >
+                        Inter
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("roboto")}
+                      >
+                        Roboto
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("open-sans")}
+                      >
+                        Open Sans
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("poppins")}
+                      >
+                        Poppins
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("lato")}
+                      >
+                        Lato
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className="color-picker-container">
@@ -254,9 +411,24 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
+                      value={colors.menuAndIcons}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        // Handle menu color change
+                        setColors((prev) => ({
+                          ...prev,
+                          menuAndIcons: e.target.value,
+                        }));
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={colors.menuAndIcons}
+                      className="flex-1 border-none bg-transparent focus:outline-none"
+                      onChange={(e) => {
+                        setColors((prev) => ({
+                          ...prev,
+                          menuAndIcons: e.target.value,
+                        }));
                       }}
                     />
                   </div>
@@ -268,4 +440,12 @@ export function RenderHeaderSection({
       )}
     </div>
   );
+}
+
+{
+  /* <option value="inter">Inter</option>
+<option value="roboto">Roboto</option>
+<option value="open-sans">Open Sans</option>
+<option value="poppins">Poppins</option>
+<option value="lato">Lato</option> */
 }

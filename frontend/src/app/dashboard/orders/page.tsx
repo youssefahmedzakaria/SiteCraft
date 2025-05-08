@@ -2,19 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar/sidebar";
-import Image from "next/image";
 import { SearchBar } from "@/components/ui/searchBar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { mockOrders } from "@/lib/orders";
 import { OrderRecord } from "@/components/dashboard/orders/orderRecord";
 import { OrderTableHeader } from "@/components/dashboard/orders/orderTableHeader";
+import { FilterButton } from "@/components/dashboard/orders/ordersFilter";
+import { format } from "date-fns";
+import { X } from "lucide-react";
 
 export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
@@ -31,9 +26,31 @@ export default function OrdersPage() {
     "Cancelled",
   ];
 
-  const handleStatusSelect = (title: string) => {
-    setStatusFilter(title);
+  const handleFiltersApply = (filters: {
+    status: string;
+    dateRange: { from: Date; to: Date } | undefined;
+  }) => {
+    setStatusFilter(filters.status);
+    setDateRange(filters.dateRange);
   };
+
+  // Filter orders based on selected filters
+  const filteredOrders = mockOrders.filter((order) => {
+    // Filter by status
+    if (statusFilter !== "All Statuses" && order.status !== statusFilter) {
+      return false;
+    }
+
+    // Filter by date range
+    if (dateRange?.from && dateRange?.to) {
+      const orderDate = new Date(order.issueDate);
+      if (orderDate < dateRange.from || orderDate > dateRange.to) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -50,64 +67,94 @@ export default function OrdersPage() {
           Manage and view your store's orders
         </h2>
 
-        {/* Search and filters */}
-        <div className="border-t border-logo-border mt-6">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              {/* Search Bar */}
-              <SearchBar placeholder="Search orders" />
+        <div className="border-t border-logo-border mt-6 space-y-2 pt-3">
+          {/* Search and filters */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            {/* Search Bar */}
+            <SearchBar placeholder="Search orders" />
 
-              {/* Date Range Picker */}
-              {/* <DateRangePicker
-                date={dateRange}
-                onDateChange={setDateRange}
-                className="w-full sm:w-auto"
-              /> */}
+            {/* Filter Button */}
+            <FilterButton
+              onApplyFilters={handleFiltersApply}
+              statuses={orderStatuses}
+              initialStatus={statusFilter}
+              initialDateRange={dateRange}
+            />
 
-              {/* Status Filter */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  >
-                    <span className="ml-2">
-                      {orderStatuses.find((status) => statusFilter === status)}
-                    </span>
-                    <Image
-                      src="/icons/dropdown-colored.svg"
-                      alt="Dropdown Icon"
-                      width={20}
-                      height={20}
-                    />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {orderStatuses.map((status) => (
-                    <DropdownMenuItem
-                      key={status}
-                      onClick={() => handleStatusSelect(status)}
-                    >
-                      {status}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
             {/* Export button */}
             <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
               <span>Export Orders</span>
             </Button>
           </div>
 
+          {/* Active filter indicators */}
+          {(statusFilter !== "All Statuses" || dateRange) && (
+            <div className="flex items-center gap-2">
+              {statusFilter !== "All Statuses" && (
+                <div
+                  className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${
+                    statusFilter === "Pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : statusFilter === "Processing"
+                      ? "bg-blue-100 text-blue-800"
+                      : statusFilter === "Shipped"
+                      ? "bg-purple-100 text-purple-800"
+                      : statusFilter === "Delivered"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  <span>{statusFilter}</span>
+                  <button
+                    onClick={() => {
+                      const resetFilters = {
+                        status: "All Statuses",
+                        dateRange: dateRange,
+                      };
+
+                      setStatusFilter(resetFilters.status);
+
+                      // Apply the reset filters immediately
+                      handleFiltersApply(resetFilters);
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+              {dateRange && (
+                <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                  <span>
+                    {format(dateRange.from, "MMM dd, yyyy")} -{" "}
+                    {format(dateRange.to, "MMM dd, yyyy")}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const resetFilters = {
+                        status: statusFilter,
+                        dateRange: undefined,
+                      };
+
+                      setDateRange(resetFilters.dateRange);
+
+                      // Apply the reset filters immediately
+                      handleFiltersApply(resetFilters);
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Order listing table */}
-          <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+          <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
               <OrderTableHeader />
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample order rows */}
-                {mockOrders.map((order) => (
+                {filteredOrders.map((order) => (
                   <OrderRecord key={order.id} order={order} />
                 ))}
               </tbody>

@@ -7,7 +7,9 @@ export type IconName =
   | 'Users' 
   | 'BarChart2' 
   | 'Store' 
-  | 'Truck';
+  | 'Truck'
+  | 'Settings'
+  | 'LogOut';
 
 export interface SidebarElement {
     id: string
@@ -70,5 +72,17 @@ export const sidebarElements: SidebarElement[] = [
     iconName: 'Truck',
     title: 'Shipping Info',
     destination: '/dashboard/shipping',
+  },
+  {
+    id: '10',
+    iconName: 'Settings',
+    title: 'Account Settings',
+    destination: '/dashboard/account-settings',
+  },
+  {
+    id: '11',
+    iconName: 'LogOut',
+    title: 'Log Out',
+    destination: '/',
   },
 ]

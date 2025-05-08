@@ -1,5 +1,4 @@
 import type { SidebarElement } from "@/lib/sidebarElements";
-import Image from "next/image";
 import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import {
@@ -14,6 +13,8 @@ import {
   Truck,
   LucideIcon,
   CornerDownRight,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
 // Create a mapping of icon names to components
@@ -28,6 +29,8 @@ const iconMap: Record<string, LucideIcon> = {
   Store,
   Truck,
   CornerDownRight,
+  Settings,
+  LogOut,
 };
 
 export function SidebarElementComponent({
