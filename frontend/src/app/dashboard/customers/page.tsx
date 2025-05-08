@@ -81,7 +81,7 @@ export default function CustomersPage() {
         </div>
 
         {/* Filters and search */}
-        <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+        <div className="border-t border-logo-border mt-6 mb-2 space-y-2 pt-3 ">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             {/* Search Bar - Using the SearchBar component like in products page */}
             <SearchBar placeholder="Search by name or email..." />
