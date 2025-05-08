@@ -21,14 +21,15 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { CustomerDetailsTableHeader } from "@/components/dashboard/customers/customerDetailsTableHeader";
 import { CustomerOrderRecord } from "@/components/dashboard/customers/customerOrderRecord";
-import { Input } from "@/components/ui/input";
+import { SearchBar } from "@/components/ui/searchBar";
+import Image from "next/image";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FilterButton } from "@/components/dashboard/orders/ordersFilter";
 
 export default function CustomerDetailsPage({
   params,
@@ -38,26 +39,19 @@ export default function CustomerDetailsPage({
   const router = useRouter();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
-
-  // Filter states
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("date-desc");
-
-  // Pagination states
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
   const [page, setPage] = useState(1);
   const ordersPerPage = 10;
 
-  // Fix the TypeScript error by adding proper type annotation
   const { customerId } = React.use(params as any) as { customerId: string };
 
   useEffect(() => {
     const foundCustomer = customers.find((c) => c.id === customerId);
-
     if (foundCustomer) {
       setCustomer(foundCustomer);
-
-      // Filter orders that belong to this customer using the customerId field we added
       const filteredOrders = mockOrders.filter(
         (order) => order.customer.customerId === customerId
       );
@@ -71,16 +65,12 @@ export default function CustomerDetailsPage({
     router.push("/dashboard/customers");
   };
 
-  // Apply filters to orders
   const filteredOrders = useMemo(() => {
     return customerOrders
       .filter((order) => {
-        // Apply status filter
         if (statusFilter !== "all" && order.status !== statusFilter) {
           return false;
         }
-
-        // Apply search query (on order ID or payment method)
         if (
           searchQuery &&
           !order.id.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -88,11 +78,15 @@ export default function CustomerDetailsPage({
         ) {
           return false;
         }
-
+        if (
+          dateRange &&
+          (order.issueDate < dateRange.from || order.issueDate > dateRange.to)
+        ) {
+          return false;
+        }
         return true;
       })
       .sort((a, b) => {
-        // Apply sorting
         if (sortBy === "date-desc") {
           return b.issueDate.getTime() - a.issueDate.getTime();
         } else if (sortBy === "date-asc") {
@@ -104,9 +98,8 @@ export default function CustomerDetailsPage({
         }
         return 0;
       });
-  }, [customerOrders, statusFilter, searchQuery, sortBy]);
+  }, [customerOrders, statusFilter, searchQuery, sortBy, dateRange]);
 
-  // Paginate filtered orders
   const paginatedOrders = useMemo(() => {
     const startIndex = (page - 1) * ordersPerPage;
     return filteredOrders.slice(startIndex, startIndex + ordersPerPage);
@@ -114,10 +107,26 @@ export default function CustomerDetailsPage({
 
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, searchQuery, sortBy]);
+  }, [statusFilter, searchQuery, sortBy, dateRange]);
+
+  const handleFiltersApply = (filters: {
+    status: string;
+    dateRange?: { from: Date; to: Date } | undefined;
+  }) => {
+    setStatusFilter(filters.status === "All Statuses" ? "all" : filters.status);
+    setDateRange(filters.dateRange);
+  };
+
+  const orderStatuses = [
+    "all",
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+  ];
 
   if (!customer) {
     return (
@@ -130,7 +139,6 @@ export default function CustomerDetailsPage({
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -141,9 +149,7 @@ export default function CustomerDetailsPage({
           </div>
         </div>
 
-        {/* Combined customer info and stats card */}
         <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-          {/* Stats grid with 5 sections */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Customer ID</p>
@@ -164,11 +170,11 @@ export default function CustomerDetailsPage({
               <p className="text-lg font-semibold">
                 {customerOrders.length > 0
                   ? `EGP ${(
-                      customerOrders.reduce(
-                        (sum, order) => sum + order.total,
-                        0
-                      ) / customerOrders.length
-                    ).toFixed(2)}`
+                    customerOrders.reduce(
+                      (sum, order) => sum + order.total,
+                      0
+                    ) / customerOrders.length
+                  ).toFixed(2)}`
                   : "EGP 0.00"}
               </p>
             </div>
@@ -177,128 +183,142 @@ export default function CustomerDetailsPage({
               <p className="text-lg font-semibold">
                 {customerOrders.length > 0
                   ? format(
-                      new Date(
-                        Math.max(
-                          ...customerOrders.map((o) => o.issueDate.getTime())
-                        )
-                      ),
-                      "MMM d, yyyy"
-                    )
+                    new Date(
+                      Math.max(
+                        ...customerOrders.map((o) => o.issueDate.getTime())
+                      )
+                    ),
+                    "MMM d, yyyy"
+                  )
                   : "N/A"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Orders List Section */}
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4">Order History</h3>
 
-          {/* Filters and search - styled like customer page */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-grow">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search orders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  onClick={() => setStatusFilter("all")}
-                  className={
-                    statusFilter === "all"
-                      ? "bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
-                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  }
-                >
-                  All
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setStatusFilter("Pending")}
-                  className={
-                    statusFilter === "Pending"
-                      ? "bg-yellow-600 text-white hover:bg-yellow-700"
-                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  }
-                >
-                  Pending
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setStatusFilter("Processing")}
-                  className={
-                    statusFilter === "Processing"
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  }
-                >
-                  Processing
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setStatusFilter("Shipped")}
-                  className={
-                    statusFilter === "Shipped"
-                      ? "bg-purple-600 text-white hover:bg-purple-700"
-                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  }
-                >
-                  Shipped
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setStatusFilter("Delivered")}
-                  className={
-                    statusFilter === "Delivered"
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  }
-                >
-                  Delivered
-                </Button>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date-desc">Newest First</SelectItem>
-                    <SelectItem value="date-asc">Oldest First</SelectItem>
-                    <SelectItem value="value-desc">Highest Value</SelectItem>
-                    <SelectItem value="value-asc">Lowest Value</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <SearchBar
+                placeholder="Search orders..."
 
-              {(statusFilter !== "all" ||
-                searchQuery ||
-                sortBy !== "date-desc") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setStatusFilter("all");
-                    setSearchQuery("");
-                    setSortBy("date-desc");
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Reset Filters
-                </Button>
-              )}
+              />
+              <FilterButton
+                onApplyFilters={handleFiltersApply}
+                statuses={orderStatuses}
+                initialStatus={statusFilter}
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                  >
+                    <span className="ml-2">
+                      {sortBy === "date-desc" ? "Newest First" : sortBy === "date-asc" ? "Oldest First" : sortBy === "value-desc" ? "Highest Value" : "Lowest Value"}
+                    </span>
+                    <Image
+                      src="/icons/dropdown-colored.svg"
+                      alt="Dropdown Icon"
+                      width={20}
+                      height={20}
+                    />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setSortBy("date-desc")}>
+                    Newest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("date-asc")}>
+                    Oldest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("value-desc")}>
+                    Highest Value
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("value-asc")}>
+                    Lowest Value
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
+
+            {(statusFilter !== "all" || searchQuery || sortBy !== "date-desc" || dateRange) && (
+              <div className="flex items-center gap-2 mt-4">
+                {statusFilter !== "all" && (
+                  <div
+                    className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${statusFilter === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : statusFilter === "Processing"
+                          ? "bg-blue-100 text-blue-800"
+                          : statusFilter === "Shipped"
+                            ? "bg-purple-100 text-purple-800"
+                            : statusFilter === "Delivered"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                      }`}
+                  >
+                    <span>{statusFilter}</span>
+                    <button
+                      onClick={() => {
+                        setStatusFilter("all");
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                {searchQuery && (
+                  <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                    <span>Search: {searchQuery}</span>
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                {sortBy !== "date-desc" && (
+                  <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                    <span>
+                      {sortBy === "date-asc"
+                        ? "Oldest First"
+                        : sortBy === "value-desc"
+                          ? "Highest Value"
+                          : "Lowest Value"}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setSortBy("date-desc");
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                {dateRange && (
+                  <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                    <span>
+                      Date: {format(dateRange.from, "MMM d, yyyy")} -{" "}
+                      {format(dateRange.to, "MMM d, yyyy")}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setDateRange(undefined);
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Orders Table */}
           <div className="border rounded-lg border-logo-border overflow-hidden">
             <table className="min-w-full divide-y divide-logo-border">
               <CustomerDetailsTableHeader />
@@ -323,7 +343,6 @@ export default function CustomerDetailsPage({
             </table>
           </div>
 
-          {/* Pagination */}
           {filteredOrders.length > 0 && (
             <div className="py-4 px-6 border-b border-t border-logo-border bg-white rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
@@ -351,7 +370,6 @@ export default function CustomerDetailsPage({
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
-                  // Show pagination numbers centered around current page
                   let pageNum = i + 1;
                   if (totalPages > 5 && page > 3) {
                     pageNum = Math.min(page - 2 + i, totalPages - 4 + i);

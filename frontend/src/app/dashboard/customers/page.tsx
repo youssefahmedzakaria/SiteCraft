@@ -5,9 +5,16 @@ import { Sidebar } from "@/components/sidebar/sidebar";
 import { CustomerTableHeader } from "@/components/dashboard/customers/customerHeader";
 import { CustomerRecord } from "@/components/dashboard/customers/customerRecord";
 import { customers } from "@/lib/customers";
-import { Input } from "@/components/ui/input";
+import { SearchBar } from "@/components/ui/searchBar";
 import { Button } from "@/components/ui/button";
-import { Search, UserCheck, UserX, Users } from "lucide-react";
+import { UserCheck, UserX, Users } from "lucide-react";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -75,45 +82,41 @@ export default function CustomersPage() {
 
         {/* Filters and search */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setStatusFilter("All")}
-                className={statusFilter === "All" 
-                  ? "bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover" 
-                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
-              >
-                All
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setStatusFilter("Active")}
-                className={statusFilter === "Active" 
-                  ? "bg-green-600 text-white hover:bg-green-700" 
-                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
-              >
-                Active
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setStatusFilter("Suspended")}
-                className={statusFilter === "Suspended" 
-                  ? "bg-red-600 text-white hover:bg-red-700" 
-                  : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"}
-              >
-                Suspended
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            {/* Search Bar - Using the SearchBar component like in products page */}
+            <SearchBar placeholder="Search by name or email..." />
+
+            {/* Status Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                >
+                  <span className="ml-2">
+                    {statusFilter}
+                  </span>
+                  <Image
+                    src="/icons/dropdown-colored.svg"
+                    alt="Dropdown Icon"
+                    width={20}
+                    height={20}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setStatusFilter("All")}>
+                  All
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("Active")}>
+                  Active
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("Suspended")}>
+                  Suspended
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
