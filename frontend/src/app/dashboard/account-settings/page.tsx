@@ -100,7 +100,56 @@ export default function AccountSettingsPage() {
                   </div>
                 </div>
               </div>
-            <hr />
+              {/*  Contact Information Section */}
+              <div>
+                <CardTitle className="font-bold text-2xl mb-4">
+                  Contact Information
+                </CardTitle>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      required
+                      placeholder="Your Phone Number"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      This number will be visible on your storefront and can
+                      help customers reach you.
+                    </p>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex">
+                      <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                        https://
+                      </span>
+                      <Input
+                        id="email"
+                        name="email"
+                        required
+                        className="rounded-l-none"
+                        placeholder="youremail@example.com"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      This email will be visible on your storefront and can help
+                      customers reach you.
+                    </p>
+                  </div>
+                </div>
+              </div>
               {/* Social Media Section */}
               <div>
                 <CardTitle className="font-bold text-2xl mb-4">
@@ -155,7 +204,10 @@ export default function AccountSettingsPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="twitter"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       X (Twitter)
                     </label>
                     <div className="flex">
@@ -201,7 +253,7 @@ export default function AccountSettingsPage() {
                   type="submit"
                   className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
                 >
-                    Save Changes
+                  Save Changes
                 </Button>
                 <Link href="/dashboard/account-settings">
                   <Button
