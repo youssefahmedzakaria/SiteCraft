@@ -158,15 +158,18 @@ export function HeaderLayoutItems() {
               </div>
             )}
             {layoutId === 6 && (
-              <div className="flex items-center justify-center justify-between w-full p-[2px] h-3 bg-gray-300">
-                <div
-                  className={`w-1 h-1 rounded-full ${
-                    6 === layoutSelected
-                      ? "bg-gray-800 border-gray-500"
-                      : "bg-white"
-                  }`}
-                ></div>
-                <div className="flex-col h-full space-y-[1px] justify-center items-center">
+              <div className="flex items-center justify-between w-full h-3 bg-gray-300">
+                <div className="w-1/3 h-full flex items-center justify-center">
+                  <div
+                    className={`w-1 h-1 rounded-full ${
+                      6 === layoutSelected
+                        ? "bg-gray-800 border-gray-500"
+                        : "bg-white"
+                    }`}
+                  ></div>
+                </div>
+                <div className="w-1/3 h-full"></div>
+                <div className="flex flex-col w-1/3 h-full justify-center items-center gap-[1.5px]">
                   <div
                     className={`w-1.5 h-[1px] ${
                       6 === layoutSelected
@@ -192,8 +195,8 @@ export function HeaderLayoutItems() {
               </div>
             )}
             {layoutId === 7 && (
-              <div className="flex items-center justify-center justify-between w-full h-3 bg-gray-300">
-                <div className="flex-col h-full w-1/3 space-y-[1px] justify-center items-center">
+              <div className="flex items-center justify-between w-full h-3 bg-gray-300">
+                <div className="flex flex-col w-1/3 h-full justify-center items-center gap-[1.5px]">
                   <div
                     className={`w-1.5 h-[1px] ${
                       7 === layoutSelected
@@ -216,7 +219,7 @@ export function HeaderLayoutItems() {
                     }`}
                   ></div>
                 </div>
-                <div className="w-1/3 h-full">
+                <div className="w-1/3 h-full flex items-center justify-center">
                   <div
                     className={`w-1 h-1 rounded-full ${
                       7 === layoutSelected
@@ -225,7 +228,7 @@ export function HeaderLayoutItems() {
                     }`}
                   ></div>
                 </div>
-                <div className="`w-1/3 h-full" />
+                <div className="w-1/3 h-full"></div>
               </div>
             )}
             {layoutId === 8 && (

@@ -1,14 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import {
   ChevronDown,
   ChevronRight,
   GripVertical,
-  Upload,
   Image as ImageIcon,
 } from "lucide-react";
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { HeaderLayoutItems } from "./headerLayoutItems";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { setStyle } from "framer-motion";
 
 type SectionName = "background" | "menuAndIcons";
 
@@ -70,10 +78,50 @@ export function RenderHeaderSection({
   });
 
   const toggleSection = (section: SectionName) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+    setExpandedSections((prev) => {
+      const isCurrentlyOpen = prev[section];
+
+      // If it's already open, close all
+      if (isCurrentlyOpen) {
+        return {
+          background: false,
+          menuAndIcons: false,
+        };
+      }
+
+      // Otherwise, open the clicked section and close others
+      return {
+        background: false,
+        menuAndIcons: false,
+        [section]: true,
+      };
+    });
+  };
+
+  // Add a state for color values
+  const [colors, setColors] = useState({
+    background: "#ffffff",
+    menuAndIcons: "#000000",
+  });
+
+  const [style, setStyle] = useState<
+    "default" | "transparent" | "grayscale-transparent" | "solid-color"
+  >("default");
+
+  const handleStyleChange = (
+    type: "default" | "transparent" | "grayscale-transparent" | "solid-color"
+  ) => {
+    setStyle(type);
+  };
+
+  const [fontFamily, setFontFamily] = useState<
+    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  >("inter");
+
+  const handleFontFamilyChange = (
+    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  ) => {
+    setFontFamily(type);
   };
 
   return (
@@ -189,7 +237,7 @@ export function RenderHeaderSection({
           {/* Background Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
+              className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("background")}
             >
               <div className="flex items-center gap-2">
@@ -207,19 +255,51 @@ export function RenderHeaderSection({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm mb-2">Style</label>
-                  <select
-                    className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => {
-                      // Handle background style change
-                    }}
-                  >
-                    <option value="default">Default</option>
-                    <option value="transparent">Transparent</option>
-                    <option value="grayscale-transparent">
-                      Grayscale transparent
-                    </option>
-                    <option value="solid-color">Solid color</option>
-                  </select>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {style === "default"
+                            ? "Default"
+                            : style === "transparent"
+                            ? "Transparent"
+                            : style === "grayscale-transparent"
+                            ? "Grayscale transparent"
+                            : "Solid color"}
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("default")}
+                      >
+                        Default
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("transparent")}
+                      >
+                        Transparent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleStyleChange("grayscale-transparent")
+                        }
+                      >
+                        Grayscale transparent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStyleChange("solid-color")}
+                      >
+                        Solid color
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Color picker for Grayscale transparent and Solid color options */}
@@ -228,9 +308,24 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
+                      value={colors.background}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        // Handle menu color change
+                        setColors((prev) => ({
+                          ...prev,
+                          background: e.target.value,
+                        }));
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={colors.background}
+                      className="flex-1 border-none bg-transparent focus:outline-none"
+                      onChange={(e) => {
+                        setColors((prev) => ({
+                          ...prev,
+                          background: e.target.value,
+                        }));
                       }}
                     />
                   </div>
@@ -242,7 +337,7 @@ export function RenderHeaderSection({
           {/* Menu & Icons Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
+              className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("menuAndIcons")}
             >
               <div className="flex items-center gap-2">
@@ -260,18 +355,55 @@ export function RenderHeaderSection({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm mb-2">Font Family</label>
-                  <select
-                    className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => {
-                      // Handle font change
-                    }}
-                  >
-                    <option value="inter">Inter</option>
-                    <option value="roboto">Roboto</option>
-                    <option value="open-sans">Open Sans</option>
-                    <option value="poppins">Poppins</option>
-                    <option value="lato">Lato</option>
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {fontFamily === "inter"
+                            ? "Inter"
+                            : fontFamily === "roboto"
+                            ? "Roboto"
+                            : fontFamily === "open-sans"
+                            ? "Open Sans"
+                            : fontFamily === "poppins"
+                            ? "Poppins"
+                            : "Lato"}
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("inter")}
+                      >
+                        Inter
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("roboto")}
+                      >
+                        Roboto
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("open-sans")}
+                      >
+                        Open Sans
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("poppins")}
+                      >
+                        Poppins
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleFontFamilyChange("lato")}
+                      >
+                        Lato
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className="color-picker-container">
@@ -279,9 +411,24 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
+                      value={colors.menuAndIcons}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        // Handle menu color change
+                        setColors((prev) => ({
+                          ...prev,
+                          menuAndIcons: e.target.value,
+                        }));
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={colors.menuAndIcons}
+                      className="flex-1 border-none bg-transparent focus:outline-none"
+                      onChange={(e) => {
+                        setColors((prev) => ({
+                          ...prev,
+                          menuAndIcons: e.target.value,
+                        }));
                       }}
                     />
                   </div>
@@ -293,4 +440,12 @@ export function RenderHeaderSection({
       )}
     </div>
   );
+}
+
+{
+  /* <option value="inter">Inter</option>
+<option value="roboto">Roboto</option>
+<option value="open-sans">Open Sans</option>
+<option value="poppins">Poppins</option>
+<option value="lato">Lato</option> */
 }
