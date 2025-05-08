@@ -6,7 +6,7 @@ import {
   GripVertical,
   Image as ImageIcon,
 } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
 import { HeaderLayoutItems } from "./headerLayoutItems";
 import {
@@ -16,12 +16,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { setStyle } from "framer-motion";
 
 type SectionName = "background" | "menuAndIcons";
 
 interface RenderHeaderSectionProps {
   detailedSectionTab: string;
+}
+interface Section {
+  id: string;
+  title: string;
+  selected: boolean;
 }
 
 export function RenderHeaderSection({
@@ -50,11 +54,11 @@ export function RenderHeaderSection({
     fileInputRef.current?.click();
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOverImage = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDropImage = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
@@ -98,12 +102,17 @@ export function RenderHeaderSection({
     });
   };
 
-  // Add a state for color values
+  {
+    /* For color selection in design */
+  }
   const [colors, setColors] = useState({
     background: "#ffffff",
     menuAndIcons: "#000000",
   });
 
+  {
+    /* for dropdownds in design */
+  }
   const [style, setStyle] = useState<
     "default" | "transparent" | "grayscale-transparent" | "solid-color"
   >("default");
@@ -124,6 +133,83 @@ export function RenderHeaderSection({
     setFontFamily(type);
   };
 
+  {
+    /* for sections reorder and management */
+  }
+  const [sections, setSections] = useState<Section[]>([
+    {
+      id: "home",
+      title: "Home",
+      selected: true,
+    },
+    {
+      id: "products",
+      title: "Products",
+      selected: true,
+    },
+    {
+      id: "categories",
+      title: "Categories",
+      selected: true,
+    },
+    {
+      id: "about",
+      title: "About Us",
+      selected: true,
+    },
+    {
+      id: "contact",
+      title: "Contact Us",
+      selected: true,
+    },
+  ]);
+
+  const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(
+    null
+  );
+  // Reference for section DOM elements
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+
+  // Drag and drop handlers
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedSectionIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
+    if (
+      draggedSectionIndex !== null &&
+      sectionRefs.current[sections[draggedSectionIndex].id]
+    ) {
+      const el = sectionRefs.current[sections[draggedSectionIndex].id];
+      if (el) {
+        el.classList.remove("opacity-50");
+      }
+    }
+    setDraggedSectionIndex(null);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    return false;
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
+    e.preventDefault();
+
+    if (draggedSectionIndex === null) return;
+    if (draggedSectionIndex === dropIndex) return;
+
+    const newSections = [...sections]; // Create a new array
+    const draggedSection = newSections[draggedSectionIndex];
+
+    newSections.splice(draggedSectionIndex, 1);
+    newSections.splice(dropIndex, 0, draggedSection);
+
+    setSections(newSections); // Set the *new* array as state
+    setDraggedSectionIndex(null);
+  };
+
   return (
     <div>
       {detailedSectionTab === "content" ? (
@@ -133,8 +219,8 @@ export function RenderHeaderSection({
             <h3 className="font-medium mb-2">Site Logo</h3>
             <div
               className="flex flex-col items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDragOver={handleDragOverImage}
+              onDrop={handleDropImage}
             >
               <div
                 className={`relative w-16 h-16 rounded ${
@@ -193,7 +279,38 @@ export function RenderHeaderSection({
           <div>
             <h3 className="font-medium mb-2">Menu Items</h3>
             <div className="space-y-2">
-              {["Home", "Products", "Categories", "About Us", "Contact Us"].map(
+              {sections.map((section, index) => (
+                <div
+                  key={section.id}
+                  ref={(el) => {
+                    sectionRefs.current[section.id] = el;
+                  }}
+                  className={`flex items-center gap-2 p-2 border border-gray-200 rounded ${
+                    draggedSectionIndex === index ? "opacity-50" : ""
+                  }`}
+                  draggable={true}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                >
+                  <div
+                    className="cursor-grab flex items-center text-gray-400 hover:text-gray-600"
+                    title="Drag to reorder"
+                  >
+                    <GripVertical size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    defaultValue={section.title}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Handle menu item text change here
+                    }}
+                  />
+                </div>
+              ))}
+              {/* {["Home", "Products", "Categories", "About Us", "Contact Us"].map(
                 (item, index) => (
                   <div
                     key={index}
@@ -225,7 +342,7 @@ export function RenderHeaderSection({
                     />
                   </div>
                 )
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -440,12 +557,4 @@ export function RenderHeaderSection({
       )}
     </div>
   );
-}
-
-{
-  /* <option value="inter">Inter</option>
-<option value="roboto">Roboto</option>
-<option value="open-sans">Open Sans</option>
-<option value="poppins">Poppins</option>
-<option value="lato">Lato</option> */
 }
