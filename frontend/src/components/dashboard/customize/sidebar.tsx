@@ -9,9 +9,6 @@ import {
   GripVertical,
   ArrowLeft,
 } from "lucide-react";
-import { Upload } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { RenderCoverSection } from "./renderCoverSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
 

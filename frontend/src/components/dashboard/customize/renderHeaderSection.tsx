@@ -18,6 +18,9 @@ interface RenderHeaderSectionProps {
 export function RenderHeaderSection({
   detailedSectionTab,
 }: RenderHeaderSectionProps) {
+  {
+    /* For image selection in content */
+  }
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +58,9 @@ export function RenderHeaderSection({
     }
   };
 
+  {
+    /* For expandable sections in design */
+  }
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
@@ -68,6 +74,11 @@ export function RenderHeaderSection({
       [section]: !prev[section],
     }));
   };
+
+  {
+    /* For layout selection in design */
+  }
+  const [layoutSelected, setLayoutSelected] = useState<number | null>(1);
 
   return (
     <div>
@@ -100,15 +111,27 @@ export function RenderHeaderSection({
                 )}
               </div>
               <div className="flex items-center gap-2 rounded">
-                <p className="text-xs">
-                  Drag and drop your image here, or{" "}
-                  <span
-                    className="cursor-pointer underline"
-                    onClick={handleBrowseClick}
-                  >
-                    browse
-                  </span>
-                </p>
+                {imagePreview ? (
+                  <p className="text-xs">
+                    Drag and drop your image here to change logo, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-xs">
+                    Drag and drop your logo here, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                )}
               </div>
               <input
                 ref={fileInputRef}
@@ -171,12 +194,12 @@ export function RenderHeaderSection({
               {[1, 2, 3, 4, 5, 6, 7, 8].map((layoutId) => (
                 <button
                   key={layoutId}
-                  className={`aspect-square p-2 rounded border border-gray-200 hover:border-blue-500 transition-colors ${
-                    layoutId === 1 ? "bg-gray-900 border-blue-500" : "bg-white"
+                  className={`aspect-square px-2 rounded border border-gray-200 hover:border-gray-900 transition-colors shadow ${
+                    layoutId === layoutSelected
+                      ? "bg-gray-900 border-gray-500"
+                      : "bg-white"
                   }`}
-                  onClick={() => {
-                    // Handle layout selection
-                  }}
+                  onClick={() => setLayoutSelected(layoutId)}
                 >
                   {layoutId === 1 && (
                     <div className="w-full h-1.5 bg-gray-300 rounded mb-1" />
