@@ -1,7 +1,18 @@
-export function ProductTableHeader() {
+export function ProductTableHeader({
+  selectAll,
+  onSelectAll,
+}: {
+  selectAll?: boolean
+  onSelectAll?: () => void
+}) {
     return (
         <thead className="bg-logo-light-button">
             <tr>
+            <th
+                scope="col"
+                className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"
+                >
+                </th>
                 <th
                 scope="col"
                 className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"

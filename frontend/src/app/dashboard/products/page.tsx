@@ -1,59 +1,64 @@
-"use client";
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Sidebar } from "@/components/sidebar/sidebar";
-import Image from "next/image";
-import { products } from "@/lib/products";
-import { productAnalytics } from "@/lib/generalAnalytics";
-import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
-import { ProductRecord } from "@/components/dashboard/products/productRecord";
-import { SearchBar } from "@/components/ui/searchBar";
-import { ProductTableHeader } from "@/components/dashboard/products/productTableHeader";
+"use client"
+import type React from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Sidebar } from "@/components/sidebar/sidebar"
+import Image from "next/image"
+import { products } from "@/lib/products"
+import { productAnalytics } from "@/lib/generalAnalytics"
+import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard"
+import { ProductRecord } from "@/components/dashboard/products/productRecord"
+import { SearchBar } from "@/components/ui/searchBar"
+import { ProductTableHeader } from "@/components/dashboard/products/productTableHeader"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useState } from "react";
-import { categories } from "@/lib/categories";
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent
+} from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import { categories } from "@/lib/categories"
+import { ApplyDiscountDialog } from "@/components/dashboard/products/dicountDialog"
 
 export default function ProductPage() {
-  const [categoryFilter, setCategoryFilter] =
-    useState<string>("All Categories");
-  const [StockFilter, setStockFilter] = useState<string>("All Stock");
-  const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
-  const [file, setFile] = useState<File | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories")
+  const [StockFilter, setStockFilter] = useState<string>("All Stock")
+  const stockStatuses = ["All Stock", "In Stock", "Out of Stock"]
+  const [file, setFile] = useState<File | null>(null)
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+  const [selectAll, setSelectAll] = useState<boolean>(false)
+  const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false)
 
   const handleCategorySelect = (title: string) => {
-    setCategoryFilter(title);
-  };
+    setCategoryFilter(title)
+  }
 
   const handleStockSelect = (title: string) => {
-    setStockFilter(title);
-  };
+    setStockFilter(title)
+  }
 
   const filteredProducts = products.filter((product) => {
     if (categoryFilter === "All Categories" && StockFilter === "All Stock") {
-      return true;
+      return true
     }
     if (categoryFilter !== "All Categories" && StockFilter === "All Stock") {
-      return product.category === categoryFilter;
+      return product.category === categoryFilter
     }
     if (StockFilter !== "All Stock" && categoryFilter === "All Categories") {
-      return product.status === StockFilter;
+      return product.status === StockFilter
     }
-    return (
-      product.category === categoryFilter && product.status === StockFilter
-    );
-  });
+    return product.category === categoryFilter && product.status === StockFilter
+  })
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
+    const selectedFile = event.target.files?.[0]
     if (selectedFile) {
-      setFile(selectedFile);
-      console.log("File selected:", selectedFile.name);
+      setFile(selectedFile)
+      console.log("File selected:", selectedFile.name)
 
       // Optional: You could add file reading logic here
       // const reader = new FileReader();
@@ -63,7 +68,28 @@ export default function ProductPage() {
       // };
       // reader.readAsText(selectedFile);
     }
+  }
+
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProducts((prevSelected) =>
+      prevSelected.includes(productId) ? prevSelected.filter((id) => id !== productId) : [...prevSelected, productId],
+    )
+  }
+
+  const handleSelectAll = () => {
+    setSelectAll((prevSelectAll) => !prevSelectAll)
+    if (!selectAll) {
+      setSelectedProducts(filteredProducts.map((product) => product.id))
+    } else {
+      setSelectedProducts([])
+    }
+  }
+
+  const handleSelectByCategory = (category: string) => {
+    const categoryProducts = filteredProducts.filter(product => product.category === category);
+    setSelectedProducts(categoryProducts.map(p => p.id));
   };
+
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -75,18 +101,11 @@ export default function ProductPage() {
 
         {/* Header section */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-4">
-          <h2 className="text-lg md:text-xl font-semibold">
-            Manage your product inventory and details
-          </h2>
+          <h2 className="text-lg md:text-xl font-semibold">Manage your product inventory and details</h2>
           <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
             <Link href="/dashboard/products/add" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                <Image
-                  src="/icons/plus.svg"
-                  alt="Add Icon"
-                  width={20}
-                  height={20}
-                />
+                <Image src="/icons/plus.svg" alt="Add Icon" width={20} height={20} />
                 <span className="ml-2">Add New Product</span>
               </Button>
             </Link>
@@ -98,19 +117,12 @@ export default function ProductPage() {
                   className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">Import or Export Categories</span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>
-                  <label htmlFor="import-file">
-                    Import Categories From Excel Sheet
-                  </label>
+                  <label htmlFor="import-file">Import Categories From Excel Sheet</label>
                   <input
                     id="import-file"
                     type="file"
@@ -119,9 +131,7 @@ export default function ProductPage() {
                     style={{ display: "none" }}
                   />
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log(file)}>
-                  Export All Categories
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log(file)}>Export All Categories</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -149,32 +159,18 @@ export default function ProductPage() {
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">
-                    {categoryFilter === "All Categories"
-                      ? "All Categories"
-                      : ""}
-                    {categories.map((category) =>
-                      categoryFilter === category.title ? category.title : ""
-                    )}
+                    {categoryFilter === "All Categories" ? "All Categories" : ""}
+                    {categories.map((category) => (categoryFilter === category.title ? category.title : ""))}
                   </span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() => handleCategorySelect("All Categories")}
-                >
+                <DropdownMenuItem onClick={() => handleCategorySelect("All Categories")}>
                   All Categories
                 </DropdownMenuItem>
                 {categories.map((category) => (
-                  <DropdownMenuItem
-                    key={category.id}
-                    onClick={() => handleCategorySelect(category.title)}
-                  >
+                  <DropdownMenuItem key={category.id} onClick={() => handleCategorySelect(category.title)}>
                     {category.title}
                   </DropdownMenuItem>
                 ))}
@@ -188,25 +184,13 @@ export default function ProductPage() {
                   size="lg"
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
-                  <span className="ml-2">
-                    {stockStatuses.map((status) =>
-                      StockFilter === status ? status : ""
-                    )}
-                  </span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <span className="ml-2">{stockStatuses.map((status) => (StockFilter === status ? status : ""))}</span>
+                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {stockStatuses.map((status) => (
-                  <DropdownMenuItem
-                    key={status}
-                    onClick={() => handleStockSelect(status)}
-                  >
+                  <DropdownMenuItem key={status} onClick={() => handleStockSelect(status)}>
                     {status}
                   </DropdownMenuItem>
                 ))}
@@ -214,14 +198,66 @@ export default function ProductPage() {
             </DropdownMenu>
           </div>
 
+          {/* Selection and Applying Discount */}
+          <div className="flex items-center  pt-1 mt-4 gap-6">
+            <DropdownMenu open={selectionDropdownOpen} onOpenChange={setSelectionDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="text-logo-txt hover:bg-logo-light-button-hover border-logo-border">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-blue-600 mr-2"
+                    checked={selectedProducts.length > 0}
+                    readOnly
+                  />
+                  {selectedProducts.length > 0 ? `${selectedProducts.length} Selected` : null}
+                  <Image src="/icons/dropdown-colored.svg" alt="Dropdown Icon" width={20} height={20} className="ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={handleSelectAll}>
+                  Select All ({filteredProducts.length})
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedProducts([])}>
+                  Select None
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <span>Select by Category</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      {categories.map((category) => (
+                        <DropdownMenuItem 
+                          key={category.id} 
+                          onSelect={() => handleSelectByCategory(category.title)}
+                        >
+                          {category.title}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {selectedProducts.length > 0 && (
+              <ApplyDiscountDialog products={selectedProducts} />
+            )}
+          </div>
+
           {/* Product listing table (responsive) */}
           <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
-              <ProductTableHeader />
+              <ProductTableHeader selectAll={selectAll} onSelectAll={handleSelectAll} />
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample product rows */}
                 {filteredProducts.map((product) => (
-                  <ProductRecord key={product.id} product={product} />
+                  <ProductRecord
+                    key={product.id}
+                    product={product}
+                    isSelected={selectedProducts.includes(product.id)}
+                    onSelect={handleSelectProduct}
+                  />
                 ))}
               </tbody>
             </table>
@@ -229,5 +265,5 @@ export default function ProductPage() {
         </div>
       </main>
     </div>
-  );
+  )
 }
