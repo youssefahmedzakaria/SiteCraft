@@ -8,6 +8,8 @@ import {
   X,
   GripVertical,
   ArrowLeft,
+  Images,
+  AppWindow,
 } from "lucide-react";
 import { RenderPromoSection } from "./renderPromoSction";
 import { RenderHeaderSection } from "./renderHeaderSection";
@@ -25,13 +27,13 @@ export function Sidebar() {
     {
       id: "Header&Menu",
       title: "Header & Menu",
-      icon: <Paintbrush size={18} />,
+      icon: <AppWindow size={18} />,
       expanded: false,
     },
     {
       id: "PromoSlider",
       title: "Promo Slider",
-      icon: <GripVertical size={18} />,
+      icon: <Images size={18} />,
       expanded: false,
     },
   ]);

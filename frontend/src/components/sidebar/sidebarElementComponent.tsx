@@ -49,7 +49,6 @@ export function SidebarElementComponent({
    const IconComponent = iconMap[element.iconName];
 
   return (
-    console.log(pathname + " " + element.destination),
     (
       <>
         <Button
