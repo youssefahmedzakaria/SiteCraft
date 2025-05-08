@@ -9,7 +9,7 @@ import {
   GripVertical,
   ArrowLeft,
 } from "lucide-react";
-import { RenderCoverSection } from "./renderCoverSection";
+import { RenderPromoSection } from "./renderPromoSction";
 import { RenderHeaderSection } from "./renderHeaderSection";
 
 interface Section {
@@ -29,8 +29,8 @@ export function Sidebar() {
       expanded: false,
     },
     {
-      id: "Cover&Headline",
-      title: "Cover & Headline",
+      id: "PromoSlider",
+      title: "Promo Slider",
       icon: <GripVertical size={18} />,
       expanded: false,
     },
@@ -192,8 +192,8 @@ export function Sidebar() {
           {/* Detailed Section Content */}
           {detailedSection.id === "Header&Menu" ? (
             <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
-          ) : detailedSection.id === "Cover&Headline" ? (
-            <RenderCoverSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "PromoSlider" ? (
+            <RenderPromoSection detailedSectionTab={detailedSectionTab} />
           ) : null}
         </div>
       ) : (

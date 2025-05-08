@@ -310,39 +310,6 @@ export function RenderHeaderSection({
                   />
                 </div>
               ))}
-              {/* {["Home", "Products", "Categories", "About Us", "Contact Us"].map(
-                (item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 p-2 border border-gray-200 rounded"
-                    draggable
-                    onDragStart={(e) =>
-                      e.dataTransfer.setData("text/plain", index.toString())
-                    }
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const draggedIndex = parseInt(
-                        e.dataTransfer.getData("text/plain")
-                      );
-                      // Handle menu item reordering here
-                    }}
-                  >
-                    <GripVertical
-                      size={16}
-                      className="text-gray-400 cursor-grab"
-                    />
-                    <input
-                      type="text"
-                      defaultValue={item}
-                      className="flex-1 border-none bg-transparent focus:outline-none"
-                      onChange={(e) => {
-                        // Handle menu item text change here
-                      }}
-                    />
-                  </div>
-                )
-              )} */}
             </div>
           </div>
         </div>
