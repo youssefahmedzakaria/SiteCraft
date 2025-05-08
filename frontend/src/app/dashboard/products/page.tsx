@@ -87,7 +87,26 @@ export default function ProductPage() {
 
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(product => product.category === category);
-    setSelectedProducts(categoryProducts.map(p => p.id));
+    const newSelection = [...selectedProducts];
+    
+    // Toggle category selection
+    const allInCategorySelected = categoryProducts.every(p => selectedProducts.includes(p.id));
+    
+    if (allInCategorySelected) {
+      // Remove all products from this category
+      newSelection.splice(0, newSelection.length, 
+        ...newSelection.filter(id => !categoryProducts.some(p => p.id === id))
+      );
+    } else {
+      // Add all products from this category
+      categoryProducts.forEach(p => {
+        if (!newSelection.includes(p.id)) {
+          newSelection.push(p.id);
+        }
+      });
+    }
+    
+    setSelectedProducts(newSelection);
   };
 
 
@@ -169,11 +188,34 @@ export default function ProductPage() {
                 <DropdownMenuItem onClick={() => handleCategorySelect("All Categories")}>
                   All Categories
                 </DropdownMenuItem>
-                {categories.map((category) => (
-                  <DropdownMenuItem key={category.id} onClick={() => handleCategorySelect(category.title)}>
-                    {category.title}
-                  </DropdownMenuItem>
-                ))}
+                {categories.map((category) => {
+                  const categoryProducts = filteredProducts.filter(p => p.category === category.title);
+                  const hasProducts = categoryProducts.length > 0;
+                  const allSelected = hasProducts && categoryProducts.every(p => selectedProducts.includes(p.id));
+                  
+                  return (
+                    <DropdownMenuItem 
+                      key={category.id} 
+                      onSelect={() => hasProducts && handleSelectByCategory(category.title)}
+                      className={!hasProducts ? "opacity-50 cursor-not-allowed" : ""}
+                    >
+                      {allSelected && (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-4 w-4 mr-2" 
+                          viewBox="0 0 20 20" 
+                          fill="currentColor"
+                        >
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {category.title}
+                      {!hasProducts && (
+                        <span className="ml-2 text-xs text-gray-500">(no products)</span>
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
             {/* Stock Filter */}
@@ -226,14 +268,34 @@ export default function ProductPage() {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      {categories.map((category) => (
-                        <DropdownMenuItem 
-                          key={category.id} 
-                          onSelect={() => handleSelectByCategory(category.title)}
-                        >
-                          {category.title}
-                        </DropdownMenuItem>
-                      ))}
+                      {categories.map((category) => {
+                        const categoryProducts = filteredProducts.filter(p => p.category === category.title);
+                        const hasProducts = categoryProducts.length > 0;
+                        const allSelected = hasProducts && categoryProducts.every(p => selectedProducts.includes(p.id));
+                        
+                        return (
+                          <DropdownMenuItem 
+                            key={category.id} 
+                            onSelect={() => hasProducts && handleSelectByCategory(category.title)}
+                            className={!hasProducts ? "opacity-50 cursor-not-allowed" : ""}
+                          >
+                            {allSelected && (
+                              <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                className="h-4 w-4 mr-2" 
+                                viewBox="0 0 20 20" 
+                                fill="currentColor"
+                              >
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                            {category.title}
+                            {!hasProducts && (
+                              <span className="ml-2 text-xs text-gray-500">(no products)</span>
+                            )}
+                          </DropdownMenuItem>
+                        );
+                      })}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
@@ -248,7 +310,7 @@ export default function ProductPage() {
           {/* Product listing table (responsive) */}
           <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
-              <ProductTableHeader selectAll={selectAll} onSelectAll={handleSelectAll} />
+              <ProductTableHeader/>
               <tbody className="bg-white divide-y divide-logo-border">
                 {/* Sample product rows */}
                 {filteredProducts.map((product) => (

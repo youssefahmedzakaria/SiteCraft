@@ -1,10 +1,4 @@
-export function ProductTableHeader({
-  selectAll,
-  onSelectAll,
-}: {
-  selectAll?: boolean
-  onSelectAll?: () => void
-}) {
+export function ProductTableHeader() {
     return (
         <thead className="bg-logo-light-button">
             <tr>
