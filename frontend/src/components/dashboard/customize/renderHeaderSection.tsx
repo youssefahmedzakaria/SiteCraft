@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import React, { useState, useRef } from "react";
 import Image from "next/image";
+import { HeaderLayoutItems } from "./headerLayoutItems";
 
 type SectionName = "background" | "menuAndIcons";
 
@@ -18,6 +19,9 @@ interface RenderHeaderSectionProps {
 export function RenderHeaderSection({
   detailedSectionTab,
 }: RenderHeaderSectionProps) {
+  {
+    /* For image selection in content */
+  }
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +59,9 @@ export function RenderHeaderSection({
     }
   };
 
+  {
+    /* For expandable sections in design */
+  }
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
@@ -100,15 +107,27 @@ export function RenderHeaderSection({
                 )}
               </div>
               <div className="flex items-center gap-2 rounded">
-                <p className="text-xs">
-                  Drag and drop your image here, or{" "}
-                  <span
-                    className="cursor-pointer underline"
-                    onClick={handleBrowseClick}
-                  >
-                    browse
-                  </span>
-                </p>
+                {imagePreview ? (
+                  <p className="text-xs">
+                    Drag and drop your image here to change logo, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-xs">
+                    Drag and drop your logo here, or{" "}
+                    <span
+                      className="cursor-pointer underline"
+                      onClick={handleBrowseClick}
+                    >
+                      browse
+                    </span>
+                  </p>
+                )}
               </div>
               <input
                 ref={fileInputRef}
@@ -165,63 +184,8 @@ export function RenderHeaderSection({
       ) : (
         <div className="p-4 space-y-6">
           {/* Layout Section */}
-          <div>
-            <h3 className="font-medium mb-2">Layout</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((layoutId) => (
-                <button
-                  key={layoutId}
-                  className={`aspect-square p-2 rounded border border-gray-200 hover:border-blue-500 transition-colors ${
-                    layoutId === 1 ? "bg-gray-900 border-blue-500" : "bg-white"
-                  }`}
-                  onClick={() => {
-                    // Handle layout selection
-                  }}
-                >
-                  {layoutId === 1 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded mb-1" />
-                  )}
-                  {layoutId === 2 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded mt-2" />
-                  )}
-                  {layoutId === 3 && (
-                    <div className="flex justify-between">
-                      <div className="w-1/3 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/3 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 4 && (
-                    <div className="flex justify-between">
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                      <div className="w-1/4 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 5 && (
-                    <div className="w-full flex justify-center">
-                      <div className="w-3/4 h-1.5 bg-gray-300 rounded" />
-                    </div>
-                  )}
-                  {layoutId === 6 && (
-                    <div className="flex items-center justify-between">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                    </div>
-                  )}
-                  {layoutId === 7 && (
-                    <div className="flex items-center justify-between">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                    </div>
-                  )}
-                  {layoutId === 8 && (
-                    <div className="w-full h-1.5 bg-gray-300 rounded" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+          <HeaderLayoutItems />
+
           {/* Background Section */}
           <div className="flex items-center">
             <button
