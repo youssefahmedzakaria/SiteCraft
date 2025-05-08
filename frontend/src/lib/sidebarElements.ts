@@ -23,7 +23,7 @@ export const sidebarElements: SidebarElement[] = [
     id: '1',
     iconName: 'Home',
     title: 'Overview',
-    destination: '/dashboard/overview',
+    destination: '/dashboard',
   },
   {
     id: '2',
