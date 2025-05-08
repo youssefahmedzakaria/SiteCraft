@@ -76,38 +76,42 @@ export function PromoLayoutItems() {
               </div>
             )}
             {layoutId === 4 && (
-              <div className="w-12 h-6 bg-gray-300 flex flex-col items-center justify-center p-[2px]">
+              <div className="w-12 h-6 bg-gray-300 flex flex-col items-start justify-end p-[3px] space-y-0.5">
                 <div
-                  className={`w-full h-full flex flex-col justify-end space-y-0.5 p-[2px] ${
-                    4 === layoutSelected
+                  className={`w-5 h-0.5 bg-gray-300 ${
+                    3 === layoutSelected
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
-                >
-                  <div className="w-5 h-0.5 bg-gray-300" />
-                  <div className="w-3 h-0.5 bg-gray-300" />
-                </div>
+                />
+                <div
+                  className={`w-3 h-0.5 bg-gray-300 ${
+                    3 === layoutSelected
+                      ? "bg-gray-800 border-gray-500"
+                      : "bg-white"
+                  }`}
+                />
               </div>
             )}
             {layoutId === 5 && (
-              <div className="w-12 h-6 bg-gray-300 flex items-center justify-center py-[2px] gap-[3px]">
-                <div
-                  className={`w-1/3 h-full flex flex-col justify-end items-center p-[2px] ${
-                    5 === layoutSelected
-                      ? "bg-gray-800 border-gray-500"
-                      : "bg-white"
-                  }`}
-                >
-                  <div className="w-2 h-0.5 bg-gray-300" />
+              <div className="w-12 h-6 flex items-center justify-center py-[2px] gap-[1px]">
+                <div className="w-4 h-full flex flex-col justify-end items-center p-[2px] bg-gray-300">
+                  <div
+                    className={`w-2 h-0.5 ${
+                      5 === layoutSelected
+                        ? "bg-gray-800 border-gray-500"
+                        : "bg-white"
+                    }`}
+                  />
                 </div>
-                <div
-                  className={`w-1/3 h-full flex flex-col justify-end items-center p-[2px] ${
-                    5 === layoutSelected
-                      ? "bg-gray-800 border-gray-500"
-                      : "bg-white"
-                  }`}
-                >
-                  <div className="w-2 h-0.5 bg-gray-300" />
+                <div className="w-4 h-full flex flex-col justify-end items-center p-[2px] bg-gray-300">
+                  <div
+                    className={`w-2 h-0.5 ${
+                      5 === layoutSelected
+                        ? "bg-gray-800 border-gray-500"
+                        : "bg-white"
+                    }`}
+                  />
                 </div>
               </div>
             )}
