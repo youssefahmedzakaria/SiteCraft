@@ -51,7 +51,7 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
 
             <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-3/12">
                 <div className="flex items-center justify-center space-x-3">
-                    <Link href={`/dashboard/customers/order-history/${customer.id}`} passHref>
+                    <Link href={`/dashboard/customers/${customer.id}`} passHref>
                         <Button
                             variant="ghost"
                             size="sm"
