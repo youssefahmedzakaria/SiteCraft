@@ -94,10 +94,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Up to 50 products</span>
                 </li>
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Analytics</span>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Standard support</span>
@@ -106,10 +106,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>1 user account</span>
                 </li>
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <X className="h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground">Reports</span>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-2">
                   <X className="h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground">Multiple user accounts</span>
@@ -167,10 +167,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Up to 200 products</span>
                 </li>
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Analytics</span>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Reports</span>
@@ -183,10 +183,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>5 user accounts</span>
                 </li>
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <X className="h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground">Unlimited products</span>
-                </li>
+                </li> */}
               </ul>
               <Button className="w-full bg-primary hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all duration-200">Select Plan</Button>
             </CardContent>

@@ -21,6 +21,15 @@ export default function PricingPage() {
           <div className="flex items-start gap-2">
             <Check className="h-5 w-5 text-green-500 mt-1" />
             <div>
+              <h3 className="font-semibold mb-1">Analytics Dashboard</h3>
+              <p className="text-sm text-muted-foreground">
+                Track visitors, sales metrics, and store performance
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Check className="h-5 w-5 text-green-500 mt-1" />
+            <div>
               <h3 className="font-semibold mb-1">Secure Hosting</h3>
               <p className="text-sm text-muted-foreground">
                 Enterprise-grade security and reliable hosting infrastructure
@@ -76,4 +85,4 @@ export default function PricingPage() {
       </div>
     </div>
   )
-} 
+}
