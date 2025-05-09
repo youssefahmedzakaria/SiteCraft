@@ -1,22 +1,39 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog";
-import { Product, products } from "@/lib/products";
-import Link from "next/link";
-import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import { DeleteConfirmationDialog } from "@/components/ui/deleteConfirmationDialog"
+import type { Product } from "@/lib/products"
+import Link from "next/link"
+import { useState } from "react"
 
-export function ProductRecord({ product }: { product: Product }) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+export function ProductRecord({
+  product,
+  isSelected = false,
+  onSelect,
+}: {
+  product: Product
+  isSelected?: boolean
+  onSelect?: (id: string) => void
+}) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleDelete = () => {
     // Implement actual delete logic here
-    console.log(`Deleting product: ${product.name}`);
-    setShowDeleteDialog(false);
-  };
+    console.log(`Deleting product: ${product.name}`)
+    setShowDeleteDialog(false)
+  }
 
   return (
-    <tr>
+    <tr className={isSelected ? "bg-blue-50" : ""}>
+      <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+        <input
+          type="checkbox"
+          className="form-checkbox h-4 w-4 text-blue-600"
+          checked={isSelected}
+          onChange={() => onSelect && onSelect(product.id)}
+        />
+      </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="text-sm font-medium text-gray-900">{product.id}</div>
@@ -37,9 +54,7 @@ export function ProductRecord({ product }: { product: Product }) {
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
         <span
           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            product.status === "In Stock"
-              ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
+            product.status === "In Stock" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
           }`}
         >
           {product.status}
@@ -51,11 +66,7 @@ export function ProductRecord({ product }: { product: Product }) {
             Edit
           </Button>
         </Link>
-        <Button
-          variant="ghost"
-          className="text-red-600 hover:text-red-900"
-          onClick={() => setShowDeleteDialog(true)}
-        >
+        <Button variant="ghost" className="text-red-600 hover:text-red-900" onClick={() => setShowDeleteDialog(true)}>
           Delete
         </Button>
 
@@ -69,5 +80,5 @@ export function ProductRecord({ product }: { product: Product }) {
         />
       </td>
     </tr>
-  );
+  )
 }
