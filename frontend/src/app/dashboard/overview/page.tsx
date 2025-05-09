@@ -13,11 +13,11 @@ import { BarChartCard } from '@/components/dashboard/charts/BarChartCard'
 const OrdersTableHeader: FC = () => (
   <thead>
     <tr className="min-w-full divide-y">
-      {['Order #', 'Customer', 'Total', 'Status'].map(label => (
+      {['Order ', 'Customer', 'Total', 'Status'].map(label => (
         <th
           key={label}
           scope="col"
-          className="px-4 py-4 text-left text-xs font-semibold text-logo-txt uppercase tracking-wider"
+          className="px-4 py-4 text-center text-xs font-semibold text-logo-txt uppercase tracking-wider"
         >
           {label}
         </th>
@@ -29,15 +29,19 @@ const OrdersTableHeader: FC = () => (
 const ProductsTableHeader: FC = () => (
   <thead>
     <tr className="min-w-full divide-y">
-      {['Product', 'Sales'].map(label => (
-        <th
-          key={label}
-          scope="col"
-          className="px-4 py-4 text-left text-xs font-semibold text-logo-txt uppercase tracking-wider"
-        >
-          {label}
-        </th>
-      ))}
+      {/* Center 'Product', keep 'Sales' left */}
+      <th
+        scope="col"
+        className="px-4 py-4 text-center text-xs font-semibold text-logo-txt uppercase tracking-wider"
+      >
+        Product
+      </th>
+      <th
+        scope="col"
+        className="px-4 py-4 text-left  text-xs font-semibold text-logo-txt uppercase tracking-wider"
+      >
+        Sales
+      </th>
     </tr>
   </thead>
 )
@@ -61,23 +65,29 @@ const getStatusClass = (status: Order['status']): string => {
 
 const OrderRecord: FC<{ order: Order }> = ({ order }) => (
   <tr className="hover:bg-logo-light-button-hover">
-    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{order.id}</td>
-    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{order.customer}</td>
-    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+      {order.id}
+    </td>
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+      {order.customer}
+    </td>
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
       e£{order.total.toFixed(2)}
     </td>
-    <td className="px-4 py-4 whitespace-nowrap text-sm">
-      <span className={getStatusClass(order.status)}>
-        {order.status}
-      </span>
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-center">
+      <span className={getStatusClass(order.status)}>{order.status}</span>
     </td>
   </tr>
 )
 
 const ProductRecord: FC<{ product: TopProduct }> = ({ product }) => (
   <tr className="hover:bg-logo-light-button-hover">
-    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{product.product}</td>
-    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{product.sales}</td>
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+      {product.product}
+    </td>
+    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+      {product.sales}
+    </td>
   </tr>
 )
 
@@ -94,23 +104,26 @@ export default function OverviewPage() {
           {/* Page Title */}
           <h1 className="text-2xl md:text-3xl font-bold">Overview</h1>
 
-          {/* Today's Orders */}
+          {/* 1) Today's Orders */}
           <section>
             <h2 className="text-lg font-semibold mb-2">Today's Orders</h2>
             <div className="border rounded-lg border-logo-border overflow-x-auto">
               <table className="min-w-full divide-y divide-logo-border">
                 <OrdersTableHeader />
                 <tbody className="bg-white divide-y divide-logo-border">
-                  {todaysOrders.map(o => <OrderRecord key={o.id} order={o} />)}
+                  {todaysOrders.map(order => (
+                    <OrderRecord key={order.id} order={order} />
+                  ))}
                 </tbody>
               </table>
             </div>
           </section>
 
-          {/* Daily Sales */}
+          {/* 2) Daily Sales */}
           <section>
             <h2 className="text-lg font-semibold mb-2">Daily Sales</h2>
-            <div className="border rounded-lg border-logo-border bg-white p-4 md:p-6">
+            {/* Reduced padding to let the chart fill more space */}
+            <div className="border rounded-lg border-logo-border bg-white p-1 md:p-2">
               <AnimatedChartWrapper delay={0}>
                 <BarChartCard
                   hideContainerBorder
@@ -124,14 +137,16 @@ export default function OverviewPage() {
             </div>
           </section>
 
-          {/* Top Selling Products */}
+          {/* 3) Top Selling Products */}
           <section>
             <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
             <div className="border rounded-lg border-logo-border overflow-x-auto">
               <table className="min-w-full divide-y divide-logo-border">
                 <ProductsTableHeader />
                 <tbody className="bg-white divide-y divide-logo-border">
-                  {topSellingProducts.map(p => <ProductRecord key={p.product} product={p} />)}
+                  {topSellingProducts.map(prod => (
+                    <ProductRecord key={prod.product} product={prod} />
+                  ))}
                 </tbody>
               </table>
             </div>
