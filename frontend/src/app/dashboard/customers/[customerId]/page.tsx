@@ -113,7 +113,7 @@ export default function CustomerDetailsPage({
 
   const handleFiltersApply = (filters: {
     status: string;
-    dateRange?: { from: Date; to: Date } | undefined;
+    dateRange: { from: Date; to: Date } | undefined;
   }) => {
     setStatusFilter(filters.status === "All Statuses" ? "all" : filters.status);
     setDateRange(filters.dateRange);
@@ -199,7 +199,7 @@ export default function CustomerDetailsPage({
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4">Order History</h3>
 
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="border-t border-logo-border mt-6 mb-2 space-y-2 pt-3 ">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <SearchBar
                 placeholder="Search orders..."
@@ -250,14 +250,14 @@ export default function CustomerDetailsPage({
                 {statusFilter !== "all" && (
                   <div
                     className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${statusFilter === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : statusFilter === "Processing"
-                          ? "bg-blue-100 text-blue-800"
-                          : statusFilter === "Shipped"
-                            ? "bg-purple-100 text-purple-800"
-                            : statusFilter === "Delivered"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : statusFilter === "Processing"
+                        ? "bg-blue-100 text-blue-800"
+                        : statusFilter === "Shipped"
+                          ? "bg-purple-100 text-purple-800"
+                          : statusFilter === "Delivered"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                       }`}
                   >
                     <span>{statusFilter}</span>
