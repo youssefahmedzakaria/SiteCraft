@@ -79,14 +79,14 @@ export function PromoLayoutItems() {
               <div className="w-12 h-6 bg-gray-300 flex flex-col items-start justify-end p-[3px] space-y-0.5">
                 <div
                   className={`w-5 h-0.5 bg-gray-300 ${
-                    3 === layoutSelected
+                    4 === layoutSelected
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
                 />
                 <div
                   className={`w-3 h-0.5 bg-gray-300 ${
-                    3 === layoutSelected
+                    4 === layoutSelected
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
