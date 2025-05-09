@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,8 +15,16 @@ import {
 import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
 import { PromoLayoutItems } from "./promoLayoutItems";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { HeaderLayoutItems } from "./headerLayoutItems";
 
-type SectionName = "image" | "title" | "description" | "button";
+type SectionName = "image" | "title" | "description" | "button" | "arrows";
 
 interface PromoImage {
   id: string;
@@ -22,6 +32,24 @@ interface PromoImage {
   description?: string;
   image?: File | null;
   imagePreview?: string | null;
+}
+
+interface PromoSettings {
+  showArrows: boolean;
+  titleFont: string;
+  titleColor: string;
+  titleSize: string;
+  descriptionFont: string;
+  descriptionColor: string;
+  descriptionSize: string;
+  buttonFont: string;
+  buttonColor: string;
+  buttonTextColor: string;
+  buttonSize: string;
+  buttonRadius: string;
+  backgroundColor: string;
+  imageObjectFit: "Cover" | "Fill" | "Contain";
+  autoplay: boolean;
 }
 
 interface RenderPromoSectionProps {
@@ -38,13 +66,50 @@ export function RenderPromoSection({
     title: false,
     description: false,
     button: false,
+    arrows: false,
+  });
+
+  const [promoSettings, setPromoSettings] = useState<PromoSettings>({
+    showArrows: true,
+    titleFont: "inter",
+    titleColor: "#000000",
+    titleSize: "16px",
+    descriptionFont: "inter",
+    descriptionColor: "#666666",
+    descriptionSize: "14px",
+    buttonFont: "inter",
+    buttonColor: "#000000",
+    buttonTextColor: "#ffffff",
+    buttonSize: "14px",
+    buttonRadius: "4px",
+    backgroundColor: "#ffffff",
+    imageObjectFit: "Contain",
+    autoplay: false,
   });
 
   const toggleSection = (section: SectionName) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+    setExpandedSections(prev => {
+      const isCurrentlyOpen = prev[section];
+      
+      if (isCurrentlyOpen) {
+        return {
+          image: false,
+          title: false,
+          description: false,
+          button: false,
+          arrows: false
+        };
+      }
+
+      return {
+        image: false,
+        title: false,
+        description: false,
+        button: false,
+        arrows: false,
+        [section]: true
+      };
+    });
   };
 
   {
@@ -401,205 +466,362 @@ export function RenderPromoSection({
         </div>
       ) : (
         <div className="p-4 space-y-6">
-          {/* Layout Section */}
-          <PromoLayoutItems />
+          <HeaderLayoutItems />
+
+          {/* Title Section */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleSection("title")}
+            >
+              <span className="font-medium">Title</span>
+              {expandedSections.title ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedSections.title && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      {promoSettings.titleFont}
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
+                      <DropdownMenuItem
+                        key={font}
+                        onSelect={() => setPromoSettings(s => ({...s, titleFont: font}))}
+                      >
+                        {font}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={promoSettings.titleColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, titleColor: e.target.value}))}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={promoSettings.titleColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, titleColor: e.target.value}))}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Font Size (px)</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(promoSettings.titleSize) || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPromoSettings(s => ({
+                        ...s,
+                        titleSize: value ? `${value}px` : '0px'
+                      }));
+                    }}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Description Section - Similar structure to Title */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleSection("description")}
+            >
+              <span className="font-medium">Description</span>
+              {expandedSections.description ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedSections.description && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      {promoSettings.descriptionFont}
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
+                      <DropdownMenuItem
+                        key={font}
+                        onSelect={() => setPromoSettings(s => ({...s, descriptionFont: font}))}
+                      >
+                        {font}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={promoSettings.descriptionColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, descriptionColor: e.target.value}))}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={promoSettings.descriptionColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, descriptionColor: e.target.value}))}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Font Size (px)</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(promoSettings.descriptionSize) || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPromoSettings(s => ({
+                        ...s,
+                        descriptionSize: value ? `${value}px` : '0px'
+                      }));
+                    }}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="14"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Button Section */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleSection("button")}
+            >
+              <span className="font-medium">Button</span>
+              {expandedSections.button ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedSections.button && (
+            <div className="space-y-4">
+              {/* Font Family Dropdown */}
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      {promoSettings.buttonFont}
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
+                      <DropdownMenuItem
+                        key={font}
+                        onSelect={() => setPromoSettings(s => ({...s, buttonFont: font}))}
+                      >
+                        {font}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+
+
+              {/* Text Color Picker */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Text Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={promoSettings.buttonTextColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, buttonTextColor: e.target.value}))}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={promoSettings.buttonTextColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, buttonTextColor: e.target.value}))}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Font Size Input */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Font Size (px)</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(promoSettings.buttonSize) || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPromoSettings(s => ({
+                        ...s,
+                        buttonSize: value ? `${value}px` : '0px'
+                      }));
+                    }}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="14"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+
+              {/* Border Radius Input */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Border Radius (px)</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(promoSettings.buttonRadius) || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPromoSettings(s => ({
+                        ...s,
+                        buttonRadius: value ? `${value}px` : '0px'
+                      }));
+                    }}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="4"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Image Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
+              className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("image")}
             >
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Image</span>
-              </div>
-              {expandedSections["image"] ? (
+              <span className="font-medium">Image</span>
+              {expandedSections.image ? (
                 <ChevronDown size={18} />
               ) : (
                 <ChevronRight size={18} />
               )}
             </button>
           </div>
-
-          {expandedSections["image"] && (
+          {expandedSections.image && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm mb-2">Font Family</label>
-                <select
-                  className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => {
-                    // Handle font change
-                  }}
-                >
-                  <option value="inter">Inter</option>
-                  <option value="roboto">Roboto</option>
-                  <option value="open-sans">Open Sans</option>
-                  <option value="poppins">Poppins</option>
-                  <option value="lato">Lato</option>
-                </select>
+                <label className="block text-sm mb-2">Object Fit</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      {promoSettings.imageObjectFit}
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {["Cover", "Fill", "Contain"].map((fit) => (
+                      <DropdownMenuItem
+                        key={fit}
+                        onSelect={() => setPromoSettings(s => ({...s, imageObjectFit: fit as any}))}
+                      >
+                        {fit}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-
-              <div className="color-picker-container">
-                <label className="block text-sm mb-2">Color</label>
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Background Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
+                    value={promoSettings.backgroundColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, backgroundColor: e.target.value}))}
                     className="w-8 h-8 cursor-pointer bg-transparent"
-                    onChange={(e) => {
-                      // Handle menu color change
-                    }}
+                  />
+                  <input
+                    type="text"
+                    value={promoSettings.backgroundColor}
+                    onChange={(e) => setPromoSettings(s => ({...s, backgroundColor: e.target.value}))}
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Title */}
+          {/* Arrows & Autoplay Section */}
           <div className="flex items-center">
             <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
-              onClick={() => toggleSection("title")}
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleSection("arrows")}
             >
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Title</span>
-              </div>
-              {expandedSections["title"] ? (
+              <span className="font-medium">Controls</span>
+              {expandedSections.arrows ? (
                 <ChevronDown size={18} />
               ) : (
                 <ChevronRight size={18} />
               )}
             </button>
           </div>
-
-          {expandedSections["title"] && (
+          {expandedSections.arrows && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-2">Font Family</label>
-                <select
-                  className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => {
-                    // Handle font change
-                  }}
+              <div className="flex items-center justify-between">
+                <span>Show Arrows</span>
+                <Button
+                  variant={promoSettings.showArrows ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPromoSettings(s => ({...s, showArrows: !s.showArrows}))}
                 >
-                  <option value="inter">Inter</option>
-                  <option value="roboto">Roboto</option>
-                  <option value="open-sans">Open Sans</option>
-                  <option value="poppins">Poppins</option>
-                  <option value="lato">Lato</option>
-                </select>
+                  {promoSettings.showArrows ? "Enabled" : "Disabled"}
+                </Button>
               </div>
-
-              <div className="color-picker-container">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                    onChange={(e) => {
-                      // Handle menu color change
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Description */}
-          <div className="flex items-center">
-            <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
-              onClick={() => toggleSection("description")}
-            >
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Description</span>
-              </div>
-              {expandedSections["description"] ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
-            </button>
-          </div>
-
-          {expandedSections["description"] && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-2">Font Family</label>
-                <select
-                  className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => {
-                    // Handle font change
-                  }}
+              <div className="flex items-center justify-between">
+                <span>Autoplay</span>
+                <Button
+                  variant={promoSettings.autoplay ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPromoSettings(s => ({...s, autoplay: !s.autoplay}))}
                 >
-                  <option value="inter">Inter</option>
-                  <option value="roboto">Roboto</option>
-                  <option value="open-sans">Open Sans</option>
-                  <option value="poppins">Poppins</option>
-                  <option value="lato">Lato</option>
-                </select>
-              </div>
-
-              <div className="color-picker-container">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                    onChange={(e) => {
-                      // Handle menu color change
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Button */}
-          <div className="flex items-center">
-            <button
-              className="flex-1 flex items-center justify-between text-left pr-4"
-              onClick={() => toggleSection("button")}
-            >
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Button</span>
-              </div>
-              {expandedSections["button"] ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
-            </button>
-          </div>
-
-          {expandedSections["button"] && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-2">Font Family</label>
-                <select
-                  className="w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => {
-                    // Handle font change
-                  }}
-                >
-                  <option value="inter">Inter</option>
-                  <option value="roboto">Roboto</option>
-                  <option value="open-sans">Open Sans</option>
-                  <option value="poppins">Poppins</option>
-                  <option value="lato">Lato</option>
-                </select>
-              </div>
-
-              <div className="color-picker-container">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                    onChange={(e) => {
-                      // Handle menu color change
-                    }}
-                  />
-                </div>
+                  {promoSettings.autoplay ? "Enabled" : "Disabled"}
+                </Button>
               </div>
             </div>
           )}

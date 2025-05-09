@@ -11,7 +11,7 @@ import {
   Images,
   AppWindow,
 } from "lucide-react";
-import { RenderPromoSection } from "./renderPromoSction";
+import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
 
 interface Section {
