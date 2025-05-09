@@ -35,7 +35,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   if (!isOpen) return null
 
   return (
-    <div className={`fixed inset-0 z-50 flex backdrop-blur ${backgroundColor} ${textColor}`}>
+    <div className={`fixed inset-0 z-50 flex backdrop-blur`}>
       <div className={`w-64 ${backgroundColor} ${textColor} h-full shadow-lg`} onClick={(e) => e.stopPropagation()}>
         <div className={`${dividerColor} flex items-center justify-between p-4`}>
           <h2 className="text-xl font-semibold">Menu</h2>

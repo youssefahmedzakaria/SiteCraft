@@ -3,8 +3,7 @@ import { Menu } from 'lucide-react';
 import { Logo } from '../navbar-components/logo';
 import { SearchBar } from '../navbar-components/search-bar';
 import { IconsGroup } from '../navbar-components/icons-group';
-import MobileMenu from '../navbar-components/mobile-menu';
-import { SideMenu } from '../navbar-components/side-menu';
+import  MobileMenu  from '../navbar-components/mobile-menu';
 
 export interface NavbarTemplate3Props {
   brandName?: string | React.ReactNode;
@@ -43,12 +42,10 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
   searchIconColor = 'text-gray-400',
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <>
-      {/* Mobile Menu (for mobile view) */}
       <MobileMenu
         NavMenuItems={menuItems}
         isOpen={isMobileMenuOpen}
@@ -61,29 +58,15 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
         dividerColor={dividerColor}
       />
 
-      {/* Side Menu (for desktop view) */}
-      <SideMenu
-        fullSearchBar={false}
-        isOpen={isSideMenuOpen}
-        onClose={() => setIsSideMenuOpen(false)}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        iconColor={iconColor}
-        menuItems={menuItems}
-        searchIconColor={searchIconColor}
-        dividerColor={dividerColor}
-      />
-
-      <nav className={`fixed top-0 left-0 w-full z-30 ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16">
             {/* Left - Menu Button */}
             <div className="w-8">
               <button
-                onClick={() => setIsSideMenuOpen(true)}
+                onClick={() => setIsMobileMenuOpen(true)}
                 className="p-1 hover:opacity-80"
-                aria-label="Open side menu"
               >
                 <Menu className={`h-6 w-6 ${iconColor}`} />
               </button>
@@ -113,7 +96,6 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
             <button
               className="p-1 hover:opacity-80"
               onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open mobile menu"
             >
               <Menu className={`h-6 w-6 ${iconColor}`} />
             </button>

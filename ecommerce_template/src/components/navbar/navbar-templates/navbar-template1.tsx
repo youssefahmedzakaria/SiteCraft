@@ -58,7 +58,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
         <div className="max-w-7xl mx-auto px-4">
           
           <div className="relative flex items-center justify-between h-16">

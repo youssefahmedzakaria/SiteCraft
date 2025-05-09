@@ -1,7 +1,8 @@
-import { CompanyLogo } from "../footer/footer-components/CompanyLogo";
-import { AboutLinks } from"../footer/footer-components/AboutLinks";
-import { Copyright } from "../footer/footer-components/Copyright";
-import { SocialMedia } from "../footer/footer-components/SocialMedia";
+import { CompanyLogo } from "./footer-components/CompanyLogo";
+import { AboutLinks } from "./footer-components/AboutLinks";
+import { SocialMedia } from "./footer-components/SocialMedia";
+import { Copyright } from "./footer-components/Copyright";
+
 interface FooterProps {
   backgroundColor?: string;
   textColor?: string;

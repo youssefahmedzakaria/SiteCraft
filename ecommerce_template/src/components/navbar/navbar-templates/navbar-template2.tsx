@@ -59,7 +59,7 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:block w-full">
