@@ -1,3 +1,4 @@
+// frontend/src/components/dashboard/charts/LineChartCard.tsx
 'use client'
 
 import {
@@ -33,100 +34,88 @@ export const LineChartCard: FC<LineChartCardProps> = ({
 }) => {
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 1200
-  );
+  )
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
+    const onResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Format month names based on screen size
-  const getTickFormatter = () => {
-    return (value: string) => {
-      // For mobile screens
-      if (windowWidth < 640) {
-        // Show first 3 letters of month name
-        return value.substring(0, 3);
-      }
-      return value;
-    };
-  };
-
-  // Determine interval and angle based on screen size
-  const getXAxisProps = () => {
-    if (windowWidth < 480) {
-      // Small mobile: show every other month
-      return { interval: 1, angle: -45, dy: 10 };
-    } else if (windowWidth < 640) {
-      // Mobile: show every other month
-      return { interval: 1, angle: -45, dy: 10 };
-    } else if (windowWidth < 1025) {
-      // Tablet (including iPad Pro and iPad Air): show every other month
-      return { interval: 1, angle: -45, dy: 10 };
-    } else {
-      // Desktop: normal display
-      return { interval: 0, angle: 0, dy: 0 };
+  // abbreviate month names on small screens
+  const tickFormatter = (val: string) => {
+    if (nameKey === 'month' && windowWidth < 640) {
+      return val.substring(0, 3)
     }
-  };
+    return val
+  }
 
-  const xAxisProps = getXAxisProps();
+  // snug legend spacing mobile vs desktop
+  const bottomMargin = windowWidth < 768 ? 5 : 20
+
+  // tilt labels on tablet/phone
+  const xAxisProps =
+    windowWidth < 1025
+      ? { interval: 1, angle: -45, dy: 10 }
+      : { interval: 0, angle: 0, dy: 0 }
+
+  // compute Y-axis width & left margin
+  const yAxisWidth = windowWidth < 480 ? 30 : 40
+  const leftMargin = yAxisWidth + 10
 
   return (
     <div className="p-4 md:p-6 border rounded-lg border-logo-border bg-white">
-      <p className="text-base md:text-lg font-semibold mb-1 text-logo-txt">{title}</p>
-      {subtitle && <p className="text-xs text-muted-foreground mb-4">{subtitle}</p>}
+      <p className="text-base md:text-lg font-semibold mb-1 text-logo-txt">
+        {title}
+      </p>
+      {subtitle && (
+        <p className="text-xs text-muted-foreground mb-4">{subtitle}</p>
+      )}
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart 
-            data={data} 
-            margin={{ 
-              top: 5, 
-              right: 20, 
-              left: 20,
-              bottom: windowWidth < 768 ? 50 : 20 
+          <LineChart
+            data={data}
+            margin={{
+              top: 5,
+              right: 20,
+              left: leftMargin,
+              bottom: bottomMargin
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(229, 231, 235)" />
-            <XAxis 
+            <XAxis
               dataKey={nameKey}
               stroke="rgb(107, 114, 128)"
-              tick={{ 
+              tick={{
                 fill: 'rgb(107, 114, 128)',
                 fontSize: windowWidth < 640 ? 10 : 12
               }}
-              tickFormatter={getTickFormatter()}
+              tickFormatter={tickFormatter}
               interval={xAxisProps.interval}
               angle={xAxisProps.angle}
-              textAnchor={xAxisProps.angle !== 0 ? "end" : "middle"}
+              textAnchor={xAxisProps.angle !== 0 ? 'end' : 'middle'}
               height={xAxisProps.angle !== 0 ? 60 : 30}
               dy={xAxisProps.dy}
             />
-            <YAxis 
+            <YAxis
               stroke="rgb(107, 114, 128)"
               tick={{ fill: 'rgb(107, 114, 128)' }}
-              width={windowWidth < 480 ? 30 : 40}
+              width={yAxisWidth}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid rgb(229, 231, 235)',
                 borderRadius: '0.375rem'
               }}
             />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey={dataKey} 
+            <Legend wrapperStyle={{ marginTop: windowWidth < 768 ? 0 : undefined }} />
+            <Line
+              type="monotone"
+              dataKey={dataKey}
               stroke={colors[0]}
               strokeWidth={windowWidth < 640 ? 1.5 : 2}
-              dot={{ 
-                fill: colors[0], 
-                r: windowWidth < 640 ? 2 : 3 
-              }}
+              dot={{ fill: colors[0], r: windowWidth < 640 ? 2 : 3 }}
               name={dataKey.charAt(0).toUpperCase() + dataKey.slice(1)}
             />
           </LineChart>
