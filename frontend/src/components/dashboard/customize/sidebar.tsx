@@ -8,8 +8,10 @@ import {
   X,
   GripVertical,
   ArrowLeft,
+  Images,
+  AppWindow,
 } from "lucide-react";
-import { RenderCoverSection } from "./renderCoverSection";
+import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
 
 interface Section {
@@ -25,13 +27,13 @@ export function Sidebar() {
     {
       id: "Header&Menu",
       title: "Header & Menu",
-      icon: <Paintbrush size={18} />,
+      icon: <AppWindow size={18} />,
       expanded: false,
     },
     {
-      id: "Cover&Headline",
-      title: "Cover & Headline",
-      icon: <GripVertical size={18} />,
+      id: "PromoSlider",
+      title: "Promo Slider",
+      icon: <Images size={18} />,
       expanded: false,
     },
   ]);
@@ -192,8 +194,8 @@ export function Sidebar() {
           {/* Detailed Section Content */}
           {detailedSection.id === "Header&Menu" ? (
             <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
-          ) : detailedSection.id === "Cover&Headline" ? (
-            <RenderCoverSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "PromoSlider" ? (
+            <RenderPromoSection detailedSectionTab={detailedSectionTab} />
           ) : null}
         </div>
       ) : (
