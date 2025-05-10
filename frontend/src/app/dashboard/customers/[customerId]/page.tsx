@@ -209,6 +209,7 @@ export default function CustomerDetailsPage({
                 onApplyFilters={handleFiltersApply}
                 statuses={orderStatuses}
                 initialStatus={statusFilter}
+                initialDateRange={dateRange}
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -308,7 +309,12 @@ export default function CustomerDetailsPage({
                     </span>
                     <button
                       onClick={() => {
+                        const resetFilters = {
+                          status: statusFilter,
+                          dateRange: undefined
+                        };
                         setDateRange(undefined);
+                        handleFiltersApply(resetFilters);
                       }}
                     >
                       <X size={16} />
