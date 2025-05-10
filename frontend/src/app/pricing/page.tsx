@@ -13,11 +13,12 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <PricingCards/>
+      <PricingCards />
 
       <div className="mt-16">
         <h2 className="text-2xl font-bold text-center mb-8">All Plans Include</h2>
         <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          {/* First row benefits */}
           <div className="flex items-start gap-2">
             <Check className="h-5 w-5 text-green-500 mt-1" />
             <div>
@@ -45,6 +46,8 @@ export default function PricingPage() {
               </p>
             </div>
           </div>
+
+          {/* Second row benefits */}
           <div className="flex items-start gap-2">
             <Check className="h-5 w-5 text-green-500 mt-1" />
             <div>
@@ -72,7 +75,8 @@ export default function PricingPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-2">
+
+          <div className="flex items-start gap-2 md:col-start-2">
             <Check className="h-5 w-5 text-green-500 mt-1" />
             <div>
               <h3 className="font-semibold mb-1">24/7 Support</h3>

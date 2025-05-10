@@ -98,10 +98,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Analytics</span>
                 </li> */}
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Standard support</span>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>1 user account</span>
@@ -175,10 +175,10 @@ export function PricingCards() {
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Reports</span>
                 </li>
-                <li className="flex items-center gap-2">
+                {/* <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>Priority support</span>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
                   <span>5 user accounts</span>
