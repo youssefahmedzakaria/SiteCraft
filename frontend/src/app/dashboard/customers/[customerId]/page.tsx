@@ -39,7 +39,7 @@ export default function CustomerDetailsPage({
   const router = useRouter();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("date-desc");
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
@@ -68,7 +68,7 @@ export default function CustomerDetailsPage({
   const filteredOrders = useMemo(() => {
     return customerOrders
       .filter((order) => {
-        if (statusFilter !== "all" && order.status !== statusFilter) {
+        if (statusFilter !== "All Statuses" && order.status !== statusFilter) {
           return false;
         }
         if (
@@ -115,12 +115,12 @@ export default function CustomerDetailsPage({
     status: string;
     dateRange: { from: Date; to: Date } | undefined;
   }) => {
-    setStatusFilter(filters.status === "All Statuses" ? "all" : filters.status);
+    setStatusFilter(filters.status === "All Statuses" ? "All Statuses" : filters.status);
     setDateRange(filters.dateRange);
   };
 
   const orderStatuses = [
-    "all",
+    "All Statuses",
     "Pending",
     "Processing",
     "Shipped",
@@ -209,6 +209,7 @@ export default function CustomerDetailsPage({
                 onApplyFilters={handleFiltersApply}
                 statuses={orderStatuses}
                 initialStatus={statusFilter}
+                initialDateRange={dateRange}
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -245,9 +246,9 @@ export default function CustomerDetailsPage({
               </DropdownMenu>
             </div>
 
-            {(statusFilter !== "all" || searchQuery || sortBy !== "date-desc" || dateRange) && (
+            {(statusFilter !== "All Statuses" || searchQuery || sortBy !== "date-desc" || dateRange) && (
               <div className="flex items-center gap-2 mt-4">
-                {statusFilter !== "all" && (
+                {statusFilter !== "All Statuses" && (
                   <div
                     className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${statusFilter === "Pending"
                       ? "bg-yellow-100 text-yellow-800"
@@ -263,7 +264,7 @@ export default function CustomerDetailsPage({
                     <span>{statusFilter}</span>
                     <button
                       onClick={() => {
-                        setStatusFilter("all");
+                        setStatusFilter("All Statuses");
                       }}
                     >
                       <X size={16} />
@@ -308,7 +309,12 @@ export default function CustomerDetailsPage({
                     </span>
                     <button
                       onClick={() => {
+                        const resetFilters = {
+                          status: statusFilter,
+                          dateRange: undefined
+                        };
                         setDateRange(undefined);
+                        handleFiltersApply(resetFilters);
                       }}
                     >
                       <X size={16} />
