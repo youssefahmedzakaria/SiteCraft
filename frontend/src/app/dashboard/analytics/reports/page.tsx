@@ -1,11 +1,12 @@
 // frontend/src/app/dashboard/reports/page.tsx
 'use client'
 
-import React, { useState, FC } from 'react'
+import React, { useState } from 'react'
 import { Sidebar } from '@/components/sidebar/sidebar'
 import Image from 'next/image'
 import { reportsData } from '@/lib/reportsData'
 import { Timespan } from '@/lib/chartData'
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -28,11 +29,16 @@ export default function ReportsPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-6 bg-gray-100">
+      {/* 
+        pt-20 on phones (<768px),
+        md:pt-[4.5rem] on tablets (≥768px <1024px),
+        lg:pt-6 on desktop (≥1024px)
+      */}
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-[4.5rem] lg:pt-6 bg-gray-100">
         <div className="container mx-auto px-4 md:px-6 space-y-6 pb-4 md:pb-8">
 
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">Reports</h1>
 
           {/* Subtitle + dropdown */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -60,19 +66,19 @@ export default function ReportsPage() {
 
           {/* Reports Table */}
           <div className="border rounded-lg border-logo-border overflow-x-auto">
-            <table className="w-full divide-y divide-logo-border table-fixed">
-              <thead className="w-full divide-y">
+            <table className="min-w-full divide-y divide-logo-border table-fixed">
+              <thead className="min-w-full divide-y ">
                 <tr>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider w-24 sm:w-1/6 md:w-1/5 whitespace-nowrap">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider w-24 sm:w-1/6 md:w-1/5 whitespace-nowrap">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider w-[50%] sm:w-[40%] whitespace-nowrap">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-logo-txt uppercase tracking-wider w-16 sm:w-1/6 md:w-1/5 whitespace-nowrap">
+                  <th className="px-4 py-3 text-right text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -80,18 +86,18 @@ export default function ReportsPage() {
               <tbody className="bg-white divide-y divide-logo-border">
                 {reportsData.map((report) => (
                   <tr key={report.id} className="hover:bg-logo-light-button-hover">
-                    <td className="px-3 sm:px-6 py-4 text-sm text-gray-900">
-                      <div className="truncate">{report.name}</div>
+                    <td className="px-4 py-4 text-sm text-gray-900 break-words">
+                      {report.name}
                     </td>
-                    <td className="px-3 sm:px-6 py-4 text-sm text-gray-500">
-                      <div className="truncate">{report.category}</div>
+                    <td className="px-4 py-4 text-sm text-gray-500 break-words">
+                      {report.category}
                     </td>
-                    <td className="px-3 sm:px-6 py-4 text-sm text-gray-500">
-                      <div className="line-clamp-2 sm:line-clamp-none overflow-y-auto max-h-24 sm:max-h-full">
+                    <td className="px-4 py-4 text-sm text-gray-500">
+                      <div className="line-clamp-2 sm:line-clamp-none overflow-y-auto max-h-24">
                         {report.description}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-4 text-right whitespace-nowrap">
+                    <td className="px-4 py-4 text-right whitespace-nowrap">
                       <button className="p-2 text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-md">
                         <Image
                           src="/icons/download.svg"

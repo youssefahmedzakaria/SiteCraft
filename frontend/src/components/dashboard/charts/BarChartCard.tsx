@@ -1,3 +1,4 @@
+// frontend/src/components/dashboard/charts/BarChartCard.tsx
 'use client'
 
 import {
@@ -46,21 +47,26 @@ export const BarChartCard: FC<BarChartCardProps> = ({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const getTickFormatter = () => (value: string) =>
-    windowWidth < 640 ? value.substring(0, 3) : value
-
-  const getXAxisProps = () => {
-    if (windowWidth < 480) {
-      return { interval: 1, angle: -45, dy: 10 }
-    } else if (windowWidth < 640) {
-      return { interval: 1, angle: -45, dy: 10 }
-    } else if (windowWidth < 1025) {
-      return { interval: 1, angle: -45, dy: 10 }
-    } else {
-      return { interval: 0, angle: 0, dy: 0 }
+  // Only abbreviate month names on narrow screens
+  const tickFormatter = (value: string) => {
+    if (nameKey === 'month' && windowWidth < 640) {
+      return value.substring(0, 3)
     }
+    return value
   }
-  const xAxisProps = getXAxisProps()
+
+  // Tilt labels on smaller/tablet sizes
+  const xAxisProps =
+    windowWidth < 1025
+      ? { interval: 1, angle: -45, dy: 10 }
+      : { interval: 0, angle: 0, dy: 0 }
+
+  // Pull legend down tighter on mobile
+  const bottomMargin = windowWidth < 768 ? 5 : 20
+
+  // Derive Y-axis width and ensure left margin is wide enough
+  const yAxisWidth = windowWidth < 480 ? 30 : 40
+  const leftMargin = yAxisWidth + 10
 
   // Choose wrapper classes based on hideContainerBorder
   const wrapperClasses = hideContainerBorder
@@ -69,7 +75,9 @@ export const BarChartCard: FC<BarChartCardProps> = ({
 
   return (
     <div className={wrapperClasses}>
-      <p className="text-base md:text-lg font-semibold mb-1 text-logo-txt">{title}</p>
+      <p className="text-base md:text-lg font-semibold mb-1 text-logo-txt">
+        {title}
+      </p>
       {subtitle && (
         <p className="text-xs text-muted-foreground mb-4">{subtitle}</p>
       )}
@@ -80,8 +88,8 @@ export const BarChartCard: FC<BarChartCardProps> = ({
             margin={{
               top: 5,
               right: 20,
-              left: 10,
-              bottom: windowWidth < 768 ? 50 : 20
+              left: leftMargin,
+              bottom: bottomMargin,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(229, 231, 235)" />
@@ -90,9 +98,9 @@ export const BarChartCard: FC<BarChartCardProps> = ({
               stroke="rgb(107, 114, 128)"
               tick={{
                 fill: 'rgb(107, 114, 128)',
-                fontSize: windowWidth < 640 ? 10 : 12
+                fontSize: windowWidth < 640 ? 10 : 12,
               }}
-              tickFormatter={getTickFormatter()}
+              tickFormatter={tickFormatter}
               interval={xAxisProps.interval}
               angle={xAxisProps.angle}
               textAnchor={xAxisProps.angle !== 0 ? 'end' : 'middle'}
@@ -102,16 +110,16 @@ export const BarChartCard: FC<BarChartCardProps> = ({
             <YAxis
               stroke="rgb(107, 114, 128)"
               tick={{ fill: 'rgb(107, 114, 128)' }}
-              width={windowWidth < 480 ? 30 : 40}
+              width={yAxisWidth}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid rgb(229, 231, 235)',
-                borderRadius: '0.375rem'
+                borderRadius: '0.375rem',
               }}
             />
-            <Legend />
+            <Legend wrapperStyle={{ marginTop: windowWidth < 768 ? 0 : undefined }} />
             <Bar
               dataKey={dataKey}
               fill={colors[0]}

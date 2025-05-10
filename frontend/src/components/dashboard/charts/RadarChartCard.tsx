@@ -1,5 +1,7 @@
+// frontend/src/components/dashboard/charts/RadarChartCard.tsx
 'use client'
 
+import React, { FC, useState, useEffect } from 'react'
 import {
   ResponsiveContainer,
   RadarChart,
@@ -10,7 +12,6 @@ import {
   Legend,
   Tooltip
 } from 'recharts'
-import type { FC } from 'react'
 import type { Datum } from '@/lib/chartData'
 
 interface RadarChartCardProps {
@@ -30,19 +31,50 @@ export const RadarChartCard: FC<RadarChartCardProps> = ({
   subtitle,
   colors = ['#cc7860', '#5d8aa8', '#6b8e23', '#b8860b', '#8b4513']
 }) => {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  )
+
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const isMobile = windowWidth < 640
+  const isFold = windowWidth < 420
+
+  // pick outer radius
+  const outerRadius = isFold ? '50%' : isMobile ? '70%' : '50%'
+
   return (
     <div className="p-4 md:p-6 border rounded-lg border-logo-border bg-white">
       <p className="text-base md:text-lg font-semibold mb-1 text-logo-txt">{title}</p>
       {subtitle && <p className="text-xs text-muted-foreground mb-4">{subtitle}</p>}
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="90%" data={data}>
+          <RadarChart
+            data={data}
+            cx="50%"
+            cy="50%"
+            outerRadius={outerRadius}
+            margin={{
+              top: isMobile ? 10 : 5,
+              right: isMobile ? 20 : 0,
+              bottom: isMobile ? 10 : 0,
+              left: isMobile ? 20 : 0,
+            }}
+          >
             <PolarGrid stroke="rgb(229, 231, 235)" />
-            <PolarAngleAxis 
+            <PolarAngleAxis
               dataKey={nameKey}
               stroke="rgb(107, 114, 128)"
-              tick={{ fill: 'rgb(107, 114, 128)', fontSize: 12 }}
+              tick={{
+                fill: 'rgb(107, 114, 128)',
+                fontSize: isMobile ? 10 : 12
+              }}
             />
+            <PolarRadiusAxis angle={90} tick={false} axisLine={false} />
             <Radar
               name="Individuals"
               dataKey={dataKey}
@@ -51,14 +83,20 @@ export const RadarChartCard: FC<RadarChartCardProps> = ({
               fillOpacity={0.6}
               strokeWidth={2}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid rgb(229, 231, 235)',
                 borderRadius: '0.375rem'
               }}
             />
-            <Legend />
+            <Legend
+              verticalAlign="bottom"
+              wrapperStyle={{
+                fontSize: isMobile ? 10 : 12,
+                marginTop: isMobile ? -10 : 0
+              }}
+            />
           </RadarChart>
         </ResponsiveContainer>
       </div>
