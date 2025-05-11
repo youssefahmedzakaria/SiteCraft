@@ -87,7 +87,7 @@ export default function CategoriesPage() {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-6 bg-gray-100 min-h-screen">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold mt-2">Categories</h1>
 
         {/* Header section */}

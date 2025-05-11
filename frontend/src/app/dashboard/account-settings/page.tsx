@@ -2,7 +2,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { Sidebar } from '@/components/sidebar/sidebar'
 import { Card, CardContent } from '@/components/ui/card'
 import { StoreInformationSection } from '@/components/dashboard/account-settings/StoreInformationSection'
@@ -25,7 +24,7 @@ export default function AccountSettingsPage() {
         </p> */}
 
         {/* Tabs */}
-        <div className="flex mb-4">
+        <div className="flex mb-1 ml-3">
           {tabs.map(tab => (
             <button
               key={tab}

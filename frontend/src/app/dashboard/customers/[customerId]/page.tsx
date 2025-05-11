@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -149,12 +151,8 @@ export default function CustomerDetailsPage({
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Customer ID</p>
-              <p className="text-lg font-semibold">#{customer.id}</p>
-            </div>
+        <div className="bg-white rounded-lg shadow overflow-hidden mb-6 flex  items-center justify-between py-6 px-10 ">
+          {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border"> */}
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Total Orders</p>
               <p className="text-2xl font-semibold">{customer.orders}</p>
@@ -193,13 +191,13 @@ export default function CustomerDetailsPage({
                   : "N/A"}
               </p>
             </div>
-          </div>
+          {/* </div> */}
         </div>
 
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4">Order History</h3>
 
-          <div className="border-t border-logo-border mt-6 mb-2 space-y-2 pt-3 ">
+          <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3 ">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <SearchBar
                 placeholder="Search orders..."
@@ -271,7 +269,7 @@ export default function CustomerDetailsPage({
                     </button>
                   </div>
                 )}
-                {searchQuery && (
+                {/* {searchQuery && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>Search: {searchQuery}</span>
                     <button
@@ -282,25 +280,7 @@ export default function CustomerDetailsPage({
                       <X size={16} />
                     </button>
                   </div>
-                )}
-                {sortBy !== "date-desc" && (
-                  <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
-                    <span>
-                      {sortBy === "date-asc"
-                        ? "Oldest First"
-                        : sortBy === "value-desc"
-                          ? "Highest Value"
-                          : "Lowest Value"}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setSortBy("date-desc");
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
+                )} */}
                 {dateRange && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>

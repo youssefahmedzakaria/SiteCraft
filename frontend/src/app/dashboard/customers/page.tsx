@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -81,7 +82,7 @@ export default function CustomersPage() {
         </div>
 
         {/* Filters and search */}
-        <div className="border-t border-logo-border mt-6 mb-2 space-y-2 pt-3 ">
+        <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3  ">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             {/* Search Bar - Using the SearchBar component like in products page */}
             <SearchBar placeholder="Search by name or email..." />
