@@ -166,6 +166,7 @@ export default function ColorPalettePage() {
     const [secondaryColor, setSecondaryColor] = useState("#ffffff");
     const [accentColor, setAccentColor] = useState("#3498db");
     const [presetPalettes, setPresetPalettes] = useState<ColorPalette[]>([]);
+    const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
 
     // Load colors from previous page
     useEffect(() => {
@@ -254,6 +255,14 @@ export default function ColorPalettePage() {
                     "#FF9800", // Orange
                 ],
             },
+            {
+                name: "Royal Elegance",
+                colors: [
+                    "#673AB7", // Purple
+                    "#FFEB3B", // Yellow
+                    "#FF4081", // Pink
+                ],
+            },
         ];
 
         setPresetPalettes(palettes);
@@ -275,7 +284,9 @@ export default function ColorPalettePage() {
         if (palette.colors[2]) {
             setAccentColor(palette.colors[2]);
         }
+        setSelectedPaletteName(palette.name);
     };
+
     const handleBackClick = () => {
         // Navigate back to the branding page
         window.location.href = "/branding";
@@ -320,15 +331,11 @@ export default function ColorPalettePage() {
                             {/* Left Column: Preset Palettes */}
                             <div>
                                 <h2 className="text-xl font-semibold mb-4">Preset Color Palettes</h2>
-                                <p className="text-sm text-gray-500 mb-4">Choose from our professionally designed color schemes</p>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">                                    {presetPalettes.map((palette, index) => (
+                                <p className="text-sm text-gray-500 mb-4">Choose from our professionally designed color schemes</p>                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">                                    {presetPalettes.map((palette, index) => (
                                         <div
                                             key={index}
-                                            className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                                                palette.colors[0] === primaryColor && 
-                                                palette.colors[1] === secondaryColor && 
-                                                (palette.colors[2] || '') === accentColor
+                                            className={`border rounded-lg p-3 cursor-pointer transition-all transform hover:scale-105 ${
+                                                palette.name === selectedPaletteName
                                                     ? "border-black bg-gray-50" 
                                                     : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                                             }`}
@@ -336,32 +343,19 @@ export default function ColorPalettePage() {
                                         >
                                             <div className="flex items-center justify-between mb-3">
                                                 <p className="font-medium">{palette.name}</p>
-                                                {palette.colors[0] === primaryColor && 
-                                                palette.colors[1] === secondaryColor && 
-                                                (palette.colors[2] || '') === accentColor && (
+                                                {palette.name === selectedPaletteName && (
                                                     <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
                                                     </svg>
                                                 )}
                                             </div>
-
-                                            <div className="flex justify-center space-x-4 my-4">
+                                            <div className="flex justify-center space-x-2">
                                                 {palette.colors.map((color, colorIndex) => (
-                                                    <div key={colorIndex} className="flex flex-col items-center">
-                                                        <div
-                                                            className="w-10 h-10 rounded-full border border-gray-300 shadow-sm transition-transform hover:scale-110"
-                                                            style={{ 
-                                                                backgroundColor: color,
-                                                                boxShadow: color === 
-                                                                    (colorIndex === 0 ? primaryColor : 
-                                                                    colorIndex === 1 ? secondaryColor : 
-                                                                    accentColor) ? '0 0 0 2px black' : ''
-                                                            }}
-                                                        ></div>
-                                                        <span className="text-xs mt-2 text-gray-600 font-medium">
-                                                            {colorIndex === 0 ? 'Primary' : colorIndex === 1 ? 'Secondary' : 'Accent'}
-                                                        </span>
-                                                    </div>
+                                                    <div 
+                                                        key={colorIndex} 
+                                                        className="w-8 h-8 rounded-full border border-gray-200"
+                                                        style={{ backgroundColor: color }}
+                                                    ></div>
                                                 ))}
                                             </div>
                                         </div>
