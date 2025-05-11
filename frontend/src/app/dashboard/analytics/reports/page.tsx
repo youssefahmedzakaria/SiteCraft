@@ -3,15 +3,42 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "@/components/sidebar/sidebar";
-import Image from "next/image";
-import { reportsData } from "@/lib/reportsData";
 import { DateRangeFilter } from "@/components/dashboard/DateRangeFilter";
+import ReportCard, { Report } from "@/components/dashboard/ReportCard";
+import { reportsData } from "@/lib/reportsData";
+import {
+  BadgeDollarSign,
+  FileUser,
+  PackageOpen,
+  ShoppingBag,
+  Tags,
+} from "lucide-react";
 
 export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
 
+  // map report IDs to your static icon paths
+  const iconMap: Record<string, React.ReactNode> = {
+    "rep-001": <FileUser size={48} className="pb-2" />,
+    "rep-002": <Tags size={48} className="pb-2" />,
+    "rep-003": <ShoppingBag size={48} className="pb-2" />,
+    "rep-004": <BadgeDollarSign size={48} className="pb-2" />,
+    "rep-005": <PackageOpen size={48} className="pb-2" />,
+  };
+
+  // build full Report[] with iconSrc
+  const reportsWithIcons: Report[] = reportsData.map((r) => ({
+    ...r,
+    iconSrc: iconMap[r.id] || "/icons/default.svg",
+  }));
+
+  const handleDownload = (id: string) => {
+    console.log(`Downloading report ${id}`);
+    // TODO: wire up real download logic here
+  };
+
   return (
-<div className="flex min-h-screen h-full bg-gray-100">
+    <div className="flex min-h-screen h-full bg-gray-100">
       <Sidebar />
 
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 h-full overflow-y-auto">
@@ -29,56 +56,14 @@ export default function ReportsPage() {
           </div>
         </div>
 
-        {/* Reports Table */}
-        <div className="border rounded-lg border-logo-border overflow-x-auto">
-          <table className="min-w-full divide-y divide-logo-border table-fixed">
-            <thead className="min-w-full divide-y">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider min-w-[300px]">
-                  Description
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-logo-txt uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-logo-border">
-              {reportsData.map((report) => (
-                <tr
-                  key={report.id}
-                  className="hover:bg-logo-light-button-hover"
-                >
-                  <td className="px-4 py-4 text-sm text-gray-900 break-words">
-                    {report.name}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-500 break-words">
-                    {report.category}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-500 min-w-[300px] max-w-[600px]">
-                    <div className="overflow-y-visible">
-                      {report.description}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right whitespace-nowrap">
-                    <button className="p-2 text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-md">
-                      <Image
-                        src="/icons/download.svg"
-                        alt="Download"
-                        width={20}
-                        height={20}
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid gap-6 md:grid-cols-2">
+          {reportsWithIcons.map((report) => (
+            <ReportCard
+              key={report.id}
+              report={report}
+              onDownload={handleDownload}
+            />
+          ))}
         </div>
       </main>
     </div>
