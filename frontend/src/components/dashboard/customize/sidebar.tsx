@@ -153,11 +153,33 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Sidebar Toggle */}
+      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between h-16">
+        <h1 className="text-lg font-bold">
+          {detailedSection
+            ? `Edit ${detailedSection.title}`
+            : "Customize Template"}
+        </h1>
+        <button onClick={toggleSidebar} className="p-1">
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
 
       {/* Main Sidebar or Detailed Section Sidebar */}
       {detailedSection ? (
         // Detailed Section Sidebar
-        <div className="w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0">
+        <div
+          className={`${
+            sidebarOpen ? "block" : "hidden"
+          } w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0`}
+        >
+          <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16">
+            <h1 className="text-lg font-bold">
+              {detailedSection
+                ? `Edit ${detailedSection.title}`
+                : "Customize Template"}
+            </h1>
+          </div>
+
           {/* Header */}
           <div className="p-4 border-b border-gray-200 h-16 flex items-center">
             <button
@@ -167,9 +189,7 @@ export function Sidebar() {
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft size={18} />
-              <h1 className="text-lg font-bold">
-                {`Edit ${detailedSection.title}`}
-              </h1>
+              <span>Back to Sections</span>
             </button>
           </div>
 
@@ -218,8 +238,7 @@ export function Sidebar() {
             "h-screen md:h-auto fixed md:static z-10 top-16 left-0 right-0 md:top-0"
           }`}
         >
-          {/* Header */}
-          <div className="p-4 border-b border-gray-200 h-16 flex items-center">
+          <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16">
             <h1 className="text-lg font-bold">Customize Template</h1>
           </div>
 
