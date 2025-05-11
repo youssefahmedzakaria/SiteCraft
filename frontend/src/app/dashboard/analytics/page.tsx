@@ -3,10 +3,18 @@
 
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar/sidebar'
-import { dashboardAnalyticsByTimespan } from '@/lib/dashboardAnalytics'
+//import { dashboardAnalyticsByTimespan } from '@/lib/dashboardAnalytics'
 import { GeneralAnalyticsCard } from '@/components/dashboard/generalAnalyticsCard'
 import { AnimatedChartWrapper } from '@/components/dashboard/charts/AnimatedChartWrapper'
+//import { chartDataByTimespan } from '@/lib/chartData'
 import { chartDataByTimespan, Timespan } from '@/lib/chartData'
+import { dashboardAnalyticsByTimespan } from '@/lib/dashboardAnalytics'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
 
 import {
   LineChartCard,
@@ -17,31 +25,36 @@ import {
   MultiLineChartCard
 } from '@/components/dashboard/charts'
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem
-} from '@/components/ui/dropdown-menu'
+import { DateRangeFilter } from '@/components/dashboard/DateRangeFilter'
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
-
 export default function AnalyticsPage() {
-  const [selectedSpan, setSelectedSpan] = useState<Timespan>('30')
-  const currentCharts = chartDataByTimespan[selectedSpan]
-  const currentMetrics = dashboardAnalyticsByTimespan[selectedSpan]
+  
+const [selectedSpan, setSelectedSpan] = useState<Timespan>('30')
+const currentCharts = chartDataByTimespan[selectedSpan]
+const currentMetrics = dashboardAnalyticsByTimespan[selectedSpan]
 
-  const axisKey =
-    selectedSpan === '7'  ? 'day' :
-    selectedSpan === '30' ? 'week' :
-                            'month'
+const axisKey =
+  selectedSpan === '7'  ? 'day' :
+  selectedSpan === '30' ? 'week' :
+                          'month'
 
-  const labels: Record<Timespan, string> = {
-    '7':   'Last week',
-    '30':  'Last month',
-    '90':  'Last quarter',
-    '365': 'Last year',
-  }
+const labels: Record<Timespan, string> = {
+  '7':   'Last week',
+  '30':  'Last month',
+  '90':  'Last quarter',
+  '365': 'Last year',
+}
+
+  // track the chosen date range
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>()
+  
+  // for now, fall back to “30” if no range (you can wire real lookup later)
+  const fallbackSpan = dateRange
+    ? undefined
+    : '30'
+  
+
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -53,12 +66,15 @@ export default function AnalyticsPage() {
           {/* Title */}
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Analytics</h1>
 
-          {/* Subtitle + dropdown aligned on same line */}
+          {/* Subtitle + date-range filter button */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-500">
               Track your store's performance and customer insights
             </p>
-
+            {/* <DateRangeFilter
+              initialDateRange={dateRange}
+              onApply={setDateRange}
+            /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
