@@ -60,9 +60,9 @@ export default function PricingPage() {
           <div className="flex items-start gap-2">
             <Check className="h-5 w-5 text-green-500 mt-1" />
             <div>
-              <h3 className="font-semibold mb-1">SSL Certificate</h3>
+              <h3 className="font-semibold mb-1">24/7 Support</h3>
               <p className="text-sm text-muted-foreground">
-                Free SSL certificate for secure transactions
+                Access to our dedicated support team
               </p>
             </div>
           </div>
@@ -72,16 +72,6 @@ export default function PricingPage() {
               <h3 className="font-semibold mb-1">Mobile Optimization</h3>
               <p className="text-sm text-muted-foreground">
                 Fully responsive design for all devices
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2 md:col-start-2">
-            <Check className="h-5 w-5 text-green-500 mt-1" />
-            <div>
-              <h3 className="font-semibold mb-1">24/7 Support</h3>
-              <p className="text-sm text-muted-foreground">
-                Access to our dedicated support team
               </p>
             </div>
           </div>
