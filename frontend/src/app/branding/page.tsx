@@ -68,7 +68,7 @@ export default function BrandingPage() {
                 </p>
 
                 <Card className="bg-white">
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-2 pb-2">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Store Information Section */}
                             <div className="lg:border-r lg:pr-8 border-gray-200">
