@@ -22,7 +22,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { HeaderLayoutItems } from "./headerLayoutItems";
 
 type SectionName = "image" | "title" | "description" | "button" | "arrows";
 
@@ -69,6 +68,7 @@ export function RenderPromoSection({
     arrows: false,
   });
 
+
   const [promoSettings, setPromoSettings] = useState<PromoSettings>({
     showArrows: true,
     titleFont: "inter",
@@ -88,16 +88,16 @@ export function RenderPromoSection({
   });
 
   const toggleSection = (section: SectionName) => {
-    setExpandedSections(prev => {
+    setExpandedSections((prev) => {
       const isCurrentlyOpen = prev[section];
-      
+
       if (isCurrentlyOpen) {
         return {
           image: false,
           title: false,
           description: false,
           button: false,
-          arrows: false
+          arrows: false,
         };
       }
 
@@ -107,7 +107,7 @@ export function RenderPromoSection({
         description: false,
         button: false,
         arrows: false,
-        [section]: true
+        [section]: true,
       };
     });
   };
@@ -466,7 +466,7 @@ export function RenderPromoSection({
         </div>
       ) : (
         <div className="p-4 space-y-6">
-          <HeaderLayoutItems />
+          <PromoLayoutItems />
 
           {/* Title Section */}
           <div className="flex items-center">
@@ -488,20 +488,27 @@ export function RenderPromoSection({
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
                       {promoSettings.titleFont}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
-                      <DropdownMenuItem
-                        key={font}
-                        onSelect={() => setPromoSettings(s => ({...s, titleFont: font}))}
-                      >
-                        {font}
-                      </DropdownMenuItem>
-                    ))}
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
+                      (font) => (
+                        <DropdownMenuItem
+                          key={font}
+                          onSelect={() =>
+                            setPromoSettings((s) => ({ ...s, titleFont: font }))
+                          }
+                        >
+                          {font}
+                        </DropdownMenuItem>
+                      )
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -511,13 +518,23 @@ export function RenderPromoSection({
                   <input
                     type="color"
                     value={promoSettings.titleColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, titleColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        titleColor: e.target.value,
+                      }))
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                   />
                   <input
                     type="text"
                     value={promoSettings.titleColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, titleColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        titleColor: e.target.value,
+                      }))
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
                   />
                 </div>
@@ -527,12 +544,12 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(promoSettings.titleSize) || ''}
+                    value={parseInt(promoSettings.titleSize) || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setPromoSettings(s => ({
+                      setPromoSettings((s) => ({
                         ...s,
-                        titleSize: value ? `${value}px` : '0px'
+                        titleSize: value ? `${value}px` : "0px",
                       }));
                     }}
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
@@ -565,20 +582,30 @@ export function RenderPromoSection({
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
                       {promoSettings.descriptionFont}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
-                      <DropdownMenuItem
-                        key={font}
-                        onSelect={() => setPromoSettings(s => ({...s, descriptionFont: font}))}
-                      >
-                        {font}
-                      </DropdownMenuItem>
-                    ))}
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
+                      (font) => (
+                        <DropdownMenuItem
+                          key={font}
+                          onSelect={() =>
+                            setPromoSettings((s) => ({
+                              ...s,
+                              descriptionFont: font,
+                            }))
+                          }
+                        >
+                          {font}
+                        </DropdownMenuItem>
+                      )
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -589,13 +616,23 @@ export function RenderPromoSection({
                   <input
                     type="color"
                     value={promoSettings.descriptionColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, descriptionColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        descriptionColor: e.target.value,
+                      }))
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                   />
                   <input
                     type="text"
                     value={promoSettings.descriptionColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, descriptionColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        descriptionColor: e.target.value,
+                      }))
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
                   />
                 </div>
@@ -606,12 +643,12 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(promoSettings.descriptionSize) || ''}
+                    value={parseInt(promoSettings.descriptionSize) || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setPromoSettings(s => ({
+                      setPromoSettings((s) => ({
                         ...s,
-                        descriptionSize: value ? `${value}px` : '0px'
+                        descriptionSize: value ? `${value}px` : "0px",
                       }));
                     }}
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
@@ -645,25 +682,33 @@ export function RenderPromoSection({
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
                       {promoSettings.buttonFont}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map((font) => (
-                      <DropdownMenuItem
-                        key={font}
-                        onSelect={() => setPromoSettings(s => ({...s, buttonFont: font}))}
-                      >
-                        {font}
-                      </DropdownMenuItem>
-                    ))}
+                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
+                      (font) => (
+                        <DropdownMenuItem
+                          key={font}
+                          onSelect={() =>
+                            setPromoSettings((s) => ({
+                              ...s,
+                              buttonFont: font,
+                            }))
+                          }
+                        >
+                          {font}
+                        </DropdownMenuItem>
+                      )
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-
-
 
               {/* Text Color Picker */}
               <div className="space-y-2">
@@ -672,13 +717,23 @@ export function RenderPromoSection({
                   <input
                     type="color"
                     value={promoSettings.buttonTextColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, buttonTextColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        buttonTextColor: e.target.value,
+                      }))
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                   />
                   <input
                     type="text"
                     value={promoSettings.buttonTextColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, buttonTextColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        buttonTextColor: e.target.value,
+                      }))
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
                   />
                 </div>
@@ -690,12 +745,12 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(promoSettings.buttonSize) || ''}
+                    value={parseInt(promoSettings.buttonSize) || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setPromoSettings(s => ({
+                      setPromoSettings((s) => ({
                         ...s,
-                        buttonSize: value ? `${value}px` : '0px'
+                        buttonSize: value ? `${value}px` : "0px",
                       }));
                     }}
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
@@ -712,12 +767,12 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(promoSettings.buttonRadius) || ''}
+                    value={parseInt(promoSettings.buttonRadius) || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setPromoSettings(s => ({
+                      setPromoSettings((s) => ({
                         ...s,
-                        buttonRadius: value ? `${value}px` : '0px'
+                        buttonRadius: value ? `${value}px` : "0px",
                       }));
                     }}
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
@@ -750,7 +805,10 @@ export function RenderPromoSection({
                 <label className="block text-sm mb-2">Object Fit</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
                       {promoSettings.imageObjectFit}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
@@ -759,7 +817,12 @@ export function RenderPromoSection({
                     {["Cover", "Fill", "Contain"].map((fit) => (
                       <DropdownMenuItem
                         key={fit}
-                        onSelect={() => setPromoSettings(s => ({...s, imageObjectFit: fit as any}))}
+                        onSelect={() =>
+                          setPromoSettings((s) => ({
+                            ...s,
+                            imageObjectFit: fit as any,
+                          }))
+                        }
                       >
                         {fit}
                       </DropdownMenuItem>
@@ -773,13 +836,23 @@ export function RenderPromoSection({
                   <input
                     type="color"
                     value={promoSettings.backgroundColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, backgroundColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        backgroundColor: e.target.value,
+                      }))
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                   />
                   <input
                     type="text"
                     value={promoSettings.backgroundColor}
-                    onChange={(e) => setPromoSettings(s => ({...s, backgroundColor: e.target.value}))}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        backgroundColor: e.target.value,
+                      }))
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
                   />
                 </div>
@@ -808,7 +881,12 @@ export function RenderPromoSection({
                 <Button
                   variant={promoSettings.showArrows ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setPromoSettings(s => ({...s, showArrows: !s.showArrows}))}
+                  onClick={() =>
+                    setPromoSettings((s) => ({
+                      ...s,
+                      showArrows: !s.showArrows,
+                    }))
+                  }
                 >
                   {promoSettings.showArrows ? "Enabled" : "Disabled"}
                 </Button>
@@ -818,7 +896,9 @@ export function RenderPromoSection({
                 <Button
                   variant={promoSettings.autoplay ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setPromoSettings(s => ({...s, autoplay: !s.autoplay}))}
+                  onClick={() =>
+                    setPromoSettings((s) => ({ ...s, autoplay: !s.autoplay }))
+                  }
                 >
                   {promoSettings.autoplay ? "Enabled" : "Disabled"}
                 </Button>

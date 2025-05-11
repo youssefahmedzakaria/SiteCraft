@@ -2,19 +2,17 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/dashboard/customize/sidebar";
-
+import { Eye } from "lucide-react";
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
     "desktop" | "tablet" | "mobile"
   >("desktop");
 
-  
-
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar></Sidebar>
+      <Sidebar />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col">
@@ -23,22 +21,7 @@ export default function CustomizeTemplatePage() {
           <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
             <Button variant="outline" className="bg-white">
               <span className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Eye size={20} />
                 Preview
               </span>
             </Button>
@@ -70,7 +53,12 @@ export default function CustomizeTemplatePage() {
             </div>
           </div>
           {/* go to dashboard on saving  */}
-          <Button className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto" onClick ={()=>{ window.location.href="/dashboard/customers";}}>
+          <Button
+            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
+            onClick={() => {
+              window.location.href = "/dashboard/customers";
+            }}
+          >
             Save Changes
           </Button>
         </div>
@@ -84,7 +72,7 @@ export default function CustomizeTemplatePage() {
               <div className="text-sm">
                 {/* {detailedSection
                   ? `Editing ${detailedSection.title}`: " */}
-                  Customize your template
+                Customize your template
                 {/* "} */}
               </div>
             </div>

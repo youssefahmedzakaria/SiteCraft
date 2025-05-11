@@ -13,11 +13,12 @@ import {
 } from "lucide-react";
 import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
+import { RenderAboutSection } from "./renderAboutSection";
 
 interface Section {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  // icon: React.ReactNode;
   expanded: boolean;
 }
 
@@ -27,13 +28,19 @@ export function Sidebar() {
     {
       id: "Header&Menu",
       title: "Header & Menu",
-      icon: <AppWindow size={18} />,
+      // icon: <AppWindow size={18} />,
       expanded: false,
     },
     {
       id: "PromoSlider",
       title: "Promo Slider",
-      icon: <Images size={18} />,
+      // icon: <Images size={18} />,
+      expanded: false,
+    },
+    {
+      id: "AboutUs",
+      title: "About Us",
+      // icon: <Images size={18} />,
       expanded: false,
     },
   ]);
@@ -139,16 +146,6 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Sidebar Toggle */}
-      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between h-16">
-        <h1 className="text-lg font-bold">
-          {detailedSection
-            ? `Edit ${detailedSection.title}`
-            : "Customize Template"}
-        </h1>
-        <button onClick={toggleSidebar} className="p-1">
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
 
       {/* Main Sidebar or Detailed Section Sidebar */}
       {detailedSection ? (
@@ -163,7 +160,9 @@ export function Sidebar() {
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft size={18} />
-              <span>Back to Sections</span>
+              <h1 className="text-lg font-bold">
+                {`Edit ${detailedSection.title}`}
+              </h1>
             </button>
           </div>
 
@@ -196,6 +195,8 @@ export function Sidebar() {
             <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "PromoSlider" ? (
             <RenderPromoSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "AboutUs" ? (
+            <RenderAboutSection detailedSectionTab={detailedSectionTab} />
           ) : null}
         </div>
       ) : (
@@ -208,7 +209,8 @@ export function Sidebar() {
             "h-screen md:h-auto fixed md:static z-10 top-16 left-0 right-0 md:top-0"
           }`}
         >
-          <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16">
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 h-16 flex items-center">
             <h1 className="text-lg font-bold">Customize Template</h1>
           </div>
 
@@ -241,7 +243,7 @@ export function Sidebar() {
                     onClick={() => toggleSection(section.id)}
                   >
                     <div className="flex items-center gap-2">
-                      {section.icon}
+                      {/* {section.icon} */}
                       <span className="font-medium">{section.title}</span>
                     </div>
                     {section.expanded ? (
