@@ -15,7 +15,6 @@ interface CustomVariationSectionProps {
     onValuesChange: (values: string[]) => void;
     onAddDefaults?: () => void;
     showDefaults: boolean;
-    dragHandle?: any;
     isDragging?: boolean;
 }
 
@@ -27,7 +26,6 @@ export function CustomVariationSection({
     onValuesChange, 
     onAddDefaults,
     showDefaults,
-    dragHandle,
     isDragging
 }: CustomVariationSectionProps) {
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);

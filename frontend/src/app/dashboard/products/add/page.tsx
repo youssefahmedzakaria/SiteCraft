@@ -203,6 +203,10 @@ export default function AddProductPage() {
                         } ${
                           draggedVariationIndex === index ? "shadow-lg" : ""
                         }`}
+                        //   onDragStart={() => handleSizeDragStart(index)} <---------------
+                        //   onDragOver={(e) => e.preventDefault()} <------------
+                        //   onDragEnter={() => handleSizeDragEnter(index)}  <------------
+                        //   onDragEnd={handleSizeDragEnd}
                         draggable
                         onDragStart={() => handleVariationDragStart(index)}
                         onDragOver={(e) => {
@@ -213,8 +217,8 @@ export default function AddProductPage() {
                       >
                         <CustomVariationSection
                           name={variation.name}
-                          values={variation.values}
                           index={index}
+                          values={variation.values}
                           onDelete={() => handleDeleteVariation(index)}
                           onChange={(name) =>
                             handleVariationNameChange(index, name)
@@ -224,9 +228,6 @@ export default function AddProductPage() {
                           }
                           onAddDefaults={() => handleAddDefaults(index)}
                           showDefaults={index === 0}
-                          onDragStart={() => handleVariationDragStart(index)}
-                          onDragOver={(e) => handleVariationDragOver(e, index)}
-                          onDragEnd={handleVariationDragEnd}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>
