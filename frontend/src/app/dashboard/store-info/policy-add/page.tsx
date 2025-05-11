@@ -14,22 +14,26 @@ export default function AddPolicyPage() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    status: "Active"
+    status: "Active",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSelectClick = () => {
-    setStatusDropdownOpen(prev => !prev);
+    setStatusDropdownOpen((prev) => !prev);
   };
 
   const handleSelectBlur = () => {
@@ -58,20 +62,21 @@ export default function AddPolicyPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="flex items-center mb-6">
-          {/* <Link href="/dashboard/store-info" className="mr-4">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </Link> */}
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Add Store Policy</h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            Create a new policy for your store
+          </h2>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Policy Title <span className="text-red-500">*</span>
               </label>
               <Input
@@ -88,7 +93,10 @@ export default function AddPolicyPage() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="content"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Policy Content <span className="text-red-500">*</span>
               </label>
               <Textarea
@@ -101,12 +109,16 @@ export default function AddPolicyPage() {
                 placeholder="Enter the full policy text here..."
               />
               <p className="text-xs text-gray-400 mt-1">
-                Write a clear and concise policy that customers can easily understand.
+                Write a clear and concise policy that customers can easily
+                understand.
               </p>
             </div>
 
             <div className="mb-6">
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Policy Status
               </label>
               <div className="relative">
@@ -132,7 +144,8 @@ export default function AddPolicyPage() {
                 </div>
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                Active policies are visible to customers. Draft policies are only visible to store administrators.
+                Active policies are visible to customers. Draft policies are
+                only visible to store administrators.
               </p>
             </div>
 

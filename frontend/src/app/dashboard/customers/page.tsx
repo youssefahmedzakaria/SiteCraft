@@ -41,11 +41,11 @@ export default function CustomersPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 min-h-screen">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         {/* Header section with title and subtitle */}
-        <div className="mb-6">
+        <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Customers</h1>
-          <h2 className="text-lg md:text-xl font-semibold mt-2 text-gray-600">Manage your customer relationships and accounts</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-600">Manage your customer relationships and accounts</h2>
         </div>
 
         {/* Stats row */}

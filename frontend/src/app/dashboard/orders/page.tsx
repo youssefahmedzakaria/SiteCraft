@@ -58,14 +58,13 @@ export default function OrdersPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">
-          Order Management
-        </h1>
-
         {/* Header section */}
-        <h2 className="text-lg md:text-xl font-semibold">
-          Manage and view your store's orders
-        </h2>
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Order Management</h1>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-600">
+            Manage and view your store's orders
+          </h2>
+        </div>
 
         <div className="border-t border-logo-border mt-6 space-y-2 pt-3">
           {/* Search and filters */}

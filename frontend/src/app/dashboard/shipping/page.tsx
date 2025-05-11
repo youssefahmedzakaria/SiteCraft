@@ -31,12 +31,11 @@ export default function ShippingPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">Shipping</h1>
-        
-        {/* Shipping Table */}
-        <div className="mt-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-            <h2 className="text-lg md:text-xl font-semibold">
+        {/* Header section */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Shipping</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-600">
               Manage shipping rates and delivery locations
             </h2>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -89,16 +88,19 @@ export default function ShippingPage() {
               </DropdownMenu>
             </div>
           </div>
-          <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
-            <table className="min-w-full divide-y divide-logo-border">
-              <ShippingTableHeader />
-              <tbody className="bg-white divide-y divide-logo-border">
-                {shippings.map((shipping) => (
-                  <ShippingRecord key={shipping.id} shipping={shipping} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+        </div>
+
+        {/* Shipping Table */}
+
+        <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+          <table className="min-w-full divide-y divide-logo-border">
+            <ShippingTableHeader />
+            <tbody className="bg-white divide-y divide-logo-border">
+              {shippings.map((shipping) => (
+                <ShippingRecord key={shipping.id} shipping={shipping} />
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Additional information or settings could go here */}

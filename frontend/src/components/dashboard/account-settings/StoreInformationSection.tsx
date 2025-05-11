@@ -15,7 +15,7 @@ export function StoreInformationSection() {
       {/* Store Information */}
       <div>
         <CardTitle className="font-bold text-2xl mb-6">
-        Manage your store information and social media accounts
+          Store Information
         </CardTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -75,7 +75,8 @@ export function StoreInformationSection() {
               className="w-full"
             />
             <p className="text-xs text-gray-400 mt-1">
-              A short description that appears in search results (150 characters max)
+              A short description that appears in search results (150 characters
+              max)
             </p>
           </div>
         </div>
@@ -101,7 +102,8 @@ export function StoreInformationSection() {
               placeholder="Your Phone Number"
             />
             <p className="text-xs text-gray-400 mt-1">
-              This number will be visible on your storefront and can help customers reach you.
+              This number will be visible on your storefront and can help
+              customers reach you.
             </p>
           </div>
           <div>
@@ -118,7 +120,8 @@ export function StoreInformationSection() {
               placeholder="youremail@example.com"
             />
             <p className="text-xs text-gray-400 mt-1">
-              This email will be visible on your storefront and can help customers reach you.
+              This email will be visible on your storefront and can help
+              customers reach you.
             </p>
           </div>
         </div>
@@ -135,7 +138,10 @@ export function StoreInformationSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="facebook" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="facebook"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Facebook
             </label>
             <div className="flex">
@@ -153,7 +159,10 @@ export function StoreInformationSection() {
           </div>
 
           <div>
-            <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="instagram"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Instagram
             </label>
             <div className="flex">
@@ -171,7 +180,10 @@ export function StoreInformationSection() {
           </div>
 
           <div>
-            <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="twitter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               X (Twitter)
             </label>
             <div className="flex">
@@ -189,7 +201,10 @@ export function StoreInformationSection() {
           </div>
 
           <div>
-            <label htmlFor="youtube" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="youtube"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               YouTube
             </label>
             <div className="flex">
@@ -226,5 +241,5 @@ export function StoreInformationSection() {
         </Link>
       </div>
     </form>
-  )
+  );
 }

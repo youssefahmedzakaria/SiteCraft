@@ -19,10 +19,12 @@ export default function EditCategoryPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">Edit Category</h1>
-        <p className="text-gray-500 mt-2 mb-6">
-          Edit the details of the category and assign products to it.
-        </p>
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Edit Category</h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            Edit the details of the category and assign products to it
+          </h2>
+        </div>
 
         <div className="flex mb-1 ml-3">
           {tabs.map((tab) => (
