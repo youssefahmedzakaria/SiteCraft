@@ -28,17 +28,19 @@ export default function StoreInfoPage() {
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Store Policies</h3>
-            <Link href="/dashboard/store-info/policy-add" className="w-full sm:w-auto">
-              <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                <Image
-                  src="/icons/plus.svg"
-                  alt="Add Policy"
-                  width={20}
-                  height={20}
-                />
-                <span className="ml-2">Add New Policy</span>
-              </Button>
-            </Link>
+            <div className="flex justify-end">
+              <Link href="/dashboard/store-info/policy-add">
+                <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  <Image
+                    src="/icons/plus.svg"
+                    alt="Add Policy"
+                    width={20}
+                    height={20}
+                  />
+                  <span className="ml-2">Add New Policy</span>
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
@@ -56,17 +58,19 @@ export default function StoreInfoPage() {
         <div className="mt-10">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">About Us</h3>
-            <Link href="/dashboard/store-info/about-add" className="w-full sm:w-auto">
-              <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                <Image
-                  src="/icons/plus.svg"
-                  alt="Add Section"
-                  width={20}
-                  height={20}
-                />
-                <span className="ml-2">Add New Section</span>
-              </Button>
-            </Link>
+            <div className="flex justify-end">
+              <Link href="/dashboard/store-info/about-add">
+                <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  <Image
+                    src="/icons/plus.svg"
+                    alt="Add About Section"
+                    width={20}
+                    height={20}
+                  />
+                  <span className="ml-2">Add New Section</span>
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
