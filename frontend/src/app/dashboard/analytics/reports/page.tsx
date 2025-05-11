@@ -11,10 +11,10 @@ export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+<div className="flex min-h-screen h-full bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 h-full overflow-y-auto">
         {/* Header section */}
         <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
@@ -40,7 +40,7 @@ export default function ReportsPage() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider min-w-[300px]">
                   Description
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-logo-txt uppercase tracking-wider">
@@ -60,8 +60,8 @@ export default function ReportsPage() {
                   <td className="px-4 py-4 text-sm text-gray-500 break-words">
                     {report.category}
                   </td>
-                  <td className="px-4 py-4 text-sm text-gray-500">
-                    <div className="line-clamp-2 sm:line-clamp-none overflow-y-auto max-h-24">
+                  <td className="px-4 py-4 text-sm text-gray-500 min-w-[300px] max-w-[600px]">
+                    <div className="overflow-y-visible">
                       {report.description}
                     </div>
                   </td>

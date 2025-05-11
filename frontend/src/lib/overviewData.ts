@@ -5,15 +5,15 @@ export interface Order {
     id: number
     customer: string
     total: number
-    status: 'Completed' | 'Processing' | 'Shipped' | 'Pending'
+    status: 'Delivered' | 'Cancelled' | 'Processing' | 'Shipped' | 'Pending'
   }
   
   export const todaysOrders: Order[] = [
-    { id: 1, customer: 'Ali Tareq',    total: 99.99,  status: 'Completed'  },
+    { id: 1, customer: 'Ali Tareq',    total: 99.99,  status: 'Delivered'  },
     { id: 2, customer: 'Jane Hamdy',  total: 149.99, status: 'Processing' },
     { id: 3, customer: 'Bob Zaki', total: 79.99,  status: 'Shipped'    },
     { id: 4, customer: 'Zakaria Brown', total: 199.99, status: 'Pending'    },
-    { id: 5, customer: 'Yehia Zamel', total: 59.99, status: 'Completed' },
+    { id: 5, customer: 'Yehia Zamel', total: 59.99, status: 'Cancelled' },
   ]
   
   // 2) Daily sales interface + mock data

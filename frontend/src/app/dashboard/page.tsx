@@ -54,8 +54,8 @@ const ProductsTableHeader: FC = () => (
 
 const getStatusClass = (status: Order["status"]): string => {
   switch (status.toLowerCase()) {
-    case "completed":
-      return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800";
+    case "shipped":
+      return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800";
     case "pending":
       return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800";
     case "processing":
@@ -63,7 +63,7 @@ const getStatusClass = (status: Order["status"]): string => {
     case "cancelled":
       return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800";
     default:
-      return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800";
+      return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800";
   }
 };
 
@@ -102,7 +102,7 @@ export default function OverviewPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 space-y-6">
         {/* Header section with title and subtitle */}
         <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Overview</h1>
