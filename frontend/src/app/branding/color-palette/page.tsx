@@ -259,19 +259,19 @@ export default function ColorPalettePage() {
                 <div className="mb-8">
                     <div className="flex items-center justify-center">
                         <div className="flex items-center">
-                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-700">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-black text-white">
                                 1
                             </div>
-                            <div className="ml-2 text-gray-500">Branding</div>
+                            <div className="ml-2 font-medium">Branding</div>
                         </div>
-                        <div className="w-12 h-1 mx-4 bg-gray-300"></div>
+                        <div className="w-12 h-1 mx-4 bg-black"></div>
                         <div className="flex items-center">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-black text-white">
                                 2
                             </div>
                             <div className="ml-2 font-medium">Color Palette</div>
                         </div>
-                        <div className="w-12 h-1 mx-4 bg-gray-300"></div>
+                        <div className="w-12 h-1 mx-4 bg-black"></div>
                         <div className="flex items-center">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-700">
                                 3
@@ -286,7 +286,6 @@ export default function ColorPalettePage() {
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Preset Palettes Section */}
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Preset Palettes</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
