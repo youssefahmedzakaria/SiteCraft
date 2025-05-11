@@ -14,6 +14,7 @@ import {
 import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
 import { RenderAboutSection } from "./renderAboutSection";
+import { RenderFooterSection } from "./renderFooterSection";
 
 interface Section {
   id: string;
@@ -40,6 +41,12 @@ export function Sidebar() {
     {
       id: "AboutUs",
       title: "About Us",
+      // icon: <Images size={18} />,
+      expanded: false,
+    },
+    {
+      id: "Footer",
+      title: "Footer",
       // icon: <Images size={18} />,
       expanded: false,
     },
@@ -197,6 +204,8 @@ export function Sidebar() {
             <RenderPromoSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "AboutUs" ? (
             <RenderAboutSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "Footer" ? (
+            <RenderFooterSection detailedSectionTab={detailedSectionTab} />
           ) : null}
         </div>
       ) : (

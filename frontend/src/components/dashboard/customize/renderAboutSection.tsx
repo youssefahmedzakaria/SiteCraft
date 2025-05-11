@@ -50,9 +50,6 @@ export function RenderAboutSection({
     background: false,
   });
 
-  //   backgroundColor?: string
-  //   imageObjectFit?: "cover" | "fill" | "contain"
-
   const [aboutUsSettings, setPromoSettings] = useState<AboutUsSettings>({
     titleFont: "inter",
     titleColor: "#000000",
