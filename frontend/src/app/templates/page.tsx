@@ -36,23 +36,23 @@ export default function SuggestedTemplatesPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">Suggested Templates</h1>
-          <Link href="/templates/view-all">
+        <h1 className="text-2xl md:text-3xl font-bold mt-2">Suggested Templates</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2 mb-6 space-y-4 md:space-y-0">
+          <p className="text-gray-500 w-full md:w-auto">
+            Choose from our suggested collection of professional templates
+          </p>
+          <Link href="/templates/view-all" className="w-full md:w-auto">
             <Button
-              className="bg-black text-white hover:bg-gray-800"
+              className="bg-black text-white hover:bg-gray-800 w-full"
             >
               View All Templates
             </Button>
           </Link>
         </div>
-        <p className="text-gray-500 mt-2 mb-6">
-          Choose from our suggested collection of professional templates
-        </p>
 
         {/* Templates Card */}
         <Card className="bg-white shadow-md">
-          <CardContent className="pt-6">
+          <CardContent className="pt-2 pb-2">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {suggestedTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />

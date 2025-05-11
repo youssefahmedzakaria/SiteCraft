@@ -230,6 +230,30 @@ export default function ColorPalettePage() {
                     "#00ACC1", // Teal
                 ],
             },
+            {
+                name: "Sunset Glow",
+                colors: [
+                    "#FF7043", // Coral
+                    "#FFEB3B", // Yellow
+                    "#FF4081", // Pink
+                ],
+            },
+            {
+                name: "Forest Retreat",
+                colors: [
+                    "#388E3C", // Green
+                    "#A5D6A7", // Light green
+                    "#FFEB3B", // Yellow
+                ],
+            },
+            {
+                name: "Urban Chic",
+                colors: [
+                    "#424242", // Dark gray
+                    "#BDBDBD", // Light gray
+                    "#FF9800", // Orange
+                ],
+            },
         ];
 
         setPresetPalettes(palettes);
@@ -291,49 +315,52 @@ export default function ColorPalettePage() {
                 </p>
 
                 <Card className="bg-white shadow-md">
-                    <CardContent className="pt-6 pb-2">
+                    <CardContent className="pt-2 pb-2">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Left Column: Preset Palettes */}
                             <div>
                                 <h2 className="text-xl font-semibold mb-4">Preset Color Palettes</h2>
                                 <p className="text-sm text-gray-500 mb-4">Choose from our professionally designed color schemes</p>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                                    {presetPalettes.map((palette, index) => (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">                                    {presetPalettes.map((palette, index) => (
                                         <div
                                             key={index}
-                                            className="border border-gray-300 rounded-lg p-3 cursor-pointer hover:shadow-md transition-all hover:border-gray-400"
+                                            className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                                                palette.colors[0] === primaryColor && 
+                                                palette.colors[1] === secondaryColor && 
+                                                (palette.colors[2] || '') === accentColor
+                                                    ? "border-black bg-gray-50" 
+                                                    : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                                            }`}
                                             onClick={() => handleSelectPalette(palette)}
                                         >
-                                            <p className="font-medium mb-2">{palette.name}</p>
-
-                                            <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm mb-2">
-                                                <div className="h-10" style={{ backgroundColor: palette.colors[0] }}>
-                                                    <div className="h-full flex items-center justify-center">
-                                                        <span className="text-white text-xs font-medium drop-shadow-sm">Primary</span>
-                                                    </div>
-                                                </div>
-                                                <div className="h-8" style={{ backgroundColor: palette.colors[1] }}>
-                                                    <div className="h-full flex items-center justify-center">
-                                                        <span className="text-xs font-medium" style={{ color: palette.colors[0] }}>Secondary</span>
-                                                    </div>
-                                                </div>
-                                                {palette.colors[2] && (
-                                                    <div className="h-6" style={{ backgroundColor: palette.colors[2] }}>
-                                                        <div className="h-full flex items-center justify-center">
-                                                            <span className="text-white text-xs font-medium drop-shadow-sm">Accent</span>
-                                                        </div>
-                                                    </div>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <p className="font-medium">{palette.name}</p>
+                                                {palette.colors[0] === primaryColor && 
+                                                palette.colors[1] === secondaryColor && 
+                                                (palette.colors[2] || '') === accentColor && (
+                                                    <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                                                    </svg>
                                                 )}
                                             </div>
 
-                                            <div className="flex space-x-2 justify-center">
+                                            <div className="flex justify-center space-x-4 my-4">
                                                 {palette.colors.map((color, colorIndex) => (
                                                     <div key={colorIndex} className="flex flex-col items-center">
                                                         <div
-                                                            className="w-6 h-6 rounded-md border border-gray-300 shadow-sm"
-                                                            style={{ backgroundColor: color }}
+                                                            className="w-10 h-10 rounded-full border border-gray-300 shadow-sm transition-transform hover:scale-110"
+                                                            style={{ 
+                                                                backgroundColor: color,
+                                                                boxShadow: color === 
+                                                                    (colorIndex === 0 ? primaryColor : 
+                                                                    colorIndex === 1 ? secondaryColor : 
+                                                                    accentColor) ? '0 0 0 2px black' : ''
+                                                            }}
                                                         ></div>
+                                                        <span className="text-xs mt-2 text-gray-600 font-medium">
+                                                            {colorIndex === 0 ? 'Primary' : colorIndex === 1 ? 'Secondary' : 'Accent'}
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
