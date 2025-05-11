@@ -3,8 +3,10 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "@/components/sidebar/sidebar";
-import { DateRangeFilter } from "@/components/dashboard/DateRangeFilter";
-import ReportCard, { Report } from "@/components/dashboard/ReportCard";
+import { DateRangeFilter } from "@/components/dashboard/analytics/DateRangeFilter";
+import ReportCard, {
+  Report,
+} from "@/components/dashboard/analytics/ReportCard";
 import { reportsData } from "@/lib/reportsData";
 import {
   BadgeDollarSign,

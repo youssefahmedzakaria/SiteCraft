@@ -9,8 +9,8 @@ import {
   dailySales,
   topSellingProducts,
 } from "@/lib/overviewData";
-import { AnimatedChartWrapper } from "@/components/dashboard/charts/AnimatedChartWrapper";
-import { BarChartCard } from "@/components/dashboard/charts/BarChartCard";
+import { AnimatedChartWrapper } from "@/components/dashboard/analytics/charts/AnimatedChartWrapper";
+import { BarChartCard } from "@/components/dashboard/analytics/charts/BarChartCard";
 
 // ─── Table Headers ─────────────────────────────────────────────────────────────
 

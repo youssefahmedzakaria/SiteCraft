@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/sidebar/sidebar";
 import Image from "next/image";
 import { products } from "@/lib/products";
 import { productAnalytics } from "@/lib/generalAnalytics";
-import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
+import { GeneralAnalyticsCard } from "@/components/dashboard/analytics/generalAnalyticsCard";
 import { ProductRecord } from "@/components/dashboard/products/productRecord";
 import { SearchBar } from "@/components/ui/searchBar";
 import { ProductTableHeader } from "@/components/dashboard/products/productTableHeader";

@@ -4,8 +4,8 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar/sidebar";
 //import { dashboardAnalyticsByTimespan } from '@/lib/dashboardAnalytics'
-import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
-import { AnimatedChartWrapper } from "@/components/dashboard/charts/AnimatedChartWrapper";
+import { GeneralAnalyticsCard } from "@/components/dashboard/analytics/generalAnalyticsCard";
+import { AnimatedChartWrapper } from "@/components/dashboard/analytics/charts/AnimatedChartWrapper";
 //import { chartDataByTimespan } from '@/lib/chartData'
 import { chartDataByTimespan, Timespan } from "@/lib/chartData";
 import { dashboardAnalyticsByTimespan } from "@/lib/dashboardAnalytics";
@@ -23,9 +23,9 @@ import {
   RadarChartCard,
   HorizontalBarChartCard,
   MultiLineChartCard,
-} from "@/components/dashboard/charts";
+} from "@/components/dashboard/analytics/charts";
 
-import { DateRangeFilter } from "@/components/dashboard/DateRangeFilter";
+import { DateRangeFilter } from "@/components/dashboard/analytics/DateRangeFilter";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 export default function AnalyticsPage() {

@@ -7,7 +7,7 @@ import { Sidebar } from "@/components/sidebar/sidebar";
 import Image from "next/image";
 import { categories } from "@/lib/categories";
 import { categoryAnalytics } from "@/lib/generalAnalytics";
-import { GeneralAnalyticsCard } from "@/components/dashboard/generalAnalyticsCard";
+import { GeneralAnalyticsCard } from "@/components/dashboard/analytics/generalAnalyticsCard";
 import { CategoryRecord } from "@/components/dashboard/categories/categoryRecord";
 import { SearchBar } from "@/components/ui/searchBar";
 import { CategoryTableHeader } from "@/components/dashboard/categories/categoryTableHeader";
