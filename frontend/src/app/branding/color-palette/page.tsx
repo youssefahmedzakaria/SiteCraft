@@ -252,6 +252,11 @@ export default function ColorPalettePage() {
             setAccentColor(palette.colors[2]);
         }
     };
+    const handleBackClick = () => {
+        // Navigate back to the branding page
+        window.location.href = "/branding";
+    };
+
     return (
         <div className="min-h-screen bg-gray-100">
             <main className="container mx-auto p-4 md:p-6">
@@ -285,194 +290,211 @@ export default function ColorPalettePage() {
                     Select from our presets or create your own custom colors.
                 </p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Preset Palettes</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {presetPalettes.map((palette, index) => (
-                                <Card
-                                    key={index}
-                                    className="cursor-pointer hover:shadow-md transition-shadow"
-                                    onClick={() => handleSelectPalette(palette)}
-                                >
-                                    <CardContent className="p-4">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                            {palette.colors.map((color, colorIndex) => (
-                                                <div
-                                                    key={colorIndex}
-                                                    className="w-8 h-8 rounded-full border border-gray-200"
-                                                    style={{ backgroundColor: color }}
-                                                />
-                                            ))}
-                                            <span className="ml-2">{palette.name}</span>
+                <Card className="bg-white shadow-md">
+                    <CardContent className="pt-6 pb-2">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Left Column: Preset Palettes */}
+                            <div>
+                                <h2 className="text-xl font-semibold mb-4">Preset Color Palettes</h2>
+                                <p className="text-sm text-gray-500 mb-4">Choose from our professionally designed color schemes</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                                    {presetPalettes.map((palette, index) => (
+                                        <div
+                                            key={index}
+                                            className="border border-gray-300 rounded-lg p-3 cursor-pointer hover:shadow-md transition-all hover:border-gray-400"
+                                            onClick={() => handleSelectPalette(palette)}
+                                        >
+                                            <p className="font-medium mb-2">{palette.name}</p>
+
+                                            <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm mb-2">
+                                                <div className="h-10" style={{ backgroundColor: palette.colors[0] }}>
+                                                    <div className="h-full flex items-center justify-center">
+                                                        <span className="text-white text-xs font-medium drop-shadow-sm">Primary</span>
+                                                    </div>
+                                                </div>
+                                                <div className="h-8" style={{ backgroundColor: palette.colors[1] }}>
+                                                    <div className="h-full flex items-center justify-center">
+                                                        <span className="text-xs font-medium" style={{ color: palette.colors[0] }}>Secondary</span>
+                                                    </div>
+                                                </div>
+                                                {palette.colors[2] && (
+                                                    <div className="h-6" style={{ backgroundColor: palette.colors[2] }}>
+                                                        <div className="h-full flex items-center justify-center">
+                                                            <span className="text-white text-xs font-medium drop-shadow-sm">Accent</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex space-x-2 justify-center">
+                                                {palette.colors.map((color, colorIndex) => (
+                                                    <div key={colorIndex} className="flex flex-col items-center">
+                                                        <div
+                                                            className="w-6 h-6 rounded-md border border-gray-300 shadow-sm"
+                                                            style={{ backgroundColor: color }}
+                                                        ></div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Live Preview Section */}
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Live Preview</h2>
-                        <Card className="bg-white mb-4">
-                            <CardContent className="p-6">
-                                <div
-                                    className="p-4 rounded-md mb-4"
-                                    style={{ backgroundColor: primaryColor }}
-                                >
-                                    <h3 className="text-lg font-semibold" style={{ color: secondaryColor }}>
-                                        Primary Color
-                                    </h3>
-                                    <p style={{ color: secondaryColor }}>
-                                        This shows how your primary color will look with text.
-                                    </p>
-                                    <Button
-                                        className="mt-2"
-                                        style={{
-                                            backgroundColor: accentColor,
-                                            color: "white"
-                                        }}
-                                    >
-                                        Sample Button
-                                    </Button>
+                                    ))}
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div
-                                        className="p-4 rounded-md"
-                                        style={{ backgroundColor: secondaryColor }}
-                                    >
-                                        <h3 className="text-lg font-semibold" style={{ color: primaryColor }}>
-                                            Secondary Color
-                                        </h3>
-                                        <p style={{ color: primaryColor }}>
-                                            Secondary color text preview.
-                                        </p>
-                                    </div>
-
-                                    <div
-                                        className="p-4 rounded-md"
-                                        style={{ backgroundColor: accentColor }}
-                                    >
-                                        <h3 className="text-lg font-semibold text-white">
-                                            Accent Color
-                                        </h3>
-                                        <p className="text-white">
-                                            Accent color text preview.
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* Custom Colors Section */}
-                <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Custom Colors</h2>
-                    <Card className="bg-white">
-                        <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {/* Primary Color */}
+                            <div className="lg:border-l lg:pl-8 border-gray-200 space-y-6">
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" />
-                                        </svg>
-                                        Primary Color
-                                    </label>
-                                    <div className="flex items-center">
+                                    <h2 className="text-xl font-semibold mb-4">Custom Colors</h2>
+                                    <p className="text-sm text-gray-500 mb-4">Customize your store's color scheme</p>
+
+                                    <div className="space-y-4">
+                                        <div className="p-3 border border-gray-200 rounded-lg">
+                                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: primaryColor }}></div>
+                                                Primary Color
+                                            </label>
+                                            <div className="flex items-center">
+                                                <div
+                                                    className="w-12 h-12 rounded-md mr-3 border border-gray-300 shadow-sm"
+                                                    style={{ backgroundColor: primaryColor }}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    value={primaryColor}
+                                                    onChange={(e) => setPrimaryColor(e.target.value)}
+                                                    className="w-32 border-gray-300"
+                                                />
+                                                <Input
+                                                    type="color"
+                                                    value={primaryColor}
+                                                    onChange={(e) => setPrimaryColor(e.target.value)}
+                                                    className="w-12 h-9 p-1 ml-2 cursor-pointer"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Secondary Color */}
+                                        <div className="p-3 border border-gray-200 rounded-lg">
+                                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
+                                                Secondary Color
+                                            </label>
+                                            <div className="flex items-center">
+                                                <div
+                                                    className="w-12 h-12 rounded-md mr-3 border border-gray-300 shadow-sm"
+                                                    style={{ backgroundColor: secondaryColor }}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    value={secondaryColor}
+                                                    onChange={(e) => setSecondaryColor(e.target.value)}
+                                                    className="w-32 border-gray-300"
+                                                />
+                                                <Input
+                                                    type="color"
+                                                    value={secondaryColor}
+                                                    onChange={(e) => setSecondaryColor(e.target.value)}
+                                                    className="w-12 h-9 p-1 ml-2 cursor-pointer"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Accent Color */}
+                                        <div className="p-3 border border-gray-200 rounded-lg">
+                                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: accentColor }}></div>
+                                                Accent Color
+                                            </label>
+                                            <div className="flex items-center">
+                                                <div
+                                                    className="w-12 h-12 rounded-md mr-3 border border-gray-300 shadow-sm"
+                                                    style={{ backgroundColor: accentColor }}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    value={accentColor}
+                                                    onChange={(e) => setAccentColor(e.target.value)}
+                                                    className="w-32 border-gray-300"
+                                                />
+                                                <Input
+                                                    type="color"
+                                                    value={accentColor}
+                                                    onChange={(e) => setAccentColor(e.target.value)}
+                                                    className="w-12 h-9 p-1 ml-2 cursor-pointer"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-3 border-t border-gray-200 mb-2">
+                                    <h2 className="text-xl font-semibold mb-3">Live Preview</h2>
+                                    <div className="border border-gray-300 rounded-lg overflow-hidden shadow-md">
                                         <div
-                                            className="w-10 h-10 rounded-md mr-3 border border-gray-200"
+                                            className="p-5 border-b border-gray-300"
                                             style={{ backgroundColor: primaryColor }}
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            className="w-32"
-                                        />
-                                        <Input
-                                            type="color"
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            className="w-12 h-9 p-1 ml-2"
-                                        />
-                                    </div>
-                                </div>
+                                        >
+                                            <h3 className="text-lg font-semibold" style={{ color: secondaryColor }}>
+                                                Primary Color
+                                            </h3>
+                                            <p style={{ color: secondaryColor }}>
+                                                This shows how your primary color will look with text.
+                                            </p>
+                                            <Button
+                                                className="mt-3"
+                                                style={{
+                                                    backgroundColor: accentColor,
+                                                    color: "white"
+                                                }}
+                                            >
+                                                Sample Button
+                                            </Button>
+                                        </div>
 
-                                {/* Secondary Color */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" />
-                                        </svg>
-                                        Secondary Color
-                                    </label>
-                                    <div className="flex items-center">
-                                        <div
-                                            className="w-10 h-10 rounded-md mr-3 border border-gray-200"
-                                            style={{ backgroundColor: secondaryColor }}
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={secondaryColor}
-                                            onChange={(e) => setSecondaryColor(e.target.value)}
-                                            className="w-32"
-                                        />
-                                        <Input
-                                            type="color"
-                                            value={secondaryColor}
-                                            onChange={(e) => setSecondaryColor(e.target.value)}
-                                            className="w-12 h-9 p-1 ml-2"
-                                        />
-                                    </div>
-                                </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                                            <div
+                                                className="p-5 border-r border-gray-300"
+                                                style={{ backgroundColor: secondaryColor }}
+                                            >
+                                                <h3 className="text-lg font-semibold" style={{ color: primaryColor }}>
+                                                    Secondary Color
+                                                </h3>
+                                                <p style={{ color: primaryColor }}>
+                                                    Secondary color text preview.
+                                                </p>
+                                            </div>
 
-                                {/* Accent Color */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" />
-                                        </svg>
-                                        Accent Color
-                                    </label>
-                                    <div className="flex items-center">
-                                        <div
-                                            className="w-10 h-10 rounded-md mr-3 border border-gray-200"
-                                            style={{ backgroundColor: accentColor }}
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={accentColor}
-                                            onChange={(e) => setAccentColor(e.target.value)}
-                                            className="w-32"
-                                        />
-                                        <Input
-                                            type="color"
-                                            value={accentColor}
-                                            onChange={(e) => setAccentColor(e.target.value)}
-                                            className="w-12 h-9 p-1 ml-2"
-                                        />
+                                            <div
+                                                className="p-5"
+                                                style={{ backgroundColor: accentColor }}
+                                            >
+                                                <h3 className="text-lg font-semibold text-white">
+                                                    Accent Color
+                                                </h3>
+                                                <p className="text-white">
+                                                    Accent color text preview.
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>        {/* Navigation Buttons */}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Navigation Buttons */}
                 <div className="mt-6 flex justify-between">
                     <Button
+                        onClick={handleBackClick}
                         variant="outline"
-                        onClick={() => window.location.href = "/branding"}
-                        className="border-gray-300"
+                        className="border-gray-300 hover:bg-gray-100"
                     >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
                         Back
                     </Button>
-
                     <Button
                         onClick={handleSaveChanges}
                         className="bg-black text-white hover:bg-gray-800"

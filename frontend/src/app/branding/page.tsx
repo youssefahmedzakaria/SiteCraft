@@ -67,193 +67,196 @@ export default function BrandingPage() {
                     Personalize your store's appearance with your brand colors and information
                 </p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Store Information Section */}
-                    <Card className="bg-white">
-                        <CardContent className="pt-6">
-                            <h2 className="text-xl font-semibold mb-4">Store Information</h2>
-                            <p className="text-sm text-gray-500 mb-6">Set your store name and logo</p>
+                <Card className="bg-white">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Store Information Section */}
+                            <div className="lg:border-r lg:pr-8 border-gray-200">
+                                <h2 className="text-xl font-semibold mb-4">Store Information</h2>
+                                <p className="text-sm text-gray-500 mb-6">Set your store name and logo</p>
 
-                            <div className="space-y-6">
-                                {/* Logo Upload */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Logo
-                                    </label>
-                                    <div className="flex items-center">
-                                        <div className="w-16 h-16 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden mr-4">
-                                            {logoFile ? (
-                                                <img
-                                                    src={URL.createObjectURL(logoFile)}
-                                                    alt="Logo Preview"
-                                                    className="w-full h-full object-contain"
-                                                />
-                                            ) : (
-                                                <svg
-                                                    className="w-8 h-8 text-gray-400"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
+                                <div className="space-y-6">
+                                    {/* Logo Upload */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Logo
+                                        </label>
+                                        <div className="flex items-center">
+                                            <div className="w-16 h-16 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden mr-4">
+                                                {logoFile ? (
+                                                    <img
+                                                        src={URL.createObjectURL(logoFile)}
+                                                        alt="Logo Preview"
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                ) : (
+                                                    <svg
+                                                        className="w-8 h-8 text-gray-400"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                        ></path>
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => document.getElementById('logo-upload')?.click()}
+                                                    className="mb-1"
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                    ></path>
+                                                    Choose File
+                                                </Button>
+                                                <input
+                                                    id="logo-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={handleLogoChange}
+                                                />
+                                                <p className="text-xs text-gray-400">
+                                                    {logoFile ? logoFile.name : 'No file chosen'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Store Name */}
+                                    <div>
+                                        <label htmlFor="storeName" className="block text-sm font-medium text-gray-700 mb-2">
+                                            Store Name
+                                        </label>
+                                        <Input
+                                            id="storeName"
+                                            value={storeName}
+                                            onChange={(e) => setStoreName(e.target.value)}
+                                            placeholder="Your Store Name"
+                                            className="w-full"
+                                        />
+                                    </div>
+
+                                    {/* Store Type */}
+                                    <div>
+                                        <label htmlFor="storeType" className="block text-sm font-medium text-gray-700 mb-2">
+                                            Store Type
+                                        </label>
+                                        <div className="relative">
+                                            <select
+                                                id="storeType"
+                                                value={storeType}
+                                                onChange={(e) => setStoreType(e.target.value)}
+                                                className="block w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] appearance-none"
+                                            >
+                                                <option value="" disabled>Select your store type</option>
+                                                <option value="fashion">Fashion & Apparel</option>
+                                                <option value="electronics">Electronics</option>
+                                                <option value="home">Home & Furniture</option>
+                                                <option value="beauty">Beauty & Personal Care</option>
+                                                <option value="food">Food & Grocery</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => document.getElementById('logo-upload')?.click()}
-                                                className="mb-1"
-                                            >
-                                                Choose File
-                                            </Button>
-                                            <input
-                                                id="logo-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={handleLogoChange}
-                                            />
-                                            <p className="text-xs text-gray-400">
-                                                {logoFile ? logoFile.name : 'No file chosen'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Store Name */}
-                                <div>
-                                    <label htmlFor="storeName" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Store Name
-                                    </label>
-                                    <Input
-                                        id="storeName"
-                                        value={storeName}
-                                        onChange={(e) => setStoreName(e.target.value)}
-                                        placeholder="Your Store Name"
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                {/* Store Type */}
-                                <div>
-                                    <label htmlFor="storeType" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Store Type
-                                    </label>
-                                    <div className="relative">
-                                        <select
-                                            id="storeType"
-                                            value={storeType}
-                                            onChange={(e) => setStoreType(e.target.value)}
-                                            className="block w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] appearance-none"
-                                        >
-                                            <option value="" disabled>Select your store type</option>
-                                            <option value="fashion">Fashion & Apparel</option>
-                                            <option value="electronics">Electronics</option>
-                                            <option value="home">Home & Furniture</option>
-                                            <option value="beauty">Beauty & Personal Care</option>
-                                            <option value="food">Food & Grocery</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                            </svg>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
 
-                    {/* Color Scheme Section */}
-                    <Card className="bg-white">
-                        <CardContent className="pt-6">
-                            <h2 className="text-xl font-semibold mb-4">Color Scheme</h2>
-                            <p className="text-sm text-gray-500 mb-6">Choose your store's colors</p>
+                            {/* Color Scheme Section */}
+                            <div className="lg:pl-8">
+                                <h2 className="text-xl font-semibold mb-4">Color Scheme</h2>
+                                <p className="text-sm text-gray-500 mb-6">Choose your store's colors</p>
 
-                            <div className="space-y-6">
-                                {/* Primary Color */}
-                                <div>
-                                    <label htmlFor="primaryColor" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Primary Color
-                                    </label>
-                                    <div className="flex items-center">
-                                        <div
-                                            className="w-10 h-10 rounded-md mr-3 border border-gray-200"
-                                            style={{ backgroundColor: primaryColor }}
-                                        ></div>
-                                        <Input
-                                            id="primaryColor"
-                                            type="text"
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            className="w-32"
-                                        />
-                                        <Input
-                                            type="color"
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            className="w-12 h-9 p-1 ml-2"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Secondary Color */}
-                                <div>
-                                    <label htmlFor="secondaryColor" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Secondary Color
-                                    </label>
-                                    <div className="flex items-center">
-                                        <div
-                                            className="w-10 h-10 rounded-md mr-3 border border-gray-200"
-                                            style={{ backgroundColor: secondaryColor }}
-                                        ></div>
-                                        <Input
-                                            id="secondaryColor"
-                                            type="text"
-                                            value={secondaryColor}
-                                            onChange={(e) => setSecondaryColor(e.target.value)}
-                                            className="w-32"
-                                        />
-                                        <Input
-                                            type="color"
-                                            value={secondaryColor}
-                                            onChange={(e) => setSecondaryColor(e.target.value)}
-                                            className="w-12 h-9 p-1 ml-2"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Color Preview */}
-                                <div className="mt-8">
-                                    <h3 className="text-sm font-medium text-gray-700 mb-3">Preview</h3>
-                                    <div className="border border-gray-200 rounded-md p-4">
-                                        <div className="flex flex-col items-center">
+                                <div className="space-y-6">
+                                    {/* Primary Color */}
+                                    <div>
+                                        <label htmlFor="primaryColor" className="block text-sm font-medium text-gray-700 mb-2">
+                                            Primary Color
+                                        </label>
+                                        <div className="flex items-center">
                                             <div
-                                                className="w-full h-16 rounded-t-md flex items-center justify-center"
+                                                className="w-10 h-10 rounded-md mr-3 border border-gray-300"
                                                 style={{ backgroundColor: primaryColor }}
-                                            >
-                                                <span className="text-white font-bold">Primary Color</span>
-                                            </div>
+                                            ></div>
+                                            <Input
+                                                id="primaryColor"
+                                                type="text"
+                                                value={primaryColor}
+                                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                                className="w-32"
+                                            />
+                                            <Input
+                                                type="color"
+                                                value={primaryColor}
+                                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                                className="w-12 h-9 p-1 ml-2"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Secondary Color */}
+                                    <div>
+                                        <label htmlFor="secondaryColor" className="block text-sm font-medium text-gray-700 mb-2">
+                                            Secondary Color
+                                        </label>
+                                        <div className="flex items-center">
                                             <div
-                                                className="w-full h-16 rounded-b-md flex items-center justify-center border-t border-gray-200"
+                                                className="w-10 h-10 rounded-md mr-3 border border-gray-300"
                                                 style={{ backgroundColor: secondaryColor }}
-                                            >
-                                                <span className="font-bold" style={{ color: primaryColor }}>Secondary Color</span>
+                                            ></div>
+                                            <Input
+                                                id="secondaryColor"
+                                                type="text"
+                                                value={secondaryColor}
+                                                onChange={(e) => setSecondaryColor(e.target.value)}
+                                                className="w-32"
+                                            />
+                                            <Input
+                                                type="color"
+                                                value={secondaryColor}
+                                                onChange={(e) => setSecondaryColor(e.target.value)}
+                                                className="w-12 h-9 p-1 ml-2"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Color Preview */}
+                                    <div className="mt-8">
+                                        <h3 className="text-sm font-medium text-gray-700 mb-3">Preview</h3>
+                                        <div className="border border-gray-300 rounded-md overflow-hidden">
+                                            <div className="flex flex-col items-center">
+                                                <div
+                                                    className="w-full h-16 flex items-center justify-center border-b border-gray-300"
+                                                    style={{ backgroundColor: primaryColor }}
+                                                >
+                                                    <span className="text-white font-bold">Primary Color</span>
+                                                </div>
+                                                <div
+                                                    className="w-full h-16 flex items-center justify-center"
+                                                    style={{ backgroundColor: secondaryColor }}
+                                                >
+                                                    <span className="font-bold" style={{ color: primaryColor }}>Secondary Color</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>                </div>        {/* Navigation Buttons */}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Navigation Buttons */}
                 <div className="mt-6 flex justify-end">
                     <Button
                         onClick={handleSaveChanges}
