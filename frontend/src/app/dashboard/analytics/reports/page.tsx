@@ -5,25 +5,10 @@ import React, { useState } from 'react'
 import { Sidebar } from '@/components/sidebar/sidebar'
 import Image from 'next/image'
 import { reportsData } from '@/lib/reportsData'
-import { Timespan } from '@/lib/chartData'
-
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { ChevronDown } from 'lucide-react'
+import { DateRangeFilter } from '@/components/dashboard/DateRangeFilter'
 
 export default function ReportsPage() {
-  const [selectedSpan, setSelectedSpan] = useState<Timespan>('30')
-  const labels: Record<Timespan, string> = {
-    '7':   'Last week',
-    '30':  'Last month',
-    '90':  'Last quarter',
-    '365': 'Last year',
-  }
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>()
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -40,34 +25,21 @@ export default function ReportsPage() {
           {/* Title */}
           <h1 className="text-2xl md:text-3xl font-bold mb-4">Reports</h1>
 
-          {/* Subtitle + dropdown */}
+          {/* Subtitle + date‐range filter */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <p className="text-gray-500">
               View and download your store's reports
             </p>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="bg-white border-logo-border text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover px-3 py-2 text-sm font-medium flex items-center"
-                >
-                  {labels[selectedSpan]}
-                  <ChevronDown className="ml-2 w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSelectedSpan('7')}>Last week</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan('30')}>Last month</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan('90')}>Last quarter</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan('365')}>Last year</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DateRangeFilter
+              initialDateRange={dateRange}
+              onApply={setDateRange}
+            />
           </div>
 
           {/* Reports Table */}
           <div className="border rounded-lg border-logo-border overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border table-fixed">
-              <thead className="min-w-full divide-y ">
+              <thead className="min-w-full divide-y">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Name
