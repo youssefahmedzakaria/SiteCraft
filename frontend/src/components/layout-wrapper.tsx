@@ -4,10 +4,9 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { usePathname } from "next/navigation";
 
-export function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+export function LayoutWrapper({ children }: { children: React.ReactNode }) {  const pathname = usePathname();
   const isAuthPage = pathname?.includes('/login') || pathname?.includes('/signup') || pathname?.includes('/dashboard') ||
-     pathname?.includes('/branding');
+     pathname?.includes('/branding') || pathname?.includes('/templates');
 
   return (
     <div className="relative flex min-h-screen flex-col">
