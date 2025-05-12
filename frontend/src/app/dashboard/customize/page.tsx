@@ -56,7 +56,7 @@ export default function CustomizeTemplatePage() {
           <Button
             className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
             onClick={() => {
-              window.location.href = "/dashboard/customers";
+              window.location.href = "/dashboard";
             }}
           >
             Save Changes

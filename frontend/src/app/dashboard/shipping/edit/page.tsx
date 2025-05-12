@@ -13,16 +13,18 @@ export default function EditShippingPage() {
   const [formData, setFormData] = useState({
     governorate: "",
     price: "",
-    estimatedDeliveryDays: ""
+    estimatedDeliveryDays: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -47,20 +49,23 @@ export default function EditShippingPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="flex items-center mb-6">
-          {/* <Link href="/dashboard/shipping" className="mr-4">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </Link> */}
-          <h1 className="text-2xl md:text-3xl font-bold">Edit Shipping Location</h1>
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            Add Shipping Location
+          </h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            Edit shipping location information
+          </h2>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <label htmlFor="governorate" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="governorate"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Governorate Name <span className="text-red-500">*</span>
               </label>
               <Input
@@ -77,7 +82,10 @@ export default function EditShippingPage() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Shipping Price <span className="text-red-500">*</span>
               </label>
               <div className="flex">
@@ -99,7 +107,10 @@ export default function EditShippingPage() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="estimatedDeliveryDays" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="estimatedDeliveryDays"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Estimated Delivery Time <span className="text-red-500">*</span>
               </label>
               <div className="relative">

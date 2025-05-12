@@ -1,92 +1,73 @@
 // frontend/src/app/dashboard/reports/page.tsx
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Sidebar } from '@/components/sidebar/sidebar'
-import Image from 'next/image'
-import { reportsData } from '@/lib/reportsData'
-import { DateRangeFilter } from '@/components/dashboard/DateRangeFilter'
+import React, { useState } from "react";
+import { Sidebar } from "@/components/sidebar/sidebar";
+import { DateRangeFilter } from "@/components/dashboard/analytics/DateRangeFilter";
+import ReportCard, {
+  Report,
+} from "@/components/dashboard/analytics/ReportCard";
+import { reportsData } from "@/lib/reportsData";
+import {
+  BadgeDollarSign,
+  FileUser,
+  PackageOpen,
+  ShoppingBag,
+  Tags,
+} from "lucide-react";
 
 export default function ReportsPage() {
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>()
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
+
+  // map report IDs to your static icon paths
+  const iconMap: Record<string, React.ReactNode> = {
+    "rep-001": <FileUser size={48} className="pb-2" />,
+    "rep-002": <Tags size={48} className="pb-2" />,
+    "rep-003": <ShoppingBag size={48} className="pb-2" />,
+    "rep-004": <BadgeDollarSign size={48} className="pb-2" />,
+    "rep-005": <PackageOpen size={48} className="pb-2" />,
+  };
+
+  // build full Report[] with iconSrc
+  const reportsWithIcons: Report[] = reportsData.map((r) => ({
+    ...r,
+    iconSrc: iconMap[r.id] || "/icons/default.svg",
+  }));
+
+  const handleDownload = (id: string) => {
+    console.log(`Downloading report ${id}`);
+    // TODO: wire up real download logic here
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen h-full bg-gray-100">
       <Sidebar />
 
-      {/* 
-        pt-20 on phones (<768px),
-        md:pt-[4.5rem] on tablets (≥768px <1024px),
-        lg:pt-6 on desktop (≥1024px)
-      */}
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-[4.5rem] lg:pt-6 bg-gray-100">
-        <div className="container mx-auto px-4 md:px-6 space-y-6 pb-4 md:pb-8">
-
-          {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold mb-4">Reports</h1>
-
-          {/* Subtitle + date‐range filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <p className="text-gray-500">
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 h-full overflow-y-auto">
+        {/* Header section */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-600">
               View and download your store's reports
-            </p>
+            </h2>
             <DateRangeFilter
               initialDateRange={dateRange}
               onApply={setDateRange}
             />
           </div>
+        </div>
 
-          {/* Reports Table */}
-          <div className="border rounded-lg border-logo-border overflow-x-auto">
-            <table className="min-w-full divide-y divide-logo-border table-fixed">
-              <thead className="min-w-full divide-y">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-logo-txt uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-logo-border">
-                {reportsData.map((report) => (
-                  <tr key={report.id} className="hover:bg-logo-light-button-hover">
-                    <td className="px-4 py-4 text-sm text-gray-900 break-words">
-                      {report.name}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-500 break-words">
-                      {report.category}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-500">
-                      <div className="line-clamp-2 sm:line-clamp-none overflow-y-auto max-h-24">
-                        {report.description}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-right whitespace-nowrap">
-                      <button className="p-2 text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-md">
-                        <Image
-                          src="/icons/download.svg"
-                          alt="Download"
-                          width={20}
-                          height={20}
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
+        <div className="grid gap-6 md:grid-cols-2">
+          {reportsWithIcons.map((report) => (
+            <ReportCard
+              key={report.id}
+              report={report}
+              onDownload={handleDownload}
+            />
+          ))}
         </div>
       </main>
     </div>
-  )
+  );
 }

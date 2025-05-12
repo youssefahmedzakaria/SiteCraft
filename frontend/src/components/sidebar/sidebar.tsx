@@ -49,7 +49,7 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="flex justify-center mt-4 lg:mt-1">
-          <Link href="/" className="transition-colors hover:opacity-90">
+          <Link href="/dashboard" className="transition-colors hover:opacity-90">
             <div className="flex items-center">
               <Image
                 src="/logo.png"

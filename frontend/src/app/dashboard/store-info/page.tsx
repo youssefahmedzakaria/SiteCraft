@@ -15,17 +15,16 @@ export default function StoreInfoPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">Store Info</h1>
-
-        {/* Header section */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-4">
-          <h2 className="text-lg md:text-xl font-semibold">
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Store Info</h1>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-600">
             Manage store policies and about us content
           </h2>
         </div>
 
         {/* Policies Table */}
-        <div className="mt-8">
+        <div>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Store Policies</h3>
             <div className="flex justify-end">

@@ -1,12 +1,18 @@
-'use client'
+"use client";
 
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { usePathname } from "next/navigation";
 
-export function LayoutWrapper({ children }: { children: React.ReactNode }) {  const pathname = usePathname();
-  const isAuthPage = pathname?.includes('/login') || pathname?.includes('/signup') || pathname?.includes('/dashboard') ||
-     pathname?.includes('/branding') || pathname?.includes('/templates');
+export function LayoutWrapper({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAuthPage =
+    pathname?.includes("/login") ||
+    pathname?.includes("/signup") ||
+    pathname?.includes("/dashboard") ||
+    pathname?.includes("/branding") ||
+    pathname?.includes("/templates") ||
+    pathname?.includes("/forgot-password");
 
   return (
     <div className="relative flex min-h-screen flex-col">

@@ -1,12 +1,13 @@
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export interface Template {
-  id: string
-  title: string
-  description: string
-  imageUrl: string
-  rating: number
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  rating: number;
 }
 
 export function TemplateCard({ template }: { template: Template }) {
@@ -26,24 +27,28 @@ export function TemplateCard({ template }: { template: Template }) {
           {template.description}
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-black">⭐ {template.rating.toFixed(1)}</span>
+          <span className="text-sm text-black">
+            ⭐ {template.rating.toFixed(1)}
+          </span>
           <div className="space-x-2">
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               variant="ghost"
               className="hover:bg-logo-light-button-hover hover:bg-gray-100 transition-colors"
             >
               Preview
             </Button>
-            <Button 
-              size="sm" 
-              className="bg-black text-primary-foreground hover:bg-gray-800 transition-colors"
-            >
-              Select
-            </Button>
+            <Link href={"/dashboard"}>
+              <Button
+                size="sm"
+                className="bg-black text-primary-foreground hover:bg-gray-800 transition-colors"
+              >
+                Select
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

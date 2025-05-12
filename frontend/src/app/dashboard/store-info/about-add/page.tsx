@@ -15,34 +15,38 @@ export default function AddAboutSectionPage() {
     title: "",
     content: "",
     type: "Text",
-    status: "Visible"
+    status: "Visible",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSelectClick = (field: string) => {
-    if (field === 'type') {
-      setTypeDropdownOpen(prev => !prev);
-    } else if (field === 'status') {
-      setStatusDropdownOpen(prev => !prev);
+    if (field === "type") {
+      setTypeDropdownOpen((prev) => !prev);
+    } else if (field === "status") {
+      setStatusDropdownOpen((prev) => !prev);
     }
   };
 
   const handleSelectBlur = (field: string) => {
     setTimeout(() => {
-      if (field === 'type') {
+      if (field === "type") {
         setTypeDropdownOpen(false);
-      } else if (field === 'status') {
+      } else if (field === "status") {
         setStatusDropdownOpen(false);
       }
     }, 200);
@@ -67,20 +71,21 @@ export default function AddAboutSectionPage() {
       <Sidebar />
 
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="flex items-center mb-6">
-          {/* <Link href="/dashboard/store-info" className="mr-4">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </Link> */}
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Add About Section</h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            Create a new about section for your store
+          </h2>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Title <span className="text-red-500">*</span>
               </label>
               <Input
@@ -97,7 +102,10 @@ export default function AddAboutSectionPage() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="content"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Content <span className="text-red-500">*</span>
               </label>
               <Textarea
@@ -110,13 +118,17 @@ export default function AddAboutSectionPage() {
                 placeholder="Section Content"
               />
               <p className="text-xs text-gray-400 mt-1">
-                A detailed description for this section that will appear on your store.
+                A detailed description for this section that will appear on your
+                store.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="type"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Section Type
                 </label>
                 <div className="relative">
@@ -125,8 +137,8 @@ export default function AddAboutSectionPage() {
                     name="type"
                     value={formData.type}
                     onChange={handleChange}
-                    onClick={() => handleSelectClick('type')}
-                    onBlur={() => handleSelectBlur('type')}
+                    onClick={() => handleSelectClick("type")}
+                    onBlur={() => handleSelectBlur("type")}
                     required
                     className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
                   >
@@ -147,7 +159,10 @@ export default function AddAboutSectionPage() {
               </div>
 
               <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="status"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Visibility Status
                 </label>
                 <div className="relative">
@@ -156,8 +171,8 @@ export default function AddAboutSectionPage() {
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    onClick={() => handleSelectClick('status')}
-                    onBlur={() => handleSelectBlur('status')}
+                    onClick={() => handleSelectClick("status")}
+                    onBlur={() => handleSelectBlur("status")}
                     required
                     className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
                   >

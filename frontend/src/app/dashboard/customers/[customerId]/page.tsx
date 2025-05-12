@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -42,7 +44,9 @@ export default function CustomerDetailsPage({
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("date-desc");
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<
+    { from: Date; to: Date } | undefined
+  >(undefined);
   const [page, setPage] = useState(1);
   const ordersPerPage = 10;
 
@@ -115,7 +119,9 @@ export default function CustomerDetailsPage({
     status: string;
     dateRange: { from: Date; to: Date } | undefined;
   }) => {
-    setStatusFilter(filters.status === "All Statuses" ? "All Statuses" : filters.status);
+    setStatusFilter(
+      filters.status === "All Statuses" ? "All Statuses" : filters.status
+    );
     setDateRange(filters.dateRange);
   };
 
@@ -140,49 +146,43 @@ export default function CustomerDetailsPage({
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Customer Details</h1>
-            <h2 className="text-lg md:text-xl text-muted-foreground mt-1">
-              {customer.name} - {customer.email}
-            </h2>
-          </div>
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Customer Details</h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            {customer.name} - {customer.email}
+          </h2>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Customer ID</p>
-              <p className="text-lg font-semibold">#{customer.id}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Total Orders</p>
-              <p className="text-2xl font-semibold">{customer.orders}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Total Spent</p>
-              <p className="text-lg font-semibold">
-                EGP {customer.totalSpent.toLocaleString()}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Avg. Order Value</p>
-              <p className="text-lg font-semibold">
-                {customerOrders.length > 0
-                  ? `EGP ${(
+        <div className="bg-white rounded-lg shadow overflow-hidden mb-6 flex  items-center justify-between py-6 px-10 ">
+          {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border"> */}
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Total Orders</p>
+            <p className="text-2xl font-semibold">{customer.orders}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Total Spent</p>
+            <p className="text-lg font-semibold">
+              EGP {customer.totalSpent.toLocaleString()}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Avg. Order Value</p>
+            <p className="text-lg font-semibold">
+              {customerOrders.length > 0
+                ? `EGP ${(
                     customerOrders.reduce(
                       (sum, order) => sum + order.total,
                       0
                     ) / customerOrders.length
                   ).toFixed(2)}`
-                  : "EGP 0.00"}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Recent Order</p>
-              <p className="text-lg font-semibold">
-                {customerOrders.length > 0
-                  ? format(
+                : "EGP 0.00"}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Recent Order</p>
+            <p className="text-lg font-semibold">
+              {customerOrders.length > 0
+                ? format(
                     new Date(
                       Math.max(
                         ...customerOrders.map((o) => o.issueDate.getTime())
@@ -190,21 +190,18 @@ export default function CustomerDetailsPage({
                     ),
                     "MMM d, yyyy"
                   )
-                  : "N/A"}
-              </p>
-            </div>
+                : "N/A"}
+            </p>
           </div>
+          {/* </div> */}
         </div>
 
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4">Order History</h3>
 
-          <div className="border-t border-logo-border mt-6 mb-2 space-y-2 pt-3 ">
+          <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3 ">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <SearchBar
-                placeholder="Search orders..."
-
-              />
+              <SearchBar placeholder="Search orders..." />
               <FilterButton
                 onApplyFilters={handleFiltersApply}
                 statuses={orderStatuses}
@@ -219,7 +216,13 @@ export default function CustomerDetailsPage({
                     className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                   >
                     <span className="ml-2">
-                      {sortBy === "date-desc" ? "Newest First" : sortBy === "date-asc" ? "Oldest First" : sortBy === "value-desc" ? "Highest Value" : "Lowest Value"}
+                      {sortBy === "date-desc"
+                        ? "Newest First"
+                        : sortBy === "date-asc"
+                        ? "Oldest First"
+                        : sortBy === "value-desc"
+                        ? "Highest Value"
+                        : "Lowest Value"}
                     </span>
                     <Image
                       src="/icons/dropdown-colored.svg"
@@ -246,20 +249,24 @@ export default function CustomerDetailsPage({
               </DropdownMenu>
             </div>
 
-            {(statusFilter !== "All Statuses" || searchQuery || sortBy !== "date-desc" || dateRange) && (
+            {(statusFilter !== "All Statuses" ||
+              searchQuery ||
+              sortBy !== "date-desc" ||
+              dateRange) && (
               <div className="flex items-center gap-2 mt-4">
                 {statusFilter !== "All Statuses" && (
                   <div
-                    className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${statusFilter === "Pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : statusFilter === "Processing"
+                    className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${
+                      statusFilter === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : statusFilter === "Processing"
                         ? "bg-blue-100 text-blue-800"
                         : statusFilter === "Shipped"
-                          ? "bg-purple-100 text-purple-800"
-                          : statusFilter === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                      }`}
+                        ? "bg-purple-100 text-purple-800"
+                        : statusFilter === "Delivered"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                   >
                     <span>{statusFilter}</span>
                     <button
@@ -271,7 +278,7 @@ export default function CustomerDetailsPage({
                     </button>
                   </div>
                 )}
-                {searchQuery && (
+                {/* {searchQuery && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>Search: {searchQuery}</span>
                     <button
@@ -282,25 +289,7 @@ export default function CustomerDetailsPage({
                       <X size={16} />
                     </button>
                   </div>
-                )}
-                {sortBy !== "date-desc" && (
-                  <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
-                    <span>
-                      {sortBy === "date-asc"
-                        ? "Oldest First"
-                        : sortBy === "value-desc"
-                          ? "Highest Value"
-                          : "Lowest Value"}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setSortBy("date-desc");
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
+                )} */}
                 {dateRange && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>
@@ -311,7 +300,7 @@ export default function CustomerDetailsPage({
                       onClick={() => {
                         const resetFilters = {
                           status: statusFilter,
-                          dateRange: undefined
+                          dateRange: undefined,
                         };
                         setDateRange(undefined);
                         handleFiltersApply(resetFilters);

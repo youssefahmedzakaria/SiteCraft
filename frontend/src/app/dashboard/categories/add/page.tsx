@@ -7,14 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import CategorysOverview from "@/components/dashboard/categories/add/categoriesOverview";
 import AssignProducts from "@/components/dashboard/categories/add/assignProducts";
 
-
 export default function AddCategoryPage() {
   const [activeTab, setActiveTab] = useState<
     "Category's Overview" | "Assign Products"
   >("Category's Overview");
   const tabs = ["Category's Overview", "Assign Products"];
-
-  
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -22,12 +19,12 @@ export default function AddCategoryPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">
-          Add New Category
-        </h1>
-        <p className="text-gray-500 mt-2 mb-6">
-          Create a new product category for your store
-        </p>
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Add New Category</h1>
+          <h2 className="text-lg md:text-xl text-gray-600">
+            Create a new product category for your store
+          </h2>
+        </div>
 
         <div className="flex mb-1 ml-3">
           {tabs.map((tab) => (
@@ -48,13 +45,9 @@ export default function AddCategoryPage() {
         <Card className="bg-white">
           <CardContent className="py-2">
             <form className="space-y-6">
-              {activeTab === "Category's Overview" && (
-                  <CategorysOverview />
-              )}
+              {activeTab === "Category's Overview" && <CategorysOverview />}
 
-              {activeTab === "Assign Products" && (
-                  <AssignProducts />
-              )}
+              {activeTab === "Assign Products" && <AssignProducts />}
 
               {/* Form Actions */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">

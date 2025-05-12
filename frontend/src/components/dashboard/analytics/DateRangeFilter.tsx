@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { SlidersHorizontal } from "lucide-react"
+import { CalendarRange, SlidersHorizontal } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -54,8 +54,8 @@ export function DateRangeFilter({
         className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border flex items-center"
         onClick={() => setOpen(true)}
       >
-        <SlidersHorizontal className="mr-2 h-4 w-4" />
-        <span>Filter</span>
+        <CalendarRange className="mr-2 h-4 w-4" />
+        <span>Date Range</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

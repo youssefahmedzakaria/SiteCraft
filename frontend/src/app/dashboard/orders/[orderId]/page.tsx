@@ -17,22 +17,23 @@ export default function OrderDetailsPage() {
       <Sidebar />
 
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2">Order Details</h1>
-
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-1 mb-4 gap-4">
-          <h2 className="text-lg md:text-xl font-semibold">
-            Order ID: {orderId}
-          </h2>
-
-          <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
-            <Link
-              href={`/dashboard/orders/${orderId}/edit`}
-              className="w-full sm:w-auto"
-            >
-              <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                Edit Status
-              </Button>
-            </Link>
+        {/* Header section */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Order Details</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <h2 className="text-lg md:text-xl text-gray-600">
+              Order ID: {orderId}
+            </h2>
+            <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
+              <Link
+                href={`/dashboard/orders/${orderId}/edit`}
+                className="w-full sm:w-auto"
+              >
+                <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  Edit Status
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
