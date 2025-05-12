@@ -1,18 +1,12 @@
 "use client";
 
-import { LoginForm } from "@/components/auth/Login/login-form";
+import { ForgotPasswordForm } from "@/components/auth/ForgotPassword/forgot-password-form";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background Pattern */}
-      {/* <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
-      </div> */}
-
       <div className="container px-4 py-8 flex flex-col md:flex-row items-center justify-between max-w-6xl">
         {/* Left Side - Branding */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0">
@@ -36,13 +30,13 @@ export default function LoginPage() {
             />
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 text-center md:text-left">
-            Your brand, Your store,
+            Reset your password,
             <br />
-            Your way.
+            Get back to business.
           </h1>
           <p className="text-muted-foreground text-center md:text-left max-w-md text-lg">
-            Create stunning websites and grow your online presence with our
-            intuitive platform designed for Egyptian businesses.
+            Don't worry! It happens. Please enter your email address and we'll
+            send you a link to reset your password.
           </p>
           <div className="mt-4 md:mt-8 flex justify-center md:justify-start w-full">
             <Image
@@ -61,7 +55,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000"></div>
             <div className="relative bg-background/90 backdrop-blur-sm p-12 rounded-lg border border-border/20">
-              <LoginForm />
+              <ForgotPasswordForm />
             </div>
           </div>
         </div>
