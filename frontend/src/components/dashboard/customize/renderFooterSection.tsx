@@ -6,9 +6,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronRight, ImageIcon, Plus } from "lucide-react";
 import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 // content sections
 type ContentSectionName = "logo" | "copyright" | "socialMedia" | "aboutLinks";
+
+// content sections
+type DesignSectionName =
+  | "general"
+  | "branding"
+  | "copyright"
+  | "socialMedia"
+  | "aboutLinks";
 
 // about link data
 interface AboutLink {
@@ -36,7 +51,7 @@ export function RenderFooterSection({
     aboutLinks: false,
   });
 
-  const toggleSection = (section: ContentSectionName) => {
+  const toggleContentSection = (section: ContentSectionName) => {
     setExpandedContentSections((prev) => {
       const isCurrentlyOpen = prev[section];
 
@@ -147,6 +162,95 @@ export function RenderFooterSection({
     console.log(contentLinks);
   };
 
+  // -----------------------------------------------------------------------------------------------------------------------------
+
+  {
+    /* design sections */
+  }
+  const [expandedDesignSections, setExpandedDesignSections] = useState<
+    Record<DesignSectionName, boolean>
+  >({
+    general: false,
+    branding: false,
+    copyright: false,
+    socialMedia: false,
+    aboutLinks: false,
+  });
+
+  const toggleDesignSection = (section: DesignSectionName) => {
+    setExpandedDesignSections((prev) => {
+      const isCurrentlyOpen = prev[section];
+
+      if (isCurrentlyOpen) {
+        return {
+          general: false,
+          branding: false,
+          copyright: false,
+          socialMedia: false,
+          aboutLinks: false,
+        };
+      }
+
+      return {
+        general: false,
+        branding: false,
+        copyright: false,
+        socialMedia: false,
+        aboutLinks: false,
+        [section]: true,
+      };
+    });
+  };
+
+  {
+    /* For design settings */
+  }
+  const [footerSettings, setFooterSettings] = useState({
+    background: "#ffffff",
+    generalText: "#000000",
+    logoWidth: "50px",
+    logoHeight: "50px",
+    aboutLinkFontFamily: "Arial",
+    aboutLinkFontSize: "14px",
+    aboutLinkFontWeight: "normal",
+    aboutLinkColor: "#000000",
+    socialMediaIconColor: "#000000",
+    socialMediaIconHoverColor: "#000000",
+    socialMediaIconSize: "20px",
+    copyrightFontFamily: "Arial",
+    copyrightFontSize: "14px",
+    copyrightFontWeight: "normal",
+    copyrightColor: "#000000",
+  });
+
+  const [aboutLinksFontFamily, setAboutLinksFontFamily] = useState<
+    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  >("inter");
+
+  const handleAboutLinksFontFamilyChange = (
+    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  ) => {
+    setAboutLinksFontFamily(type);
+    setFooterSettings((s) => ({
+      ...s,
+      aboutLinkFontFamily: type ? `${type}px` : "0px",
+    }));
+  };
+
+  const [copyrightFontFamily, setCopyrightFontFamily] = useState<
+    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  >("inter");
+
+  const handleCopyrightFontFamilyChange = (
+    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  ) => {
+    setCopyrightFontFamily(type);
+    setFooterSettings((s) => ({
+      ...s,
+      copyrightFontFamily: type ? `${type}px` : "0px",
+    }));
+  };
+
   return (
     <div>
       {detailedSectionTab === "content" ? (
@@ -155,7 +259,7 @@ export function RenderFooterSection({
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleSection("logo")}
+              onClick={() => toggleContentSection("logo")}
             >
               <span className="font-medium">Branding</span>
               {expandedContentSections.logo ? (
@@ -259,7 +363,7 @@ export function RenderFooterSection({
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleSection("copyright")}
+              onClick={() => toggleContentSection("copyright")}
             >
               <span className="font-medium">Copyright</span>
               {expandedContentSections.copyright ? (
@@ -285,7 +389,7 @@ export function RenderFooterSection({
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleSection("socialMedia")}
+              onClick={() => toggleContentSection("socialMedia")}
             >
               <span className="font-medium">Social Media</span>
               {expandedContentSections.socialMedia ? (
@@ -388,7 +492,7 @@ export function RenderFooterSection({
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleSection("aboutLinks")}
+              onClick={() => toggleContentSection("aboutLinks")}
             >
               <span className="font-medium">About Links</span>
               {expandedContentSections.aboutLinks ? (
@@ -462,7 +566,493 @@ export function RenderFooterSection({
           )}
         </div>
       ) : (
-        <div className="p-4 space-y-6"></div>
+        <div className="p-4 space-y-6">
+          {/* General */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleDesignSection("general")}
+            >
+              <span className="font-medium">General</span>
+              {expandedDesignSections.general ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedDesignSections.general && (
+            <div className="space-y-4">
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Background Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.background}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        background: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.background}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        background: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Text Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.generalText}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        generalText: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.generalText}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        generalText: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Branding */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleDesignSection("branding")}
+            >
+              <span className="font-medium">Branding</span>
+              {expandedDesignSections.branding ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedDesignSections.branding && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Logo Width</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(footerSettings.logoWidth) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFooterSettings((s) => ({
+                        ...s,
+                        logoWidth: value ? `${value}px` : "0px",
+                      }));
+                    }}
+                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Logo Height</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(footerSettings.logoHeight) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFooterSettings((s) => ({
+                        ...s,
+                        logoHeight: value ? `${value}px` : "0px",
+                      }));
+                    }}
+                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Copyright */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleDesignSection("copyright")}
+            >
+              <span className="font-medium">Copyright</span>
+              {expandedDesignSections.copyright ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedDesignSections.copyright && (
+            <div className="space-y-4">
+              {/* font family */}
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {copyrightFontFamily === "inter"
+                          ? "Inter"
+                          : copyrightFontFamily === "roboto"
+                          ? "Roboto"
+                          : copyrightFontFamily === "open-sans"
+                          ? "Open Sans"
+                          : copyrightFontFamily === "poppins"
+                          ? "Poppins"
+                          : "Lato"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => handleCopyrightFontFamilyChange("inter")}
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCopyrightFontFamilyChange("roboto")}
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleCopyrightFontFamilyChange("open-sans")
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCopyrightFontFamilyChange("poppins")}
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCopyrightFontFamilyChange("lato")}
+                    >
+                      Lato
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* font size */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Font Size</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(footerSettings.copyrightFontSize) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFooterSettings((s) => ({
+                        ...s,
+                        copyrightFontSize: value ? `${value}px` : "0px",
+                      }));
+                    }}
+                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+
+              {/* font weight */}
+
+              {/* font color */}
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Text Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.copyrightColor}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        copyrightColor: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.copyrightColor}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        copyrightColor: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Social Media */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleDesignSection("socialMedia")}
+            >
+              <span className="font-medium">Social Media</span>
+              {expandedDesignSections.socialMedia ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedDesignSections.socialMedia && (
+            <div className="space-y-4">
+              {/* icon size */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Icons Size</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(footerSettings.socialMediaIconSize) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFooterSettings((s) => ({
+                        ...s,
+                        socialMediaIconSize: value ? `${value}px` : "0px",
+                      }));
+                    }}
+                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+
+              {/* icon color */}
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Icons Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.socialMediaIconColor}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        socialMediaIconColor: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.socialMediaIconColor}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        socialMediaIconColor: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* icon hover color */}
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Icons Hover Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.socialMediaIconHoverColor}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        socialMediaIconHoverColor: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.socialMediaIconHoverColor}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        socialMediaIconHoverColor: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* About Link */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleDesignSection("aboutLinks")}
+            >
+              <span className="font-medium">About Links</span>
+              {expandedDesignSections.aboutLinks ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedDesignSections.aboutLinks && (
+            <div className="space-y-4">
+              {/* font family */}
+              <div>
+                <label className="block text-sm mb-2">Font Family</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {aboutLinksFontFamily === "inter"
+                          ? "Inter"
+                          : aboutLinksFontFamily === "roboto"
+                          ? "Roboto"
+                          : aboutLinksFontFamily === "open-sans"
+                          ? "Open Sans"
+                          : aboutLinksFontFamily === "poppins"
+                          ? "Poppins"
+                          : "Lato"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => handleAboutLinksFontFamilyChange("inter")}
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleAboutLinksFontFamilyChange("roboto")}
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleAboutLinksFontFamilyChange("open-sans")
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleAboutLinksFontFamilyChange("poppins")
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleAboutLinksFontFamilyChange("lato")}
+                    >
+                      Lato
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* font size */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Font Size</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="number"
+                    value={parseInt(footerSettings.aboutLinkFontSize) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFooterSettings((s) => ({
+                        ...s,
+                        aboutLinkFontSize: value ? `${value}px` : "0px",
+                      }));
+                    }}
+                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
+                    placeholder="16"
+                    min="0"
+                  />
+                  <span className="text-sm text-gray-500">px</span>
+                </div>
+              </div>
+
+              {/* font weight */}
+
+              {/* font color */}
+              <div className="color-picker-container">
+                <label className="block text-sm mb-2">Text Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={footerSettings.aboutLinkColor}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        aboutLinkColor: e.target.value,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={footerSettings.aboutLinkColor}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      setFooterSettings((prev) => ({
+                        ...prev,
+                        aboutLinkColor: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
