@@ -68,7 +68,6 @@ export function RenderPromoSection({
     arrows: false,
   });
 
-
   const [promoSettings, setPromoSettings] = useState<PromoSettings>({
     showArrows: true,
     titleFont: "inter",
@@ -252,7 +251,7 @@ export function RenderPromoSection({
     /* add and delete promo */
   }
   const handleAddPromo = () => {
-    const newPromoId = promos.length + 1;
+    const newPromoId = parseInt(promos[promos.length - 1].id) + 1;
     const newPromo: PromoImage = {
       id: newPromoId.toString(),
       title: "New Promo",
