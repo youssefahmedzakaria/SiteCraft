@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Controllers;
 
 import com.sitecraft.backend.Models.User;
+import com.sitecraft.backend.Services.TenantDatabaseService;
 import com.sitecraft.backend.Services.UserService;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,35 +15,44 @@ import java.util.List;
 public class AuthController {
 
     @Autowired
+    private TenantDatabaseService tenantDatabaseService;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping(path = "/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
+    public ResponseEntity register(@RequestBody User user) throws Exception {
+        boolean isExist = userService.isUserExists(user.getEmail());
+        if (isExist) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User with this email exists.");
+        }
+        userService.register(user);
+        tenantDatabaseService.createUserDatabaseAndSchema("yehiadb","postgres","123456");
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("User registered successfully.");
+
     }
 
+
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
         boolean isExist = userService.isUserExists(loginRequest.getEmail());
 
         if (!isExist) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("User with this email does not exist.");
-            return "Yehia";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User with this email does not exist.");
         }
 
         User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (user == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body("Incorrect password. Please try again.");
-            return "Yehia";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Incorrect password. Please try again.");
         }
 
         user.setPassword(null);
-
-//        return ResponseEntity.ok(user);
-        return "Yehia";
+        return ResponseEntity.ok(user);
     }
 
 

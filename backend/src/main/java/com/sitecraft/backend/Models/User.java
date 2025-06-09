@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Models;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
@@ -15,17 +16,22 @@ public class User {
     private String password;
     private String gender;
     private String phone;
+    @JsonProperty("database_name")
+    @Column(name = "database_name")
+    private String databaseName;
 
-    public User(Long id, String name, String email, String password, String gender, String phone) {
+    public User(Long id, String name, String email, String password, String gender, String phone, String databaseName) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.gender = gender;
         this.phone = phone;
+        this.databaseName = databaseName;
     }
 
     public User() {
+
     }
 
     // Getters and Setters
@@ -76,5 +82,13 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 }
