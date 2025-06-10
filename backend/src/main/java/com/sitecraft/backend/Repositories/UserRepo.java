@@ -1,9 +1,9 @@
 package com.sitecraft.backend.Repositories;
 
-import com.sitecraft.backend.Models.User;
+import com.sitecraft.backend.Models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepo extends JpaRepository<Users, Long> {
 
-    User getUserByEmail(String email);
+    Users getUserByEmail(String email);
 }

@@ -1,39 +1,32 @@
 package com.sitecraft.backend.Controllers;
 
-import com.sitecraft.backend.Models.User;
-import com.sitecraft.backend.Services.TenantDatabaseService;
+import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Services.UserService;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    @Autowired
-    private TenantDatabaseService tenantDatabaseService;
-
     @Autowired
     private UserService userService;
 
     @PostMapping(path = "/register")
-    public ResponseEntity register(@RequestBody User user) throws Exception {
-        boolean isExist = userService.isUserExists(user.getEmail());
+    public ResponseEntity register(@RequestBody Users users) throws Exception {
+        boolean isExist = userService.isUserExists(users.getEmail());
         if (isExist) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("User with this email exists.");
         }
-        userService.register(user);
-        tenantDatabaseService.createUserDatabaseAndSchema("yehiadb","postgres","123456");
+        userService.register(users);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body("User registered successfully.");
 
     }
-
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
@@ -44,20 +37,19 @@ public class AuthController {
                     .body("User with this email does not exist.");
         }
 
-        User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+        Users users = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
-        if (user == null) {
+        if (users == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Incorrect password. Please try again.");
         }
 
-        user.setPassword(null);
-        return ResponseEntity.ok(user);
+        users.setPassword(null);
+        return ResponseEntity.ok(users);
     }
 
-
     @GetMapping
-    public List<User> getUsers() {
+    public List<Users> getUsers() {
         return userService.getAllUsers();
     }
 

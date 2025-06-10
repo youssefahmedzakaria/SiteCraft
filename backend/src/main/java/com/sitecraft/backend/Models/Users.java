@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Users")  // Use double quotes to exactly match the table name in the database
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,21 +16,17 @@ public class User {
     private String password;
     private String gender;
     private String phone;
-    @JsonProperty("database_name")
-    @Column(name = "database_name")
-    private String databaseName;
 
-    public User(Long id, String name, String email, String password, String gender, String phone, String databaseName) {
+    public Users(Long id, String name, String email, String password, String gender, String phone) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.gender = gender;
         this.phone = phone;
-        this.databaseName = databaseName;
     }
 
-    public User() {
+    public Users() {
 
     }
 
@@ -82,13 +78,5 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
     }
 }

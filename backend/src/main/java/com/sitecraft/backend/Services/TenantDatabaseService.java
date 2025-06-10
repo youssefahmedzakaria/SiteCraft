@@ -21,7 +21,9 @@ public class TenantDatabaseService {
         // 1. Create database
         try (Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", dbUsername, dbPassword);
              Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("CREATE DATABASE " + dbName);
+            // Quote the database name to preserve case
+            String quotedDbName = "\"" + dbName + "\"";
+            stmt.executeUpdate("CREATE DATABASE " + quotedDbName);
         }
         // 2. Apply schema to new DB
         try (Connection newDbConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + dbName, dbUsername, dbPassword)) {

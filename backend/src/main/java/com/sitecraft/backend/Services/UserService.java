@@ -1,6 +1,6 @@
 package com.sitecraft.backend.Services;
 
-import com.sitecraft.backend.Models.User;
+import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,29 +16,29 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public List<User> getAllUsers() {
+    public List<Users> getAllUsers() {
         return userRepo.findAll(); // Automatically provided by JpaRepository
     }
 
-    public User register(User user) {
+    public Users register(Users users) {
         // Hash the user's password before saving
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return userRepo.save(user); // Automatically provided by JpaRepository
+        String encodedPassword = passwordEncoder.encode(users.getPassword());
+        users.setPassword(encodedPassword);
+        return userRepo.save(users); // Automatically provided by JpaRepository
     }
 
     public boolean isUserExists(String email) {
-        User user = userRepo.getUserByEmail(email);
-        return user != null;
+        Users users = userRepo.getUserByEmail(email);
+        return users != null;
     }
 
-    public User login(String email, String password) {
-        User user = userRepo.getUserByEmail(email);
+    public Users login(String email, String password) {
+        Users users = userRepo.getUserByEmail(email);
 //        if (passwordEncoder.matches(password, user.getPassword())) {
 //            return user;
 //        }
-        if (user.getPassword().equals(password)) {
-            return user;
+        if (users.getPassword().equals(password)) {
+            return users;
         }
         return null;
     }
