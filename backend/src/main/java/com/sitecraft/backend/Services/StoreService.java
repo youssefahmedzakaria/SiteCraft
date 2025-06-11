@@ -34,10 +34,8 @@ public class StoreService {
         }
     }
 
-//    public Store updateStore(Long storeId, Store updatedStore) {
+//    public Store updateStore(Store updatedStore) {
 //        Store store = storeRepo.findById(storeId).get();
-//
-//
 //
 //    }
 }

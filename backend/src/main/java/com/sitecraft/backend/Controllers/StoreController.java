@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.StoreService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,22 +38,23 @@ public class StoreController {
         }
     }
 
-    @PutMapping("/updateStoreInfo")
-    public ResponseEntity<?> updateStore(@RequestBody Store updatedStore) {
-        try {
-            Store resultStore = storeService.updateStore(storeId, updatedStore);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Store updated successfully");
-            response.put("store", resultStore);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
-    }
+//    @PutMapping("/updateStoreInfo")
+//    public ResponseEntity<?> updateStore(@RequestBody Store updatedStore, HttpSession session) {
+//        try {
+//
+//            Store resultStore = storeService.updateStore(updatedStore, storeID);
+//
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("success", true);
+//            response.put("message", "Store updated successfully");
+//            response.put("store", resultStore);
+//
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            Map<String, Object> errorResponse = new HashMap<>();
+//            errorResponse.put("success", false);
+//            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//        }
+//    }
 }
