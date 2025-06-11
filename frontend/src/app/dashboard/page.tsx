@@ -126,41 +126,44 @@ export default function OverviewPage() {
           </div>
         </section>
 
-        {/* 2) Daily Sales */}
-        <section>
-          <h2 className="text-lg font-semibold mb-2">Daily Sales</h2>
-          {/* Reduced padding to let the chart fill more space */}
-          <div className="border rounded-lg border-logo-border bg-white p-1 md:p-2">
-            <AnimatedChartWrapper delay={0}>
-              <BarChartCard
-                hideContainerBorder
-                data={dailySales.map((s) => ({
-                  date: s.date,
-                  sales: s.sales,
-                }))}
-                dataKey="sales"
-                nameKey="date"
-                title=""
-                subtitle=""
-              />
-            </AnimatedChartWrapper>
-          </div>
-        </section>
+        <div className="flex flex-col gap-4 md:flex-row">
+          {/* Last 7 Days Sales */}
+          <section className="flex-1 flex flex-col">
+            <h2 className="text-lg font-semibold mb-2">Last 7 Days</h2>
+            <div className="flex-1 border rounded-lg border-logo-border bg-white p-1 md:p-2 flex items-center justify-center">
+              <div className="w-full max-w-md">
+                <AnimatedChartWrapper delay={0}>
+                  <BarChartCard
+                    hideContainerBorder
+                    data={dailySales.map((s) => ({
+                      date: s.date,
+                      sales: s.sales,
+                    }))}
+                    dataKey="sales"
+                    nameKey="date"
+                    title=""
+                    subtitle=""
+                  />
+                </AnimatedChartWrapper>
+              </div>
+            </div>
+          </section>
 
-        {/* 3) Top Selling Products */}
-        <section>
-          <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
-          <div className="border rounded-lg border-logo-border overflow-x-auto">
-            <table className="min-w-full divide-y divide-logo-border">
-              <ProductsTableHeader />
-              <tbody className="bg-white divide-y divide-logo-border">
-                {topSellingProducts.map((prod) => (
-                  <ProductRecord key={prod.product} product={prod} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          {/* Top Selling Products */}
+          <section className="flex-1 flex flex-col">
+            <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
+            <div className="flex-1 border rounded-lg border-logo-border overflow-x-auto">
+              <table className="min-w-full divide-y divide-logo-border">
+                <ProductsTableHeader />
+                <tbody className="bg-white divide-y divide-logo-border">
+                  {topSellingProducts.map((prod) => (
+                    <ProductRecord key={prod.product} product={prod} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );

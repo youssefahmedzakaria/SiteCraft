@@ -89,6 +89,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
 
+    @PostMapping("/setSession")
+    public void setSession(@RequestBody Map<String, Long> in, HttpSession session) {
+        session.setAttribute("owner", in.get("owner"));
+        session.setAttribute("storeId", in.get("storeId"));
+    }
+
     public static class LoginRequest {
         private String email;
         private String password;
