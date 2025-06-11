@@ -1,11 +1,11 @@
 package com.sitecraft.backend.Services;
-
+import com.sitecraft.backend.Models.UserRole;
 import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Repositories.UserRepo;
+import com.sitecraft.backend.Repositories.UserRoleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -14,32 +14,40 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private UserRoleRepo userRoleRepo;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public List<Users> getAllUsers() {
-        return userRepo.findAll(); // Automatically provided by JpaRepository
+        return userRepo.findAll();
     }
 
     public Users register(Users users) {
-        // Hash the user's password before saving
         String encodedPassword = passwordEncoder.encode(users.getPassword());
         users.setPassword(encodedPassword);
-        return userRepo.save(users); // Automatically provided by JpaRepository
+        return userRepo.save(users);
     }
 
     public boolean isUserExists(String email) {
-        Users users = userRepo.getUserByEmail(email);
+        Users users = userRepo.findByEmail(email);
         return users != null;
     }
 
     public Users login(String email, String password) {
-        Users users = userRepo.getUserByEmail(email);
-//        if (passwordEncoder.matches(password, user.getPassword())) {
-//            return user;
-//        }
-        if (users.getPassword().equals(password)) {
-            return users;
+        Users user = userRepo.findByEmail(email);
+        if (user == null) return null;
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return null;
         }
-        return null;
+
+        UserRole userRole = userRoleRepo.findByUserId(user.getId());
+        if (userRole != null) {
+            user.setRole(userRole.getRole());
+        }
+
+        return user;
     }
+
 }

@@ -2,6 +2,7 @@ package com.sitecraft.backend.Controllers;
 
 import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Services.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         boolean isExist = userService.isUserExists(loginRequest.getEmail());
 
         if (!isExist) {
@@ -37,15 +38,44 @@ public class AuthController {
                     .body("User with this email does not exist.");
         }
 
-        Users users = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+        Users user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
-        if (users == null) {
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Incorrect password. Please try again.");
         }
 
-        users.setPassword(null);
-        return ResponseEntity.ok(users);
+        user.setPassword(null);
+        if (user.getRole().equals("admin")) {
+            session.setAttribute("admin", user);
+        }
+        session.setAttribute("owner", user);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("User logged in successfully.");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity logout(HttpSession session) {
+        session.invalidate(); // clears all attributes and invalidates the session
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("User logged out successfully.");
+    }
+
+    @GetMapping("/printRole")
+    public String printRole (HttpSession session) {
+        if (session.getAttribute("owner") == null && session.getAttribute("admin") == null) {
+            return "Not logged in.";
+        }
+        String role = null;
+        if (session.getAttribute("owner") != null) {
+            Users user = (Users) session.getAttribute("owner");
+            role = user.getRole();
+        }
+        if (session.getAttribute("admin") != null) {
+            Users user = (Users) session.getAttribute("admin");
+            role = user.getRole();
+        }
+
+        return role;
     }
 
     @GetMapping
