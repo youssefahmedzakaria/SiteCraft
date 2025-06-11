@@ -38,23 +38,57 @@ public class StoreController {
         }
     }
 
-//    @PutMapping("/updateStoreInfo")
-//    public ResponseEntity<?> updateStore(@RequestBody Store updatedStore, HttpSession session) {
-//        try {
-//
-//            Store resultStore = storeService.updateStore(updatedStore, storeID);
-//
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("success", true);
-//            response.put("message", "Store updated successfully");
-//            response.put("store", resultStore);
-//
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            Map<String, Object> errorResponse = new HashMap<>();
-//            errorResponse.put("success", false);
-//            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-//        }
-//    }
+    @PutMapping("/updateStoreInfo")
+    public ResponseEntity<?> updateStore(@RequestBody Store updatedStore, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Store resultStore = storeService.updateStorePartial(storeId, updatedStore); // Call a new method that does partial update
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Store updated successfully");
+            response.put("store", resultStore);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
+    @GetMapping("/getStoreInfo")
+    public ResponseEntity<?> getStoreInfo(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Store store = storeService.getStore(storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Store retrieved successfully");
+            response.put("store", store);
+
+            return ResponseEntity.ok(response);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    Map.of("success", false, "message", "An unexpected error occurred: " + e.getMessage())
+            );
+        }
+    }
+
+
 }

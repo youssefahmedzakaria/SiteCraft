@@ -1,7 +1,8 @@
 package com.sitecraft.backend.Models;
-
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "store")
@@ -43,6 +44,10 @@ public class Store {
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SocialMedia> socialMediaAccounts = new ArrayList<>();
+
 
     // Constructors
     public Store() {
@@ -158,5 +163,13 @@ public class Store {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public void setSocialMediaAccounts(List<SocialMedia> socialMediaAccounts) {
+        this.socialMediaAccounts = socialMediaAccounts;
+    }
+
+    public List<SocialMedia> getSocialMediaAccounts() {
+        return socialMediaAccounts;
     }
 }
