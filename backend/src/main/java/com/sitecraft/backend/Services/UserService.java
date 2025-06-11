@@ -43,8 +43,12 @@ public class UserService {
         }
 
         UserRole userRole = userRoleRepo.findByUserId(user.getId());
+
         if (userRole != null) {
             user.setRole(userRole.getRole());
+        }
+        else {
+            user.setRole("undefined");
         }
 
         return user;

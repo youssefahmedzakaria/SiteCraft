@@ -16,8 +16,7 @@ public class StoreService {
     @Autowired
     private UserRoleRepo userRoleRepo;
 
-    @Autowired
-    private TenantDatabaseService tenantDatabaseService;
+
 
     public Store createStore(Store store, Long userId) {
         try {
@@ -25,22 +24,8 @@ public class StoreService {
 
             Store savedStore = storeRepo.save(store);
 
-            String cleanStoreName = savedStore.getStoreName()
-                    .replaceAll("[^a-zA-Z0-9]", "")  // Remove special characters and spaces
-                    .toLowerCase();  // Convert to lowercase
-            String databaseName = cleanStoreName + savedStore.getId();
-
-            tenantDatabaseService.createUserDatabaseAndSchema(
-                    databaseName,
-                    "postgres",
-                    "123456"
-            );
-
-            savedStore.setDatabaseName(databaseName);
-            savedStore.setDatabaseUrl("jdbc:postgresql://localhost:5432/" + databaseName);
-
-            UserRole adminRole = new UserRole("owner", userId, savedStore.getId());
-            userRoleRepo.save(adminRole);
+            UserRole ownerRole = new UserRole("owner", userId, savedStore.getId());
+            userRoleRepo.save(ownerRole);
 
             return storeRepo.save(savedStore);
 
