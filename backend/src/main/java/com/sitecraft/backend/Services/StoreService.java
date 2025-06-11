@@ -33,6 +33,13 @@ public class StoreService {
             throw new RuntimeException("Failed to create store: " + e.getMessage());
         }
     }
+
+//    public Store updateStore(Long storeId, Store updatedStore) {
+//        Store store = storeRepo.findById(storeId).get();
+//
+//
+//
+//    }
 }
 
 

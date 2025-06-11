@@ -56,10 +56,12 @@ public class AuthController {
 
             user.setPassword(null);
             if (user.getRole().equals("staff")) {
-                session.setAttribute("staff", user);
+                session.setAttribute("staff", user.getId());
+                session.setAttribute("storeId", user.getStoreId());
             }
             else {
-                session.setAttribute("owner", user);
+                session.setAttribute("owner", user.getId());
+                session.setAttribute("storeId", user.getStoreId());
             }
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body("User logged in successfully.");
@@ -79,9 +81,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("User logged out successfully.");
     }
 
-    @GetMapping("/getUser")
-    public String getUser() {
-        return "Yehia";
+    @GetMapping("/getSession")
+    public ResponseEntity getSession(HttpSession session) {
+        Map<String, Object> sessionData = new HashMap<>();
+        sessionData.put("storeId", session.getAttribute("storeId"));
+        sessionData.put("owner", session.getAttribute("owner"));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
 
     public static class LoginRequest {

@@ -43,14 +43,15 @@ public class UserService {
         }
 
         UserRole userRole = userRoleRepo.findByUserId(user.getId());
-
+        Long storeId = null;
         if (userRole != null) {
             user.setRole(userRole.getRole());
+            storeId = userRole.getStoreId();
         }
         else {
             user.setRole("undefined");
         }
-
+        user.setStoreId(storeId);
         return user;
     }
 
