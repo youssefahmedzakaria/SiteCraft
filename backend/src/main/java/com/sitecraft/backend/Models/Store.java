@@ -12,48 +12,45 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "store_name")
     private String storeName;
 
-    @Column(name = "store_type")
     private String storeType;
 
-    @Column(name = "logo")
     private String logo;
 
-    @Column(name = "web_address")
     private String webAddress;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "email_address")
     private String emailAddress;
 
-    @Column(name = "address")
     private String address;
 
-    @Column(name = "address_link")
     private String addressLink;
 
-    @Column(name = "opening_hours")
     private String openingHours;
 
-    @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SocialMedia> socialMediaAccounts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Policy> policies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AboutUs> aboutUs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
     // Constructors
     public Store() {
     }
 
-    public Store(Long id, String storeName, String storeType, String logo, String webAddress, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate) {
+    public Store(Long id, String storeName, String storeType, String logo, String webAddress, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
         this.id = id;
         this.storeName = storeName;
         this.storeType = storeType;
@@ -66,6 +63,10 @@ public class Store {
         this.addressLink = addressLink;
         this.openingHours = openingHours;
         this.creationDate = creationDate;
+        this.socialMediaAccounts = socialMediaAccounts;
+        this.policies = policies;
+        this.aboutUs = aboutUs;
+        this.shippingInfo = shippingInfo;
     }
 
     // Getters and Setters
@@ -171,5 +172,29 @@ public class Store {
 
     public List<SocialMedia> getSocialMediaAccounts() {
         return socialMediaAccounts;
+    }
+
+    public List<Policy> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(List<Policy> policies) {
+        this.policies = policies;
+    }
+
+    public List<AboutUs> getAboutUs() {
+        return aboutUs;
+    }
+
+    public void setAboutUs(List<AboutUs> aboutUs) {
+        this.aboutUs = aboutUs;
+    }
+
+    public List<ShippingInfo> getShippingInfo() {
+        return shippingInfo;
+    }
+
+    public void setShippingInfo(List<ShippingInfo> shippingInfo) {
+        this.shippingInfo = shippingInfo;
     }
 }
