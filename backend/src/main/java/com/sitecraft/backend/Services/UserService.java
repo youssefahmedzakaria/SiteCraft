@@ -1,11 +1,11 @@
 package com.sitecraft.backend.Services;
-
-import com.sitecraft.backend.Models.User;
+import com.sitecraft.backend.Models.UserRole;
+import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Repositories.UserRepo;
+import com.sitecraft.backend.Repositories.UserRoleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -14,32 +14,44 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private UserRoleRepo userRoleRepo;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public List<User> getAllUsers() {
-        return userRepo.findAll(); // Automatically provided by JpaRepository
+    public List<Users> getAllUsers() {
+        return userRepo.findAll();
     }
 
-    public User register(User user) {
-        // Hash the user's password before saving
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return userRepo.save(user); // Automatically provided by JpaRepository
+    public Users register(Users users) {
+        String encodedPassword = passwordEncoder.encode(users.getPassword());
+        users.setPassword(encodedPassword);
+        return userRepo.save(users);
     }
 
     public boolean isUserExists(String email) {
-        User user = userRepo.getUserByEmail(email);
-        return user != null;
+        Users users = userRepo.findByEmail(email);
+        return users != null;
     }
 
-    public User login(String email, String password) {
-        User user = userRepo.getUserByEmail(email);
-//        if (passwordEncoder.matches(password, user.getPassword())) {
-//            return user;
-//        }
-        if (user.getPassword().equals(password)) {
-            return user;
+    public Users login(String email, String password) {
+        Users user = userRepo.findByEmail(email);
+        if (user == null) return null;
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return null;
         }
-        return null;
+
+        UserRole userRole = userRoleRepo.findByUserId(user.getId());
+
+        if (userRole != null) {
+            user.setRole(userRole.getRole());
+        }
+        else {
+            user.setRole("undefined");
+        }
+
+        return user;
     }
+
 }

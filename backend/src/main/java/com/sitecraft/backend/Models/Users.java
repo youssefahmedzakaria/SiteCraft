@@ -1,11 +1,12 @@
 package com.sitecraft.backend.Models;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Users")  // Use double quotes to exactly match the table name in the database
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,8 +16,10 @@ public class User {
     private String password;
     private String gender;
     private String phone;
+    @Transient
+    private String role; // Not persisted in DB
 
-    public User(Long id, String name, String email, String password, String gender, String phone) {
+    public Users(Long id, String name, String email, String password, String gender, String phone) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -25,7 +28,8 @@ public class User {
         this.phone = phone;
     }
 
-    public User() {
+    public Users() {
+
     }
 
     // Getters and Setters
@@ -76,5 +80,13 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
