@@ -15,12 +15,14 @@ public class Customer {
     private String gender;
     private String phone;
     private String status;
-
     private Long wishlistId;
     private Long cartId;
     private Long storeId;
 
-    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, Long wishlistId, Long cartId, Long storeId) {
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Order> orders;
+
+    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, Long wishlistId, Long cartId, Long storeId, List<Order> orders) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -31,6 +33,7 @@ public class Customer {
         this.wishlistId = wishlistId;
         this.cartId = cartId;
         this.storeId = storeId;
+        this.orders = orders;
     }
 
     public Customer() {
@@ -115,5 +118,13 @@ public class Customer {
 
     public void setStoreId(Long storeId) {
         this.storeId = storeId;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }
