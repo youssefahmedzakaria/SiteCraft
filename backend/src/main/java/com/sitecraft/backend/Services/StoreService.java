@@ -1,13 +1,16 @@
 package com.sitecraft.backend.Services;
+import com.sitecraft.backend.Models.ShippingInfo;
 import com.sitecraft.backend.Models.SocialMedia;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Models.UserRole;
+import com.sitecraft.backend.Repositories.ShippingInfoRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.Repositories.UserRoleRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,7 +25,8 @@ public class StoreService {
     @Autowired
     private UserRoleRepo userRoleRepo;
 
-
+    @Autowired
+    private ShippingInfoRepo shippingInfoRepo;
 
     public Store createStore(Store store, Long userId) {
         try {
@@ -39,6 +43,8 @@ public class StoreService {
             throw new RuntimeException("Failed to create store: " + e.getMessage());
         }
     }
+
+    // ------------------------------ Account Settings ------------------------------------------------
 
     @Transactional
     public Store updateStorePartial(Long storeId, Store updatedData) {
@@ -79,6 +85,60 @@ public class StoreService {
         }
         return existingStore.get();
     }
+
+    // --------------------------------- Shipping Info -----------------------------------------------
+
+    public List<ShippingInfo> getShippingInfosByStoreId(Long storeId) {
+        try {
+            return shippingInfoRepo.findByStoreId(storeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get shipping infos by store: " + e.getMessage());
+        }
+    }
+
+    public ShippingInfo addShippingInfo(ShippingInfo shippingInfo) {
+        try {
+            return shippingInfoRepo.save(shippingInfo);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add shipping info: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updateShippingInfo(Long shippingInfoId, ShippingInfo updatedInfo, Long storeId) {
+        try {
+            ShippingInfo existing = shippingInfoRepo.findById(shippingInfoId)
+                    .orElseThrow(() -> new RuntimeException("Shipping Info not found"));
+
+            if (!existing.getStore().getId().equals(storeId)) {
+                throw new IllegalAccessException("Shipping Info does not belong to your store");
+            }
+
+            if (updatedInfo.getShippingPrice() != null) existing.setShippingPrice(updatedInfo.getShippingPrice());
+            if (updatedInfo.getGovernmentName() != null) existing.setGovernmentName(updatedInfo.getGovernmentName());
+            existing.setEstimatedDeliveryTime(updatedInfo.getEstimatedDeliveryTime());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update shipping info: " + e.getMessage());
+        }
+    }
+
+    public void deleteShippingInfo(Long shippingInfoId, Long storeId) {
+        try {
+            ShippingInfo existing = shippingInfoRepo.findById(shippingInfoId)
+                    .orElseThrow(() -> new RuntimeException("Shipping Info not found"));
+
+            if (!existing.getStore().getId().equals(storeId)) {
+                throw new IllegalAccessException("Shipping Info does not belong to your store");
+            }
+            shippingInfoRepo.deleteById(shippingInfoId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete shipping info: " + e.getMessage());
+        }
+    }
+
+//    public Optional<ShippingInfo> getShippingInfoById(Long id) {
+//        return shippingInfoRepo.findById(id);
+//    }
 
 }
 
