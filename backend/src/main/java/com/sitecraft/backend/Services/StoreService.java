@@ -200,6 +200,57 @@ public class StoreService {
             throw new RuntimeException("Failed to delete policy: " + e.getMessage());
         }
     }
+
+    public List<AboutUs> getAboutUsListByStoreId(Long storeId) {
+        try {
+            return aboutUsRepository.findByStoreId(storeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch About Us entries: " + e.getMessage());
+        }
+    }
+
+    public AboutUs getAboutUsById(Long aboutUsId, Long storeId) {
+        try {
+            return aboutUsRepository.findByIdAndStoreId(aboutUsId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("About Us entry not found or does not belong to your store"));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch About Us entry: " + e.getMessage());
+        }
+    }
+
+    public AboutUs addAboutUs(AboutUs aboutUs) {
+        try {
+            return aboutUsRepository.save(aboutUs);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add About Us entry: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updateAboutUs(Long aboutUsId, AboutUs updated, Long storeId) {
+        try {
+            AboutUs existing = aboutUsRepository.findByIdAndStoreId(aboutUsId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("About Us entry not found or does not belong to your store"));
+
+            if (updated.getTitle() != null) existing.setTitle(updated.getTitle());
+            if (updated.getContent() != null) existing.setContent(updated.getContent());
+            if (updated.getStatus() != null) existing.setStatus(updated.getStatus());
+            if (updated.getType() != null) existing.setType(updated.getType());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update About Us entry: " + e.getMessage());
+        }
+    }
+
+    public void deleteAboutUs(Long aboutUsId, Long storeId) {
+        try {
+            aboutUsRepository.findByIdAndStoreId(aboutUsId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("About Us entry not found or does not belong to your store"));
+            aboutUsRepository.deleteById(aboutUsId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete About Us entry: " + e.getMessage());
+        }
+    }
+
 }
 
 

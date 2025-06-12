@@ -1,5 +1,6 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.DTOs.StoreInfoDTO;
+import com.sitecraft.backend.Models.AboutUs;
 import com.sitecraft.backend.Models.Policy;
 import com.sitecraft.backend.Models.ShippingInfo;
 import com.sitecraft.backend.Models.Store;
@@ -358,4 +359,125 @@ public class StoreController {
         }
     }
 
+    @GetMapping("/getStoreAboutUsList")
+    public ResponseEntity<?> getStoreAboutUsList(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            List<AboutUs> aboutUsList = storeService.getAboutUsListByStoreId(storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "All store About Us entries retrieved successfully",
+                    "aboutUsList", aboutUsList
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/getStoreAboutUsById/{id}")
+    public ResponseEntity<?> getStoreAboutUsById(@PathVariable Long id, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            AboutUs aboutUs = storeService.getAboutUsById(id, storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "About Us entry retrieved successfully",
+                    "aboutUs", aboutUs
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/addAboutUs")
+    public ResponseEntity<?> addAboutUs(@RequestBody AboutUs aboutUs, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Store store = new Store();
+            store.setId(storeId);
+            aboutUs.setStore(store);
+
+            AboutUs savedAboutUs = storeService.addAboutUs(aboutUs);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "About Us entry added successfully",
+                    "aboutUs", savedAboutUs
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/updateAboutUs/{id}")
+    public ResponseEntity<?> updateAboutUs(@PathVariable Long id, @RequestBody AboutUs updatedAboutUs, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            storeService.updateAboutUs(id, updatedAboutUs, storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "About Us entry updated successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @DeleteMapping("/deleteAboutUs/{id}")
+    public ResponseEntity<?> deleteAboutUs(@PathVariable Long id, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            storeService.deleteAboutUs(id, storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "About Us entry deleted successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }
