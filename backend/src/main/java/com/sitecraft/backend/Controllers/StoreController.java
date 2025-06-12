@@ -1,10 +1,8 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.DTOs.StoreInfoDTO;
-import com.sitecraft.backend.Models.AboutUs;
-import com.sitecraft.backend.Models.Policy;
-import com.sitecraft.backend.Models.ShippingInfo;
-import com.sitecraft.backend.Models.Store;
+import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Services.StoreService;
+import com.sitecraft.backend.Services.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,8 @@ public class StoreController {
 
     @Autowired
     private StoreService storeService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/{userId}")
     public ResponseEntity<?> createStore(@RequestBody Store store, @PathVariable Long userId) {
@@ -479,5 +479,42 @@ public class StoreController {
                     "message", e.getMessage()
             ));
         }
+    }
+
+    // --------------------------------- Staff Management -----------------------------------------------
+
+    @GetMapping("/getStoreStaff")
+    public ResponseEntity<?> getAllStaff(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            List<Users> staffMembers = userService.getAllStaffByStoreId(storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "All staff members are retrieved successfully",
+                    "staffMembers", staffMembers
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/addStaff")
+    public ResponseEntity<Users> addStaff(@RequestBody Users user, HttpSession session) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.addStaff((Long) session.getAttribute("storeId"), user));
+    }
+
+    @DeleteMapping("/removeStaff/{staffId}")
+    public ResponseEntity<Void> removeStaff(@PathVariable Long staffId, HttpSession session) {
+        userService.removeStaff((Long) session.getAttribute("storeId"), staffId);
+        return ResponseEntity.noContent().build();
     }
 }

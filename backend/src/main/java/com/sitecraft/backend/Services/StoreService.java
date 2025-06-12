@@ -38,7 +38,7 @@ public class StoreService {
             Users tempUser = new Users();
             tempUser.setId(userId);
 
-            UserRole ownerRole = new UserRole("owner", tempUser, savedStore);
+            UserRole ownerRole = new UserRole("owner", tempUser, savedStore.getId());
             userRoleRepo.save(ownerRole);
 
             return storeRepo.save(savedStore);

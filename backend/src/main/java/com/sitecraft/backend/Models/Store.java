@@ -46,14 +46,12 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRole> userRoles = new ArrayList<>();
 
     // Constructors
     public Store() {
     }
 
-    public Store(Long id, String storeName, String storeType, String logo, String webAddress, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo, List<UserRole> userRoles) {
+    public Store(Long id, String storeName, String storeType, String logo, String webAddress, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
         this.id = id;
         this.storeName = storeName;
         this.storeType = storeType;
@@ -70,7 +68,7 @@ public class Store {
         this.policies = policies;
         this.aboutUs = aboutUs;
         this.shippingInfo = shippingInfo;
-        this.userRoles = userRoles;
+
     }
 
     // Getters and Setters
@@ -202,11 +200,4 @@ public class Store {
         this.shippingInfo = shippingInfo;
     }
 
-    public List<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
 }

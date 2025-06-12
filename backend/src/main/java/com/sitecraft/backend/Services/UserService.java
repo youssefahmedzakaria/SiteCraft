@@ -1,28 +1,39 @@
 package com.sitecraft.backend.Services;
+import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Models.UserRole;
 import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.Repositories.UserRepo;
 import com.sitecraft.backend.Repositories.UserRoleRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepo userRepo;
+
     @Autowired
     private UserRoleRepo userRoleRepo;
+
     @Autowired
     private StoreRepo storeRepo;
 
-    // private final JavaMailSender mailSender; // You need to configure this
-
+    private final JavaMailSender mailSender; // You need to configure this
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public UserService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public List<Users> getAllUsers() {
         return userRepo.findAll();
@@ -47,11 +58,11 @@ public class UserService {
             return null;
         }
 
-        UserRole userRole = userRoleRepo.findByUserId(user);
+        UserRole userRole = userRoleRepo.findByUser(user);
         Long storeId = null;
         if (userRole != null) {
             user.setRole(userRole.getRole());
-            storeId = userRole.getStoreId().getId();
+            storeId = userRole.getStoreId();
         }
         else {
             user.setRole("undefined");
@@ -62,46 +73,56 @@ public class UserService {
 
     // -------------------------------------------- staff management ---------------------------------------------------
 
-//    public List<User> getAllStaffByStoreId(Long storeId) {
-//        return userRoleRepository.findByRoleAndStoreId("staff", storeId)
-//                .stream()
-//                .map(UserRole::getUser)
-//                .collect(Collectors.toList());
-//    }
+    public List<Users> getAllStaffByStoreId(Long storeId) {
+        try {
+            return userRoleRepo.findByRoleAndStoreId("staff", storeId)
+                    .stream()
+                    .map(UserRole::getUser)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get staff of the store: " + e.getMessage());
+        }
+    }
 
-//    public User addStaff(Long storeId, User user) {
-//        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-//            throw new RuntimeException("Email already exists");
-//        }
-//
-//        String generatedPassword = UUID.randomUUID().toString().substring(0, 8);
-//        user.setPassword(generatedPassword); // You should hash this in production
-//
-//        User savedUser = userRepository.save(user);
-//        Store store = storeRepository.findById(storeId)
-//                .orElseThrow(() -> new RuntimeException("Store not found"));
-//
-//        UserRole userRole = new UserRole();
-//        userRole.setRole("staff");
-//        userRole.setUser(savedUser);
-//        userRole.setStore(store);
-//        userRoleRepository.save(userRole);
-//
-//        sendCredentialsEmail(savedUser.getEmail(), savedUser.getEmail(), generatedPassword);
-//
-//        return savedUser;
-//    }
+    public Users addStaff(Long storeId, Users user) {
+        if (userRepo.findByEmail(user.getEmail()) != null) {
+            throw new RuntimeException("Email already exists");
+        }
 
-//    public void removeStaff(Long storeId, Long userId) {
-//        userRoleRepository.deleteByUserIdAndStoreId(userId, storeId);
-//        userRepository.deleteById(userId);
-//    }
+        String generatedPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(generatedPassword); // You should hash this in production
+        sendCredentialsEmail(user.getEmail(), user.getEmail(), generatedPassword);
 
-//    private void sendCredentialsEmail(String to, String username, String password) {
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(to);
-//        message.setSubject("Your Staff Account Credentials");
-//        message.setText("Login Email: " + username + "\nPassword: " + password);
-//        mailSender.send(message);
-//    }
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        Users savedUser = userRepo.save(user);
+
+        UserRole userRole = new UserRole();
+        userRole.setRole("staff");
+        userRole.setUser(savedUser);
+        userRole.setStoreId(storeId);
+        userRoleRepo.save(userRole);
+
+
+
+
+        return savedUser;
+    }
+
+    @Transactional
+    public void removeStaff(Long storeId, Long userId) {
+        Users tempUser = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+        userRoleRepo.deleteByUserAndStoreId(tempUser, storeId);
+        userRepo.deleteById(userId);
+    }
+
+    private void sendCredentialsEmail(String to, String username, String password) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Your Staff Account Credentials");
+        message.setText("Login Email: " + username + "\nPassword: " + password);
+        mailSender.send(message);
+    }
 }
