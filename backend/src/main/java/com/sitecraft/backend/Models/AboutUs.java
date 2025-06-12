@@ -3,7 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "AboutUs")
+@Table(name = "aboutus")
 
 public class AboutUs {
 
