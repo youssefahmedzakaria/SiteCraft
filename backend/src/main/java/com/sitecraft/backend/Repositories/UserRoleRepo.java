@@ -8,6 +8,6 @@ import java.util.List;
 public interface UserRoleRepo extends JpaRepository<UserRole, Long> {
     UserRole findByUser(Users userId);
     List<UserRole> findByRoleAndStoreId(String role, Long storeId);
-
+    UserRole findByStoreIdAndUser(Long storeId, Users userId);
     void deleteByUserAndStoreId(Users userId, Long storeId);
 }

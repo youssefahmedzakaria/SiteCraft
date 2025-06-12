@@ -508,13 +508,51 @@ public class StoreController {
     }
 
     @PostMapping("/addStaff")
-    public ResponseEntity<Users> addStaff(@RequestBody Users user, HttpSession session) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.addStaff((Long) session.getAttribute("storeId"), user));
+    public ResponseEntity<?> addStaff(@RequestBody Users user, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            user.setStoreId(storeId);
+
+            Users savedUser = userService.addStaff(user);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Staff added successfully",
+                    "staffMember", savedUser
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
     }
 
     @DeleteMapping("/removeStaff/{staffId}")
-    public ResponseEntity<Void> removeStaff(@PathVariable Long staffId, HttpSession session) {
-        userService.removeStaff((Long) session.getAttribute("storeId"), staffId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> removeStaff(@PathVariable Long staffId, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            userService.removeStaff((Long) session.getAttribute("storeId"), staffId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Staff removed successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
     }
 }

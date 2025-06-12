@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Services;
+import com.sitecraft.backend.Models.ShippingInfo;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Models.UserRole;
 import com.sitecraft.backend.Models.Users;
@@ -84,38 +85,50 @@ public class UserService {
         }
     }
 
-    public Users addStaff(Long storeId, Users user) {
-        if (userRepo.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("Email already exists");
+    public Users addStaff(Users user) {
+        try {
+            if (userRepo.findByEmail(user.getEmail()) != null) {
+                throw new RuntimeException("Email already exists");
+            }
+
+            String generatedPassword = UUID.randomUUID().toString().substring(0, 8);
+            user.setPassword(generatedPassword); // You should hash this in production
+
+            sendCredentialsEmail(user.getEmail(), user.getEmail(), generatedPassword);
+
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+
+            Users savedUser = userRepo.save(user);
+
+            UserRole userRole = new UserRole();
+            userRole.setRole("staff");
+            userRole.setUser(savedUser);
+            userRole.setStoreId(user.getStoreId());
+            userRoleRepo.save(userRole);
+
+            return savedUser;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add staff to the store: " + e.getMessage());
         }
-
-        String generatedPassword = UUID.randomUUID().toString().substring(0, 8);
-        user.setPassword(generatedPassword); // You should hash this in production
-        sendCredentialsEmail(user.getEmail(), user.getEmail(), generatedPassword);
-
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-
-        Users savedUser = userRepo.save(user);
-
-        UserRole userRole = new UserRole();
-        userRole.setRole("staff");
-        userRole.setUser(savedUser);
-        userRole.setStoreId(storeId);
-        userRoleRepo.save(userRole);
-
-
-
-
-        return savedUser;
     }
 
     @Transactional
     public void removeStaff(Long storeId, Long userId) {
-        Users tempUser = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
-        userRoleRepo.deleteByUserAndStoreId(tempUser, storeId);
-        userRepo.deleteById(userId);
+        try {
+            Users existing = userRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Staff not found"));
+
+            if (userRoleRepo.findByStoreIdAndUser(storeId, existing) == null) {
+                throw new IllegalAccessException("Staff does not belong to your store");
+            }
+
+            userRoleRepo.deleteByUserAndStoreId(existing, storeId);
+            userRepo.deleteById(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to remove staff from the store: " + e.getMessage());
+        }
+
     }
 
     private void sendCredentialsEmail(String to, String username, String password) {
