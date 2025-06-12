@@ -1,5 +1,6 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.DTOs.StoreInfoDTO;
+import com.sitecraft.backend.Models.Policy;
 import com.sitecraft.backend.Models.ShippingInfo;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.StoreService;
@@ -218,7 +219,7 @@ public class StoreController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "All store info retrieved successfully");
-            response.put("Store Info", storeInfoDTO);
+            response.put("StoreInfo", storeInfoDTO);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -229,4 +230,132 @@ public class StoreController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    @GetMapping("/getStorePolicies")
+    public ResponseEntity<?> getStorePolicies(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            List<Policy> policies = storeService.getStorePolicies(storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "All store policies retrieved successfully");
+            response.put("StorePolicies", policies);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/getStorePolicyById/{policyId}")
+    public ResponseEntity<?> getStorePolicyById(HttpSession session, @PathVariable Long policyId) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Policy policy = storeService.getStorePolicyById(policyId,storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Policy retrieved successfully");
+            response.put("Policy", policy);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/addPolicy")
+    public ResponseEntity<?> addPolicy(@RequestBody Policy policy, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            // Attach store to policy
+            Store store = new Store();
+            store.setId(storeId);
+            policy.setStore(store);
+
+            Policy savedPolicy = storeService.addPolicy(policy);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Policy added successfully",
+                    "policy", savedPolicy
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/updatePolicy/{policyId}")
+    public ResponseEntity<?> updatePolicy(@PathVariable Long policyId, @RequestBody Policy updatedPolicy, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            storeService.updatePolicyById(policyId, updatedPolicy, storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Policy updated successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @DeleteMapping("/deletePolicy/{policyId}")
+    public ResponseEntity<?> deletePolicy(@PathVariable Long policyId, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            storeService.deletePolicyById(policyId, storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Policy deleted successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
 }
