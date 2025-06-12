@@ -35,8 +35,10 @@ public class StoreService {
             store.setCreationDate(LocalDateTime.now());
 
             Store savedStore = storeRepo.save(store);
+            Users tempUser = new Users();
+            tempUser.setId(userId);
 
-            UserRole ownerRole = new UserRole("owner", userId, savedStore.getId());
+            UserRole ownerRole = new UserRole("owner", tempUser, savedStore);
             userRoleRepo.save(ownerRole);
 
             return storeRepo.save(savedStore);
