@@ -1,5 +1,4 @@
 package com.sitecraft.backend.Models;
-
 import jakarta.persistence.*;
 
 import java.util.List;
