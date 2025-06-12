@@ -102,7 +102,7 @@ export const Footer = ({
   copyrightText = `© ${new Date().getFullYear()} ${companyName}`
 }: FooterProps) => {
   return (
-    <div className={`py-8 md:py-12 px-4 md:px-8 lg:px-16 ${backgroundColor} mt-12 md:mt-24`}>
+    <div className={`py-8 md:py-12 px-4 md:px-8 lg:px-16 ${backgroundColor} `}>
       {/* Main content row */}
       <div className="flex flex-col items-center md:flex-row justify-between w-full gap-6 md:gap-0">
         {/* Left - Logo - Centered on mobile */}

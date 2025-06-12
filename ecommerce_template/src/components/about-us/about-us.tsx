@@ -2,6 +2,7 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export interface AboutUsProps {
+  id?: string
   title: string
   description: string
   image: string
@@ -20,6 +21,7 @@ export interface AboutUsProps {
 }
 
 export function AboutUs({
+  id,
   title,
   description,
   image,

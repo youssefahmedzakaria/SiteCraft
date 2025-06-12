@@ -53,7 +53,7 @@ const navbarComponents: Record<string, React.ComponentType<NavbarTemplateProps>>
   template8: NavbarTemplate8,
 }
 
-const Navbar: React.FC<NavbarProps> = ({
+ export const Navbar = ({
   template = "template1",
   brandName = "",
   backgroundColor = "bg-white",
@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({
   iconColor = "text-black",
   dividerColor = "border-gray-200",
   searchIconColor = "text-black",
-}) => {
+}: NavbarProps) => {
   const Component = navbarComponents[template] || NavbarTemplate1
 
   return (

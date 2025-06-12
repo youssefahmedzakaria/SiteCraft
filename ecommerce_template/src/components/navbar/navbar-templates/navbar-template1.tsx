@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import { Logo } from '../navbar-components/logo';
 import { Navigation } from '../navbar-components/navigation';
 import { FullSearchBar } from '../navbar-components/full-search-bar';
 import { IconsGroup } from '../navbar-components/icons-group';
-import  MobileMenu  from '../navbar-components/mobile-menu'
+import MobileMenu from '../navbar-components/mobile-menu';
 
 export interface NavbarTemplate1Props {
   brandName?: string | React.ReactNode;
@@ -28,6 +28,7 @@ export interface NavbarTemplate1Props {
   iconColor?: string;
   dividerColor?: string;
   searchIconColor?: string;
+  onSearch?: (query: string) => void;
 }
 
 export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
@@ -41,8 +42,15 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
   iconColor = 'text-black',
   dividerColor = 'border-gray-200',
   searchIconColor = 'text-gray-400',
+  onSearch
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleSearch = (query: string) => {
+    if (onSearch) {
+      onSearch(query);
+    }
+  };
 
   return (
     <>
@@ -56,11 +64,11 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
         MobileMenuItems={MobileMenuItems || []}
         searchIconColor={searchIconColor}
         dividerColor={dividerColor}
+        onSearch={handleSearch}
       />
 
       <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
         <div className="max-w-7xl mx-auto px-4">
-          
           <div className="relative flex items-center justify-between h-16">
             {/* Left - Logo and Brand */}
             <Logo brandName={brandName} logo={logo} textColor={textColor} />
@@ -71,17 +79,28 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
                 iconColor={searchIconColor}
                 backgroundColor="bg-white/20"
                 textColor={textColor}
+                onSearch={handleSearch}
               />
             </div>
 
             {/* Right - Icons on desktop / Menu button on mobile */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <div className="hidden md:flex">
                 <IconsGroup iconColor={iconColor} />
               </div>
               <button
                 className="md:hidden p-1 hover:opacity-80"
+                onClick={() => {
+                  setIsMobileMenuOpen(true);
+                }}
+                aria-label="Toggle search"
+              >
+                <Search className={`h-6 w-6 ${iconColor}`} />
+              </button>
+              <button
+                className="md:hidden p-1 hover:opacity-80"
                 onClick={() => setIsMobileMenuOpen(true)}
+                aria-label="Open menu"
               >
                 <Menu className={`h-6 w-6 ${iconColor}`} />
               </button>

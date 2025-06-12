@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+
 export interface PoliciesProps {
   id?: string;
   title?: string;
@@ -6,16 +7,19 @@ export interface PoliciesProps {
     title: string;
     content: string;
   }>;
-  variant?: "centered" | "default" | "left" |"titleLeftContentCenter";
+  variant?: "centered" | "default" | "left" | "titleLeftContentCenter";
   backgroundColor?: string;
   titleColor?: string;
   titleSize?: string;
+  titleFont?: string;
+  titleFontWeight?: string;
   sectionTitleColor?: string;
   sectionTitleSize?: string;
+  sectionTitleFont?: string;
+  sectionTitleFontWeight?: string;
   sectionContentColor?: string;
   sectionContentSize?: string;
   sectionContentFont?: string;
-  sectionContentFontSize?: string;
   sectionContentFontWeight?: string;
 }
 
@@ -27,57 +31,60 @@ export function Policies({
   backgroundColor,
   titleColor,
   titleSize,
+  titleFont,
+  titleFontWeight,
   sectionTitleColor,
   sectionTitleSize,
+  sectionTitleFont,
+  sectionTitleFontWeight,
   sectionContentColor,
   sectionContentSize,
   sectionContentFont,
-  sectionContentFontSize,
   sectionContentFontWeight,
 }: PoliciesProps) {
   const variants = {
     centered: {
       container: `relative py-12 md:py-16 ${backgroundColor}`,
       wrapper: "max-w-4xl mx-auto px-4 text-center",
-      title: cn("text-3xl md:text-4xl lg:text-6xl font-light text-center mb-8 md:mb-12", titleColor, titleSize),
-      sectionTitle: cn("text-xl md:text-2xl font-medium text-center mb-3 md:mb-4", sectionTitleColor, sectionTitleSize),
-      sectionContent: cn("text-center mb-8 md:mb-12", sectionContentColor, sectionContentSize),
+      title: cn("md:text-4xl lg:text-6xl text-center mb-8 md:mb-12", titleColor, titleSize, titleFont, titleFontWeight),
+      sectionTitle: cn(" md:text-2xl text-center mb-3 md:mb-4", sectionTitleColor, sectionTitleSize, sectionTitleFont, sectionTitleFontWeight),
+      sectionContent: cn("text-center mb-8 md:mb-12", sectionContentColor, sectionContentSize, sectionContentFont, sectionContentFontWeight),
       subtitleWrapper: "mt-8 md:mt-12 text-center italic",
     },
     default: {
       container: `relative py-12 md:py-16 ${backgroundColor}`,
       wrapper: "max-w-6xl mx-auto px-4",
-      title: cn("text-3xl md:text-4xl lg:text-6xl font-light text-center mb-8 md:mb-12", titleColor, titleSize),
-      sectionTitle: cn("text-xl md:text-2xl font-medium mb-3 md:mb-4", sectionTitleColor, sectionTitleSize),
-      sectionContent: cn("text-gray-600 mb-8 md:mb-12", sectionContentColor, sectionContentSize),
+      title: cn(" md:text-4xl lg:text-6xl  text-center mb-8 md:mb-12", titleColor, titleSize, titleFont, titleFontWeight),
+      sectionTitle: cn(" md:text-2xl  mb-3 md:mb-4", sectionTitleColor, sectionTitleSize, sectionTitleFont, sectionTitleFontWeight),
+      sectionContent: cn(" mb-8 md:mb-12", sectionContentColor, sectionContentSize, sectionContentFont, sectionContentFontWeight),
       subtitleWrapper: "mt-8 md:mt-12 text-center italic",
     },
     titleLeftContentRight: {
       container: `relative py-12 md:py-16 ${backgroundColor}`,
       wrapper: "max-w-6xl mx-auto px-4 flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-8",
       titleWrapper: "flex flex-col mb-6 md:mb-0",
-      title: cn("text-3xl md:text-4xl lg:text-6xl font-light mb-2 md:mb-4", titleColor, titleSize),
+      title: cn("md:text-4xl lg:text-6xl mb-2 md:mb-4", titleColor, titleSize, titleFont, titleFontWeight),
       contentWrapper: "space-y-6 md:space-y-8",
-      sectionTitle: cn("text-xl md:text-2xl font-medium mb-2", sectionTitleColor, sectionTitleSize),
-      sectionContent: cn("text-gray-600", sectionContentColor, sectionContentSize),
+      sectionTitle: cn(" md:text-2xl mb-2", sectionTitleColor, sectionTitleSize, sectionTitleFont, sectionTitleFontWeight),
+      sectionContent: cn( sectionContentColor, sectionContentSize, sectionContentFont, sectionContentFontWeight),
       subtitleWrapper: "mt-2 md:mt-4 italic",
     },
     left: {
       container: `relative py-12 md:py-16 ${backgroundColor}`,
       wrapper: "max-w-6xl mx-auto px-4",
-      title: cn("text-3xl md:text-4xl lg:text-6xl font-light text-left mb-8 md:mb-12", titleColor, titleSize),
-      sectionTitle: cn("text-xl md:text-2xl font-medium mb-3 md:mb-4", sectionTitleColor, sectionTitleSize),
-      sectionContent: cn("text-gray-600 mb-8 md:mb-12", sectionContentColor, sectionContentSize),
+      title: cn("md:text-4xl lg:text-6xl text-left mb-8 md:mb-12", titleColor, titleSize, titleFont, titleFontWeight),
+      sectionTitle: cn(" md:text-2xl mb-3 md:mb-4", sectionTitleColor, sectionTitleSize, sectionTitleFont, sectionTitleFontWeight),
+      sectionContent: cn(" mb-8 md:mb-12", sectionContentColor, sectionContentSize, sectionContentFont, sectionContentFontWeight),
       subtitleWrapper: "mt-8 md:mt-12 italic",
     },
     titleLeftContentCenter: {
       container: `relative py-12 md:py-16 ${backgroundColor}`,
       wrapper: "max-w-6xl mx-auto px-4 flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-8",
       titleWrapper: "flex flex-col mb-6 md:mb-0",
-      title: cn("text-3xl md:text-4xl lg:text-6xl font-light mb-2 md:mb-4", titleColor, titleSize),
+      title: cn("md:text-4xl lg:text-6xl mb-2 md:mb-4", titleColor, titleSize, titleFont, titleFontWeight),
       contentWrapper: "space-y-6 md:space-y-8 md:col-span-2",
-      sectionTitle: cn("text-xl md:text-2xl font-medium text-center mb-3 md:mb-4", sectionTitleColor, sectionTitleSize),
-      sectionContent: cn("text-center text-gray-600", sectionContentColor, sectionContentSize),
+      sectionTitle: cn(" md:text-2xl text-center mb-3 md:mb-4", sectionTitleColor, sectionTitleSize, sectionTitleFont, sectionTitleFontWeight),
+      sectionContent: cn("text-center", sectionContentColor, sectionContentSize, sectionContentFont, sectionContentFontWeight),
       subtitleWrapper: "mt-2 md:mt-4 italic text-center md:col-span-2",
     },
   };
@@ -93,9 +100,11 @@ export function Policies({
     >
       <h2
         className={cn(
-          "text-xl md:text-4xl font-bold mb-4",
+          "md:text-4xl lg:text-6xl mb-4",
           titleColor,
           titleSize,
+          titleFont,
+          titleFontWeight,
           style.title
         )}
       >
@@ -106,9 +115,11 @@ export function Policies({
           <div key={index} className="mb-8">
             <h3
               className={cn(
-                "text-2xl font-medium mb-4",
+                "md:text-2xl lg:text-4xl font-medium mb-4",
                 sectionTitleColor,
                 sectionTitleSize,
+                sectionTitleFont,
+                sectionTitleFontWeight,
                 style.sectionTitle
               )}
             >
@@ -116,11 +127,12 @@ export function Policies({
             </h3>
             <p
               className={cn(
-                "text-gray-600",
+                "md:text-lg lg:text-xl text-gray-600",
                 sectionContentColor,
                 sectionContentSize,
                 sectionContentFont,
-                sectionContentFontSize,
+                sectionContentFontWeight,
+                sectionContentFont,
                 sectionContentFontWeight,
                 style.sectionContent
               )}
@@ -132,7 +144,4 @@ export function Policies({
       </div>
     </div>
   );
-  }
-  
-
-
+}

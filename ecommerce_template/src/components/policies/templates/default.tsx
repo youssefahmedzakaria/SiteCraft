@@ -12,12 +12,15 @@ export interface DefaultPoliciesProbs{
     backgroundColor?: string;
     titleColor?: string;
     titleSize?: string;
+    titleFont?: string;
+    titleFontWeight?: string;
     sectionTitleColor?: string;
     sectionTitleSize?: string;
+    sectionTitleFont?: string;
+    sectionTitleFontWeight?: string;
     sectionContentColor?: string;
     sectionContentSize?: string;
     sectionContentFont?: string;
-    sectionContentFontSize?: string;
     sectionContentFontWeight?: string;
 }
 
@@ -41,12 +44,15 @@ export function DefaultPolicies( {
     backgroundColor = "bg-[#F5ECD5]",
     titleColor = "text-[#4A102A]",
     titleSize = "text-4xl",
+    titleFont = "font-sans",
+    titleFontWeight = "font-bold",
     sectionTitleColor = "text-[#4A102A]",
     sectionTitleSize = "text-2xl",
+    sectionTitleFont = "font-serif",
+    sectionTitleFontWeight = "font-medium",
     sectionContentColor = "text-gray-600",
     sectionContentSize = "text-lg",
     sectionContentFont = "font-serif",
-    sectionContentFontSize = "text-lg",
     sectionContentFontWeight = "font-medium",
 }: DefaultPoliciesProbs) {
     return (
@@ -58,15 +64,16 @@ export function DefaultPolicies( {
             backgroundColor={backgroundColor}
             titleColor={titleColor}
             titleSize={titleSize}
+            titleFont={titleFont}
+            titleFontWeight={titleFontWeight}
             sectionTitleColor={sectionTitleColor}
             sectionTitleSize={sectionTitleSize}
+            sectionTitleFont={sectionTitleFont}
+            sectionTitleFontWeight={sectionTitleFontWeight}
             sectionContentColor={sectionContentColor}
             sectionContentSize={sectionContentSize}
             sectionContentFont={sectionContentFont}
-            sectionContentFontSize={sectionContentFontSize}
             sectionContentFontWeight={sectionContentFontWeight}
         />
     )
 }
-    
- 

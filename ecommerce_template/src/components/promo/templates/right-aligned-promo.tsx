@@ -64,7 +64,7 @@ export function RightAlignedPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-  id,
+  id, 
 }: RightAlignedPromoProps) {
   return (
     <section id={id} className={cn("w-full", backgroundColor)}>

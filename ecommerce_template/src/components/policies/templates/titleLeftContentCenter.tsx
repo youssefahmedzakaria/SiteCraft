@@ -12,12 +12,15 @@ export interface TitleLeftContentCenterPoliciesProbs{
     backgroundColor?: string;
     titleColor?: string;
     titleSize?: string;
+    titleFont?: string;
+    titleFontWeight?: string;
     sectionTitleColor?: string;
     sectionTitleSize?: string;
+    sectionTitleFont?: string;
+    sectionTitleFontWeight?: string;
     sectionContentColor?: string;
     sectionContentSize?: string;
     sectionContentFont?: string;
-    sectionContentFontSize?: string;
     sectionContentFontWeight?: string;
 }
 
@@ -41,12 +44,15 @@ export function TitleLeftContentCenterPolicies( {
     backgroundColor = "bg-[#F5ECD5]",
     titleColor = "text-[#4A102A]",
     titleSize = "text-4xl",
+    titleFont = "font-serif",
+    titleFontWeight = "font-medium",
     sectionTitleColor = "text-[#4A102A]",
     sectionTitleSize = "text-2xl",
+    sectionTitleFont = "font-serif",
+    sectionTitleFontWeight = "font-medium",
     sectionContentColor = "text-gray-600",
     sectionContentSize = "text-lg",
     sectionContentFont = "font-serif",
-    sectionContentFontSize = "text-lg",
     sectionContentFontWeight = "font-medium",
 }: TitleLeftContentCenterPoliciesProbs) {
     return (
@@ -58,12 +64,15 @@ export function TitleLeftContentCenterPolicies( {
             backgroundColor={backgroundColor}
             titleColor={titleColor}
             titleSize={titleSize}
+            titleFont={titleFont}
+            titleFontWeight={titleFontWeight}
             sectionTitleColor={sectionTitleColor}
             sectionTitleSize={sectionTitleSize}
+            sectionTitleFont={sectionTitleFont}
+            sectionTitleFontWeight={sectionTitleFontWeight}
             sectionContentColor={sectionContentColor}
             sectionContentSize={sectionContentSize}
             sectionContentFont={sectionContentFont}
-            sectionContentFontSize={sectionContentFontSize}
             sectionContentFontWeight={sectionContentFontWeight}
         />
     )

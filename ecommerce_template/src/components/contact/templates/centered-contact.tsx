@@ -5,6 +5,7 @@ interface CenteredContactProps {
   backgroundColor?: string
   title?: string
   address?: string
+  addressUrl?: string
   openHours?: string
   phone?: string
   contactEmail?: string
@@ -18,7 +19,9 @@ interface CenteredContactProps {
   titleFont?: string
   titleColor?: string
   contentColor?: string
-  
+  contentFont?: string
+  contentSize?: string
+  titleSize?: string
 }
 
 export function CenteredContact(props: CenteredContactProps) {

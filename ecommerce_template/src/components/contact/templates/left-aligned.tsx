@@ -5,6 +5,7 @@ interface LeftAlignedContactProps {
   backgroundColor?: string
   title?: string
   address?: string
+  addressUrl?: string
   openHours?: string
   phone?: string
   contactEmail?: string
@@ -18,6 +19,9 @@ interface LeftAlignedContactProps {
   titleFont?: string
   titleColor?: string
   contentColor?: string
+  contentFont?: string
+  contentSize?: string
+  titleSize?: string  
 }
 
 export function LeftAlignedContact(props: LeftAlignedContactProps) {
