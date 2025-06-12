@@ -151,11 +151,55 @@ public class StoreService {
         }
     }
 
+    public List<Policy> getStorePolicies(Long storeId) {
+        try {
+            List<Policy> policies = policyRepository.findByStoreId(storeId);
+            return policies;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch store policies: " + e.getMessage());
+        }
+    }
 
-//    public Optional<ShippingInfo> getShippingInfoById(Long id) {
-//        return shippingInfoRepo.findById(id);
-//    }
+    public Policy getStorePolicyById(Long policyId, Long storeId) {
+        try {
+            return policyRepository.findByIdAndStoreId(policyId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("Policy not found or does not belong to your store"));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch store policy: " + e.getMessage());
+        }
+    }
 
+    public Policy addPolicy(Policy policy) {
+        try {
+            return policyRepository.save(policy);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add policy: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updatePolicyById(Long policyId, Policy updatedPolicy, Long storeId) {
+        try {
+            Policy existing = policyRepository.findByIdAndStoreId(policyId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("Policy not found or does not belong to your store"));
+
+            if (updatedPolicy.getTitle() != null) existing.setTitle(updatedPolicy.getTitle());
+            if (updatedPolicy.getDescription() != null) existing.setDescription(updatedPolicy.getDescription());
+            if (updatedPolicy.getStatus() != null) existing.setStatus(updatedPolicy.getStatus());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update policy: " + e.getMessage());
+        }
+    }
+
+    public void deletePolicyById(Long policyId, Long storeId) {
+        try {
+            policyRepository.findByIdAndStoreId(policyId, storeId)
+                    .orElseThrow(() -> new IllegalAccessException("Policy not found or does not belong to your store"));
+            policyRepository.deleteById(policyId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete policy: " + e.getMessage());
+        }
+    }
 }
 
 
