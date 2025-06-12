@@ -25,15 +25,4 @@ public class Config {
 
         return http.build();
     }
-
-    @Bean
-    @Primary
-    public DataSource defaultDataSource() {
-        return DataSourceBuilder.create()
-                .driverClassName("org.postgresql.Driver")
-                .url("jdbc:postgresql://localhost:5432/SiteCraft")
-                .username("postgres")
-                .password("123456")
-                .build();
-    }
 }

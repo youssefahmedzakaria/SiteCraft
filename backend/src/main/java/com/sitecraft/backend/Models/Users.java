@@ -16,6 +16,11 @@ public class Users {
     private String password;
     private String gender;
     private String phone;
+    @Transient
+    private String role; // Not persisted in DB
+
+    @Transient
+    private Long storeId;
 
     public Users(Long id, String name, String email, String password, String gender, String phone) {
         this.id = id;
@@ -78,5 +83,21 @@ public class Users {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Long getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(Long storeId) {
+        this.storeId = storeId;
     }
 }
