@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Controllers;
+import com.sitecraft.backend.DTOs.StoreInfoDTO;
 import com.sitecraft.backend.Models.ShippingInfo;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.StoreService;
@@ -69,8 +70,8 @@ public class StoreController {
     }
 
 
-    @GetMapping("/getStoreInfo")
-    public ResponseEntity<?> getStoreInfo(HttpSession session) {
+    @GetMapping("/getStoreSettings")
+    public ResponseEntity<?> getStoreSettings(HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
@@ -193,6 +194,33 @@ public class StoreController {
             response.put("message", "Shipping info deleted successfully");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // --------------------------------- Store Info -----------------------------------------------
+    @GetMapping("/getStoreInfo")
+    public ResponseEntity<?> getStoreInfo(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            StoreInfoDTO storeInfoDTO = storeService.getStoreInfoByStoreId(storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "All store info retrieved successfully");
+            response.put("Store Info", storeInfoDTO);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);

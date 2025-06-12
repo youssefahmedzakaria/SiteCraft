@@ -1,11 +1,7 @@
 package com.sitecraft.backend.Services;
-import com.sitecraft.backend.Models.ShippingInfo;
-import com.sitecraft.backend.Models.SocialMedia;
-import com.sitecraft.backend.Models.Store;
-import com.sitecraft.backend.Models.UserRole;
-import com.sitecraft.backend.Repositories.ShippingInfoRepo;
-import com.sitecraft.backend.Repositories.StoreRepo;
-import com.sitecraft.backend.Repositories.UserRoleRepo;
+import com.sitecraft.backend.DTOs.StoreInfoDTO;
+import com.sitecraft.backend.Models.*;
+import com.sitecraft.backend.Repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +23,12 @@ public class StoreService {
 
     @Autowired
     private ShippingInfoRepo shippingInfoRepo;
+
+    @Autowired
+    private PolicyRepo policyRepository;
+
+    @Autowired
+    private AboutUsRepo aboutUsRepository;
 
     public Store createStore(Store store, Long userId) {
         try {
@@ -135,6 +137,20 @@ public class StoreService {
             throw new RuntimeException("Failed to delete shipping info: " + e.getMessage());
         }
     }
+
+    // --------------------------------- Store Info -----------------------------------------------
+
+    public StoreInfoDTO getStoreInfoByStoreId(Long storeId) {
+        try {
+            List<Policy> policies = policyRepository.findByStoreId(storeId);
+            List<AboutUs> aboutUsList = aboutUsRepository.findByStoreId(storeId);
+
+            return new StoreInfoDTO(policies, aboutUsList);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch store info: " + e.getMessage());
+        }
+    }
+
 
 //    public Optional<ShippingInfo> getShippingInfoById(Long id) {
 //        return shippingInfoRepo.findById(id);
