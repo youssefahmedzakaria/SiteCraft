@@ -2,7 +2,7 @@ package com.sitecraft.backend.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 @Entity
-@Table(name = "ShippingInfo")
+@Table(name = "Shippinginfo")
 
 public class ShippingInfo {
 
