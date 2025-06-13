@@ -1,5 +1,4 @@
 package com.sitecraft.backend.Models;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;

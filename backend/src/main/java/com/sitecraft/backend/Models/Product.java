@@ -36,7 +36,6 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductImage> images;
 
-    // Constructors
     public Product() {}
 
     public Product(String name, String description, String discountType, Double discountValue,
