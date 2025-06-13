@@ -12,8 +12,8 @@ public interface ProductImageRepo extends JpaRepository<ProductImage, Long> {
     List<ProductImage> findByProductId(Long productId);
 
     @Modifying
-    @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
-    void deleteByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM ProductImage WHERE product_id = ?1", nativeQuery = true)
+    void deleteByProductId(Long productId);
 
     @Modifying
     @Query("DELETE FROM ProductVariants pv WHERE pv.product.id = :productId")

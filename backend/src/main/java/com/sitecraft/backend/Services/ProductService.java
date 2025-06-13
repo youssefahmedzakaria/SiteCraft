@@ -110,75 +110,108 @@ public class ProductService {
         return productRepo.save(product);
     }    @Transactional
     public void deleteProduct(Long id, Long storeId) {
-        Product product = productRepo.findByIdAndStoreId(id, storeId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        
         try {
-            // Step 1: Delete all variant attribute values first (to avoid FK constraint)
-            // Using native query from ProductRepo instead of VariantAttributeValueRepo
-            productRepo.deleteAllVariantAttributeValuesByProductId(id);
+            Product product = productRepo.findByIdAndStoreId(id, storeId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
             
-            // Step 2: Delete from junction tables if they exist
-            // Using raw SQL to handle tables that might not have entity classes
-            try {
-                // Delete from wishlistproduct table
-                productRepo.deleteWishListProductsByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from wishlistproduct table: " + e.getMessage());
-            }
+            System.out.println("Starting deletion process for product ID: " + id);
             
-            try {
-                // Delete from cartproduct table
-                productRepo.deleteCartProductsByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from cartproduct table: " + e.getMessage());
-            }
+            // Delete in the correct order based on foreign key dependencies
+            deleteProductDependencies(id);
             
-            try {
-                // Delete from categoryproduct table
-                productRepo.deleteCategoryProductsByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from categoryproduct table: " + e.getMessage());
-            }
-            
-            try {
-                // Delete from orderproduct table
-                productRepo.deleteOrderProductsByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from orderproduct table: " + e.getMessage());
-            }
-            
-            try {
-                // Delete from review table
-                productRepo.deleteReviewsByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from review table: " + e.getMessage());
-            }
-            
-            try {
-                // Delete from productattribute table
-                productRepo.deleteProductAttributesByProductId(id);
-            } catch (Exception e) {
-                // Table might not exist or no records to delete
-                System.out.println("Note: Could not delete from productattribute table: " + e.getMessage());
-            }
-            
-            // Step 3: Delete product variants
-            productVariantsRepo.deleteByProductId(id);
-            
-            // Step 4: Delete product images
-            productImageRepo.deleteByProductId(id);
-            
-            // Step 5: Finally delete the product
+            // Finally delete the product itself
             productRepo.delete(product);
             
+            System.out.println("Product deletion completed successfully for ID: " + id);
+            
         } catch (Exception e) {
+            System.err.println("Error deleting product: " + e.getMessage());
             throw new RuntimeException("Error deleting product: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    public void deleteProductDependencies(Long productId) {
+        System.out.println("Deleting dependencies for product ID: " + productId);
+        
+        // Step 1: Delete VariantAttributeValue (references ProductVariants)
+        try {
+            productRepo.deleteVariantAttributeValuesByProductId(productId);
+            System.out.println("Deleted variant attribute values");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete variant attribute values: " + e.getMessage());
+        }
+        
+        // Step 2: Delete OrderProduct (references Product)
+        try {
+            productRepo.deleteOrderProductsByProductId(productId);
+            System.out.println("Deleted order products");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete order products: " + e.getMessage());
+        }
+        
+        // Step 3: Delete WishListProduct (references Product)
+        try {
+            productRepo.deleteWishListProductsByProductId(productId);
+            System.out.println("Deleted wishlist products");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete wishlist products: " + e.getMessage());
+        }
+        
+        // Step 4: Delete CartProduct (references Product)
+        try {
+            productRepo.deleteCartProductsByProductId(productId);
+            System.out.println("Deleted cart products");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete cart products: " + e.getMessage());
+        }
+        
+        // Step 5: Delete CategoryProduct (references Product)
+        try {
+            productRepo.deleteCategoryProductsByProductId(productId);
+            System.out.println("Deleted category products");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete category products: " + e.getMessage());
+        }
+        
+        // Step 6: Delete Review (references Product)
+        try {
+            productRepo.deleteReviewsByProductId(productId);
+            System.out.println("Deleted reviews");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete reviews: " + e.getMessage());
+        }
+        
+        // Step 7: Delete AttributeValue (references ProductAttribute)
+        try {
+            productRepo.deleteAttributeValuesByProductId(productId);
+            System.out.println("Deleted attribute values");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete attribute values: " + e.getMessage());
+        }
+        
+        // Step 8: Delete ProductAttribute (references Product)
+        try {
+            productRepo.deleteProductAttributesByProductId(productId);
+            System.out.println("Deleted product attributes");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete product attributes: " + e.getMessage());
+        }
+        
+        // Step 9: Delete ProductVariants (references Product)
+        try {
+            productVariantsRepo.deleteByProductId(productId);
+            System.out.println("Deleted product variants");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete product variants: " + e.getMessage());
+        }
+        
+        // Step 10: Delete ProductImage (references Product)
+        try {
+            productImageRepo.deleteByProductId(productId);
+            System.out.println("Deleted product images");
+        } catch (Exception e) {
+            System.out.println("Note: Could not delete product images: " + e.getMessage());
         }
     }
 

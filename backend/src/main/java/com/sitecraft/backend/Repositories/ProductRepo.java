@@ -27,31 +27,43 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     @Query(value = "DELETE FROM variantattributevalue WHERE variant_id = :variantId", nativeQuery = true)
     void deleteVariantAttributeValuesByVariantId(@Param("variantId") Long variantId);
     
+    // Delete VariantAttributeValue based on ProductVariants that belong to this Product
     @Modifying
-    @Query(value = "DELETE FROM variantattributevalue WHERE variant_id IN (SELECT id FROM productvariants WHERE product_id = :productId)", nativeQuery = true)
-    void deleteAllVariantAttributeValuesByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM VariantAttributeValue WHERE variant_id IN (SELECT id FROM ProductVariants WHERE product_id = ?1)", nativeQuery = true)
+    void deleteVariantAttributeValuesByProductId(Long productId);
     
+    // Delete OrderProduct
     @Modifying
-    @Query(value = "DELETE FROM wishlistproduct WHERE product_id = :productId", nativeQuery = true)
-    void deleteWishListProductsByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM OrderProduct WHERE product_id = ?1", nativeQuery = true)
+    void deleteOrderProductsByProductId(Long productId);
     
+    // Delete WishListProduct
     @Modifying
-    @Query(value = "DELETE FROM cartproduct WHERE product_id = :productId", nativeQuery = true)
-    void deleteCartProductsByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM WishListProduct WHERE product_id = ?1", nativeQuery = true)
+    void deleteWishListProductsByProductId(Long productId);
     
+    // Delete CartProduct
     @Modifying
-    @Query(value = "DELETE FROM categoryproduct WHERE product_id = :productId", nativeQuery = true)
-    void deleteCategoryProductsByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM CartProduct WHERE product_id = ?1", nativeQuery = true)
+    void deleteCartProductsByProductId(Long productId);
     
+    // Delete CategoryProduct
     @Modifying
-    @Query(value = "DELETE FROM orderproduct WHERE product_id = :productId", nativeQuery = true)
-    void deleteOrderProductsByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM CategoryProduct WHERE product_id = ?1", nativeQuery = true)
+    void deleteCategoryProductsByProductId(Long productId);
     
+    // Delete Review
     @Modifying
-    @Query(value = "DELETE FROM review WHERE product_id = :productId", nativeQuery = true)
-    void deleteReviewsByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM Review WHERE product_id = ?1", nativeQuery = true)
+    void deleteReviewsByProductId(Long productId);
     
+    // Delete AttributeValue based on ProductAttribute that belongs to this Product
     @Modifying
-    @Query(value = "DELETE FROM productattribute WHERE product_id = :productId", nativeQuery = true)
-    void deleteProductAttributesByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM AttributeValue WHERE product_attribute_id IN (SELECT id FROM ProductAttribute WHERE product_id = ?1)", nativeQuery = true)
+    void deleteAttributeValuesByProductId(Long productId);
+    
+    // Delete ProductAttribute
+    @Modifying
+    @Query(value = "DELETE FROM ProductAttribute WHERE product_id = ?1", nativeQuery = true)
+    void deleteProductAttributesByProductId(Long productId);
 }

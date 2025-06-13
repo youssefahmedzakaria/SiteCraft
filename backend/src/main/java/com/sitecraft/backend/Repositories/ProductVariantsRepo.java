@@ -12,6 +12,6 @@ public interface ProductVariantsRepo extends JpaRepository<ProductVariants, Long
     List<ProductVariants> findByProductId(Long productId);
 
     @Modifying
-    @Query("DELETE FROM ProductVariants pv WHERE pv.product.id = :productId")
-    void deleteByProductId(@Param("productId") Long productId);
+    @Query(value = "DELETE FROM ProductVariants WHERE product_id = ?1", nativeQuery = true)
+    void deleteByProductId(Long productId);
 }
