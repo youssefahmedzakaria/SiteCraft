@@ -51,9 +51,4 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
-//    @GetMapping("/{id}/orders")
-//    public ResponseEntity<List<Order>> getOrders(@PathVariable Long id) {
-//        return ResponseEntity.ok(service.getCustomerOrders(id));
-//    }
 }

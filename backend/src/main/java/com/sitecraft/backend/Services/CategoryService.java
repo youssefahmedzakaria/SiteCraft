@@ -1,0 +1,179 @@
+package com.sitecraft.backend.Services;
+
+import com.sitecraft.backend.Models.Category;
+import com.sitecraft.backend.Models.Product;
+import com.sitecraft.backend.Models.Store;
+import com.sitecraft.backend.Repositories.CategoryRepo;
+import com.sitecraft.backend.Repositories.ProductRepo;
+import com.sitecraft.backend.Repositories.StoreRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class CategoryService {
+
+    @Autowired
+    private CategoryRepo categoryRepo;
+
+    @Autowired
+    private ProductRepo productRepo;
+
+    @Autowired
+    private StoreRepo storeRepo;
+
+    // Basic CRUD Operations
+    public List<Category> getAllCategories(Long storeId) {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+        return categoryRepo.findByStoreId(existingStore.getId());
+    }
+
+    public Category getCategoryById(Long id, Long storeId) {
+        Category category = categoryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        // Validate store ID match
+        if (!category.getStore().getId().equals(storeId)) {
+            throw new RuntimeException("Unauthorized access to this category");
+        }
+
+        return category;
+    }
+
+    public Category createCategory(Category category, Long storeId) {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        // Check if category name already exists for this store
+        if (categoryRepo.existsByNameAndStoreId(category.getName(), storeId)) {
+            throw new RuntimeException("Category name already exists in this store");
+        }
+
+        category.setStore(existingStore);
+        return categoryRepo.save(category);
+    }
+
+    public Category updateCategory(Long id, Category updatedCategory, Long storeId) {
+        Category existingCategory = getCategoryById(id, storeId);
+
+        if (updatedCategory.getName() != null) {
+            // Check name uniqueness if changing name
+            if (!existingCategory.getName().equals(updatedCategory.getName()) &&
+                categoryRepo.existsByNameAndStoreId(updatedCategory.getName(), storeId)) {
+                throw new RuntimeException("Category name already exists in this store");
+            }
+            existingCategory.setName(updatedCategory.getName());
+        }
+        if (updatedCategory.getImage() != null) {
+            existingCategory.setImage(updatedCategory.getImage());
+        }
+        if (updatedCategory.getDescription() != null) {
+            existingCategory.setDescription(updatedCategory.getDescription());
+        }
+
+        return categoryRepo.save(existingCategory);
+    }
+
+    public void deleteCategory(Long id, Long storeId) {
+        Category category = getCategoryById(id, storeId);
+
+        // Check if category has products
+        Long productCount = categoryRepo.countProductsByCategoryId(id);
+        if (productCount > 0) {
+            throw new RuntimeException("Cannot delete category with products. Please move or delete products first.");
+        }
+
+        categoryRepo.deleteById(id);
+    }
+
+    // Search functionality
+    public List<Category> searchCategories(String search, Long storeId) {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        if (search == null || search.trim().isEmpty()) {
+            return categoryRepo.findByStoreId(storeId);
+        }
+        return categoryRepo.findByStoreIdAndNameContaining(storeId, search.trim());
+    }
+
+    // Product assignment
+    public List<Product> getCategoryProducts(Long categoryId, Long storeId) {
+        Category category = getCategoryById(categoryId, storeId);
+        return category.getProducts();
+    }
+
+    public void assignProductsToCategory(Long categoryId, List<Long> productIds, Long storeId) {
+        Category category = getCategoryById(categoryId, storeId);
+
+        List<Product> products = productRepo.findAllById(productIds);
+        for (Product product : products) {
+            if (!product.getStore().getId().equals(storeId)) {
+                throw new RuntimeException("Product does not belong to this store");
+            }
+            product.setCategory(category);
+        }
+
+        productRepo.saveAll(products);
+    }
+
+    public void removeProductFromCategory(Long categoryId, Long productId, Long storeId) {
+        getCategoryById(categoryId, storeId); // Validate category access
+
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (!product.getStore().getId().equals(storeId)) {
+            throw new RuntimeException("Product does not belong to this store");
+        }
+
+        if (product.getCategory() == null || !product.getCategory().getId().equals(categoryId)) {
+            throw new RuntimeException("Product does not belong to this category");
+        }
+
+        product.setCategory(null);
+        productRepo.save(product);
+    }
+
+    // Analytics
+    public Map<String, Object> getCategoryAnalytics(Long storeId) {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<Category> categories = categoryRepo.findByStoreId(storeId);
+        Map<String, Object> analytics = new HashMap<>();
+
+        Long totalCategories = (long) categories.size();
+        Long categoriesWithProducts = 0L;
+        String topCategoryName = "";
+        Long maxProducts = 0L;
+
+        for (Category category : categories) {
+            Long productCount = categoryRepo.countProductsByCategoryId(category.getId());
+            if (productCount > 0) {
+                categoriesWithProducts++;
+            }
+            if (productCount > maxProducts) {
+                maxProducts = productCount;
+                topCategoryName = category.getName();
+            }
+        }
+
+        analytics.put("totalCategories", totalCategories);
+        analytics.put("categoriesWithProducts", categoriesWithProducts);
+        analytics.put("categoriesWithoutProducts", totalCategories - categoriesWithProducts);
+
+        if (!topCategoryName.isEmpty()) {
+            Map<String, Object> topCategory = new HashMap<>();
+            topCategory.put("name", topCategoryName);
+            topCategory.put("productCount", maxProducts);
+            analytics.put("topPerformingCategory", topCategory);
+        }
+
+        return analytics;
+    }
+}
