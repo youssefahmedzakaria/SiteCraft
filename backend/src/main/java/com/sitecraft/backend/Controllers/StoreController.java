@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Controllers;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitecraft.backend.DTOs.StoreInfoDTO;
 import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Services.StoreService;
@@ -8,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,54 +27,117 @@ public class StoreController {
     private UserService userService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<?> createStore(@RequestBody Store store, @PathVariable Long userId) {
+    public ResponseEntity<?> createStore(
+            @RequestPart(value = "store") String storeJson,
+            @RequestPart(value = "logo", required = false) MultipartFile logo,
+            HttpSession session) {
+
         try {
-            Store createdStore = storeService.createStore(store, userId);
+            ObjectMapper mapper = new ObjectMapper();
+            Store newStore = mapper.readValue(storeJson, Store.class);
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+            if (logo != null && !logo.isEmpty()) {
+                // Generate unique filename
+                String originalFilename = logo.getOriginalFilename();
+                String extension = originalFilename != null ?
+                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                String filename = "Store_Logo" + storeId + "_" + logo.getOriginalFilename();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Store created successfully");
-            response.put("store", createdStore);
+                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId;
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                File destFile = new File(dir, filename);
+                logo.transferTo(destFile);
+
+                // Set new logo path relative to project (or public URL if you're serving it)
+                String logoUrl = "/uploads/stores/" + storeId + "/" + filename;
+                newStore.setLogo(logoUrl);
+            }
+
+            Store store = storeService.createStore(newStore, (Long) session.getAttribute("userId"));
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store created successfully",
+                    "store", store
+            ));
 
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "An unexpected error occurred: " + e.getMessage()
+            ));
         }
     }
 
     // ------------------------------ Account Settings ------------------------------------------------
 
     @PutMapping("/updateStoreInfo")
-    public ResponseEntity<?> updateStore(@RequestBody Store updatedStore, HttpSession session) {
+    public ResponseEntity<?> updateStore(
+            @RequestPart(value = "store") String storeJson,
+            @RequestPart(value = "logo", required = false) MultipartFile logo,
+            HttpSession session) {
+
         try {
+            ObjectMapper mapper = new ObjectMapper();
+            Store updatedStore = mapper.readValue(storeJson, Store.class);
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
+            Store existingStore = storeService.getStore(storeId);
+            // Delete old logo if a new one is uploaded
+            if (logo != null && !logo.isEmpty()) {
+                    String oldLogoPath = System.getProperty("user.dir") +existingStore.getLogo();
+                    System.out.println("------------------------------------------------------------------------");
+                    System.out.println(oldLogoPath);
+                    System.out.println("------------------------------------------------------------------------");
+                    File oldLogoFile = new File(oldLogoPath);
+                    if (oldLogoFile.exists()) {
+                        boolean deleted = oldLogoFile.delete();
+                        System.out.println("Old logo deleted: " + deleted);
+                    }
 
-            Store resultStore = storeService.updateStorePartial(storeId, updatedStore); // Call a new method that does partial update
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Store updated successfully");
-            response.put("store", resultStore);
+                // Generate unique filename
+                String originalFilename = logo.getOriginalFilename();
+                String extension = originalFilename != null ?
+                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                String filename = "Store_Logo" + storeId + "_" + logo.getOriginalFilename();
 
-            return ResponseEntity.ok(response);
+                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId;
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                File destFile = new File(dir, filename);
+                logo.transferTo(destFile);
+
+                // Set new logo path relative to project (or public URL if you're serving it)
+                String logoUrl = "/uploads/stores/" + storeId + "/" + filename;
+                updatedStore.setLogo(logoUrl);
+            }
+
+            Store resultStore = storeService.updateStorePartial(storeId, updatedStore);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store updated successfully",
+                    "store", resultStore
+            ));
 
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "An unexpected error occurred: " + e.getMessage()
+            ));
         }
     }
-
 
     @GetMapping("/getStoreSettings")
     public ResponseEntity<?> getStoreSettings(HttpSession session) {
