@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session, @RequestParam Long storeId) {
         try {
             boolean isExist = userService.isUserExists(loginRequest.getEmail());
 
@@ -89,7 +89,6 @@ public class AuthController {
     public void setSession(@RequestBody Map<String, Long> in, HttpSession session) {
         session.setAttribute("userId", in.get("userId"));
         session.setAttribute("storeId", in.get("storeId"));
-        session.setAttribute("role", in.get("role"));
     }
 
     public static class LoginRequest {
