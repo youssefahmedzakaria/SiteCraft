@@ -19,12 +19,14 @@ export default function CustomizeTemplatePage() {
         {/* Toolbar */}
         <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
           <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+            {/* preview */}
             <Button variant="outline" className="bg-white">
               <span className="flex items-center gap-2">
                 <Eye size={20} />
                 Preview
               </span>
             </Button>
+            {/* views */}
             <div className="flex border border-gray-200 rounded-md overflow-hidden">
               <button
                 className={`px-2 sm:px-4 py-2 text-sm ${

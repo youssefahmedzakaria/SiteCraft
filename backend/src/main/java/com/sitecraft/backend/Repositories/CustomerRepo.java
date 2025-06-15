@@ -49,6 +49,4 @@ public interface CustomerRepo extends JpaRepository<Customer, Long> {
       @Param("startDate") LocalDate startDate,
       @Param("endDate")   LocalDate endDate
   );
-
-
 }

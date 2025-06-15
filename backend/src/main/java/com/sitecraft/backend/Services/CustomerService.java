@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.time.LocalDate;
 
+
 @Service
 public class CustomerService {
     @Autowired
@@ -59,4 +60,14 @@ public class CustomerService {
             throw new RuntimeException("Failed to suspend Customer: " + e.getMessage());
         }
     }
+
+
+
+//    public List<Order> getCustomerOrders(Long customerId) {
+//        /* Optional sanity-check that customer exists */
+//        if (!customerRepo.existsById(customerId)) {
+//            throw new IllegalArgumentException("Customer not found");
+//        }
+//        return orderRepo.findByCustomerId(customerId);
+//    }
 }

@@ -15,6 +15,8 @@ import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
 import { RenderAboutSection } from "./renderAboutSection";
 import { RenderFooterSection } from "./renderFooterSection";
+import { RenderPoliciesSection } from "./renderPoliciesSection";
+import { RenderContactSection } from "./renderContactSection";
 
 interface Section {
   id: string;
@@ -41,6 +43,18 @@ export function Sidebar() {
     {
       id: "AboutUs",
       title: "About Us",
+      // icon: <Images size={18} />,
+      expanded: false,
+    },
+    {
+      id: "Policies",
+      title: "Policies",
+      // icon: <Images size={18} />,
+      expanded: false,
+    },
+    {
+      id: "ContactUs",
+      title: "Contact Us",
       // icon: <Images size={18} />,
       expanded: false,
     },
@@ -222,8 +236,12 @@ export function Sidebar() {
             <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "PromoSlider" ? (
             <RenderPromoSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "Policies" ? (
+            <RenderPoliciesSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "AboutUs" ? (
             <RenderAboutSection detailedSectionTab={detailedSectionTab} />
+          ) : detailedSection.id === "ContactUs" ? (
+            <RenderContactSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "Footer" ? (
             <RenderFooterSection detailedSectionTab={detailedSectionTab} />
           ) : null}
