@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.math.BigDecimal;
 
 @Service
 public class ProductService {
@@ -52,10 +53,12 @@ public class ProductService {
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setDiscountType(productDTO.getDiscountType());
-        product.setDiscountValue(productDTO.getDiscountValue());
-        product.setMinCap(productDTO.getMinCap());
-        product.setPercentageMax(productDTO.getPercentageMax());
-        product.setMaxCap(productDTO.getMaxCap());
+        product.setDiscountValue(
+            productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
+        );
+        product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
+        product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
+        product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
         product.setCategory(category);
         product.setStore(store);
 
@@ -96,10 +99,12 @@ public class ProductService {
         if (productDTO.getName() != null) product.setName(productDTO.getName());
         if (productDTO.getDescription() != null) product.setDescription(productDTO.getDescription());
         if (productDTO.getDiscountType() != null) product.setDiscountType(productDTO.getDiscountType());
-        if (productDTO.getDiscountValue() != null) product.setDiscountValue(productDTO.getDiscountValue());
-        if (productDTO.getMinCap() != null) product.setMinCap(productDTO.getMinCap());
-        if (productDTO.getPercentageMax() != null) product.setPercentageMax(productDTO.getPercentageMax());
-        if (productDTO.getMaxCap() != null) product.setMaxCap(productDTO.getMaxCap());
+        if (productDTO.getDiscountValue() != null) product.setDiscountValue(
+            productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
+        );
+        if (productDTO.getMinCap() != null) product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
+        if (productDTO.getPercentageMax() != null) product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
+        if (productDTO.getMaxCap() != null) product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
         
         if (productDTO.getCategoryId() != null) {
             Category category = categoryRepo.findById(productDTO.getCategoryId())
@@ -287,10 +292,12 @@ public class ProductService {
 
         for (Product product : products) {
             product.setDiscountType(discountType);
-            product.setDiscountValue(discountValue);
-            product.setMinCap(minCap);
-            product.setPercentageMax(percentageMax);
-            product.setMaxCap(maxCap);
+            product.setDiscountValue(
+                discountValue == null ? null : BigDecimal.valueOf(discountValue)
+            );
+            product.setMinCap(minCap == null ? null : BigDecimal.valueOf(minCap));
+            product.setPercentageMax(percentageMax == null ? null : BigDecimal.valueOf(percentageMax));
+            product.setMaxCap(maxCap == null ? null : BigDecimal.valueOf(maxCap));
         }
 
         productRepo.saveAll(products);

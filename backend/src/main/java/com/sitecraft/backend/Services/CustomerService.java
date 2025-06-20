@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 @Service
 public class CustomerService {
@@ -24,7 +25,7 @@ public class CustomerService {
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
             // Check if customer belongs to the store
-            if (!customer.getStoreId().equals(storeId)) {
+            if (customer.getStore() == null || !customer.getStore().getId().equals(storeId)) {
                 throw new IllegalAccessException("Customer does not belong to your store");
             }
 
