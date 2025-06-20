@@ -87,12 +87,40 @@ public class ProductService {
         if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
             for (ProductVariantDTO variantDTO : productDTO.getVariants()) {
                 ProductVariants variant = new ProductVariants();
-                variant.setSku(variantDTO.getSku());
                 variant.setStock(variantDTO.getStock());
                 variant.setPrice(variantDTO.getPrice());
                 variant.setProductionCost(variantDTO.getProductionCost());
                 variant.setProduct(savedProduct);
-                productVariantsRepo.save(variant);
+                ProductVariants savedVariant = productVariantsRepo.save(variant);
+
+                // Save VariantAttributeValues if provided
+                if (variantDTO.getAttributeValueIds() != null && !variantDTO.getAttributeValueIds().isEmpty()) {
+                    List<AttributeValue> attributeValues = attributeValueRepo.findAllById(variantDTO.getAttributeValueIds());
+                    List<String> attributePairs = new ArrayList<>();
+                    for (AttributeValue av : attributeValues) {
+                        ProductAttribute pa = av.getProductAttribute();
+                        if (pa != null) {
+                            attributePairs.add(pa.getAttributeName() + "-" + av.getAttributeValue());
+                        }
+                        // Save VariantAttributeValue
+                        VariantAttributeValue vav = new VariantAttributeValue();
+                        vav.setVariant(savedVariant);
+                        vav.setAttributeValue(av);
+                        variantAttributeValueRepo.save(vav);
+                    }
+                    // Generate SKU: storeId|productId|attributeName-attributeValue|...
+                    String sku = store.getId() + "|" + savedProduct.getId();
+                    if (!attributePairs.isEmpty()) {
+                        sku += "|" + String.join("|", attributePairs);
+                    }
+                    savedVariant.setSku(sku);
+                    productVariantsRepo.save(savedVariant);
+                } else {
+                    // Fallback SKU if no attributes
+                    String sku = store.getId() + "|" + savedProduct.getId() + "|" + savedVariant.getId();
+                    savedVariant.setSku(sku);
+                    productVariantsRepo.save(savedVariant);
+                }
             }
         }
 
