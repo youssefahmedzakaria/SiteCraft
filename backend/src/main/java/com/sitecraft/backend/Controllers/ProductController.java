@@ -152,44 +152,22 @@ public class ProductController {
         }
     }
 
+    /*
     @GetMapping("/filter")
-    public ResponseEntity<?> filterProducts(@RequestParam(required = false) String category,
-                                          @RequestParam(required = false) String stockStatus,
-                                          @RequestParam(required = false) String search,
-                                          HttpSession session) {
-        try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
-
-            List<Product> products = productService.filterProducts(category, stockStatus, search, storeId);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Products filtered successfully");
-            response.put("data", products);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+    public ResponseEntity<List<Product>> getFilteredProducts(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String stockStatus,
+            @RequestParam(required = false) String search,
+            @RequestParam Long storeId) {
+        
+        List<Product> products = productService.filterProducts(category, stockStatus, search, storeId);
+        return ResponseEntity.ok(products);
     }
+    */
 
-    @GetMapping("/stats")
-    public ResponseEntity<?> getProductStatistics(HttpSession session) {
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Object>> getProductStatistics(@RequestParam Long storeId) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
-
             Map<String, Object> stats = productService.getProductStatistics(storeId);
 
             Map<String, Object> response = new HashMap<>();

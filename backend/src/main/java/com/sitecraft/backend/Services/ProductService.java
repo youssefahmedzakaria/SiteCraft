@@ -29,6 +29,25 @@ public class ProductService {
     
     @Autowired
     private StoreRepo storeRepo;
+ 
+    @Autowired
+    private OrderRepo orderRepo;
+    @Autowired
+    private OrderProductRepo orderProductRepo;
+    @Autowired
+    private WishListProductRepo wishListProductRepo;
+    @Autowired
+    private CartProductRepo cartProductRepo;
+    @Autowired
+    private CategoryProductRepo categoryProductRepo;
+    @Autowired
+    private ReviewRepo reviewRepo;
+    @Autowired
+    private AttributeValueRepo attributeValueRepo;
+    @Autowired
+    private ProductAttributeRepo productAttributeRepo;
+    @Autowired
+    private VariantAttributeValueRepo variantAttributeValueRepo;
 
     public List<Product> getAllProducts(Long storeId) {
         return productRepo.findByStoreId(storeId);
@@ -116,110 +135,50 @@ public class ProductService {
     }    @Transactional
     public void deleteProduct(Long id, Long storeId) {
         try {
-            Product product = productRepo.findByIdAndStoreId(id, storeId)
+            Product product = productRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Product not found"));
-            
-            System.out.println("Starting deletion process for product ID: " + id);
-            
-            // Delete in the correct order based on foreign key dependencies
-            deleteProductDependencies(id);
-            
-            // Finally delete the product itself
+
+            // 1. Set productId to null in OrderProduct
+            List<OrderProduct> orderProducts = orderProductRepo.findByProductId(id);
+            for (OrderProduct op : orderProducts) {
+                op.setProduct(null);
+            }
+            orderProductRepo.saveAll(orderProducts);
+
+            // 2. Delete dependent entities in correct order
+            // a. VariantAttributeValue (via ProductVariants)
+            List<ProductVariants> variants = productVariantsRepo.findByProductId(id);
+            for (ProductVariants variant : variants) {
+                variantAttributeValueRepo.deleteAll(variantAttributeValueRepo.findAll().stream().filter(vav -> vav.getVariant().getId().equals(variant.getId())).toList());
+            }
+            // b. WishListProduct
+            wishListProductRepo.deleteAll(wishListProductRepo.findAll().stream().filter(wlp -> wlp.getProduct().getId().equals(id)).toList());
+            // c. CartProduct
+            cartProductRepo.deleteAll(cartProductRepo.findAll().stream().filter(cp -> cp.getProduct().getId().equals(id)).toList());
+            // d. CategoryProduct
+            categoryProductRepo.deleteAll(categoryProductRepo.findAll().stream().filter(cp -> cp.getProduct().getId().equals(id)).toList());
+            // e. Review
+            reviewRepo.deleteAll(reviewRepo.findAll().stream().filter(r -> r.getProduct().getId().equals(id)).toList());
+            // f. AttributeValue (via ProductAttribute)
+            List<ProductAttribute> attributes = productAttributeRepo.findAll().stream().filter(attr -> attr.getProduct().getId().equals(id)).toList();
+            for (ProductAttribute attr : attributes) {
+                attributeValueRepo.deleteAll(attributeValueRepo.findAll().stream().filter(av -> av.getProductAttribute().getId().equals(attr.getId())).toList());
+            }
+            // g. ProductAttribute
+            productAttributeRepo.deleteAll(attributes);
+            // h. ProductVariants
+            productVariantsRepo.deleteAll(variants);
+            // i. ProductImage
+            productImageRepo.deleteAll(productImageRepo.findByProductId(id));
+
+            // 3. Delete the product itself
             productRepo.delete(product);
-            
-            System.out.println("Product deletion completed successfully for ID: " + id);
-            
         } catch (Exception e) {
-            System.err.println("Error deleting product: " + e.getMessage());
             throw new RuntimeException("Error deleting product: " + e.getMessage(), e);
         }
     }
 
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public void deleteProductDependencies(Long productId) {
-        System.out.println("Deleting dependencies for product ID: " + productId);
-        
-        // Step 1: Delete VariantAttributeValue (references ProductVariants)
-        try {
-            productRepo.deleteVariantAttributeValuesByProductId(productId);
-            System.out.println("Deleted variant attribute values");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete variant attribute values: " + e.getMessage());
-        }
-        
-        // Step 2: Delete OrderProduct (references Product)
-        try {
-            productRepo.deleteOrderProductsByProductId(productId);
-            System.out.println("Deleted order products");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete order products: " + e.getMessage());
-        }
-        
-        // Step 3: Delete WishListProduct (references Product)
-        try {
-            productRepo.deleteWishListProductsByProductId(productId);
-            System.out.println("Deleted wishlist products");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete wishlist products: " + e.getMessage());
-        }
-        
-        // Step 4: Delete CartProduct (references Product)
-        try {
-            productRepo.deleteCartProductsByProductId(productId);
-            System.out.println("Deleted cart products");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete cart products: " + e.getMessage());
-        }
-        
-        // Step 5: Delete CategoryProduct (references Product)
-        try {
-            productRepo.deleteCategoryProductsByProductId(productId);
-            System.out.println("Deleted category products");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete category products: " + e.getMessage());
-        }
-        
-        // Step 6: Delete Review (references Product)
-        try {
-            productRepo.deleteReviewsByProductId(productId);
-            System.out.println("Deleted reviews");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete reviews: " + e.getMessage());
-        }
-        
-        // Step 7: Delete AttributeValue (references ProductAttribute)
-        try {
-            productRepo.deleteAttributeValuesByProductId(productId);
-            System.out.println("Deleted attribute values");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete attribute values: " + e.getMessage());
-        }
-        
-        // Step 8: Delete ProductAttribute (references Product)
-        try {
-            productRepo.deleteProductAttributesByProductId(productId);
-            System.out.println("Deleted product attributes");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete product attributes: " + e.getMessage());
-        }
-        
-        // Step 9: Delete ProductVariants (references Product)
-        try {
-            productVariantsRepo.deleteByProductId(productId);
-            System.out.println("Deleted product variants");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete product variants: " + e.getMessage());
-        }
-        
-        // Step 10: Delete ProductImage (references Product)
-        try {
-            productImageRepo.deleteByProductId(productId);
-            System.out.println("Deleted product images");
-        } catch (Exception e) {
-            System.out.println("Note: Could not delete product images: " + e.getMessage());
-        }
-    }
-
+    /*
     public List<Product> filterProducts(String category, String stockStatus, String search, Long storeId) {
         Long categoryId = null;
         if (category != null && !category.isEmpty()) {
@@ -231,6 +190,7 @@ public class ProductService {
 
         return productRepo.findProductsWithFilters(storeId, categoryId, search);
     }
+    */
 
     public Map<String, Object> getProductStatistics(Long storeId) {
         Map<String, Object> stats = new HashMap<>();
