@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
 
 @Service
 public class ProductService {
@@ -324,7 +326,7 @@ public class ProductService {
                 String filename = "product_" + productId + "_" + System.currentTimeMillis() + extension;
                 
                 // For now, simulate file storage (replace with actual file upload logic)
-                String imageUrl = "/uploads/products/" + productId + "/" + filename;
+                String imageUrl = "/uploads/products/" + "product" + productId + "/" + filename;
                 
                 // Save to database
                 ProductImage productImage = new ProductImage();
@@ -339,6 +341,55 @@ public class ProductService {
             return imageUrls;
         } catch (Exception e) {
             throw new RuntimeException("Error uploading images: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public Product createProductWithImages(ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
+        Product product = createProduct(productDTO, storeId);
+        if (images != null && !images.isEmpty()) {
+            saveProductImages(product.getStore().getId(), product.getId(), images, product);
+        }
+        return getProductById(product.getId(), storeId);
+    }
+
+    @Transactional
+    public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
+        Product product = updateProduct(id, productDTO, storeId);
+        if (images != null) {
+            // Remove old images
+            List<ProductImage> oldImages = productImageRepo.findByProductId(id);
+            for (ProductImage img : oldImages) {
+                String path = System.getProperty("user.dir") + img.getImageUrl();
+                File file = new File(path);
+                if (file.exists()) file.delete();
+            }
+            productImageRepo.deleteAll(oldImages);
+            // Save new images
+            if (!images.isEmpty()) {
+                saveProductImages(product.getStore().getId(), product.getId(), images, product);
+            }
+        }
+        return getProductById(product.getId(), storeId);
+    }
+
+    private void saveProductImages(Long storeId, Long productId, List<MultipartFile> images, Product product) throws IOException {
+        String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId + "/products/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        int count = 1;
+        String productNameSlug = product.getName().toLowerCase().replaceAll("[^a-z0-9]+", "-");
+        for (MultipartFile image : images) {
+            if (image.isEmpty()) continue;
+            String filename = productNameSlug + "_" + storeId + "_" + productId + "_img" + count + ".png";
+            File destFile = new File(dir, filename);
+            image.transferTo(destFile);
+            ProductImage productImage = new ProductImage();
+            productImage.setImageUrl("/uploads/stores/" + storeId + "/products/" + filename);
+            productImage.setAlt(product.getName() + " image " + count);
+            productImage.setProduct(product);
+            productImageRepo.save(productImage);
+            count++;
         }
     }
 }

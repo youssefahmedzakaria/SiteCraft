@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,59 +76,62 @@ public class ProductController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductCreateDTO productDTO, HttpSession session) {
+    @PostMapping("create")
+    public ResponseEntity<?> createProduct(
+        @RequestPart("product") String productJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
-
-            Product product = productService.createProduct(productDTO, storeId);
-
+            ObjectMapper mapper = new ObjectMapper();
+            ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
+            Product product = productService.createProductWithImages(productDTO, storeId, images);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product created successfully");
             response.put("data", product);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("message", e.getMessage());
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductCreateDTO productDTO, HttpSession session) {
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> updateProduct(
+        @PathVariable Long id,
+        @RequestPart("product") String productJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
-
-            Product product = productService.updateProduct(id, productDTO, storeId);
-
+            ObjectMapper mapper = new ObjectMapper();
+            ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
+            Product product = productService.updateProductWithImages(id, productDTO, storeId, images);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product updated successfully");
             response.put("data", product);
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("message", e.getMessage());
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id, HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
@@ -272,6 +276,7 @@ public class ProductController {
         }
     }
 
+    /*
     @PostMapping("/{id}/upload-images")
     public ResponseEntity<?> uploadProductImages(@PathVariable Long id, 
                                                @RequestParam("images") MultipartFile[] images, 
@@ -306,6 +311,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+    */
 
     @GetMapping("/{id}/images")
     public ResponseEntity<?> getProductImages(@PathVariable Long id, HttpSession session) {
