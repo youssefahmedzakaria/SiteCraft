@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session, @RequestParam Long storeId) {
         try {
             boolean isExist = userService.isUserExists(loginRequest.getEmail());
 
@@ -55,14 +55,9 @@ public class AuthController {
             }
 
             user.setPassword(null);
-            if (user.getRole().equals("staff")) {
-                session.setAttribute("staff", user.getId());
-                session.setAttribute("storeId", user.getStoreId());
-            }
-            else {
-                session.setAttribute("owner", user.getId());
-                session.setAttribute("storeId", user.getStoreId());
-            }
+            session.setAttribute("storeId", user.getStoreId());
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("role", user.getRole());
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body("User logged in successfully.");
 
@@ -85,13 +80,14 @@ public class AuthController {
     public ResponseEntity getSession(HttpSession session) {
         Map<String, Object> sessionData = new HashMap<>();
         sessionData.put("storeId", session.getAttribute("storeId"));
-        sessionData.put("owner", session.getAttribute("owner"));
+        sessionData.put("userId", session.getAttribute("userId"));
+        sessionData.put("role", session.getAttribute("role"));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
 
     @PostMapping("/setSession")
     public void setSession(@RequestBody Map<String, Long> in, HttpSession session) {
-        session.setAttribute("owner", in.get("owner"));
+        session.setAttribute("userId", in.get("userId"));
         session.setAttribute("storeId", in.get("storeId"));
     }
 

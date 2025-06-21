@@ -1,5 +1,5 @@
 package com.sitecraft.backend.Models;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,23 +13,20 @@ public class UserRole {
     @Column(name = "role")
     private String role;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 
-    @Column(name = "store_id")
     private Long storeId;
 
-    // Constructors
-    public UserRole() {
-    }
-
-    public UserRole(String role, Long userId, Long storeId) {
+    public UserRole(String role, Users user, Long storeId) {
         this.role = role;
-        this.userId = userId;
+        this.user = user;
         this.storeId = storeId;
     }
 
-    // Getters and Setters
+    public UserRole() {}
+
     public Long getId() {
         return id;
     }
@@ -46,12 +43,12 @@ public class UserRole {
         this.role = role;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public Long getStoreId() {

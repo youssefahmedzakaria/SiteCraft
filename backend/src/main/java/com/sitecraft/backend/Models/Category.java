@@ -1,11 +1,10 @@
 package com.sitecraft.backend.Models;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
+import java.util.List;
 
-// Category.java
 @Entity
-@Table(name = "Category")
-
+@Table(name = "category")
 public class Category {
 
     @Id
@@ -13,25 +12,29 @@ public class Category {
     private Long id;
 
     private String name;
-    private String image;
+
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String image;
+
+    @ManyToOne
     @JoinColumn(name = "store_id")
-    @JsonIgnore
     private Store store;
 
-    public Category(Long id, String name, String image, String description, Store store) {
-        this.id = id;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
+
+    // Constructors
+    public Category() {}
+
+    public Category(String name, String description, String image, Store store) {
         this.name = name;
-        this.image = image;
         this.description = description;
+        this.image = image;
         this.store = store;
     }
 
-    public Category() {
-    }
-
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -48,14 +51,6 @@ public class Category {
         this.name = name;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -64,11 +59,27 @@ public class Category {
         this.description = description;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public Store getStore() {
         return store;
     }
 
     public void setStore(Store store) {
         this.store = store;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

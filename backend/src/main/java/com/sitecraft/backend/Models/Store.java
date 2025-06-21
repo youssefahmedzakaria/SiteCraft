@@ -46,6 +46,7 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
+
     // Constructors
     public Store() {
     }
@@ -67,6 +68,7 @@ public class Store {
         this.policies = policies;
         this.aboutUs = aboutUs;
         this.shippingInfo = shippingInfo;
+
     }
 
     // Getters and Setters
@@ -197,4 +199,5 @@ public class Store {
     public void setShippingInfo(List<ShippingInfo> shippingInfo) {
         this.shippingInfo = shippingInfo;
     }
+
 }
