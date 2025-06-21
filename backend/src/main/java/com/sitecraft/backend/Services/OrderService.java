@@ -1,10 +1,12 @@
 package com.sitecraft.backend.Services;
+
 import com.sitecraft.backend.Models.Order;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Repositories.OrderRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +21,8 @@ public class OrderService {
 
     public List<Order> getAllOrders(Long storeId) {
         Store existingStore = storeRepo.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+            .orElseThrow(() -> new RuntimeException("Store not found"));
+
         return orderRepo.findByStoreId(existingStore.getId());
     }
 
@@ -42,7 +45,6 @@ public class OrderService {
 
     public Order updateOrderStatus(Long orderId, String newStatus) {
         Optional<Order> orderOptional = orderRepo.findById(orderId);
-
         if (orderOptional.isEmpty()) {
             throw new RuntimeException("Order not found.");
         }
