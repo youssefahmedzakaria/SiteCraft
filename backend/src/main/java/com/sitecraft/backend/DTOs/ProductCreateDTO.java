@@ -11,6 +11,7 @@ public class ProductCreateDTO {
     private Double percentageMax;
     private Double maxCap;
     private Long categoryId;
+    private List<ProductAttributeDTO> attributes;
     private List<ProductVariantDTO> variants;
     private List<String> imageUrls;
 
@@ -41,6 +42,9 @@ public class ProductCreateDTO {
 
     public Long getCategoryId() { return categoryId; }
     public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    public List<ProductAttributeDTO> getAttributes() { return attributes; }
+    public void setAttributes(List<ProductAttributeDTO> attributes) { this.attributes = attributes; }
 
     public List<ProductVariantDTO> getVariants() { return variants; }
     public void setVariants(List<ProductVariantDTO> variants) { this.variants = variants; }

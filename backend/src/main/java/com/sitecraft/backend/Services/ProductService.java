@@ -2,6 +2,8 @@ package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.DTOs.ProductCreateDTO;
 import com.sitecraft.backend.DTOs.ProductVariantDTO;
+import com.sitecraft.backend.DTOs.ProductAttributeDTO;
+import com.sitecraft.backend.DTOs.VariantAttributeDTO;
 import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,14 +64,12 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(ProductCreateDTO productDTO, Long storeId) {
-        // Get store and category
         Store store = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
-        
+
         Category category = categoryRepo.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        // Create product
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
@@ -85,7 +85,30 @@ public class ProductService {
 
         Product savedProduct = productRepo.save(product);
 
-        // Save variants if provided
+        Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
+
+        if (productDTO.getAttributes() != null && !productDTO.getAttributes().isEmpty()) {
+            for (ProductAttributeDTO attrDTO : productDTO.getAttributes()) {
+                ProductAttribute productAttribute = new ProductAttribute();
+                productAttribute.setProduct(savedProduct);
+                productAttribute.setAttributeName(attrDTO.getName());
+
+                Map<String, AttributeValue> valueMap = new HashMap<>();
+                List<AttributeValue> attributeValues = new ArrayList<>();
+
+                for (String value : attrDTO.getValues()) {
+                    AttributeValue attributeValue = new AttributeValue();
+                    attributeValue.setAttributeValue(value);
+                    attributeValue.setProductAttribute(productAttribute);
+                    attributeValues.add(attributeValue);
+                    valueMap.put(value, attributeValue);
+                }
+                productAttribute.setAttributeValues(attributeValues);
+                productAttributeRepo.save(productAttribute);
+                createdAttributes.put(attrDTO.getName(), valueMap);
+            }
+        }
+
         if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
             for (ProductVariantDTO variantDTO : productDTO.getVariants()) {
                 ProductVariants variant = new ProductVariants();
@@ -93,40 +116,32 @@ public class ProductService {
                 variant.setPrice(variantDTO.getPrice());
                 variant.setProductionCost(variantDTO.getProductionCost());
                 variant.setProduct(savedProduct);
-                ProductVariants savedVariant = productVariantsRepo.save(variant);
 
-                // Save VariantAttributeValues if provided
-                if (variantDTO.getAttributeValueIds() != null && !variantDTO.getAttributeValueIds().isEmpty()) {
-                    List<AttributeValue> attributeValues = attributeValueRepo.findAllById(variantDTO.getAttributeValueIds());
-                    List<String> attributePairs = new ArrayList<>();
-                    for (AttributeValue av : attributeValues) {
-                        ProductAttribute pa = av.getProductAttribute();
-                        if (pa != null) {
-                            attributePairs.add(pa.getAttributeName() + "-" + av.getAttributeValue());
-                        }
-                        // Save VariantAttributeValue
+                ProductVariants savedVariant = productVariantsRepo.save(variant);
+                List<String> attributePairsForSku = new ArrayList<>();
+
+                if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
+                    for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
+                        AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
                         VariantAttributeValue vav = new VariantAttributeValue();
                         vav.setVariant(savedVariant);
                         vav.setAttributeValue(av);
                         variantAttributeValueRepo.save(vav);
+                        attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
                     }
-                    // Generate SKU: storeId|productId|attributeName-attributeValue|...
-                    String sku = store.getId() + "|" + savedProduct.getId();
-                    if (!attributePairs.isEmpty()) {
-                        sku += "|" + String.join("|", attributePairs);
-                    }
-                    savedVariant.setSku(sku);
-                    productVariantsRepo.save(savedVariant);
-                } else {
-                    // Fallback SKU if no attributes
-                    String sku = store.getId() + "|" + savedProduct.getId() + "|" + savedVariant.getId();
-                    savedVariant.setSku(sku);
-                    productVariantsRepo.save(savedVariant);
                 }
+
+                Collections.sort(attributePairsForSku);
+                String attributesString = String.join("|", attributePairsForSku);
+                String generatedSku = savedProduct.getStore().getId() + "|" + savedProduct.getId();
+                if (!attributesString.isEmpty()) {
+                    generatedSku += "|" + attributesString;
+                }
+                variant.setSku(generatedSku);
+                productVariantsRepo.save(variant);
             }
         }
 
-        // Save images if provided
         if (productDTO.getImageUrls() != null && !productDTO.getImageUrls().isEmpty()) {
             for (String imageUrl : productDTO.getImageUrls()) {
                 ProductImage image = new ProductImage();
@@ -161,8 +176,85 @@ public class ProductService {
             product.setCategory(category);
         }
 
+        // Only update variants and attributes if they are provided in the DTO
+        if (productDTO.getAttributes() != null) {
+            // Delete old attributes and variants in the correct order
+            List<ProductVariants> variantsToDelete = new ArrayList<>(product.getVariants());
+            for (ProductVariants variant : variantsToDelete) {
+                List<VariantAttributeValue> vavsToDelete = variantAttributeValueRepo.findByVariant(variant);
+                variantAttributeValueRepo.deleteAll(vavsToDelete);
+            }
+            productVariantsRepo.deleteAll(variantsToDelete);
+            productAttributeRepo.deleteAll(product.getAttributes());
+
+            product.getAttributes().clear();
+            product.getVariants().clear();
+
+            // Re-create attributes and variants
+            Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
+
+            if (productDTO.getAttributes() != null && !productDTO.getAttributes().isEmpty()) {
+                for (ProductAttributeDTO attrDTO : productDTO.getAttributes()) {
+                    ProductAttribute productAttribute = new ProductAttribute();
+                    productAttribute.setProduct(product);
+                    productAttribute.setAttributeName(attrDTO.getName());
+
+                    Map<String, AttributeValue> valueMap = new HashMap<>();
+                    List<AttributeValue> attributeValues = new ArrayList<>();
+
+                    for (String value : attrDTO.getValues()) {
+                        AttributeValue attributeValue = new AttributeValue();
+                        attributeValue.setAttributeValue(value);
+                        attributeValue.setProductAttribute(productAttribute);
+                        attributeValues.add(attributeValue);
+                        valueMap.put(value, attributeValue);
+                    }
+                    productAttribute.setAttributeValues(attributeValues);
+                    productAttributeRepo.save(productAttribute);
+                    product.getAttributes().add(productAttribute);
+                    createdAttributes.put(attrDTO.getName(), valueMap);
+                }
+            }
+
+            if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+                for (ProductVariantDTO variantDTO : productDTO.getVariants()) {
+                    ProductVariants variant = new ProductVariants();
+                    variant.setStock(variantDTO.getStock());
+                    variant.setPrice(variantDTO.getPrice());
+                    variant.setProductionCost(variantDTO.getProductionCost());
+                    variant.setProduct(product);
+
+                    ProductVariants savedVariant = productVariantsRepo.save(variant);
+                    product.getVariants().add(savedVariant);
+                    List<String> attributePairsForSku = new ArrayList<>();
+
+                    if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
+                        for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
+                            AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
+                            VariantAttributeValue vav = new VariantAttributeValue();
+                            vav.setVariant(savedVariant);
+                            vav.setAttributeValue(av);
+                            variantAttributeValueRepo.save(vav);
+                            attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                        }
+                    }
+
+                    Collections.sort(attributePairsForSku);
+                    String attributesString = String.join("|", attributePairsForSku);
+                    String generatedSku = product.getStore().getId() + "|" + product.getId();
+                     if (!attributesString.isEmpty()) {
+                        generatedSku += "|" + attributesString;
+                    }
+                    variant.setSku(generatedSku);
+                    productVariantsRepo.save(variant);
+                }
+            }
+        }
+
         return productRepo.save(product);
-    }    @Transactional
+    }
+
+    @Transactional
     public void deleteProduct(Long id, Long storeId) {
         try {
             Product product = productRepo.findById(id)
