@@ -6,8 +6,12 @@ import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Repositories.CategoryRepo;
 import com.sitecraft.backend.Repositories.ProductRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
+import com.sitecraft.backend.DTOs.CategoryCreateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,35 +48,48 @@ public class CategoryService {
         return category;
     }
 
-    public Category createCategory(Category category, Long storeId) {
+    public Category createCategory(CategoryCreateDTO categoryDTO, Long storeId, MultipartFile image) throws IOException {
         Store existingStore = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-        // Check if category name already exists for this store
-        if (categoryRepo.existsByNameAndStoreId(category.getName(), storeId)) {
+        if (categoryRepo.existsByNameAndStoreId(categoryDTO.getName(), storeId)) {
             throw new RuntimeException("Category name already exists in this store");
         }
 
+        Category category = new Category();
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
         category.setStore(existingStore);
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = saveCategoryImage(storeId, category.getName(), image);
+            category.setImage(imageUrl);
+        }
+
         return categoryRepo.save(category);
     }
 
-    public Category updateCategory(Long id, Category updatedCategory, Long storeId) {
+    public Category updateCategory(Long id, CategoryCreateDTO categoryDTO, Long storeId, MultipartFile image) throws IOException {
         Category existingCategory = getCategoryById(id, storeId);
 
-        if (updatedCategory.getName() != null) {
-            // Check name uniqueness if changing name
-            if (!existingCategory.getName().equals(updatedCategory.getName()) &&
-                categoryRepo.existsByNameAndStoreId(updatedCategory.getName(), storeId)) {
+        if (categoryDTO.getName() != null) {
+            if (!existingCategory.getName().equals(categoryDTO.getName()) &&
+                categoryRepo.existsByNameAndStoreId(categoryDTO.getName(), storeId)) {
                 throw new RuntimeException("Category name already exists in this store");
             }
-            existingCategory.setName(updatedCategory.getName());
+            existingCategory.setName(categoryDTO.getName());
         }
-        if (updatedCategory.getImage() != null) {
-            existingCategory.setImage(updatedCategory.getImage());
+
+        if (categoryDTO.getDescription() != null) {
+            existingCategory.setDescription(categoryDTO.getDescription());
         }
-        if (updatedCategory.getDescription() != null) {
-            existingCategory.setDescription(updatedCategory.getDescription());
+
+        if (image != null && !image.isEmpty()) {
+            if (existingCategory.getImage() != null && !existingCategory.getImage().isEmpty()) {
+                deleteCategoryImageFile(existingCategory.getImage());
+            }
+            String newImageUrl = saveCategoryImage(storeId, existingCategory.getName(), image);
+            existingCategory.setImage(newImageUrl);
         }
 
         return categoryRepo.save(existingCategory);
@@ -87,18 +104,8 @@ public class CategoryService {
             throw new RuntimeException("Cannot delete category with products. Please move or delete products first.");
         }
 
+        deleteCategoryImageFile(category.getImage());
         categoryRepo.deleteById(id);
-    }
-
-    // Search functionality
-    public List<Category> searchCategories(String search, Long storeId) {
-        Store existingStore = storeRepo.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
-
-        if (search == null || search.trim().isEmpty()) {
-            return categoryRepo.findByStoreId(storeId);
-        }
-        return categoryRepo.findByStoreIdAndNameContaining(storeId, search.trim());
     }
 
     // Product assignment
@@ -175,5 +182,28 @@ public class CategoryService {
         }
 
         return analytics;
+    }
+
+    private String saveCategoryImage(Long storeId, String categoryName, MultipartFile image) throws IOException {
+        String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId + "/categories/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        String categoryNameSlug = categoryName.toLowerCase().replaceAll("[^a-z0-9]+", "-");
+        String filename = categoryNameSlug + "_" + storeId + "_" + System.currentTimeMillis() + ".png";
+
+        File destFile = new File(dir, filename);
+        image.transferTo(destFile);
+
+        return "/uploads/stores/" + storeId + "/categories/" + filename;
+    }
+
+    private void deleteCategoryImageFile(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) return;
+        String path = System.getProperty("user.dir") + imageUrl;
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }
