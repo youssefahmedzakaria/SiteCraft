@@ -1,11 +1,13 @@
+import {heroui} from '@heroui/theme';
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/components/(date-picker|button|ripple|spinner|calendar|date-input|form|popover).js"
   ],
   theme: {
     container: {
@@ -50,6 +52,17 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        logo: {
+          'txt': '#cc7860f2', // 95% opacity
+          'txt-hover': '#cc7860cc', // 80% - 90% opacity (cc7860e6)
+          'border': '#cc78604d', // 30% opacity
+          'light-button-hover': '#cc78601a', // 10% opacity
+          'dark-button': '#a95d47f2', // 95% opacity
+          'dark-button-hover': '#a95d47e6', // 90% opacity
+          'dark-button-active': '#a95d47cc', // 80% opacity
+          'colored-bg': '#a95d470d', // 5% opacity
+          'left-nav': '#263238', // 100% opacity #455a64 #e0e0e0
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -72,7 +85,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"),heroui()],
 }
 
 export default config 

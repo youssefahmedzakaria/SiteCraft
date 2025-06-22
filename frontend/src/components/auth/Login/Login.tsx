@@ -3,7 +3,7 @@
 import React from 'react'
 import styles from './Login.module.css'
 import { useAuth } from '@/hooks/useAuth'
-import { LoginForm } from './LoginForm'
+import { LoginForm } from '@/components/auth/Login/login-form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const Login = () => {

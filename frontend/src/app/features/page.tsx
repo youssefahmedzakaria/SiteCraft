@@ -68,7 +68,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="container py-16">
+    <div className="container pt-24 pb-16">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Features</h1>
         <p className="text-xl text-muted-foreground">
@@ -78,7 +78,7 @@ export default function FeaturesPage() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <div key={index} className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
+          <div key={index} className="p-6 border rounded-lg border-logo-border">
             <feature.icon className="h-12 w-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
             <p className="text-muted-foreground">{feature.description}</p>
