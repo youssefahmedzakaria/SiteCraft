@@ -1,8 +1,6 @@
 package com.sitecraft.backend.Services;
-import com.sitecraft.backend.Models.ShippingInfo;
-import com.sitecraft.backend.Models.Store;
-import com.sitecraft.backend.Models.UserRole;
-import com.sitecraft.backend.Models.Users;
+import com.sitecraft.backend.Models.*;
+import com.sitecraft.backend.Repositories.OTPRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.Repositories.UserRepo;
 import com.sitecraft.backend.Repositories.UserRoleRepo;
@@ -12,7 +10,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,7 +28,7 @@ public class UserService {
     private UserRoleRepo userRoleRepo;
 
     @Autowired
-    private StoreRepo storeRepo;
+    private OTPRepo otpRepo;
 
     private final JavaMailSender mailSender; // You need to configure this
 
@@ -71,6 +73,73 @@ public class UserService {
         user.setStoreId(storeId);
         return user;
     }
+
+    public void sendOTP(String email) {
+        Users user = userRepo.findByEmail(email);
+        if (user == null) return;
+
+        // Deactivate old OTPs
+        List<OTP> oldOtps = otpRepo.findByUserIdAndActiveTrue(user.getId());
+        for (OTP o : oldOtps) {
+            o.setActive(false);
+        }
+        otpRepo.saveAll(oldOtps);
+
+        // 1. Generate a 6-digit random OTP
+        String otpCode = String.format("%06d", new Random().nextInt(999999));
+
+        OTP otp = new OTP();
+        otp.setCode(otpCode);
+        otp.setActive(true);
+        otp.setUserId(user.getId());
+        otp.setUserType("user");
+        otp.setCreatedAt(LocalDateTime.now());
+        otp.setExpiresAt(LocalDateTime.now().plusMinutes(5)); // expires in 5 minutes
+        otpRepo.save(otp);
+
+        // 3. Send OTP by email
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Your OTP Code");
+        message.setText("Your OTP is: " + otpCode + "\nIt is valid for 5 minutes.");
+        mailSender.send(message);
+    }
+
+    public void verifyOTP(String email, String code) {
+        try {
+            Users user = userRepo.findByEmail(email);
+            OTP otp = otpRepo.findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(user.getId(), code, LocalDateTime.now());
+
+
+            if (otp == null) {
+                throw new RuntimeException("Invalid or expired OTP");
+            }
+
+            // Deactivate OTP
+            otp.setActive(false);
+            otpRepo.save(otp);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to verify OTP: " + e.getMessage(), e);
+        }
+    }
+
+    public void resetPassword(String email, String newPassword) {
+        try {
+            Users user = userRepo.findByEmail(email);
+            if (user == null)
+            {
+                throw new RuntimeException("User not found");
+            }
+
+            String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
+            user.setPassword(encodedPassword);
+            userRepo.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to reset password: " + e.getMessage(), e);
+        }
+    }
+
 
     // -------------------------------------------- staff management ---------------------------------------------------
 
