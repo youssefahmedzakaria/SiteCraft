@@ -6,6 +6,7 @@ import com.sitecraft.backend.Services.AnalyticsService.DailySales;
 import com.sitecraft.backend.Services.AnalyticsService.CategorySales;
 import com.sitecraft.backend.Services.AnalyticsService.DailyNetProfit;
 import com.sitecraft.backend.Services.AnalyticsService.SalesByProduct;
+import com.sitecraft.backend.Services.AnalyticsService.SourceCount;
 import com.sitecraft.backend.Repositories.WishlistAnalyticsDao.WishlistTrend;
 import com.sitecraft.backend.Services.CustomerService;
 
@@ -13,10 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
-import com.sitecraft.backend.Services.AnalyticsService.SourceCount;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,9 +36,11 @@ public class AnalyticsController {
     ) {
         this.analyticsService = analyticsService;
         this.customerService = customerService;
-    }    @GetMapping("/orders/count")
+    }
+
+    @GetMapping("/orders/count")
     public ResponseEntity<Long> getOrderCount(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -48,7 +50,7 @@ public class AnalyticsController {
 
     @GetMapping("/sales/total")
     public ResponseEntity<BigDecimal> getTotalSales(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -58,7 +60,7 @@ public class AnalyticsController {
 
     @GetMapping("/sales/daily")
     public ResponseEntity<List<DailySales>> getDailySales(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -68,7 +70,7 @@ public class AnalyticsController {
 
     @GetMapping("/profit/daily")
     public ResponseEntity<List<DailyNetProfit>> getDailyNetProfit(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -78,7 +80,7 @@ public class AnalyticsController {
 
     @GetMapping("/sales/category")
     public ResponseEntity<List<CategorySales>> getSalesByCategory(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -88,7 +90,7 @@ public class AnalyticsController {
 
     @GetMapping("/products/top")
     public ResponseEntity<List<ProductSales>> getTopProductsByDateRange(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
         @RequestParam(defaultValue = "5") int limit
@@ -99,7 +101,7 @@ public class AnalyticsController {
 
     @GetMapping("/wishlist/trends")
     public ResponseEntity<List<WishlistTrend>> getWishlistTrends(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -109,7 +111,7 @@ public class AnalyticsController {
 
     @GetMapping("/sales/product")
     public ResponseEntity<List<SalesByProduct>> getSalesByProduct(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -119,7 +121,7 @@ public class AnalyticsController {
 
     @GetMapping("/customers/new")
     public ResponseEntity<Long> getNewCustomers(
-        @RequestParam Long storeId,
+        @SessionAttribute("storeId") Long storeId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -128,28 +130,24 @@ public class AnalyticsController {
     }
 
     @GetMapping("/customers/returning")
-public ResponseEntity<Long> getReturningCustomers(
-    @RequestParam Long storeId,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-) {
-    long count = customerService.countReturningCustomersByDateRange(startDate, endDate, storeId);
-    return ResponseEntity.ok(count);
-}
+    public ResponseEntity<Long> getReturningCustomers(
+        @SessionAttribute("storeId") Long storeId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        long count = customerService.countReturningCustomersByDateRange(startDate, endDate, storeId);
+        return ResponseEntity.ok(count);
+    }
 
-@GetMapping("/customers/acquisition")
-public ResponseEntity<List<SourceCount>> getCustomerAcquisition(
-    @RequestParam Long storeId,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-) {
-    // start at 00:00:00 on startDate
-    LocalDateTime start = startDate.atStartOfDay();
-    // end at 23:59:59.999999999 on endDate
-    LocalDateTime end   = endDate.atTime(LocalTime.MAX);
-
-    List<SourceCount> acquisition = analyticsService.getVisitCountsBySource(start, end, storeId);
-    return ResponseEntity.ok(acquisition);
-}
-
+    @GetMapping("/customers/acquisition")
+    public ResponseEntity<List<SourceCount>> getCustomerAcquisition(
+        @SessionAttribute("storeId") Long storeId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end   = endDate.atTime(LocalTime.MAX);
+        List<SourceCount> acquisition = analyticsService.getVisitCountsBySource(start, end, storeId);
+        return ResponseEntity.ok(acquisition);
+    }
 }
