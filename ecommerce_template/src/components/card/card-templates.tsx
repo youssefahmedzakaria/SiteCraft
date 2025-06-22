@@ -7,15 +7,11 @@ import Link from "next/link"
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-
 type CardItemType = "product" | "category"
-
 
 type CardVariant = "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
 
-
 type ImageRatio = "square" | "portrait" | "landscape"
-
 
 type CornerRadius = "none" | "small" | "medium" | "large"
 
@@ -147,12 +143,27 @@ export default function FlexibleCard({
   // Get item description
   const description =
     type === "product"
-      ? item.additionalInfoSections?.find((section: any) => section.title === "shortDesc")?.description || ""
+      ? item.additionalInfoSections?.find((section: any) => section.title === "shortDesc")?.description ||
+        item.description ||
+        ""
       : "Explore our collection"
 
   // Get item image
   const imageUrl = item.media?.mainMedia?.image?.url || "/placeholder.svg?height=300&width=300"
   const secondaryImageUrl = item.media?.items?.[1]?.image?.url
+
+  // Get price value - handle multiple price structures
+  const getPrice = () => {
+    return item.price?.value || item.price?.price || 0
+  }
+
+  const getOriginalPrice = () => {
+    return item.price?.originalPrice || item.originalPrice || null
+  }
+
+  const formatPrice = (price: number) => {
+    return price.toFixed(2)
+  }
 
   // Wrap content in Link if needed
   const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -171,6 +182,31 @@ export default function FlexibleCard({
       e.preventDefault()
       ctaAction()
     }
+  }
+
+  // Enhanced price display component
+  const PriceDisplay = ({ className = "" }: { className?: string }) => {
+    if (!showPrice || type !== "product") return null
+
+    const currentPrice = getPrice()
+    const originalPrice = getOriginalPrice()
+    const isOnSale = originalPrice && originalPrice > currentPrice
+
+    return (
+      <div className={cn("flex items-center gap-2", className)}>
+        {isOnSale ? (
+          <>
+            <span className="text-sm line-through text-gray-500">${formatPrice(originalPrice)}</span>
+            <span className={cn("font-bold text-red-600")}>${formatPrice(currentPrice)}</span>
+            <span className="px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700 rounded-md">
+              {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
+            </span>
+          </>
+        ) : (
+          <span className={cn("font-semibold", textColor)}>${formatPrice(currentPrice)}</span>
+        )}
+      </div>
+    )
   }
 
   // Render different card variants
@@ -200,6 +236,7 @@ export default function FlexibleCard({
                   <div className={cn("text-center p-4", contentClassName)}>
                     <h3 className="text-white text-xl font-bold">{item.name}</h3>
                     {showDescription && <p className="text-white/80 text-sm mt-1">{description}</p>}
+                    <PriceDisplay className="justify-center mt-2 text-white" />
                     {showCta && (
                       <div
                         onClick={handleCtaClick}
@@ -241,9 +278,7 @@ export default function FlexibleCard({
           <div className={cn("space-y-1", contentClassName)}>
             {showTitle && <h3 className="text-sm font-medium truncate">{item.name}</h3>}
             {showSubtitle && <p className="text-xs text-gray-500 truncate">{description}</p>}
-            {showPrice && type === "product" && (
-              <div className={cn("text-sm font-semibold", textAccentClass)}>${item.price?.price}</div>
-            )}
+            <PriceDisplay className="text-sm" />
             {showSku && type === "product" && <div className="text-xs text-gray-400">SKU: {item.sku || "N/A"}</div>}
           </div>
         </div>
@@ -296,7 +331,7 @@ export default function FlexibleCard({
             {showSku && type === "product" && <div className="text-xs text-gray-400">SKU: {item.sku || "N/A"}</div>}
 
             <div className="flex justify-between items-center pt-2">
-              {showPrice && type === "product" && <span className="font-bold">${item.price?.price}</span>}
+              <PriceDisplay />
               {showCta && (
                 <button
                   onClick={handleCtaClick}
@@ -339,9 +374,7 @@ export default function FlexibleCard({
           </ContentWrapper>
           <div className={cn("mt-2", contentClassName)}>
             {showTitle && <h3 className="text-sm">{item.name}</h3>}
-            {showPrice && type === "product" && (
-              <div className={cn("text-sm font-medium", textAccentClass)}>${item.price?.price}</div>
-            )}
+            <PriceDisplay className="text-sm mt-1" />
           </div>
         </div>
       )
@@ -380,13 +413,25 @@ export default function FlexibleCard({
               {type === "product" && hoverEffect && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex gap-2">
-                    <button className="bg-white p-2 rounded-full shadow-md">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onAddToCart?.()
+                      }}
+                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    >
                       <ShoppingCart className="w-5 h-5" />
                     </button>
-                    <button className="bg-white p-2 rounded-full shadow-md">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onAddToFavorite?.()
+                      }}
+                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    >
                       <Heart className="w-5 h-5" />
                     </button>
-                    <button className="bg-white p-2 rounded-full shadow-md">
+                    <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
                       <Eye className="w-5 h-5" />
                     </button>
                   </div>
@@ -411,7 +456,7 @@ export default function FlexibleCard({
               </div>
             )}
             {showSku && type === "product" && <div className="text-xs text-gray-400">SKU: {item.sku || "N/A"}</div>}
-            {showPrice && type === "product" && <div className="font-semibold">${item.price?.price}</div>}
+            <PriceDisplay />
           </div>
         </div>
       )
@@ -440,6 +485,7 @@ export default function FlexibleCard({
                   <div className={cn("p-6", contentClassName)}>
                     <h3 className="text-white text-2xl font-bold">{item.name}</h3>
                     {showDescription && <p className="text-white/80 mt-1">{description}</p>}
+                    <PriceDisplay className="mt-2 text-white" />
                     {showCta && (
                       <div onClick={handleCtaClick} className="text-white/80 mt-2 cursor-pointer hover:text-white">
                         {ctaText}
@@ -477,8 +523,8 @@ export default function FlexibleCard({
                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => {
-                      e.preventDefault();
-                      onAddToCart?.();
+                      e.preventDefault()
+                      onAddToCart?.()
                     }}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
                   >
@@ -486,8 +532,8 @@ export default function FlexibleCard({
                   </button>
                   <button
                     onClick={(e) => {
-                      e.preventDefault();
-                      onAddToFavorite?.();
+                      e.preventDefault()
+                      onAddToFavorite?.()
                     }}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
                   >
@@ -501,15 +547,15 @@ export default function FlexibleCard({
             {showTitle && <h3 className="font-medium">{item.name}</h3>}
             {showSubtitle && <p className="text-sm text-gray-500">{description}</p>}
             <div className="flex justify-between items-center">
-              {showPrice && type === "product" && <span className="font-semibold">${item.price?.price}</span>}
+              <PriceDisplay />
               {showCta && (
                 <button
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.preventDefault()
                     if (type === "product") {
-                      onAddToCart?.();
+                      onAddToCart?.()
                     } else {
-                      ctaAction?.();
+                      ctaAction?.()
                     }
                   }}
                   className={cn("text-xs text-white px-3 py-1 rounded-full", buttonBgClass, buttonHoverClass)}

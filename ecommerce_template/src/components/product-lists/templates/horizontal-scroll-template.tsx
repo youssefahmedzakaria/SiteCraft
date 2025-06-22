@@ -193,6 +193,7 @@ export function HorizontalScrollProductTemplate({
         )}
       </div>
       {/* Show More Button */}
+      {showMoreButton &&(
       <div className="flex justify-end mt-6">
         <Link 
           href="/products" 
@@ -207,6 +208,7 @@ export function HorizontalScrollProductTemplate({
           {showMoreText}
         </Link>
       </div>
+      )}
     </div>
   )
 }

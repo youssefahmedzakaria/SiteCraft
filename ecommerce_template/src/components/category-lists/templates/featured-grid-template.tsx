@@ -127,6 +127,7 @@ export default function FeaturedGridCategoryTemplate({
       </div>
 
       {/* Show More Button */}
+      {showMoreButton &&(
       <div className="flex justify-end mt-6">
         <Link 
           href="/categories" 
@@ -141,6 +142,7 @@ export default function FeaturedGridCategoryTemplate({
           {showMoreText}
         </Link>
       </div>
+      )}
     </div>
   )
 }

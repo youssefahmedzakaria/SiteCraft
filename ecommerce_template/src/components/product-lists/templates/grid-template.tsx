@@ -1,5 +1,4 @@
 "use client"
-
 import Image from "next/image"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -125,21 +124,23 @@ export function GridProductTemplate({
         ))}
       </div>
       {/* Show More Button */}
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/products" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            "hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor
-
-          )}
-        >
-          {showMoreText}
-        </Link>
-      </div>
+      {showMoreButton && (
+        <div className="flex justify-end mt-6">
+          <Link 
+            href="/products" 
+            className={cn(
+              "inline-flex items-center px-6 py-2",
+              "hover:bg-opacity-80 transition-colors duration-300",
+              "rounded-lg text-sm font-medium",
+              showMorebuttonBgColor,
+              showMorebuttonTextColor
+            )}
+          >
+            {showMoreText}
+          </Link>
+        </div>
+      )}
+      
     </div>
   )
 }

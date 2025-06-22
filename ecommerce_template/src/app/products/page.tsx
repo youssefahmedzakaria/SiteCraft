@@ -1,983 +1,597 @@
 "use client"
-
-import { useState, useEffect, useRef } from "react"
-import Image from "next/image"
-import Link from "next/link"
+import { useState } from "react"
+import {GridProductTemplate,HorizontalScrollProductTemplate,ListViewProductTemplate,FeaturedGridProductTemplate} from "@/components/product-lists";
+import { ChevronLeft, ChevronRight, Filter, Search, User, ShoppingCart, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Filter, ChevronLeft, ChevronRight, Search, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// Generic product interface that can handle any product structure
-interface ProductAttribute {
-  [key: string]: any
-}
-
-interface ProductMedia {
-  [key: string]: any
-  url?: string
-}
-
-interface ProductPrice {
-  [key: string]: any
-  value?: number
-  currency?: string
-  compareAtPrice?: number
-  onSale?: boolean
-}
-
-interface Product {
-  id: string
-  title?: string
-  name?: string
-  description?: string
-  slug?: string
-  path?: string
-  media?: ProductMedia | ProductMedia[] | { [key: string]: ProductMedia }
-  price?: ProductPrice | number
-  category?: string | string[]
-  tags?: string[]
-  attributes?: ProductAttribute
-  [key: string]: any // Allow any additional fields
-}
-
-// Generic filter configuration
-interface FilterConfig {
-  id: string
-  type: "search" | "range" | "select" | "multiselect" | "checkbox" | "radio" | "toggle" | "color" | "size"
-  label: string
-  field: string // The field in the product object to filter on
-  options?: { label: string; value: string | number; color?: string }[] // For select, multiselect, checkbox, radio
-  min?: number // For range
-  max?: number // For range
-  step?: number // For range
-  defaultValue?: any
-  placeholder?: string
-  nestedField?: string // For nested fields like price.value
-}
-
-interface SortOption {
-  id: string
-  label: string
-  field: string
-  direction: "asc" | "desc"
-  nestedField?: string // For nested fields like price.value
-}
-
-interface ProductsPageConfig {
-  title?: string
-  perPage?: number
-  filters?: FilterConfig[]
-  sortOptions?: SortOption[]
-  layout?: {
-    defaultView?: "grid" | "list" | "compact"
-    allowViewChange?: boolean
-    columns?: {
-      sm?: number
-      md?: number
-      lg?: number
-    }
-  }
-  pagination?: {
-    enabled?: boolean
-    position?: "top" | "bottom" | "both"
-    type?: "numbered" | "loadMore" | "infinite"
-  }
-  urls?: {
-    product?: string // URL pattern for product pages, e.g., "/products/[slug]"
-    category?: string // URL pattern for category pages
-  }
-  currency?: {
-    code?: string
-    symbol?: string
-    position?: "before" | "after"
-  }
-  theme?: {
-    colors?: {
-      primary?: string
-      secondary?: string
-      accent?: string
-      background?: string
-      text?: string
-      border?: string
-    }
-    borderRadius?: string
-    cardShadow?: string
-  }
-}
-
-// Default configuration
-const defaultConfig: ProductsPageConfig = {
-  title: "Products",
-  perPage: 12,
-  filters: [
-    {
-      id: "search",
-      type: "search",
-      label: "Search",
-      field: "all", // Special case to search across multiple fields
-      placeholder: "Search products...",
-    },
-    {
-      id: "price",
-      type: "range",
-      label: "Price",
-      field: "price",
-      nestedField: "value",
-      min: 0,
-      max: 1000,
-      step: 10,
-      defaultValue: [0, 1000],
-    },
-    {
-      id: "category",
-      type: "multiselect",
-      label: "Categories",
-      field: "category",
-      options: [],
-    },
-  ],
-  sortOptions: [
-    { id: "featured", label: "Featured", field: "featured", direction: "desc" },
-    { id: "price-asc", label: "Price: Low to High", field: "price", nestedField: "value", direction: "asc" },
-    { id: "price-desc", label: "Price: High to Low", field: "price", nestedField: "value", direction: "desc" },
-    { id: "name-asc", label: "Name: A to Z", field: "name", direction: "asc" },
-    { id: "name-desc", label: "Name: Z to A", field: "name", direction: "desc" },
-    { id: "newest", label: "Newest", field: "createdAt", direction: "desc" },
-    { id: "oldest", label: "Oldest", field: "createdAt", direction: "asc" },
-  ],
-  layout: {
-    defaultView: "grid",
-    allowViewChange: true,
-    columns: { sm: 2, md: 3, lg: 4 },
+const products = [
+  {
+    id: 1,
+    name: "Diamond Solitaire Ring",
+    price: { value: 299.99 },
+    category: "Rings",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "diamond-solitaire-ring",
+    description: "Elegant diamond solitaire ring crafted in 18k gold",
+    inStock: true,
   },
-  pagination: {
-    enabled: true,
-    position: "bottom",
-    type: "numbered",
+  {
+    id: 2,
+    name: "Pearl Drop Earrings",
+    price: { value: 199.99 },
+    category: "Earrings",
+    media: { mainMedia: { image: { url: "/earing.jpg" } } },
+    slug: "pearl-drop-earrings",
+    description: "Classic pearl drop earrings with sterling silver",
+    inStock: true,
   },
-  urls: {
-    product: "/products/[slug]",
-    category: "/categories/[slug]",
+  {
+    id: 3,
+    name: "Gold Chain Necklace",
+    price: { value: 399.99 },
+    category: "Necklaces",
+    media: { mainMedia: { image: { url: "/neckless.jpg" } } },
+    slug: "gold-chain-necklace",
+    description: "Luxurious 14k gold chain necklace",
+    inStock: true,
   },
-  currency: {
-    code: "USD",
-    symbol: "$",
-    position: "before",
+  {
+    id: 4,
+    name: "Silver Hoop Earrings",
+    price: { value: 89.99 },
+    category: "Earrings",
+    media: { mainMedia: { image: { url: "/earing.jpg" } } },
+    slug: "silver-hoop-earrings",
+    description: "Modern silver hoop earrings for everyday wear",
+    inStock: false,
   },
-  theme: {
-    colors: {
-      primary: "bg-yellow-400 hover:bg-yellow-500 text-black",
-      secondary: "bg-gray-100 hover:bg-gray-200 text-gray-800",
-      accent: "bg-blue-600 hover:bg-blue-700 text-white",
-      background: "bg-white",
-      text: "text-gray-900",
-      border: "border-gray-200",
-    },
-    borderRadius: "rounded-md",
-    cardShadow: "shadow-sm hover:shadow-md",
+  {
+    id: 5,
+    name: "Ruby Engagement Ring",
+    price: { value: 599.99 },
+    category: "Rings",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "ruby-engagement-ring",
+    description: "Stunning ruby engagement ring with diamond accents",
+    inStock: true,
   },
-}
+  {
+    id: 6,
+    name: "Vintage Pearl Necklace",
+    price: { value: 449.99 },
+    category: "Necklaces",
+    media: { mainMedia: { image: { url: "/neckless.jpg" } } },
+    slug: "vintage-pearl-necklace",
+    description: "Vintage-inspired pearl necklace with gold clasp",
+    inStock: true,
+  },
+  {
+    id: 7,
+    name: "Tennis Bracelet",
+    price: { value: 799.99 },
+    category: "Bracelets",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "tennis-bracelet",
+    description: "Classic diamond tennis bracelet in white gold",
+    inStock: true,
+  },
+  {
+    id: 8,
+    name: "Luxury Watch",
+    price: { value: 1299.99 },
+    category: "Watches",
+    media: { mainMedia: { image: { url: "/earing.jpg" } } },
+    slug: "luxury-watch",
+    description: "Swiss-made luxury watch with leather strap",
+    inStock: true,
+  },
+  {
+    id: 9,
+    name: "Heart Pendant",
+    price: { value: 249.99 },
+    category: "Pendants",
+    media: { mainMedia: { image: { url: "/neckless.jpg" } } },
+    slug: "heart-pendant",
+    description: "Romantic heart pendant with diamond accent",
+    inStock: true,
+  },
+  {
+    id: 10,
+    name: "Charm Anklet",
+    price: { value: 129.99 },
+    category: "Anklets",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "charm-anklet",
+    description: "Delicate anklet with multiple charms",
+    inStock: true,
+  },
+  {
+    id: 11,
+    name: "Gold Chain",
+    price: { value: 349.99 },
+    category: "Chains",
+    media: { mainMedia: { image: { url: "/earing.jpg" } } },
+    slug: "gold-chain",
+    description: "18k gold chain for layering",
+    inStock: true,
+  },
+  {
+    id: 12,
+    name: "Lucky Charm",
+    price: { value: 79.99 },
+    category: "Charms",
+    media: { mainMedia: { image: { url: "/neckless.jpg" } } },
+    slug: "lucky-charm",
+    description: "Sterling silver lucky charm pendant",
+    inStock: true,
+  },
+  {
+    id: 13,
+    name: "Rose Gold Ring",
+    price: { value: 179.99 },
+    category: "Rings",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "rose-gold-ring",
+    description: "Beautiful rose gold ring with intricate design",
+    inStock: true,
+  },
+  {
+    id: 14,
+    name: "Crystal Earrings",
+    price: { value: 129.99 },
+    category: "Earrings",
+    media: { mainMedia: { image: { url: "/earing.jpg" } } },
+    slug: "crystal-earrings",
+    description: "Sparkling crystal drop earrings",
+    inStock: true,
+  },
+  {
+    id: 15,
+    name: "Infinity Necklace",
+    price: { value: 219.99 },
+    category: "Necklaces",
+    media: { mainMedia: { image: { url: "/neckless.jpg" } } },
+    slug: "infinity-necklace",
+    description: "Elegant infinity symbol necklace in silver",
+    inStock: true,
+  },
+  {
+    id: 16,
+    name: "Statement Bracelet",
+    price: { value: 329.99 },
+    category: "Bracelets",
+    media: { mainMedia: { image: { url: "/ring2.jpg" } } },
+    slug: "statement-bracelet",
+    description: "Bold statement bracelet with gemstones",
+    inStock: false,
+  },
+]
 
-// Helper function to get nested property value
-const getNestedValue = (obj: any, path: string | undefined, defaultValue: any = undefined): any => {
-  if (!path) return obj
-  const travel = (regexp: RegExp) =>
-    String.prototype.split
-      .call(path, regexp)
-      .filter(Boolean)
-      .reduce((res, key) => (res !== null && res !== undefined ? res[key] : res), obj)
-  const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/)
-  return result === undefined || result === obj ? defaultValue : result
-}
-
-// Helper function to format price
-const formatPrice = (price: any, config: ProductsPageConfig): string => {
-  if (price === undefined || price === null) return ""
-
-  let value: number
-  if (typeof price === "number") {
-    value = price
-  } else if (typeof price === "object" && "value" in price) {
-    value = price.value as number
-  } else if (typeof price === "object" && "price" in price) {
-    value = price.price as number
-  } else {
-    return ""
-  }
-
-  const symbol = config.currency?.symbol || "$"
-  const formattedValue = value.toFixed(2)
-
-  return config.currency?.position === "after" ? `${formattedValue} ${symbol}` : `${symbol}${formattedValue}`
-}
-
-// Helper function to get product image URL
-const getProductImageUrl = (product: Product): string => {
-  if (!product.media) return "/placeholder.svg"
-
-  if (typeof product.media === "string") return product.media
-
-  if (Array.isArray(product.media) && product.media.length > 0) {
-    const firstMedia = product.media[0]
-    return typeof firstMedia === "string" ? firstMedia : firstMedia.url || "/placeholder.svg"
-  }
-
-  if (typeof product.media === "object") {
-    // Try common patterns
-    if ("url" in product.media) return product.media.url as string
-    if ("src" in product.media) return product.media.src as string
-    if ("mainMedia" in product.media && typeof product.media.mainMedia === "object") {
-      const mainMedia = product.media.mainMedia
-      if ("url" in mainMedia) return mainMedia.url as string
-      if ("src" in mainMedia) return mainMedia.src as string
-      if ("image" in mainMedia && typeof mainMedia.image === "object" && "url" in mainMedia.image) {
-        return mainMedia.image.url as string
-      }
-    }
-    if ("featured" in product.media && typeof product.media.featured === "object") {
-      const featured = product.media.featured
-      if ("url" in featured) return featured.url as string
-      if ("src" in featured) return featured.src as string
-    }
-  }
-
-  return "/placeholder.svg"
-}
-
-// Helper function to get product name
-const getProductName = (product: Product): string => {
-  return product.name || product.title || "Untitled Product"
-}
-
-// Helper function to get product price
-const getProductPrice = (product: Product): number => {
-  if (typeof product.price === "number") return product.price
-  if (typeof product.price === "object" && "value" in product.price) return product.price.value as number
-  if (typeof product.price === "object" && "price" in product.price) return product.price.price as number
-  return 0
-}
-
-// Helper function to get product category
-const getProductCategory = (product: Product): string[] => {
-  if (!product.category) return []
-  if (typeof product.category === "string") return [product.category]
-  if (Array.isArray(product.category)) return product.category as string[]
-  return []
-}
-
-// Helper function to get product URL
-const getProductUrl = (product: Product, config: ProductsPageConfig): string => {
-  const urlPattern = config.urls?.product || "/products/[slug]"
-  const slug = product.slug || product.id
-  return urlPattern.replace("[slug]", slug)
-}
-
-// Helper function to extract all unique categories from products
-const extractCategories = (products: Product[]): { label: string; value: string }[] => {
-  const categoriesSet = new Set<string>()
-
-  products.forEach((product) => {
-    const categories = getProductCategory(product)
-    categories.forEach((category) => categoriesSet.add(category))
-  })
-
-  return Array.from(categoriesSet).map((category) => ({
-    label: category,
-    value: category,
-  }))
-}
-
-// Helper function to extract price range from products
-const extractPriceRange = (products: Product[]): [number, number] => {
-  if (products.length === 0) return [0, 1000]
-
-  let min = Number.MAX_VALUE
-  let max = Number.MIN_VALUE
-
-  products.forEach((product) => {
-    const price = getProductPrice(product)
-    if (price < min) min = price
-    if (price > max) max = price
-  })
-
-  // Round min down and max up to nearest 10
-  min = Math.floor(min / 10) * 10
-  max = Math.ceil(max / 10) * 10
-
-  return [min, max]
-}
-
-interface ProductsPageProps {
-  products: Product[]
-  config?: Partial<ProductsPageConfig>
-}
-
-export default function ProductsPage({ products: initialProducts = [], config: userConfig = {} }: ProductsPageProps) {
-  // Create a memoized config to prevent unnecessary re-renders
-  const configRef = useRef<ProductsPageConfig>({
-    ...defaultConfig,
-    ...userConfig,
-    filters: [...(defaultConfig.filters || []), ...(userConfig.filters || [])],
-    sortOptions: [...(defaultConfig.sortOptions || []), ...(userConfig.sortOptions || [])],
-    layout: {
-      ...defaultConfig.layout,
-      ...userConfig.layout,
-    },
-    pagination: {
-      ...defaultConfig.pagination,
-      ...userConfig.pagination,
-    },
-    urls: {
-      ...defaultConfig.urls,
-      ...userConfig.urls,
-    },
-    currency: {
-      ...defaultConfig.currency,
-      ...userConfig.currency,
-    },
-    theme: {
-      ...defaultConfig.theme,
-      ...userConfig.theme,
-      colors: {
-        ...defaultConfig.theme?.colors,
-        ...userConfig.theme?.colors,
-      },
-    },
-  })
-  const config = configRef.current
-
-  // State
-  const [products] = useState<Product[]>(initialProducts)
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(initialProducts)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+export default function JewelryProductsPage({
+  // Text configuration props
+  mainTitle = "Jewelry Products",
+  subtitle = "Discover our exquisite collection of handcrafted jewelry pieces, each designed to tell your unique story",
+  ctaText = "View Product",
+  
+  // Background and styling props
+  bgColor = "bg-[#F5ECD5]",
+  pageTitleColor = "text-[#4A102A]",
+  subtitleColor = "text-[#4A102A]/80",
+  fontFamily = "font-serif",
+  titleFont = "font-bold",
+  accentColor = "bg-black/20",
+  overlayColor = "bg-black/50",
+  
+  // Pagination props
+  itemsPerPage = 12,
+  showPagination = true,
+  
+  // Template selection and props
+  columns = { sm: 2, md: 3, lg: 3 },
+  showTitle = false,
+  textColor = "text-[#4A102A]",
+  borderRadius = "rounded-2xl",
+  hoverEffect = true,
+  gap = "gap-8",
+  imageHeight = "aspect-[4/3]",
+  titlePosition = "overlay" as "overlay" | "top" | "bottom",
+  showCta = true,
+  cornerRadius = "large" as "large" | "small" | "none" | "medium",
+  cardShadow = "shadow-xl hover:shadow-2xl",
+  showSubtitle = false,
+  borderColor = "border-white/20",
+  cardVariant = "hover" as "overlay" | "default" | "compact" | "detailed" | "minimal" | "hover" | "featured",
+  titleColor = "text-white",
+  titleFontSize = "text-3xl",
+  showMoreButton = false,
+  
+  // Filter props
+  showFilters = true,
+  enablePriceFilter = true,
+  enableCategoryFilter = true,
+  enableStockFilter = true,
+  enableSorting = true,
+  maxPriceLimit = 1500,
+}) {
   const [currentPage, setCurrentPage] = useState(1)
-  const [view, setView] = useState<"grid" | "list" | "compact">(config.layout?.defaultView || "grid")
+  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  // Dynamic filter state
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({})
-  const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([])
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
-  const filtersInitialized = useRef(false)
+  // Filter states
+  const [maxPrice, setMaxPrice] = useState(maxPriceLimit)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState("featured")
+  const [showInStockOnly, setShowInStockOnly] = useState(false)
 
-  // Initialize filter values with defaults - only once
-  useEffect(() => {
-    if (filtersInitialized.current) return
+  const categories = [
+    "Rings",
+    "Earrings", 
+    "Necklaces",
+    "Bracelets",
+    "Watches",
+    "Pendants",
+    "Anklets",
+    "Chains",
+    "Charms",
+  ]
 
-    const initialFilterValues: Record<string, any> = {}
-    config.filters?.forEach((filter) => {
-      if (filter.defaultValue !== undefined) {
-        initialFilterValues[filter.id] = filter.defaultValue
-      } else {
-        switch (filter.type) {
-          case "search":
-            initialFilterValues[filter.id] = ""
-            break
-          case "range":
-            initialFilterValues[filter.id] = [filter.min || 0, filter.max || 1000]
-            break
-          case "multiselect":
-          case "checkbox":
-            initialFilterValues[filter.id] = []
-            break
-          case "select":
-          case "radio":
-            initialFilterValues[filter.id] = ""
-            break
-          case "toggle":
-            initialFilterValues[filter.id] = false
-            break
-        }
-      }
-    })
-
-    // Set default sort option
-    initialFilterValues.sortBy = config.sortOptions?.[0]?.id || "featured"
-
-    setFilterValues(initialFilterValues)
-    filtersInitialized.current = true
-  }, [config.filters, config.sortOptions])
-
-  // Extract category options and price range from products - only once
-  useEffect(() => {
-    if (products.length > 0) {
-      // Extract categories
-      const categories = extractCategories(products)
-      setCategoryOptions(categories)
-
-      // Extract price range
-      const [min, max] = extractPriceRange(products)
-      setPriceRange([min, max])
-
-      // Update price filter value if not set yet
-      setFilterValues((prev) => {
-        if (!prev.price) {
-          return { ...prev, price: [min, max] }
-        }
-        return prev
-      })
-    }
-  }, [products])
-
-  // Apply filters and sorting when filterValues change
-  useEffect(() => {
-    if (products.length === 0 || !filtersInitialized.current) return
-
+  // Apply filters
+  const getFilteredProducts = () => {
     let filtered = [...products]
 
-    // Apply all filters
-    config.filters?.forEach((filter) => {
-      const value = filterValues[filter.id]
-      if (value === undefined || value === null) return
-
-      switch (filter.type) {
-        case "search":
-          if (value && typeof value === "string" && value.trim() !== "") {
-            const searchTerm = value.toLowerCase()
-            filtered = filtered.filter((product) => {
-              if (filter.field === "all") {
-                // Search across multiple fields
-                return (
-                  getProductName(product).toLowerCase().includes(searchTerm) ||
-                  (product.description && product.description.toLowerCase().includes(searchTerm))
-                )
-              } else {
-                const fieldValue = getNestedValue(product, filter.field)
-                return fieldValue && String(fieldValue).toLowerCase().includes(searchTerm)
-              }
-            })
-          }
-          break
-        case "range":
-          if (Array.isArray(value) && value.length === 2) {
-            filtered = filtered.filter((product) => {
-              let fieldValue
-              if (filter.nestedField) {
-                const obj = getNestedValue(product, filter.field)
-                fieldValue = obj ? getNestedValue(obj, filter.nestedField) : undefined
-              } else {
-                fieldValue = getNestedValue(product, filter.field)
-              }
-
-              // Handle special case for price
-              if (filter.field === "price" && typeof fieldValue !== "number") {
-                fieldValue = getProductPrice(product)
-              }
-
-              return fieldValue >= value[0] && fieldValue <= value[1]
-            })
-          }
-          break
-        case "multiselect":
-        case "checkbox":
-          if (Array.isArray(value) && value.length > 0) {
-            filtered = filtered.filter((product) => {
-              let fieldValue = getNestedValue(product, filter.field)
-
-              // Handle special case for category
-              if (filter.field === "category") {
-                fieldValue = getProductCategory(product)
-              }
-
-              if (Array.isArray(fieldValue)) {
-                return fieldValue.some((v) => value.includes(v))
-              }
-              return value.includes(fieldValue)
-            })
-          }
-          break
-        case "select":
-        case "radio":
-          if (value) {
-            filtered = filtered.filter((product) => {
-              const fieldValue = getNestedValue(product, filter.field)
-              return fieldValue === value
-            })
-          }
-          break
-        case "toggle":
-          if (value === true) {
-            filtered = filtered.filter((product) => {
-              const fieldValue = getNestedValue(product, filter.field)
-              return Boolean(fieldValue)
-            })
-          }
-          break
-      }
-    })
-
-    // Apply sorting
-    const sortOption = config.sortOptions?.find((option) => option.id === filterValues.sortBy)
-    if (sortOption) {
-      filtered.sort((a, b) => {
-        let aValue, bValue
-
-        if (sortOption.nestedField) {
-          const aObj = getNestedValue(a, sortOption.field)
-          const bObj = getNestedValue(b, sortOption.field)
-          aValue = aObj ? getNestedValue(aObj, sortOption.nestedField) : undefined
-          bValue = bObj ? getNestedValue(bObj, sortOption.nestedField) : undefined
-        } else {
-          aValue = getNestedValue(a, sortOption.field)
-          bValue = getNestedValue(b, sortOption.field)
-        }
-
-        // Handle special cases
-        if (sortOption.field === "price") {
-          aValue = getProductPrice(a)
-          bValue = getProductPrice(b)
-        } else if (sortOption.field === "name") {
-          aValue = getProductName(a)
-          bValue = getProductName(b)
-        }
-
-        if (aValue === undefined) return 1
-        if (bValue === undefined) return -1
-        if (aValue === bValue) return 0
-
-        const modifier = sortOption.direction === "asc" ? 1 : -1
-        return aValue > bValue ? modifier : -modifier
-      })
+    // Price filter
+    if (enablePriceFilter) {
+      filtered = filtered.filter((product) => product.price.value <= maxPrice)
     }
 
-    setFilteredProducts(filtered)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [filterValues, products])
+    // Category filter
+    if (enableCategoryFilter && selectedCategories.length > 0) {
+      filtered = filtered.filter((product) => selectedCategories.includes(product.category))
+    }
 
-  // Calculate pagination
-  const perPage = config.perPage || 12
-  const totalProducts = filteredProducts.length
-  const totalPages = Math.ceil(totalProducts / perPage)
-  const startIndex = (currentPage - 1) * perPage
-  const endIndex = startIndex + perPage
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+    // Stock filter
+    if (enableStockFilter && showInStockOnly) {
+      filtered = filtered.filter((product) => product.inStock)
+    }
 
-  const handlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages) return
-    setCurrentPage(pageNumber)
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    // Sort
+    if (enableSorting) {
+      switch (sortBy) {
+        case "price-asc":
+          filtered.sort((a, b) => a.price.value - b.price.value)
+          break
+        case "price-desc":
+          filtered.sort((a, b) => b.price.value - a.price.value)
+          break
+        case "name-asc":
+          filtered.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case "name-desc":
+          filtered.sort((a, b) => b.name.localeCompare(a.name))
+          break
+      }
+    }
+
+    return filtered
   }
 
-  const handleFilterChange = (filterId: string, value: any) => {
-    setFilterValues((prev) => ({ ...prev, [filterId]: value }))
+  const filteredProducts = getFilteredProducts()
+  const totalItems = filteredProducts.length
+  const totalPages = Math.ceil(totalItems / selectedItemsPerPage)
+  const startIndex = (currentPage - 1) * selectedItemsPerPage
+  const endIndex = startIndex + selectedItemsPerPage
+  const currentProducts = filteredProducts.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 200, behavior: 'smooth' })
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setSelectedItemsPerPage(newItemsPerPage)
+    setCurrentPage(1) // Reset to first page
+  }
+
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories([...selectedCategories, category])
+    } else {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category))
+    }
+    setCurrentPage(1)
   }
 
   const clearAllFilters = () => {
-    const clearedValues: Record<string, any> = {}
-    config.filters?.forEach((filter) => {
-      switch (filter.type) {
-        case "search":
-          clearedValues[filter.id] = ""
-          break
-        case "range":
-          if (filter.id === "price") {
-            clearedValues[filter.id] = priceRange
-          } else {
-            clearedValues[filter.id] = [filter.min || 0, filter.max || 1000]
-          }
-          break
-        case "multiselect":
-        case "checkbox":
-          clearedValues[filter.id] = []
-          break
-        case "select":
-        case "radio":
-          clearedValues[filter.id] = ""
-          break
-        case "toggle":
-          clearedValues[filter.id] = false
-          break
+    setMaxPrice(maxPriceLimit)
+    setSelectedCategories([])
+    setSortBy("featured")
+    setShowInStockOnly(false)
+    setCurrentPage(1)
+  }
+
+  // Generate page numbers for pagination (matching categories page)
+  const getPageNumbers = () => {
+    const pageNumbers = []
+    const maxPagesToShow = 5
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i)
       }
-    })
-    clearedValues.sortBy = config.sortOptions?.[0]?.id || "featured"
-    setFilterValues(clearedValues)
-  }
-
-  // Render filter component based on filter type
-  const renderFilter = (filter: FilterConfig) => {
-    const value = filterValues[filter.id]
-
-    switch (filter.type) {
-      case "search":
-        return (
-          <div className="relative">
-            <Input
-              placeholder={filter.placeholder || "Search..."}
-              value={value || ""}
-              onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-              className="pl-10 border-gray-300"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          </div>
-        )
-      case "range":
-        const rangeValue = value || (filter.id === "price" ? priceRange : [filter.min || 0, filter.max || 1000])
-        return (
-          <>
-            <Slider
-              min={filter.id === "price" ? priceRange[0] : filter.min || 0}
-              max={filter.id === "price" ? priceRange[1] : filter.max || 1000}
-              step={filter.step || 10}
-              value={rangeValue}
-              onValueChange={(newValue) => handleFilterChange(filter.id, newValue)}
-              className="my-6"
-            />
-            <div className="flex justify-between mt-2 text-sm text-gray-500">
-              <span>
-                {config.currency?.position === "before" ? config.currency?.symbol : ""}
-                {rangeValue[0]}
-                {config.currency?.position === "after" ? ` ${config.currency?.symbol}` : ""}
-              </span>
-              <span>
-                {config.currency?.position === "before" ? config.currency?.symbol : ""}
-                {rangeValue[1]}
-                {config.currency?.position === "after" ? ` ${config.currency?.symbol}` : ""}
-              </span>
-            </div>
-          </>
-        )
-      case "multiselect":
-      case "checkbox":
-        // Use categoryOptions for category filter, otherwise use filter.options
-        const options = filter.id === "category" ? categoryOptions : filter.options || []
-        return (
-          <div className="space-y-2">
-            {options.map((option) => (
-              <label key={option.value} className="flex items-center space-x-2 cursor-pointer">
-                <Checkbox
-                  checked={(value || []).includes(option.value)}
-                  onCheckedChange={(checked) => {
-                    const newValue = checked
-                      ? [...(value || []), option.value]
-                      : (value || []).filter((v: any) => v !== option.value)
-                    handleFilterChange(filter.id, newValue)
-                  }}
-                  className="rounded-sm"
-                />
-                <span className="text-sm text-gray-700">{option.label}</span>
-              </label>
-            ))}
-          </div>
-        )
-      case "select":
-        return (
-          <Select value={value} onValueChange={(newValue) => handleFilterChange(filter.id, newValue)}>
-            <SelectTrigger className="w-full border-gray-300">
-              <SelectValue placeholder={filter.placeholder || "Select..."} />
-            </SelectTrigger>
-            <SelectContent>
-              {filter.options?.map((option) => (
-                <SelectItem key={option.value} value={String(option.value)}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )
-      default:
-        return null
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i)
+        }
+        pageNumbers.push('...')
+        pageNumbers.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1)
+        pageNumbers.push('...')
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i)
+        }
+      } else {
+        pageNumbers.push(1)
+        pageNumbers.push('...')
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i)
+        }
+        pageNumbers.push('...')
+        pageNumbers.push(totalPages)
+      }
     }
+    
+    return pageNumbers
   }
 
-  // Determine grid columns based on view and config
-  const gridColumns = () => {
-    const cols = config.layout?.columns || { sm: 2, md: 3, lg: 4 }
-    return `grid grid-cols-${cols.sm} md:grid-cols-${cols.md} lg:grid-cols-${cols.lg} gap-4 md:gap-6`
+  const handleAddToCart = (product: any) => {
+    console.log('Added to cart:', product)
+    // Add your cart logic here
+  }
+
+  const handleAddToFavorite = (product: any) => {
+    console.log('Added to favorites:', product)
+    // Add your favorites logic here
   }
 
   return (
-    <div className={cn("container mx-auto px-4 py-8 max-w-7xl", config.theme?.colors?.background)}>
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className={cn("text-3xl font-bold", config.theme?.colors?.text)}>{config.title}</h1>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          {/* Search filter if configured to show in header */}
-          {config.filters?.some((f) => f.id === "search") && (
-            <div className="relative flex-1 md:w-64">
-              <Input
-                placeholder="Search products..."
-                value={filterValues.search || ""}
-                onChange={(e) => handleFilterChange("search", e.target.value)}
-                className="pl-10 border-gray-300 rounded-full"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            </div>
-          )}
-
-          {/* View switcher */}
-          {config.layout?.allowViewChange && (
-            <Select value={view} onValueChange={(value: "grid" | "list" | "compact") => setView(value)}>
-              <SelectTrigger className="w-[120px] border-gray-300">
-                <SelectValue placeholder="View" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="grid">Grid View</SelectItem>
-                <SelectItem value="list">List View</SelectItem>
-                <SelectItem value="compact">Compact</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-
-          {/* Mobile filter button */}
-          <Button variant="outline" onClick={() => setIsFilterOpen(true)} className="md:hidden border-gray-300">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </Button>
+    <div className={`min-h-screen ${bgColor} pt-20`}>
+      <div className="container mx-auto px-4 py-12">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className={`text-5xl ${titleFont} ${pageTitleColor} mb-4`}>
+            {mainTitle}
+          </h1>
+          <p className={`text-xl ${subtitleColor} font-light max-w-2xl mx-auto`}>
+            {subtitle}
+          </p>
         </div>
-      </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Filters Sidebar */}
-        <div
-          className={cn(
-            isFilterOpen ? "block" : "hidden md:block",
-            "bg-white md:sticky md:top-24 md:self-start md:w-64 space-y-6",
-          )}
-        >
-          {isFilterOpen && (
-            <div className="flex justify-between items-center mb-4 md:hidden">
-              <h2 className="text-xl font-bold">Filters</h2>
-              <Button variant="ghost" onClick={() => setIsFilterOpen(false)}>
-                <span className="sr-only">Close</span>
-                <X className="h-6 w-6" />
-              </Button>
-            </div>
-          )}
-
-          {/* Dynamic filters */}
-          {config.filters?.map((filter) => {
-            // Skip search filter if it's shown in the header
-            if (filter.id === "search") return null
-
-            return (
-              <div key={filter.id} className="space-y-2">
-                <h3 className="font-medium text-gray-900 mb-3">{filter.label}</h3>
-                {renderFilter(filter)}
-              </div>
-            )
-          })}
-
-          {/* Sort options */}
-          <div>
-            <h3 className="font-medium text-gray-900 mb-3">Sort By</h3>
-            <Select
-              value={filterValues.sortBy || config.sortOptions?.[0]?.id}
-              onValueChange={(value) => handleFilterChange("sortBy", value)}
+        <div className="flex gap-8">
+          {/* Filter Sidebar */}
+          {showFilters && (
+            <div
+              className={cn(
+                "transition-all duration-300 ease-in-out",
+                isFilterOpen ? "w-80 opacity-100" : "w-0 opacity-0 overflow-hidden",
+              )}
             >
-              <SelectTrigger className="w-full border-gray-300">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                {config.sortOptions?.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 w-80">
+                {/* Maximum Price */}
+                {enablePriceFilter && (
+                  <div className="space-y-4 mb-6">
+                    <h3 className={`text-lg font-semibold ${textColor}`}>Maximum Price</h3>
+                    <Slider
+                      min={0}
+                      max={maxPriceLimit}
+                      step={10}
+                      value={[maxPrice]}
+                      onValueChange={(value) => setMaxPrice(value[0])}
+                      className="my-6"
+                    />
+                    <div className={`flex justify-between text-sm ${textColor}/70`}>
+                      <span>$0</span>
+                      <span>${maxPrice}</span>
+                    </div>
+                  </div>
+                )}
 
-          <Button variant="outline" className="w-full border-gray-300 hover:bg-gray-50" onClick={clearAllFilters}>
-            Clear All Filters
-          </Button>
-        </div>
+                {/* Categories */}
+                {enableCategoryFilter && (
+                  <div className="space-y-4 mb-6">
+                    <h3 className={`text-lg font-semibold ${textColor}`}>Categories</h3>
+                    <div className="space-y-3 max-h-48 overflow-y-auto">
+                      {categories.map((category) => (
+                        <label key={category} className="flex items-center space-x-3 cursor-pointer">
+                          <Checkbox
+                            checked={selectedCategories.includes(category)}
+                            onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                            className={`rounded-md border-2 border-current`}
+                          />
+                          <span className={`${textColor} font-medium text-sm`}>{category}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-        {/* Products Grid */}
-        <div className="flex-1">
-          {/* Products Count */}
-          <div className="mb-6">
-            <p className="text-gray-500 text-sm">
-              Showing {paginatedProducts.length} of {totalProducts} products
-            </p>
-          </div>
+                {/* Stock Filter */}
+                {enableStockFilter && (
+                  <div className="space-y-4 mb-6">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <Checkbox
+                        checked={showInStockOnly}
+                        onCheckedChange={(checked) => setShowInStockOnly(checked === true)}
+                        className="rounded-md border-2 border-current"
+                      />
+                      <span className={`${textColor} font-medium`}>In Stock Only</span>
+                    </label>
+                  </div>
+                )}
 
-          {isLoading ? (
-            <div className={gridColumns()}>
-              {Array.from({ length: perPage }).map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <div className="bg-gray-200 aspect-square rounded-md mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                {/* Sort */}
+                {enableSorting && (
+                  <div className="space-y-4 mb-6">
+                    <h3 className={`text-lg font-semibold ${textColor}`}>Sort By</h3>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full border-2 border-current rounded-xl">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="featured">Featured</SelectItem>
+                        <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                        <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                        <SelectItem value="name-asc">Name: A to Z</SelectItem>
+                        <SelectItem value="name-desc">Name: Z to A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  className={`w-full border-2 border-current hover:${accentColor} rounded-xl font-semibold ${textColor}`}
+                  onClick={clearAllFilters}
+                >
+                  Clear All Filters
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Products Section */}
+          <div className="flex-1">
+            {/* Items per page selector and results info */}
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+              <div className={`${textColor} text-sm`}>
+                {Math.min(endIndex, totalItems)} out of {totalItems} products
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {showFilters && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    className={`border-2 border-current rounded-xl ${textColor} hover:${accentColor}`}
+                  >
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filters
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Products Display */}
+            {currentProducts.length === 0 ? (
+              <div className="text-center py-16">
+                <h3 className={`text-2xl font-semibold ${textColor} mb-4`}>No products found</h3>
+                <p className={`${textColor}/70 mb-6`}>Try adjusting your filters to find what you are looking for.</p>
+                <Button
+                  onClick={clearAllFilters}
+                  className={`${pageTitleColor.replace('text-', 'bg-')} hover:opacity-90 text-white rounded-xl px-8 py-3 font-semibold`}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            ) : (
+              <GridProductTemplate
+                products={currentProducts}
+                columns={columns}
+                showTitle={showTitle}
+                gap={gap}
+                bgColor="bg-transparent"
+                textColor={textColor}
+                accentColor={accentColor}
+                borderColor={borderColor}
+                borderRadius={borderRadius}
+                overlayColor={overlayColor}
+                showCta={showCta}
+                ctaText={ctaText}
+                titlePosition={titlePosition}
+                imageHeight={imageHeight}
+                fontFamily={fontFamily}
+                cardShadow={cardShadow}
+                hoverEffect={hoverEffect}
+                cardVariant={cardVariant}
+                showSubtitle={showSubtitle}
+                cornerRadius={cornerRadius}
+                titleColor={titleColor}
+                titleFontSize={titleFontSize}
+                titleFont={titleFont}
+                onAddToCart={handleAddToCart}
+                onAddToFavorite={handleAddToFavorite}
+                showMoreButton={showMoreButton}
+              />
+            )}
+
+            {/* Pagination */}
+            {showPagination && totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row justify-center items-center mt-12 gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-md border transition-colors ${currentPage === 1 
+                      ? 'border-gray-300 text-gray-400 cursor-not-allowed' 
+                      : `border-current ${textColor} hover:${accentColor}`
+                    }`}
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {getPageNumbers().map((page, index) => {
+                        if (page === '...') {
+                          return (
+                            <span
+                              key={`dots-${index}`}
+                              className="px-3 py-2 rounded-md text-sm text-gray-400 cursor-default"
+                            >
+                              ...
+                            </span>
+                          )
+                        }
+
+                        return (
+                          <button
+                            key={index}
+                            onClick={() => handlePageChange(page as number)}
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                              page === currentPage
+                                ? `${pageTitleColor.replace('text-', 'bg-')} text-white`
+                                : `${textColor} hover:${accentColor} border border-current`
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      })}
+                  </div>
+                  
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-md border transition-colors ${currentPage === totalPages 
+                      ? 'border-gray-300 text-gray-400 cursor-not-allowed' 
+                      : `border-current ${textColor} hover:${accentColor}`
+                    }`}
+                  >
+                    <ChevronRight size={20} />
+                  </button>
                 </div>
-              ))}
-            </div>
-          ) : paginatedProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-              <p className="text-gray-500">Try adjusting your search or filter to find what you are looking for.</p>
-              <Button variant="default" onClick={clearAllFilters} className={cn("mt-4", config.theme?.colors?.primary)}>
-                Clear Filters
-              </Button>
-            </div>
-          ) : view === "grid" ? (
-            <div className={gridColumns()}>
-              {paginatedProducts.map((product) => (
-                <Link
-                  href={getProductUrl(product, config)}
-                  key={product.id}
-                  className="group transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div
-                    className={cn(
-                      "bg-white overflow-hidden border border-gray-100",
-                      config.theme?.borderRadius,
-                      config.theme?.cardShadow,
-                    )}
-                  >
-                    <div className="aspect-square relative overflow-hidden">
-                      <Image
-                        src={getProductImageUrl(product) || "/placeholder.svg"}
-                        alt={getProductName(product)}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-medium text-gray-900 line-clamp-1">{getProductName(product)}</h3>
-                      {product.category && (
-                        <p className="text-sm text-gray-500 mb-1">
-                          {Array.isArray(product.category) ? product.category[0] : product.category}
-                        </p>
-                      )}
-                      <p className="font-semibold">{formatPrice(product.price, config)}</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : view === "list" ? (
-            <div className="space-y-4">
-              {paginatedProducts.map((product) => (
-                <Link
-                  href={getProductUrl(product, config)}
-                  key={product.id}
-                  className="group transition-all duration-300 hover:-translate-y-1 block"
-                >
-                  <div
-                    className={cn(
-                      "bg-white overflow-hidden border border-gray-100 flex",
-                      config.theme?.borderRadius,
-                      config.theme?.cardShadow,
-                    )}
-                  >
-                    <div className="relative w-1/3 aspect-square">
-                      <Image
-                        src={getProductImageUrl(product) || "/placeholder.svg"}
-                        alt={getProductName(product)}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4 w-2/3">
-                      <h3 className="font-medium text-gray-900">{getProductName(product)}</h3>
-                      {product.category && (
-                        <p className="text-sm text-gray-500 mb-1">
-                          {Array.isArray(product.category) ? product.category[0] : product.category}
-                        </p>
-                      )}
-                      <p className="font-semibold">{formatPrice(product.price, config)}</p>
-                      {product.description && (
-                        <p className="text-sm text-gray-500 my-2 line-clamp-2">{product.description}</p>
-                      )}
-                      <Button className={cn("mt-3", config.theme?.colors?.primary)}>View Product</Button>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {paginatedProducts.map((product) => (
-                <Link
-                  href={getProductUrl(product, config)}
-                  key={product.id}
-                  className="group transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div
-                    className={cn(
-                      "bg-white overflow-hidden border border-gray-100",
-                      config.theme?.borderRadius,
-                      config.theme?.cardShadow,
-                    )}
-                  >
-                    <div className="aspect-square relative overflow-hidden">
-                      <Image
-                        src={getProductImageUrl(product) || "/placeholder.svg"}
-                        alt={getProductName(product)}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-2">
-                      <h3 className="font-medium text-gray-900 text-sm line-clamp-1">{getProductName(product)}</h3>
-                      <p className="font-semibold text-sm">{formatPrice(product.price, config)}</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Pagination */}
-          {config.pagination?.enabled && totalPages > 1 && (
-            <div className="flex justify-center items-center mt-10 gap-1">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="h-8 w-8 p-0 border-gray-300"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Previous page</span>
-              </Button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                // Show first page, last page, and pages around current page
-                if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
-                  return (
-                    <Button
-                      key={page}
-                      variant={page === currentPage ? "default" : "outline"}
-                      onClick={() => handlePageChange(page)}
-                      className={cn(
-                        "h-8 w-8 p-0",
-                        page === currentPage ? config.theme?.colors?.primary : "border-gray-300",
-                      )}
-                    >
-                      {page}
-                    </Button>
-                  )
-                }
-
-                // Show ellipsis for skipped pages
-                if ((page === 2 && currentPage > 3) || (page === totalPages - 1 && currentPage < totalPages - 2)) {
-                  return (
-                    <span key={page} className="px-2">
-                      ...
-                    </span>
-                  )
-                }
-
-                return null
-              })}
-
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="h-8 w-8 p-0 border-gray-300"
-              >
-                <ChevronRight className="h-4 w-4" />
-                <span className="sr-only">Next page</span>
-              </Button>
-            </div>
-          )}
+                
+                <div className={`${textColor} text-sm`}>
+                  Page {currentPage} of {totalPages}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

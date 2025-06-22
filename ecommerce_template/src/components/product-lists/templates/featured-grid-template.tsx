@@ -136,6 +136,7 @@ export function FeaturedGridProductTemplate({
         ))}
       </div>
       {/* Show More Button */}
+      {showMoreButton && (
       <div className="flex justify-end mt-6">
         <Link 
           href="/products" 
@@ -153,6 +154,7 @@ export function FeaturedGridProductTemplate({
           </svg>
         </Link>
       </div>
+      )}
     </div>
   )
 }

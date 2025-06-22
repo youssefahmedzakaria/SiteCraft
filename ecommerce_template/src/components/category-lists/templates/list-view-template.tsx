@@ -144,6 +144,7 @@ export function ListViewCategoryTemplate({
         ))}
       </div>
             {/* Show More Button */}
+      {showMoreButton && categories.length > 0 && (
       <div className="flex justify-end mt-6">
         <Link 
           href="/categories" 
@@ -158,6 +159,7 @@ export function ListViewCategoryTemplate({
           {showMoreText}
         </Link>
       </div>
+      )}
     </div>
   )
 }

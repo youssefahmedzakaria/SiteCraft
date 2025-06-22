@@ -187,6 +187,7 @@ export function HorizontalScrollCategoryTemplate({
         )}
       </div>
             {/* Show More Button */}
+       {showMoreButton && ( 
       <div className="flex justify-end mt-6">
         <Link 
           href="/categories" 
@@ -201,6 +202,7 @@ export function HorizontalScrollCategoryTemplate({
           {showMoreText}
         </Link>
       </div>
+      )}
     </div>
   )
 }
