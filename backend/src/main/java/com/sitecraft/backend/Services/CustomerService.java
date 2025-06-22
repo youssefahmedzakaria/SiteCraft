@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.time.LocalDate;
+
 
 @Service
 public class CustomerService {
@@ -15,6 +17,28 @@ public class CustomerService {
 
     public List<Customer> getAllCustomers(Long storeId) {
         return customerRepo.findByStoreId(storeId);
+    }
+
+    /**
+     * Count new customers registered within the given date range for the specified store.
+     */
+    public long countNewCustomersByDateRange(
+        LocalDate startDate,
+        LocalDate endDate,
+        Long storeId
+    ) {
+        return customerRepo.countNewCustomersByDateRange(storeId, startDate, endDate);
+    }
+
+    /**
+     * Count returning customers (who updated profile) within the given date range for the specified store.
+     */
+    public long countReturningCustomersByDateRange(
+        LocalDate startDate,
+        LocalDate endDate,
+        Long storeId
+    ) {
+        return customerRepo.countReturningCustomersByDateRange(storeId, startDate, endDate);
     }
 
     @Transactional
@@ -36,6 +60,7 @@ public class CustomerService {
             throw new RuntimeException("Failed to suspend Customer: " + e.getMessage());
         }
     }
+
 
 
 //    public List<Order> getCustomerOrders(Long customerId) {
