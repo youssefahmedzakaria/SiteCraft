@@ -12,6 +12,17 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/contexts/cart-context"
+import { cn } from "@/lib/utils"
+import type { ThemeConfig } from "@/app/product/[slug]/product"
+
+const defaultTheme: ThemeConfig = {
+  backgroundColor: "#F5ECD5",
+  textColor: "#4A102A",
+  accentColor: "#F5ECD5",
+  secondaryColor: "#4A102A",
+  borderRadius: "rounded-lg",
+  fontFamily: "font-sans",
+}
 
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
@@ -41,6 +52,8 @@ export default function CheckoutPage() {
   const tax = state.total * 0.08
   const total = state.total + shipping + tax
 
+  const theme = defaultTheme;
+
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
@@ -54,12 +67,12 @@ export default function CheckoutPage() {
 
   if (state.items.length === 0 && step !== 3) {
     return (
-      <div className="container mx-auto px-4 py-8 mt-20">
+      <div className={cn("min-h-screen pt-20 px-8", theme.fontFamily)} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
         <div className="text-center py-16">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">No items to checkout</h1>
-          <p className="text-gray-600 mb-8">Your cart is empty. Add some items before proceeding to checkout.</p>
+          <h1 className="text-3xl font-bold mb-4" style={{ color: theme.textColor }}>No items to checkout</h1>
+          <p className="mb-8" style={{ color: theme.secondaryColor }}>Your cart is empty. Add some items before proceeding to checkout.</p>
           <Link href="/products">
-            <Button size="lg">Continue Shopping</Button>
+            <Button size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>Continue Shopping</Button>
           </Link>
         </div>
       </div>
@@ -69,29 +82,29 @@ export default function CheckoutPage() {
   // Order Confirmation Step
   if (step === 3) {
     return (
-      <div className="container mx-auto px-4 py-8 mt-20">
+      <div className={cn("min-h-screen pt-20 px-8", theme.fontFamily)} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
         <div className="max-w-2xl mx-auto text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-8 h-8 text-green-600" />
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: theme.accentColor }}>
+            <Check className="w-8 h-8" style={{ color: theme.secondaryColor }} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Confirmed!</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-3xl font-bold mb-4" style={{ color: theme.textColor }}>Order Confirmed!</h1>
+          <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Thank you for your purchase. Your order has been confirmed and will be shipped soon.
           </p>
-          <div className="bg-gray-50 p-6 rounded-lg mb-8">
+          <div className="p-6 rounded-lg mb-8" style={{ backgroundColor: theme.accentColor }}>
             <h2 className="font-semibold mb-2">Order Details</h2>
-            <p className="text-sm text-gray-600">Order #: ORD-{Date.now()}</p>
-            <p className="text-sm text-gray-600">Total: ${total.toFixed(2)}</p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: theme.secondaryColor }}>Order #: ORD-{Date.now()}</p>
+            <p className="text-sm" style={{ color: theme.secondaryColor }}>Total: ${total.toFixed(2)}</p>
+            <p className="text-sm" style={{ color: theme.secondaryColor }}>
               Estimated delivery: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
             </p>
           </div>
           <div className="flex gap-4 justify-center">
             <Link href="/products">
-              <Button variant="outline">Continue Shopping</Button>
+              <Button size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>Continue Shopping</Button>
             </Link>
             <Link href="/profile">
-              <Button>View Orders</Button>
+              <Button size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>View Orders</Button>
             </Link>
           </div>
         </div>
@@ -100,39 +113,35 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-20">
+    <div className={cn("min-h-screen pt-20 px-8", theme.fontFamily)} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
       <div className="flex items-center gap-4 mb-8">
-        <Link href="/cart">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cart
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
+        <h1 className="text-3xl font-bold" style={{ color: theme.textColor }}>Checkout</h1>
       </div>
 
       {/* Progress Steps */}
       <div className="flex items-center justify-center mb-8">
         <div className="flex items-center">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= 1 ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
+            className={`w-8 h-8 rounded-full flex items-center justify-center`}
+            style={{ backgroundColor: step >= 1 ? theme.secondaryColor : '#e5e5e5', color: step >= 1 ? theme.backgroundColor : theme.secondaryColor, border: `2px solid ${theme.secondaryColor}` }}
           >
             1
           </div>
-          <span className="ml-2 text-sm font-medium">Shipping</span>
+          <span className="ml-2 text-sm font-medium" style={{ color: theme.secondaryColor }}>Shipping</span>
         </div>
-        <div className="w-16 h-px bg-gray-300 mx-4" />
+        <div className="w-16 h-px mx-4" style={{ backgroundColor: theme.secondaryColor }} />
         <div className="flex items-center">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= 2 ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{
+              backgroundColor: step === 2 ? theme.secondaryColor : 'transparent',
+              color: step === 2 ? theme.backgroundColor : theme.secondaryColor,
+              border: `2px solid ${theme.secondaryColor}`,
+            }}
           >
             2
           </div>
-          <span className="ml-2 text-sm font-medium">Payment</span>
+          <span className="ml-2 text-sm font-medium" style={{ color: theme.secondaryColor }}>Payment</span>
         </div>
       </div>
 
@@ -141,7 +150,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-2">
           {step === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Shipping Information</h2>
+              <h2 className="text-xl font-semibold" style={{ color: theme.secondaryColor }}>Shipping Information</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -240,7 +249,7 @@ export default function CheckoutPage() {
                 </Select>
               </div>
 
-              <Button onClick={() => setStep(2)} className="w-full" size="lg">
+              <Button onClick={() => setStep(2)} className="w-full" size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>
                 Continue to Payment
               </Button>
             </div>
@@ -248,22 +257,26 @@ export default function CheckoutPage() {
 
           {step === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Payment Information</h2>
+              <h2 className="text-xl font-semibold" style={{ color: theme.secondaryColor }}>Payment Information</h2>
 
               <RadioGroup
                 value={formData.paymentMethod}
                 onValueChange={(value) => handleInputChange("paymentMethod", value)}
               >
-                <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: theme.secondaryColor }}>
                   <RadioGroupItem value="card" id="card" />
                   <Label htmlFor="card" className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
                     Credit/Debit Card
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: theme.secondaryColor }}>
                   <RadioGroupItem value="paypal" id="paypal" />
                   <Label htmlFor="paypal">PayPal</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: theme.secondaryColor }}>
+                  <RadioGroupItem value="cash" id="cash" />
+                  <Label htmlFor="cash">Cash on Delivery</Label>
                 </div>
               </RadioGroup>
 
@@ -325,10 +338,10 @@ export default function CheckoutPage() {
               </div>
 
               <div className="flex gap-4">
-                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                <Button variant="outline" onClick={() => setStep(1)} className="flex-1" style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}>
                   Back to Shipping
                 </Button>
-                <Button onClick={handleSubmitOrder} className="flex-1" size="lg">
+                <Button onClick={handleSubmitOrder} className="flex-1" size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>
                   Place Order
                 </Button>
               </div>
@@ -338,20 +351,20 @@ export default function CheckoutPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-50 p-6 rounded-lg sticky top-24">
-            <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+          <div className={cn("p-6 rounded-lg sticky top-24", theme.borderRadius)} style={{ backgroundColor: `${theme.secondaryColor}20`, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)' }}>
+            <h2 className="text-xl font-semibold mb-6" style={{ color: theme.secondaryColor }}>Order Summary</h2>
 
             <div className="space-y-4 mb-6">
               {state.items.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                  <div className="relative w-12 h-12 rounded overflow-hidden" style={{ backgroundColor: theme.backgroundColor }}>
                     <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{item.name}</p>
-                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                    <p className="text-sm font-medium" style={{ color: theme.textColor }}>{item.name}</p>
+                    <p className="text-xs" style={{ color: theme.secondaryColor }}>Qty: {item.quantity}</p>
                   </div>
-                  <p className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-sm font-medium" style={{ color: theme.textColor }}>${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -379,11 +392,11 @@ export default function CheckoutPage() {
             </div>
 
             <div className="mt-6 space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm" style={{ color: theme.secondaryColor }}>
                 <Truck className="w-4 h-4" />
                 <span>Free shipping on orders over $500</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm" style={{ color: theme.secondaryColor }}>
                 <Shield className="w-4 h-4" />
                 <span>Secure checkout</span>
               </div>
