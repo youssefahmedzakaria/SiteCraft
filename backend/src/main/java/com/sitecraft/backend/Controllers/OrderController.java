@@ -88,4 +88,29 @@ public class OrderController {
         }
     }
 
+    @PutMapping("/cancelOrder/{id}")
+    public ResponseEntity<?> cancelOrder(HttpSession session, @PathVariable("id") Long orderId) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+            else if (!customerId.equals(orderService.getCustomerIdOfOrder(orderId))) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "This order does not belong to the customer."));
+            }
+
+            orderService.cancelOrder(orderId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Order canceled successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }

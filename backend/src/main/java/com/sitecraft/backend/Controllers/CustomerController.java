@@ -51,4 +51,18 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    @PostMapping("/setSession")
+    public ResponseEntity setSession(HttpSession session, @RequestBody Customer customer) {
+        session.setAttribute("customerId", customer.getId());
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("Session Updated Successfully.");
+    }
+
+    @GetMapping("/getSession")
+    public ResponseEntity getSession(HttpSession session) {
+        Map<String, Object> sessionData = new HashMap<>();
+        sessionData.put("customerId", session.getAttribute("customerId"));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
+    }
 }
