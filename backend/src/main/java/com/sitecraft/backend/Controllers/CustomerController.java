@@ -1,6 +1,8 @@
 package com.sitecraft.backend.Controllers;
 
+import com.sitecraft.backend.Models.Address;
 import com.sitecraft.backend.Models.Customer;
+import com.sitecraft.backend.Models.Order;
 import com.sitecraft.backend.Services.CustomerService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,55 @@ public class CustomerController {
             errorResponse.put("message", e.getMessage());
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
+    //----------------------------------------(E-commerce)----------------------------------------
+
+    @GetMapping("/getInfo")
+    public ResponseEntity getCustomerInfo(HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+
+            Customer customer = customerService.getCustomerInfo(customerId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "customer", customer
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/getAddresses")
+    public ResponseEntity getCustomerAddresses(HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+
+            List<Address> addresses = customerService.getCustomerAddresses(customerId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "addresses", addresses
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
         }
     }
 
