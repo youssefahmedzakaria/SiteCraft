@@ -2,6 +2,7 @@ package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -14,11 +15,16 @@ public class Product {
 
     private String name;
     private String description;
+    @Column(name = "discount_type")
     private String discountType;
-    private Double discountValue;
-    private Double minCap;
-    private Double percentageMax;
-    private Double maxCap;
+    @Column(name = "discount_value")
+    private BigDecimal discountValue;
+    @Column(name = "min_cap")
+    private BigDecimal minCap;
+    @Column(name = "percentage_max")
+    private BigDecimal percentageMax;
+    @Column(name = "max_cap")
+    private BigDecimal maxCap;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -30,16 +36,25 @@ public class Product {
     @JsonIgnore
     private Store store;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariants> variants;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductImage> images;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductAttribute> attributes;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryProduct> categoryProducts;
 
     public Product() {}
 
-    public Product(String name, String description, String discountType, Double discountValue,
-                  Double minCap, Double percentageMax, Double maxCap, Category category, Store store) {
+    public Product(String name, String description, String discountType, BigDecimal discountValue,
+                  BigDecimal minCap, BigDecimal percentageMax, BigDecimal maxCap, Category category, Store store) {
         this.name = name;
         this.description = description;
         this.discountType = discountType;
@@ -64,17 +79,17 @@ public class Product {
     public String getDiscountType() { return discountType; }
     public void setDiscountType(String discountType) { this.discountType = discountType; }
 
-    public Double getDiscountValue() { return discountValue; }
-    public void setDiscountValue(Double discountValue) { this.discountValue = discountValue; }
+    public BigDecimal getDiscountValue() { return discountValue; }
+    public void setDiscountValue(BigDecimal discountValue) { this.discountValue = discountValue; }
 
-    public Double getMinCap() { return minCap; }
-    public void setMinCap(Double minCap) { this.minCap = minCap; }
+    public BigDecimal getMinCap() { return minCap; }
+    public void setMinCap(BigDecimal minCap) { this.minCap = minCap; }
 
-    public Double getPercentageMax() { return percentageMax; }
-    public void setPercentageMax(Double percentageMax) { this.percentageMax = percentageMax; }
+    public BigDecimal getPercentageMax() { return percentageMax; }
+    public void setPercentageMax(BigDecimal percentageMax) { this.percentageMax = percentageMax; }
 
-    public Double getMaxCap() { return maxCap; }
-    public void setMaxCap(Double maxCap) { this.maxCap = maxCap; }
+    public BigDecimal getMaxCap() { return maxCap; }
+    public void setMaxCap(BigDecimal maxCap) { this.maxCap = maxCap; }
 
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
@@ -87,4 +102,13 @@ public class Product {
 
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images; }
+
+    public List<ProductAttribute> getAttributes() { return attributes; }
+    public void setAttributes(List<ProductAttribute> attributes) { this.attributes = attributes; }
+
+    public List<Review> getReviews() { return reviews; }
+    public void setReviews(List<Review> reviews) { this.reviews = reviews; }
+
+    public List<CategoryProduct> getCategoryProducts() { return categoryProducts; }
+    public void setCategoryProducts(List<CategoryProduct> categoryProducts) { this.categoryProducts = categoryProducts; }
 }

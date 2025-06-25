@@ -1,14 +1,17 @@
 package com.sitecraft.backend.Controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitecraft.backend.Models.Category;
 import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.CategoryService;
+import com.sitecraft.backend.DTOs.CategoryCreateDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,8 +76,11 @@ public class CategoryController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody Category category, HttpSession session) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<?> createCategory(
+            @RequestPart("category") String categoryJson,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
@@ -82,7 +88,10 @@ public class CategoryController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            Category savedCategory = categoryService.createCategory(category, storeId);
+            ObjectMapper mapper = new ObjectMapper();
+            CategoryCreateDTO categoryDTO = mapper.readValue(categoryJson, CategoryCreateDTO.class);
+
+            Category savedCategory = categoryService.createCategory(categoryDTO, storeId, image);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -99,8 +108,12 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category updatedCategory, HttpSession session) {
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateCategory(
+            @PathVariable Long id,
+            @RequestPart("category") String categoryJson,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
@@ -108,7 +121,10 @@ public class CategoryController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            Category category = categoryService.updateCategory(id, updatedCategory, storeId);
+            ObjectMapper mapper = new ObjectMapper();
+            CategoryCreateDTO categoryDTO = mapper.readValue(categoryJson, CategoryCreateDTO.class);
+
+            Category category = categoryService.updateCategory(id, categoryDTO, storeId, image);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -149,7 +165,8 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
+    
+    /*
     @GetMapping("/search")
     public ResponseEntity<?> searchCategories(@RequestParam(required = false) String q, HttpSession session) {
         try {
@@ -175,6 +192,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+    */
 
     @GetMapping("/{id}/products")
     public ResponseEntity<?> getCategoryProducts(@PathVariable Long id, HttpSession session) {
