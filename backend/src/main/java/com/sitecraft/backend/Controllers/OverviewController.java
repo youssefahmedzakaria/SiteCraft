@@ -43,13 +43,15 @@ public class OverviewController {
     }
 
     @GetMapping("/products/top")
-    public ResponseEntity<List<ProductSales>> getTopProducts(
-        @SessionAttribute("storeId") Long storeId,
-        @RequestParam(defaultValue = "5") int limit
-    ) {
-        List<ProductSales> list = overviewService.getTopProducts(storeId, limit);
-        return ResponseEntity.ok(list);
-    }
+public ResponseEntity<List<ProductSales>> getTopProducts(
+    @SessionAttribute("storeId") Long storeId,
+    @RequestParam(required = false) Integer limit
+) {
+    int l = (limit != null) ? limit : 5;
+    List<ProductSales> list = overviewService.getTopProducts(storeId, l);
+    return ResponseEntity.ok(list);
+}
+
 
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getTodayOrders(

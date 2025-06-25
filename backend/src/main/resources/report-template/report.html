@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="${reportName}"></title>
+
+  <!-- Tailwind CSS for colors/spacing/etc -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"/>
+
+  <style>
+    /* 1) Make Chrome Headless trim margins and size to content */
+    @page { size: auto; margin: 0; }
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 2) Your custom colors */
+    .bg-logo-left-nav { background-color: #263238; }
+    .border-logo-border { border-color: #cc78604d; }
+    .text-logo-txt { color: #cc7860f2; }
+    .hover\:bg-logo-light-button-hover:hover { background-color: #cc78601a; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Top nav: logo only, flush left -->
+  <nav class="bg-logo-left-nav flex items-center" style="height:44px; padding-left:24px;">
+    <img
+      src="font.png"
+      alt="SiteCraft Logo"
+      style="height:100%;"/>
+  </nav>
+  <!-- Container with padding on all sides for rounded corners -->
+  <div class="container mx-auto bg-white mx-6 mt-6 mb-6 rounded-lg shadow" style="padding:24px;">
+
+    <!-- Title & subtitle -->
+    <h1 class="text-2xl font-bold text-center mb-2" th:text="${reportName}"></h1>
+    <h2 class="text-lg text-gray-600 text-center mb-6" th:text="${reportDescription}"></h2>
+
+    <!-- Data table with fixed layout -->
+    <div class="overflow-x-auto">
+      <table
+        class="min-w-full table-fixed border border-logo-border divide-y divide-logo-border"
+      >
+        <thead class="bg-gray-200">
+          <tr>
+            <!-- Center headers -->
+            <th
+              th:each="col : ${columns}"
+              th:text="${col}"
+              class="px-4 py-2 text-center text-xs font-semibold uppercase text-logo-txt"
+            ></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-logo-border">
+          <tr
+            th:each="row : ${rows}"
+            class="hover:bg-logo-light-button-hover"
+          >
+            <td
+              th:each="cell : ${row}"
+              th:text="${cell}"
+              class="px-4 py-2 text-center text-sm text-gray-900"
+            ></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>
