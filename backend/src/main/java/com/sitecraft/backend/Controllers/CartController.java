@@ -17,11 +17,18 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping("/{customerId}")
-    public ResponseEntity<ShoppingCart> getCart(@PathVariable Long customerId) {
+    @GetMapping
+    public ResponseEntity<?> getCartSummary(HttpSession session) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
         ShoppingCart cart = cartService.getCartByCustomerId(customerId);
         if (cart == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(java.util.Map.of(
+            "id", cart.getId(),
+            "totalPrice", cart.getTotalPrice()
+        ));
     }
 
     @GetMapping("/products")
@@ -81,19 +88,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getCartSummary(HttpSession session) {
-        Long customerId = (Long) session.getAttribute("customerId");
-        if (customerId == null) {
-            return ResponseEntity.status(401).build();
-        }
-        ShoppingCart cart = cartService.getCartByCustomerId(customerId);
-        if (cart == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(java.util.Map.of(
-            "id", cart.getId(),
-            "totalPrice", cart.getTotalPrice()
-        ));
-    }
+   
 }
 
 class UpdateCartProductRequest {
