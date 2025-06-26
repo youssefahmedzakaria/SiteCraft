@@ -79,7 +79,7 @@ public class UserService {
         if (user == null) return;
 
         // Deactivate old OTPs
-        List<OTP> oldOtps = otpRepo.findByUserIdAndActiveTrue(user.getId());
+        List<OTP> oldOtps = otpRepo.findByUserIdAndActiveTrue(String.valueOf(user.getId()));
         for (OTP o : oldOtps) {
             o.setActive(false);
         }
@@ -91,7 +91,7 @@ public class UserService {
         OTP otp = new OTP();
         otp.setCode(otpCode);
         otp.setActive(true);
-        otp.setUserId(user.getId());
+        otp.setUserId(String.valueOf(user.getId()));
         otp.setUserType("user");
         otp.setCreatedAt(LocalDateTime.now());
         otp.setExpiresAt(LocalDateTime.now().plusMinutes(5)); // expires in 5 minutes
@@ -108,7 +108,7 @@ public class UserService {
     public void verifyOTP(String email, String code) {
         try {
             Users user = userRepo.findByEmail(email);
-            OTP otp = otpRepo.findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(user.getId(), code, LocalDateTime.now());
+            OTP otp = otpRepo.findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(String.valueOf(user.getId()), code, LocalDateTime.now());
 
 
             if (otp == null) {
@@ -126,12 +126,14 @@ public class UserService {
 
     public void resetPassword(String email, String newPassword) {
         try {
+            if (newPassword == null || newPassword.length() < 8) {
+                throw new RuntimeException("Password must be at least 8 characters long.");
+            }
             Users user = userRepo.findByEmail(email);
             if (user == null)
             {
                 throw new RuntimeException("User not found");
             }
-
             String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
             user.setPassword(encodedPassword);
             userRepo.save(user);
