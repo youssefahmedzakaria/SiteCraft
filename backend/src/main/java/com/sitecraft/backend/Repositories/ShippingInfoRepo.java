@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ShippingInfoRepo extends JpaRepository<ShippingInfo, Long> {
     List<ShippingInfo> findByStoreId(Long storeId);
+    ShippingInfo findByStoreIdAndGovernmentName(Long storeId, String governmentName);
 }
