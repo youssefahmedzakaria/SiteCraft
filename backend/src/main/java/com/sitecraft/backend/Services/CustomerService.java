@@ -99,7 +99,6 @@ public class CustomerService {
         }
     }
 
-    @Transactional
     public void updateCustomerInfo(Long customerId, Customer updatedCustomer) {
         try {
             Customer customer = customerRepo.findById(customerId)
@@ -108,11 +107,11 @@ public class CustomerService {
             if (updatedCustomer.getName() != null) customer.setName(updatedCustomer.getName());
             if (updatedCustomer.getPhone() != null) customer.setPhone(updatedCustomer.getPhone());
             if (updatedCustomer.getGender() != null) customer.setGender(updatedCustomer.getGender());
+            customerRepo.save(customer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update customer info: " + e.getMessage());
         }
     }
-
 
     public void changePassword(Long customerId, Map<String, String> passwords) {
         try {
@@ -140,7 +139,62 @@ public class CustomerService {
         }
     }
 
+    public void addAddress(Long customerId, Address newAddress) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
 
+            Address address = new Address();
+            address.setTitle(newAddress.getTitle());
+            address.setCity(newAddress.getCity());
+            address.setStreetNum(newAddress.getStreetNum());
+            address.setBuildingNum(newAddress.getBuildingNum());
+            address.setFloorNum(newAddress.getFloorNum());
+            address.setApartmentNum(newAddress.getApartmentNum());
+            address.setLandmark(newAddress.getLandmark());
+            address.setCustomer(customer);
+            addressRepo.save(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add address: " + e.getMessage());
+        }
+    }
+
+    public void updateAddress(Long customerId, Long addressId, Address updatedAddress) {
+        try {
+            Address address = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+
+            if (!address.getCustomer().getId().equals(customerId)) {
+                throw new RuntimeException("Unauthorized access to this address.");
+            }
+
+            if (updatedAddress.getTitle() != null) address.setTitle(updatedAddress.getTitle());
+            if (updatedAddress.getCity() != null) address.setCity(updatedAddress.getCity());
+            if (updatedAddress.getStreetNum() != null) address.setStreetNum(updatedAddress.getStreetNum());
+            if (updatedAddress.getBuildingNum() != null) address.setBuildingNum(updatedAddress.getBuildingNum());
+            if (updatedAddress.getFloorNum() != null) address.setFloorNum(updatedAddress.getFloorNum());
+            if (updatedAddress.getApartmentNum() != null) address.setApartmentNum(updatedAddress.getApartmentNum());
+            if (updatedAddress.getLandmark() != null) address.setLandmark(updatedAddress.getLandmark());
+            addressRepo.save(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update address: " + e.getMessage());
+        }
+    }
+
+    public void deleteAddress(Long customerId, Long addressId) {
+        try {
+            Address address = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+
+            if (!address.getCustomer().getId().equals(customerId)) {
+                throw new RuntimeException("Unauthorized access to this address.");
+            }
+
+            addressRepo.delete(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete address: " + e.getMessage());
+        }
+    }
 
 
 //    public List<Order> getCustomerOrders(Long customerId) {

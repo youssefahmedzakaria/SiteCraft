@@ -3,6 +3,8 @@ package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Address;
 import com.sitecraft.backend.Models.Customer;
 import com.sitecraft.backend.Models.Order;
+import com.sitecraft.backend.Repositories.AddressRepo;
+import com.sitecraft.backend.Repositories.CustomerRepo;
 import com.sitecraft.backend.Services.CustomerService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +146,79 @@ public class CustomerController {
                     "message", "Password updated successfully."
             ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/addAddress")
+    public ResponseEntity<?> addAddress(@RequestBody Address address, HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Customer ID not found in session."
+                ));
+            }
+
+            customerService.addAddress(customerId, address);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Address added successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/updateAddress/{id}")
+    public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody Address address, HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Customer ID not found in session."
+                ));
+            }
+
+            customerService.updateAddress(customerId, id, address);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Address updated successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @DeleteMapping("/deleteAddress/{id}")
+    public ResponseEntity<?> deleteAddress(@PathVariable Long id, HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Customer ID not found in session."
+                ));
+            }
+
+            customerService.deleteAddress(customerId, id);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Address deleted successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "message", e.getMessage()
             ));
