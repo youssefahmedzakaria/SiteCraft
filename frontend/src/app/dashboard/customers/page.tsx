@@ -8,7 +8,7 @@ import { CustomerRecord } from "@/components/dashboard/customers/customerRecord"
 import { customers } from "@/lib/customers";
 import { SearchBar } from "@/components/ui/searchBar";
 import { Button } from "@/components/ui/button";
-import { UserCheck, UserX, Users } from "lucide-react";
+import { ChevronDown, UserCheck, UserX, Users } from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -45,7 +45,9 @@ export default function CustomersPage() {
         {/* Header section with title and subtitle */}
         <div className="mb-6 space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">Customers</h1>
-          <h2 className="text-lg md:text-xl font-semibold text-gray-600">Manage your customer relationships and accounts</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-600">
+            Manage your customer relationships and accounts
+          </h2>
         </div>
 
         {/* Stats row */}
@@ -59,7 +61,7 @@ export default function CustomersPage() {
               <p className="text-2xl font-bold">{customers.length}</p>
             </div>
           </div>
-          
+
           <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
             <div className="rounded-full bg-green-100 p-3 mr-4">
               <UserCheck className="h-6 w-6 text-green-600" />
@@ -69,7 +71,7 @@ export default function CustomersPage() {
               <p className="text-2xl font-bold">{activeCount}</p>
             </div>
           </div>
-          
+
           <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
             <div className="rounded-full bg-red-100 p-3 mr-4">
               <UserX className="h-6 w-6 text-red-600" />
@@ -95,15 +97,8 @@ export default function CustomersPage() {
                   size="lg"
                   className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
-                  <span className="ml-2">
-                    {statusFilter}
-                  </span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <span className="ml-2">{statusFilter}</span>
+                  <ChevronDown size={16}/>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>

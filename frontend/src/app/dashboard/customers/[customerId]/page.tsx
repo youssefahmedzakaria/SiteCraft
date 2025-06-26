@@ -18,6 +18,7 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -224,12 +225,7 @@ export default function CustomerDetailsPage({
                         ? "Highest Value"
                         : "Lowest Value"}
                     </span>
-                    <Image
-                      src="/icons/dropdown-colored.svg"
-                      alt="Dropdown Icon"
-                      width={20}
-                      height={20}
-                    />
+                    <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

@@ -7,6 +7,7 @@ import { StoreAboutTableHeader } from "@/components/dashboard/storeInfo/aboutTab
 import { PolicyRecord } from "@/components/dashboard/storeInfo/policyRecord";
 import { AboutRecord } from "@/components/dashboard/storeInfo/aboutRecord";
 import { policies, aboutSections } from "@/lib/store-info";
+import { Plus } from "lucide-react";
 
 export default function StoreInfoPage() {
   return (
@@ -30,12 +31,7 @@ export default function StoreInfoPage() {
             <div className="flex justify-end">
               <Link href="/dashboard/store-info/policy-add">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                  <Image
-                    src="/icons/plus.svg"
-                    alt="Add Policy"
-                    width={20}
-                    height={20}
-                  />
+                  <Plus size={16} />
                   <span className="ml-2">Add New Policy</span>
                 </Button>
               </Link>
@@ -60,12 +56,7 @@ export default function StoreInfoPage() {
             <div className="flex justify-end">
               <Link href="/dashboard/store-info/about-add">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                  <Image
-                    src="/icons/plus.svg"
-                    alt="Add About Section"
-                    width={20}
-                    height={20}
-                  />
+                  <Plus size={16} />
                   <span className="ml-2">Add New Section</span>
                 </Button>
               </Link>

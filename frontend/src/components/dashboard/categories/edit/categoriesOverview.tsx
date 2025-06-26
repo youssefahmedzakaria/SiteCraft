@@ -3,6 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 // import { Category } from "@/lib/categories";
 
 export default function CategorysOverview() {
@@ -100,13 +101,7 @@ export default function CategorysOverview() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-2">
-              <Image
-                src="/icons/upload.svg"
-                alt="Upload"
-                width={40}
-                height={40}
-                className="mx-auto"
-              />
+                <Upload size={40}/>
               <p className="text-sm text-gray-500">
                 Drag and drop your image here, or{" "}
                 <span

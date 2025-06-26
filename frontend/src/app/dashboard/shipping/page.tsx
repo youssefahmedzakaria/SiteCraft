@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { ChevronDown, Plus } from "lucide-react";
 
 export default function ShippingPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -41,12 +42,7 @@ export default function ShippingPage() {
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Link href="/dashboard/shipping/add" className="w-full sm:w-auto">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover w-full">
-                  <Image
-                    src="/icons/plus.svg"
-                    alt="Add Shipping"
-                    width={20}
-                    height={20}
-                  />
+                  <Plus size={16} />
                   <span className="ml-2">Add New Location</span>
                 </Button>
               </Link>
@@ -60,12 +56,7 @@ export default function ShippingPage() {
                     <span className="ml-2">
                       Import or Export Shipping Locations
                     </span>
-                    <Image
-                      src="/icons/dropdown-colored.svg"
-                      alt="Dropdown Icon"
-                      width={20}
-                      height={20}
-                    />
+                    <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { ChevronDown, Plus } from "lucide-react";
 
 export default function CategoriesPage() {
   const [sortType, setSortType] = useState<
@@ -100,13 +101,8 @@ export default function CategoriesPage() {
                 href="/dashboard/categories/add"
                 className="w-full sm:w-auto"
               >
-                <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                  <Image
-                    src="/icons/plus.svg"
-                    alt="Add Icon"
-                    width={20}
-                    height={20}
-                  />
+                <Button className="w-full justify-center items-center sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  <Plus size={16} />
                   <span className="ml-2">Add New Category</span>
                 </Button>
               </Link>
@@ -118,12 +114,7 @@ export default function CategoriesPage() {
                     className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                   >
                     <span className="ml-2">Import or Export Categories</span>
-                    <Image
-                      src="/icons/dropdown-colored.svg"
-                      alt="Dropdown Icon"
-                      width={20}
-                      height={20}
-                    />
+                    <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -182,12 +173,7 @@ export default function CategoriesPage() {
                       : "Products (Desc)"}
                   </span>
 
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>

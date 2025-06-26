@@ -23,6 +23,7 @@ import {
 import { useState } from "react";
 import { categories } from "@/lib/categories";
 import { ApplyDiscountDialog } from "@/components/dashboard/products/dicountDialog";
+import { ChevronDown, Plus } from "lucide-react";
 
 export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] =
@@ -138,12 +139,7 @@ export default function ProductPage() {
             <div className="flex flex-wrap gap-2 md:flex-col lg:flex-row md:items-center justify-end">
               <Link href="/dashboard/products/add" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                  <Image
-                    src="/icons/plus.svg"
-                    alt="Add Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <Plus size={16} />
                   <span className="ml-2">Add New Product</span>
                 </Button>
               </Link>
@@ -155,12 +151,7 @@ export default function ProductPage() {
                     className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                   >
                     <span className="ml-2">Import or Export Categories</span>
-                    <Image
-                      src="/icons/dropdown-colored.svg"
-                      alt="Dropdown Icon"
-                      width={20}
-                      height={20}
-                    />
+                    <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -214,12 +205,7 @@ export default function ProductPage() {
                       categoryFilter === category.title ? category.title : ""
                     )}
                   </span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -287,12 +273,7 @@ export default function ProductPage() {
                       StockFilter === status ? status : ""
                     )}
                   </span>
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                  />
+                  <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -328,13 +309,7 @@ export default function ProductPage() {
                   {selectedProducts.length > 0
                     ? `${selectedProducts.length} Selected`
                     : null}
-                  <Image
-                    src="/icons/dropdown-colored.svg"
-                    alt="Dropdown Icon"
-                    width={20}
-                    height={20}
-                    className="ml-2"
-                  />
+                  <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
