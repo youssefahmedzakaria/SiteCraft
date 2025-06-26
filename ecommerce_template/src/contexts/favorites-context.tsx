@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
 
-interface FavoriteItem {
+export interface FavoriteItem {
   id: string
   name: string
   price: number

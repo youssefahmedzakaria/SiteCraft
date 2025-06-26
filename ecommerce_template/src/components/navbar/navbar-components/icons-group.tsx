@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, ShoppingBag, Heart } from 'lucide-react';
+import Link from 'next/link';
 
 export interface IconsGroupProps {
   iconColor?: string;
@@ -24,7 +25,7 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
   return (
     <div className={`flex ${orientation === 'horizontal' ? 'space-x-6' : 'flex-col space-y-4'}`}>
       {icons.map(({ Icon, label, href }) => (
-        <a 
+        <Link 
           key={label} 
           href={href}
           className={`p-1 hover:opacity-80 flex ${orientation === 'horizontal' ? 'items-center' : 'flex-col items-center'}`}
@@ -35,7 +36,7 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
               {label}
             </span>
           )}
-        </a>
+        </Link>
       ))}
     </div>
   );
