@@ -167,6 +167,7 @@ public class OrderService {
                 orderProduct.setPrice(variant.getPrice().doubleValue());
                 orderProducts.add(orderProduct);
             }
+            orderProductRepo.saveAll(orderProducts);
 
             // Handle Shipping Data
             Address address = addressRepo.findById(addressId)
@@ -180,21 +181,21 @@ public class OrderService {
             shipping.setCost(shippingInfo.getShippingPrice().doubleValue());
             shipping.setStatus("Pending");
             shipping.setShippingDate(null);
+            shippingRepo.save(shipping);
 
 //            TODO
             // process order payment here
-            PaymentLog paymentLog = new PaymentLog();
+//            PaymentLog paymentLog = new PaymentLog();
 //            paymentLog.setTransactionId(paymentId);
+            //            paymentLogRepo.save(paymentLog);
 
             order.setPrice(cart.getTotalPrice().doubleValue());
             order.setIssueDate(LocalDateTime.now());
-            order.setPaymentLog(paymentLog);
+//            order.setPaymentLog(paymentLog);
             order.setShipping(shipping);
             order.setOrderProducts(orderProducts);
 
-            orderProductRepo.saveAll(orderProducts);
-            shippingRepo.save(shipping);
-            paymentLogRepo.save(paymentLog);
+
             orderRepo.save(order);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
