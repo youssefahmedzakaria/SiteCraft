@@ -1,10 +1,13 @@
 package com.sitecraft.backend.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "wishlist")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class WishList {
 
     @Id
@@ -15,9 +18,11 @@ public class WishList {
     private Integer numberOfProducts;
 
     @OneToOne(mappedBy = "wishList")
+    @JsonIgnore
     private Customer customer;
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<WishListProduct> wishListProducts;
 
     public WishList() {

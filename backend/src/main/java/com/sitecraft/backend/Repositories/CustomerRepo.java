@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 public interface CustomerRepo extends JpaRepository<Customer, Long> {
     List<Customer> findByStoreId(Long storeId);
+    Customer findByEmailAndStoreId(String email, Long storeId);
     
     /**
      * Count new customers registered within the given date range for the specified store.
