@@ -8,6 +8,7 @@ public class ProductVariantDTO {
     private String sku;
     private Integer stock;
     private BigDecimal price;
+    private BigDecimal discountedPrice;
     private BigDecimal productionCost;
     private List<VariantAttributeDTO> attributes;
 
@@ -18,6 +19,15 @@ public class ProductVariantDTO {
         this.sku = sku;
         this.stock = stock;
         this.price = price;
+        this.productionCost = productionCost;
+    }
+
+    public ProductVariantDTO(Long id, String sku, Integer stock, BigDecimal price, BigDecimal discountedPrice, BigDecimal productionCost) {
+        this.id = id;
+        this.sku = sku;
+        this.stock = stock;
+        this.price = price;
+        this.discountedPrice = discountedPrice;
         this.productionCost = productionCost;
     }
 
@@ -33,6 +43,9 @@ public class ProductVariantDTO {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public BigDecimal getDiscountedPrice() { return discountedPrice; }
+    public void setDiscountedPrice(BigDecimal discountedPrice) { this.discountedPrice = discountedPrice; }
 
     public BigDecimal getProductionCost() { return productionCost; }
     public void setProductionCost(BigDecimal productionCost) { this.productionCost = productionCost; }
