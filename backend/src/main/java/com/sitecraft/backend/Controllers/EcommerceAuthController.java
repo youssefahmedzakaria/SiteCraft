@@ -150,6 +150,75 @@ public class EcommerceAuthController {
         }
     }
 
+    @PostMapping("/forgotPassword/sendOTP")
+    public ResponseEntity<?> sendCustomerOTP(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            if (!ecommerceAuthService.isCustomerExists(email)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "No customer with this email exists."));
+            }
+            ecommerceAuthService.sendCustomerOTP(email);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "OTP sent successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/forgotPassword/verifyOTP")
+    public ResponseEntity<?> verifyCustomerOTP(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            String code = body.get("otp");
+            if (!ecommerceAuthService.isCustomerExists(email)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "No customer with this email exists."));
+            }
+            ecommerceAuthService.verifyCustomerOTP(email, code);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/forgotPassword/resetPassword")
+    public ResponseEntity<?> resetCustomerPassword(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            String newPassword = body.get("newPassword");
+            if (newPassword == null || newPassword.length() < 8) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Password must be at least 8 characters long."));
+            }
+            if (!ecommerceAuthService.isCustomerExists(email)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "No customer with this email exists."));
+            }
+            ecommerceAuthService.resetCustomerPassword(email, newPassword);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Password reset successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
     public static class LoginRequest {
         private String email;
         private String password;

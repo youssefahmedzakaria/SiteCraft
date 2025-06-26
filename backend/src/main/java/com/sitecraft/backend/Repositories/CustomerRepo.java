@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public interface CustomerRepo extends JpaRepository<Customer, Long> {
     List<Customer> findByStoreId(Long storeId);
     Customer findByEmailAndStoreId(String email, Long storeId);
+    Customer findByEmail(String email);
     
     /**
      * Count new customers registered within the given date range for the specified store.
@@ -30,7 +31,7 @@ public interface CustomerRepo extends JpaRepository<Customer, Long> {
   );
   /**
    * Count returning customers for a given store.
-   * A customer is “returning” if they placed at least one order
+   * A customer is "returning" if they placed at least one order
    * BEFORE the start date, AND at least one order BETWEEN start and end.
    */
   @Query(value = """
