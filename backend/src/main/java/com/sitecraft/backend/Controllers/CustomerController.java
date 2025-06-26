@@ -103,6 +103,54 @@ public class CustomerController {
         }
     }
 
+    @PutMapping("/updateCustomerInfo")
+    public ResponseEntity<?> updateCustomerInfo(@RequestBody Customer updatedCustomer, HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+
+            customerService.updateCustomerInfo(customerId, updatedCustomer);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Customer profile updated successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String,String> passwords, HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Customer ID not found in session."
+                ));
+            }
+
+            customerService.changePassword(customerId, passwords);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Password updated successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
     @PostMapping("/setSession")
     public ResponseEntity setSession(HttpSession session, @RequestBody Customer customer) {
         session.setAttribute("customerId", customer.getId());

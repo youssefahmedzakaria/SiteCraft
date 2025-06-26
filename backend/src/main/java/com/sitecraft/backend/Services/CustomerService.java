@@ -7,10 +7,11 @@ import com.sitecraft.backend.Repositories.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 
@@ -97,6 +98,49 @@ public class CustomerService {
             throw new RuntimeException("Failed to get customer addresses: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public void updateCustomerInfo(Long customerId, Customer updatedCustomer) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            if (updatedCustomer.getName() != null) customer.setName(updatedCustomer.getName());
+            if (updatedCustomer.getPhone() != null) customer.setPhone(updatedCustomer.getPhone());
+            if (updatedCustomer.getGender() != null) customer.setGender(updatedCustomer.getGender());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update customer info: " + e.getMessage());
+        }
+    }
+
+
+    public void changePassword(Long customerId, Map<String, String> passwords) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            String currentPassword = passwords.get("currentPassword");
+            String newPassword = passwords.get("newPassword");
+
+            if (newPassword.length() < 8) {
+                throw new RuntimeException("New password must be at least 8 characters long.");
+            }
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (!encoder.matches(currentPassword, customer.getPassword())) {
+                throw new RuntimeException("Current password is incorrect.");
+            }
+
+            customer.setPassword(encoder.encode(newPassword));
+            customerRepo.save(customer);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update password: " + e.getMessage());
+        }
+    }
+
+
 
 
 //    public List<Order> getCustomerOrders(Long customerId) {
