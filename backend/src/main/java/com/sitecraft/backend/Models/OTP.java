@@ -14,7 +14,7 @@ public class OTP {
 
     private Boolean active = true;
 
-    private Long userId;
+    private String userId;
 
     private String userType;
 
@@ -25,7 +25,7 @@ public class OTP {
     public OTP() {
     }
 
-    public OTP(Long id, String code, Boolean active, Long userId, String userType, LocalDateTime createdAt, LocalDateTime expiresAt) {
+    public OTP(Long id, String code, Boolean active, String userId, String userType, LocalDateTime createdAt, LocalDateTime expiresAt) {
         this.id = id;
         this.code = code;
         this.active = active;
@@ -59,11 +59,11 @@ public class OTP {
         this.active = active;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

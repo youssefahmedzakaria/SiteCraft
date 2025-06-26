@@ -9,6 +9,6 @@ import java.util.Optional;
 
 
 public interface OTPRepo extends JpaRepository<OTP, Long> {
-    OTP findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(Long userId, String code, LocalDateTime now);
-    List<OTP> findByUserIdAndActiveTrue(Long id);
+    OTP findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(String userId, String code, LocalDateTime now);
+    List<OTP> findByUserIdAndActiveTrue(String userId);
 }

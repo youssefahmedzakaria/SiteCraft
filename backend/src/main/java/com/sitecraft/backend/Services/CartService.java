@@ -2,6 +2,10 @@ package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
+import com.sitecraft.backend.DTOs.CartProductDTO;
+import com.sitecraft.backend.DTOs.ProductDTO;
+import com.sitecraft.backend.DTOs.ProductImageDTO;
+import com.sitecraft.backend.DTOs.ProductVariantDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,5 +119,66 @@ public class CartService {
             }
         }
         cart.setTotalPrice(total);
+    }
+
+    public List<CartProductDTO> getCartProductDTOs(Long cartId) {
+        List<CartProduct> cartProducts = getCartProducts(cartId);
+        if (cartProducts == null) return null;
+        List<CartProductDTO> dtos = new java.util.ArrayList<>();
+        for (CartProduct cp : cartProducts) {
+            Product product = cp.getProduct();
+            ProductDTO productDTO = mapProductToDTO(product);
+            ProductVariants variant = productVariantsRepo.findAll().stream()
+                .filter(v -> v.getSku().equals(cp.getSku()))
+                .findFirst().orElse(null);
+            ProductVariantDTO variantDTO = (variant != null) ? mapVariantToDTO(variant) : null;
+            dtos.add(new CartProductDTO(
+                cp.getId(),
+                cp.getQuantity(),
+                cp.getSku(),
+                productDTO,
+                variantDTO
+            ));
+        }
+        return dtos;
+    }
+
+    private ProductDTO mapProductToDTO(Product product) {
+        if (product == null) return null;
+        List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
+        if (product.getImages() != null) {
+            for (ProductImage img : product.getImages()) {
+                imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
+            }
+        }
+        List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
+        if (product.getVariants() != null) {
+            for (ProductVariants v : product.getVariants()) {
+                variantDTOs.add(mapVariantToDTO(v));
+            }
+        }
+        return new ProductDTO(
+            product.getId(),
+            product.getName(),
+            product.getDescription(),
+            product.getDiscountType(),
+            product.getDiscountValue(),
+            product.getMinCap(),
+            product.getPercentageMax(),
+            product.getMaxCap(),
+            imageDTOs,
+            variantDTOs
+        );
+    }
+
+    private ProductVariantDTO mapVariantToDTO(ProductVariants variant) {
+        if (variant == null) return null;
+        return new ProductVariantDTO(
+            variant.getId(),
+            variant.getSku(),
+            variant.getStock(),
+            variant.getPrice(),
+            variant.getProductionCost()
+        );
     }
 } 
