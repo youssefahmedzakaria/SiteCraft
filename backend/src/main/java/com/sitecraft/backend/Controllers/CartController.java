@@ -3,9 +3,11 @@ package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.CartProduct;
 import com.sitecraft.backend.Models.ShoppingCart;
 import com.sitecraft.backend.Services.CartService;
+import com.sitecraft.backend.DTOs.CartProductDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -22,37 +24,85 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    @GetMapping("/{customerId}/products")
-    public ResponseEntity<List<CartProduct>> getCartProducts(@PathVariable Long customerId) {
+    @GetMapping("/products")
+    public ResponseEntity<List<CartProductDTO>> getCartProducts(HttpSession session) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
         ShoppingCart cart = cartService.getCartByCustomerId(customerId);
         if (cart == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(cart.getCartProducts());
+        List<CartProductDTO> dtos = cartService.getCartProductDTOs(cart.getId());
+        return ResponseEntity.ok(dtos);
     }
 
-    @PostMapping("/{customerId}/add")
-    public ResponseEntity<CartProduct> addProductToCart(@PathVariable Long customerId, @RequestParam Long productId, @RequestParam String sku, @RequestParam int quantity) {
-        CartProduct cp = cartService.addProductToCart(customerId, productId, sku, quantity);
+    @PostMapping("/add")
+    public ResponseEntity<CartProductDTO> addProductToCart(HttpSession session, @RequestBody AddCartProductRequest req) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        CartProduct cp = cartService.addProductToCart(customerId, req.productId, req.sku, req.quantity);
         if (cp == null) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(cp);
+        ShoppingCart cart = cartService.getCartByCustomerId(customerId);
+        CartProductDTO dto = cartService.getCartProductDTOs(cart.getId()).stream().filter(d -> d.getCartProductId().equals(cp.getId())).findFirst().orElse(null);
+        return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/{customerId}/remove/{cartProductId}")
-    public ResponseEntity<Void> removeProductFromCart(@PathVariable Long customerId, @PathVariable Long cartProductId) {
+    @DeleteMapping("/remove/{cartProductId}")
+    public ResponseEntity<Void> removeProductFromCart(HttpSession session, @PathVariable Long cartProductId) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
         boolean removed = cartService.removeProductFromCart(customerId, cartProductId);
         if (!removed) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{customerId}/update/{cartProductId}")
-    public ResponseEntity<Void> updateProductQuantity(@PathVariable Long customerId, @PathVariable Long cartProductId, @RequestParam int quantity) {
-        boolean updated = cartService.updateProductQuantity(customerId, cartProductId, quantity);
+    @PutMapping("/update")
+    public ResponseEntity<Void> updateProductQuantity(HttpSession session, @RequestBody UpdateCartProductRequest req) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        boolean updated = cartService.updateProductQuantity(customerId, req.cartProductId, req.quantity);
         if (!updated) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{customerId}/clear")
-    public ResponseEntity<Void> clearCart(@PathVariable Long customerId) {
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearCart(HttpSession session) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
         cartService.clearCart(customerId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> getCartSummary(HttpSession session) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        ShoppingCart cart = cartService.getCartByCustomerId(customerId);
+        if (cart == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(java.util.Map.of(
+            "id", cart.getId(),
+            "totalPrice", cart.getTotalPrice()
+        ));
+    }
+}
+
+class UpdateCartProductRequest {
+    public Long cartProductId;
+    public int quantity;
+}
+
+class AddCartProductRequest {
+    public Long productId;
+    public String sku;
+    public int quantity;
 } 
