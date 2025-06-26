@@ -1,11 +1,14 @@
 package com.sitecraft.backend.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Table(name = "shoppingcart")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ShoppingCart {
 
     @Id
@@ -16,9 +19,11 @@ public class ShoppingCart {
     private BigDecimal totalPrice;
 
     @OneToOne(mappedBy = "shoppingCart")
+    @JsonIgnore
     private Customer customer;
 
     @OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<CartProduct> cartProducts;
 
     public ShoppingCart() {
