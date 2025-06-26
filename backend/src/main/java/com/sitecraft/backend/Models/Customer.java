@@ -15,14 +15,26 @@ public class Customer {
     private String gender;
     private String phone;
     private String status;
-    private Long wishlistId;
-    private Long cartId;
-    private Long storeId;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wishlist_id")
+    private WishList wishList;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    private ShoppingCart shoppingCart;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Order> orders;
 
-    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, Long wishlistId, Long cartId, Long storeId, List<Order> orders) {
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Review> reviews;
+
+    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -30,10 +42,11 @@ public class Customer {
         this.gender = gender;
         this.phone = phone;
         this.status = status;
-        this.wishlistId = wishlistId;
-        this.cartId = cartId;
-        this.storeId = storeId;
+        this.wishList = wishList;
+        this.shoppingCart = shoppingCart;
+        this.store = store;
         this.orders = orders;
+        this.reviews = reviews;
     }
 
     public Customer() {
@@ -96,28 +109,28 @@ public class Customer {
         this.status = status;
     }
 
-    public Long getWishlistId() {
-        return wishlistId;
+    public WishList getWishList() {
+        return wishList;
     }
 
-    public void setWishlistId(Long wishlistId) {
-        this.wishlistId = wishlistId;
+    public void setWishList(WishList wishList) {
+        this.wishList = wishList;
     }
 
-    public Long getCartId() {
-        return cartId;
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
     }
 
-    public void setCartId(Long cartId) {
-        this.cartId = cartId;
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
     }
 
-    public Long getStoreId() {
-        return storeId;
+    public Store getStore() {
+        return store;
     }
 
-    public void setStoreId(Long storeId) {
-        this.storeId = storeId;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public List<Order> getOrders() {
@@ -126,5 +139,13 @@ public class Customer {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }
