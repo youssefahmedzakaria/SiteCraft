@@ -1,6 +1,7 @@
 import type { SidebarElement } from "@/lib/sidebarElements";
 import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Home,
   Layout,
@@ -39,6 +40,7 @@ export function SidebarElementComponent({
   element: SidebarElement;
 }) {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   // Check if current path matches this element's destination
   const isActive =
@@ -53,6 +55,20 @@ export function SidebarElementComponent({
   // Dynamically get the icon component from lucide-react
   const IconComponent = iconMap[element.iconName];
 
+  // Handle logout action
+  const handleClick = async (e: React.MouseEvent) => {
+    if (element.title === 'Log Out') {
+      e.preventDefault();
+      console.log('🔐 Logout button clicked in sidebar');
+      try {
+        await logout();
+        console.log('✅ Logout successful from sidebar');
+      } catch (error) {
+        console.error('❌ Logout failed from sidebar:', error);
+      }
+    }
+  };
+
   return (
     <>
       <Button
@@ -60,6 +76,7 @@ export function SidebarElementComponent({
         className={`w-full text-base text-primary-foreground hover:text-logo-txt-hover hover:bg-logo-light-button-hover rounded-none flex items-center justify-start pl-4 gap-2 ${
           isActive ? "bg-logo-light-button-hover text-logo-txt-hover" : ""
         }`}
+        onClick={handleClick}
       >
         {IconComponent && <IconComponent size={20} />}
 

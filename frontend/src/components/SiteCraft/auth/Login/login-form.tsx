@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useLoginForm } from "@/hooks/useLoginForm";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Label } from "@/components/SiteCraft/ui/label";
@@ -13,21 +13,16 @@ import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export function LoginForm() {
-  const { login, loginError } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    // setIsLoading(true)
-
-    // const formData = new FormData(event.currentTarget)
-    // const email = formData.get("email") as string
-    // const password = formData.get("password") as string
-
-    // await login(email, password)
-    // setIsLoading(false)
-    window.location.href = "/dashboard";
-  }
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    isLoading,
+    loginError,
+    onSubmit,
+    clearError
+  } = useLoginForm();
 
   return (
     <form onSubmit={onSubmit} className="w-full space-y-6">
@@ -63,6 +58,11 @@ export function LoginForm() {
             autoComplete="email"
             required
             disabled={isLoading}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              if (loginError) clearError()
+            }}
             className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
@@ -92,6 +92,11 @@ export function LoginForm() {
             autoComplete="current-password"
             required
             disabled={isLoading}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              if (loginError) clearError()
+            }}
             className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
           />
         </div>

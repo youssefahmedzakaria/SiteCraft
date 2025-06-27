@@ -1,50 +1,61 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
+import { ProductCreateDTO } from "@/lib/products";
 
-export function LowStockSection() {
-  {
-    /* For low stock */
-  }
-  const [lowStockOption, setLowStockOption] = useState<string | null>(
-    "Number of Items"
-  );
+interface LowStockSectionProps {
+  formData: ProductCreateDTO;
+  updateFormData: (updates: Partial<ProductCreateDTO>) => void;
+}
 
-  {
-    /* For low stock */
-  }
-  const handleLowStockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value === lowStockOption) {
-      setLowStockOption(null);
-    } else {
-      setLowStockOption(event.target.value);
-    }
+export function LowStockSection({ formData, updateFormData }: LowStockSectionProps) {
+  const [lowStockOption, setLowStockOption] = useState<string>("Number of Items");
+
+  // Handle form field changes
+  const handleStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateFormData({ stock: parseInt(e.target.value) || 0 });
   };
 
-  {
-    /* Low Stock Settings Section */
-  }
+  const handleLowStockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLowStockOption(event.target.value);
+  };
+
   return (
     <div className="space-y-4">
       <div className="mb-2">
-        <CardTitle className="font-bold">Low Stock Settings</CardTitle>
+        <CardTitle className="font-bold">Stock Management</CardTitle>
         <p className="text-gray-500">
-          Enter the details for stock level availabile in your inventory you
-          want to be noified at
+          Set the initial stock level and low stock notification settings
         </p>
       </div>
 
-      {/* Settings type and value */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        {/* Settings Type */}
-        <div className="flex-1 space-y-2">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Settings Type
+      {/* Initial Stock */}
+      <div className="space-y-2">
+        <label
+          htmlFor="stock"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Initial Stock <span className="text-red-500">*</span>
+        </label>
+        <Input
+          id="stock"
+          name="stock"
+          type="number"
+          value={formData.stock || ''}
+          onChange={handleStockChange}
+          placeholder="e.g. 100"
+          className="w-full"
+          required
+        />
+      </div>
+
+      {/* Low Stock Settings */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Low Stock Notification Type
           </label>
           <div className="flex gap-10">
             <label className="flex gap-2">
@@ -68,45 +79,31 @@ export function LowStockSection() {
           </div>
         </div>
 
-        {/* Settings Value */}
-        <div className="flex-1 space-y-2">
+        {/* Low Stock Value */}
+        <div className="space-y-2">
           <label
-            htmlFor="name"
+            htmlFor="lowStockValue"
             className="block text-sm font-medium text-gray-700"
           >
             {lowStockOption === "Percentage"
-              ? "Percentage Value"
-              : "Minimum Inventory Capacity"}
-            <span className="text-red-500">*</span>
+              ? "Low Stock Percentage"
+              : "Low Stock Threshold"}
           </label>
           <Input
-            id="settingsValue"
-            name="settingsValue"
-            placeholder="e.g. 10"
+            id="lowStockValue"
+            name="lowStockValue"
+            type="number"
+            placeholder={lowStockOption === "Percentage" ? "e.g. 10" : "e.g. 5"}
             className="w-full"
-            required
           />
+          <p className="text-xs text-gray-500">
+            {lowStockOption === "Percentage" 
+              ? "You'll be notified when stock falls below this percentage"
+              : "You'll be notified when stock falls below this number of items"
+            }
+          </p>
         </div>
       </div>
-
-      {/* Maximum inventory capacity */}
-      {lowStockOption === "Percentage" && (
-        <div className="flex-1 space-y-2">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Maximum Inventory Capacity <span className="text-red-500">*</span>
-          </label>
-          <Input
-            id="maxCapacity"
-            name="maxCapacity"
-            placeholder="e.g. 90"
-            className="w-full"
-            required
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -29,7 +29,7 @@ export const MultiLineChartCard: FC<MultiLineChartCardProps> = ({
   nameKey,
   title,
   subtitle,
-  colors = ['#cc7860', '#5d8aa8', '#6b8e23', '#b8860b', '#8b4513']
+  colors = ['#4dbf38', '#3da32e', '#2d8724', '#1d6b1a', '#0d4f10']
 }) => {
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 1200

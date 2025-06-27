@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LayoutWrapper } from "@/components/SiteCraft/layout-wrapper";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +33,9 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <LayoutWrapper> {children}</LayoutWrapper>
+        <SessionProvider>
+          <LayoutWrapper> {children}</LayoutWrapper>
+        </SessionProvider>
       </body>
     </html>
   );

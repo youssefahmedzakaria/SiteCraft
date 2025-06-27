@@ -22,7 +22,7 @@ interface BarChartCardProps {
   title: string
   subtitle?: string
   colors?: string[]
-  /** When true, skip this card’s own border/padding wrapper */
+  /** When true, skip this card's own border/padding wrapper */
   hideContainerBorder?: boolean
 }
 
@@ -32,7 +32,7 @@ export const BarChartCard: FC<BarChartCardProps> = ({
   nameKey,
   title,
   subtitle,
-  colors = ['#cc7860', '#5d8aa8', '#6b8e23', '#b8860b', '#8b4513'],
+  colors = ['#4dbf38', '#3da32e', '#2d8724', '#1d6b1a', '#0d4f10'],
   hideContainerBorder = false,
 }) => {
   const [windowWidth, setWindowWidth] = useState<number>(

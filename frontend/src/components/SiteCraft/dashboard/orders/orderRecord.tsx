@@ -10,13 +10,13 @@ export function OrderRecord({ order }: { order: Order }) {
       <tr>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">{order.id}</td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {order.customer.name}
+          {order.customer?.name || 'N/A'}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {format(order.issueDate, "MMM dd, yyyy")}
+          {format(new Date(order.issueDate), "MMM dd, yyyy")}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {order.total.toFixed(2)}EGP
+          {(order.price || 0).toFixed(2)} EGP
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
           <span

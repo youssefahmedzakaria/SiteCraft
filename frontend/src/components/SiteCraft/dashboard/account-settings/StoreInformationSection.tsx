@@ -1,17 +1,179 @@
 // frontend/src/components/dashboard/account-settings/StoreInformationSection.tsx
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Loader2 } from "lucide-react";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
+import { Store } from "@/lib/store-info";
 
 export function StoreInformationSection() {
+  const { store, loading, error, updating, updateStore } = useStoreSettings();
+  
+  const [formData, setFormData] = useState<Partial<Store>>({
+    storeName: '',
+    description: '',
+    phoneNumber: '',
+    emailAddress: '',
+    address: '',
+    addressLink: '',
+    openingHours: '',
+    subdomain: '',
+  });
+
+  const [socialMedia, setSocialMedia] = useState({
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    youtube: '',
+  });
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  // Update form data when store data loads
+  useEffect(() => {
+    if (store) {
+      setFormData({
+        storeName: store.storeName || '',
+        description: store.description || '',
+        phoneNumber: store.phoneNumber || '',
+        emailAddress: store.emailAddress || '',
+        address: store.address || '',
+        addressLink: store.addressLink || '',
+        openingHours: store.openingHours || '',
+        subdomain: store.subdomain || '',
+      });
+
+      // Set logo preview if exists
+      if (store.logo) {
+        setLogoPreview(`http://localhost:8080${store.logo}`);
+      }
+
+      // Set social media data
+      if (store.socialMediaAccounts) {
+        const socialData = {
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          youtube: '',
+        };
+
+        store.socialMediaAccounts.forEach(account => {
+          if (account.platform.toLowerCase() === 'facebook') {
+            socialData.facebook = account.url.replace('https://facebook.com/', '');
+          } else if (account.platform.toLowerCase() === 'instagram') {
+            socialData.instagram = account.url.replace('https://instagram.com/', '');
+          } else if (account.platform.toLowerCase() === 'twitter') {
+            socialData.twitter = account.url.replace('https://x.com/', '');
+          } else if (account.platform.toLowerCase() === 'youtube') {
+            socialData.youtube = account.url.replace('https://youtube.com/', '');
+          }
+        });
+
+        setSocialMedia(socialData);
+      }
+    }
+  }, [store]);
+
+  const handleInputChange = (field: keyof Store, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSocialMediaChange = (platform: string, value: string) => {
+    setSocialMedia(prev => ({
+      ...prev,
+      [platform]: value
+    }));
+  };
+
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    
+    try {
+      // Prepare social media accounts
+      const socialMediaAccounts = [];
+      if (socialMedia.facebook) {
+        socialMediaAccounts.push({
+          platform: 'Facebook',
+          url: `https://facebook.com/${socialMedia.facebook}`
+        });
+      }
+      if (socialMedia.instagram) {
+        socialMediaAccounts.push({
+          platform: 'Instagram',
+          url: `https://instagram.com/${socialMedia.instagram}`
+        });
+      }
+      if (socialMedia.twitter) {
+        socialMediaAccounts.push({
+          platform: 'Twitter',
+          url: `https://x.com/${socialMedia.twitter}`
+        });
+      }
+      if (socialMedia.youtube) {
+        socialMediaAccounts.push({
+          platform: 'YouTube',
+          url: `https://youtube.com/${socialMedia.youtube}`
+        });
+      }
+
+      const updateData = {
+        ...formData,
+        socialMediaAccounts
+      };
+
+      await updateStore(updateData, logoFile || undefined);
+      
+      // Show success message (you can add a toast notification here)
+      console.log('✅ Store information updated successfully!');
+    } catch (error) {
+      console.error('❌ Failed to update store information:', error);
+      // Show error message (you can add a toast notification here)
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-logo-txt" />
+        <span className="ml-2 text-gray-600">Loading store settings...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600 mb-4">Error: {error}</p>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <form className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Store Information */}
       <div>
         <CardTitle className="font-bold text-2xl mb-6">
@@ -30,6 +192,8 @@ export function StoreInformationSection() {
               name="storeName"
               required
               placeholder="Your Store Name"
+              value={formData.storeName}
+              onChange={(e) => handleInputChange('storeName', e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               This will be displayed on your storefront and receipts
@@ -38,7 +202,7 @@ export function StoreInformationSection() {
 
           <div>
             <label
-              htmlFor="storeUrl"
+              htmlFor="subdomain"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Web Address <span className="text-red-500">*</span>
@@ -48,11 +212,13 @@ export function StoreInformationSection() {
                 https://
               </span>
               <Input
-                id="storeUrl"
-                name="storeUrl"
+                id="subdomain"
+                name="subdomain"
                 required
                 className="rounded-l-none"
                 placeholder="yourstore.example.com"
+                value={formData.subdomain}
+                onChange={(e) => handleInputChange('subdomain', e.target.value)}
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">
@@ -62,21 +228,48 @@ export function StoreInformationSection() {
 
           <div className="md:col-span-2">
             <label
-              htmlFor="storeDescription"
+              htmlFor="description"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Store Description
             </label>
             <Textarea
-              id="storeDescription"
-              name="storeDescription"
+              id="description"
+              name="description"
               placeholder="Brief description of your store"
               rows={4}
               className="w-full"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               A short description that appears in search results (150 characters
               max)
+            </p>
+          </div>
+
+          {/* Logo Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Store Logo
+            </label>
+            <div className="flex items-center space-x-4">
+              {logoPreview && (
+                <img
+                  src={logoPreview}
+                  alt="Store logo preview"
+                  className="w-16 h-16 object-cover rounded border"
+                />
+              )}
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className="max-w-xs"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Upload your store logo (recommended size: 200x200px)
             </p>
           </div>
         </div>
@@ -100,6 +293,8 @@ export function StoreInformationSection() {
               name="phoneNumber"
               required
               placeholder="Your Phone Number"
+              value={formData.phoneNumber}
+              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               This number will be visible on your storefront and can help
@@ -108,21 +303,71 @@ export function StoreInformationSection() {
           </div>
           <div>
             <label
-              htmlFor="email"
+              htmlFor="emailAddress"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Email Address <span className="text-red-500">*</span>
             </label>
             <Input
-              id="email"
-              name="email"
+              id="emailAddress"
+              name="emailAddress"
               required
               placeholder="youremail@example.com"
+              value={formData.emailAddress}
+              onChange={(e) => handleInputChange('emailAddress', e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               This email will be visible on your storefront and can help
               customers reach you.
             </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="address"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Address
+            </label>
+            <Input
+              id="address"
+              name="address"
+              placeholder="Your Store Address"
+              value={formData.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="addressLink"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Address Link (Google Maps)
+            </label>
+            <Input
+              id="addressLink"
+              name="addressLink"
+              placeholder="https://maps.google.com/..."
+              value={formData.addressLink}
+              onChange={(e) => handleInputChange('addressLink', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="openingHours"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Opening Hours
+            </label>
+            <Input
+              id="openingHours"
+              name="openingHours"
+              placeholder="Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"
+              value={formData.openingHours}
+              onChange={(e) => handleInputChange('openingHours', e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -154,6 +399,8 @@ export function StoreInformationSection() {
                 name="facebook"
                 placeholder="yourstorepage"
                 className="rounded-l-none"
+                value={socialMedia.facebook}
+                onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
               />
             </div>
           </div>
@@ -175,6 +422,8 @@ export function StoreInformationSection() {
                 name="instagram"
                 placeholder="yourstorehandle"
                 className="rounded-l-none"
+                value={socialMedia.instagram}
+                onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
               />
             </div>
           </div>
@@ -196,6 +445,8 @@ export function StoreInformationSection() {
                 name="twitter"
                 placeholder="yourstorehandle"
                 className="rounded-l-none"
+                value={socialMedia.twitter}
+                onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
               />
             </div>
           </div>
@@ -217,6 +468,8 @@ export function StoreInformationSection() {
                 name="youtube"
                 placeholder="yourchannel"
                 className="rounded-l-none"
+                value={socialMedia.youtube}
+                onChange={(e) => handleSocialMediaChange('youtube', e.target.value)}
               />
             </div>
           </div>
@@ -227,13 +480,23 @@ export function StoreInformationSection() {
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           type="submit"
+          disabled={updating}
           className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
         >
-          Save Changes
+          {updating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Changes'
+          )}
         </Button>
         <Link href="/dashboard/account-settings">
           <Button
+            type="button"
             variant="outline"
+            disabled={updating}
             className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
           >
             Cancel

@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
 public class StoreController {
 
     @Autowired
@@ -30,41 +31,39 @@ public class StoreController {
     public ResponseEntity<?> createStore(
             @RequestPart(value = "store") String storeJson,
             @RequestPart(value = "logo", required = false) MultipartFile logo,
-            HttpSession session) {
+            @PathVariable Long userId) {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
             Store newStore = mapper.readValue(storeJson, Store.class);
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
+            
+            // Create the store first to get the store ID
+            Store createdStore = storeService.createStore(newStore, userId);
+            
+            // Handle logo upload if provided
             if (logo != null && !logo.isEmpty()) {
-                // Generate unique filename
                 String originalFilename = logo.getOriginalFilename();
                 String extension = originalFilename != null ?
                         originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
-                String filename = "Store_Logo" + storeId + "_" + logo.getOriginalFilename();
+                String filename = "Store_Logo" + createdStore.getId() + "_" + logo.getOriginalFilename();
 
-                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId;
+                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + createdStore.getId();
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
 
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
-                // Set new logo path relative to project (or public URL if you're serving it)
-                String logoUrl = "/uploads/stores/" + storeId + "/" + filename;
-                newStore.setLogo(logoUrl);
+                // Update store with logo path
+                String logoUrl = "/uploads/stores/" + createdStore.getId() + "/" + filename;
+                createdStore.setLogo(logoUrl);
+                createdStore = storeService.updateStorePartial(createdStore.getId(), createdStore);
             }
-
-            Store store = storeService.createStore(newStore, (Long) session.getAttribute("userId"));
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Store created successfully",
-                    "store", store
+                    "store", createdStore
             ));
 
         } catch (Exception e) {

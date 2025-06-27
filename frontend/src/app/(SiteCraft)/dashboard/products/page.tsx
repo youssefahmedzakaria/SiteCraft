@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Image from "next/image";
-import { products } from "@/lib/products";
+import { useProductManagement } from "@/hooks/useProductManagement";
 import { productAnalytics } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
 import { ProductRecord } from "@/components/SiteCraft/dashboard/products/productRecord";
@@ -23,17 +23,25 @@ import {
 import { useState } from "react";
 import { categories } from "@/lib/categories";
 import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/dicountDialog";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
 
 export default function ProductPage() {
-  const [categoryFilter, setCategoryFilter] =
-    useState<string>("All Categories");
-  const [StockFilter, setStockFilter] = useState<string>("All Stock");
+  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
+  const [stockFilter, setStockFilter] = useState<string>("All Stock");
+  const [searchQuery, setSearchQuery] = useState("");
   const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
   const [file, setFile] = useState<File | null>(null);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
+
+  const {
+    products,
+    isLoading,
+    error,
+    clearError,
+    fetchProducts
+  } = useProductManagement();
 
   const handleCategorySelect = (title: string) => {
     setCategoryFilter(title);
@@ -43,19 +51,40 @@ export default function ProductPage() {
     setStockFilter(title);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
   const filteredProducts = products.filter((product) => {
-    if (categoryFilter === "All Categories" && StockFilter === "All Stock") {
-      return true;
+    // Filter by category
+    if (categoryFilter !== "All Categories") {
+      if (!product.categoryId) return false;
+      const category = categories.find(c => c.id === product.categoryId.toString());
+      if (!category || category.title !== categoryFilter) {
+        return false;
+      }
     }
-    if (categoryFilter !== "All Categories" && StockFilter === "All Stock") {
-      return product.category === categoryFilter;
+
+    // Filter by stock status
+    if (stockFilter !== "All Stock") {
+      const productStatus = product.stock > 0 ? "In Stock" : "Out of Stock";
+      if (productStatus !== stockFilter) {
+        return false;
+      }
     }
-    if (StockFilter !== "All Stock" && categoryFilter === "All Categories") {
-      return product.status === StockFilter;
+
+    // Filter by search query
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const productName = product.name.toLowerCase();
+      const productDescription = product.description.toLowerCase();
+      
+      if (!productName.includes(searchLower) && !productDescription.includes(searchLower)) {
+        return false;
+      }
     }
-    return (
-      product.category === categoryFilter && product.status === StockFilter
-    );
+
+    return true;
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,18 +92,10 @@ export default function ProductPage() {
     if (selectedFile) {
       setFile(selectedFile);
       console.log("File selected:", selectedFile.name);
-
-      // Optional: You could add file reading logic here
-      // const reader = new FileReader();
-      // reader.onload = (e) => {
-      //   const content = e.target?.result;
-      //   // Process the file content
-      // };
-      // reader.readAsText(selectedFile);
     }
   };
 
-  const handleSelectProduct = (productId: string) => {
+  const handleSelectProduct = (productId: number) => {
     setSelectedProducts((prevSelected) =>
       prevSelected.includes(productId)
         ? prevSelected.filter((id) => id !== productId)
@@ -93,7 +114,11 @@ export default function ProductPage() {
 
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(
-      (product) => product.category === category
+      (product) => {
+        if (!product.categoryId) return false;
+        const categoryObj = categories.find(c => c.id === product.categoryId.toString());
+        return categoryObj && categoryObj.title === category;
+      }
     );
     const newSelection = [...selectedProducts];
 
@@ -122,6 +147,22 @@ export default function ProductPage() {
 
     setSelectedProducts(newSelection);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading products...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -176,6 +217,24 @@ export default function ProductPage() {
           </div>
         </div>
 
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Stats cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
           {productAnalytics.map((product) => (
@@ -187,7 +246,11 @@ export default function ProductPage() {
         <div className="border-t border-logo-border mt-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
-            <SearchBar placeholder="Search: e.g. Watch"></SearchBar>
+            <SearchBar 
+              placeholder="Search products by name or description" 
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
 
             {/* Category Filter */}
             <DropdownMenu>
@@ -198,68 +261,26 @@ export default function ProductPage() {
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">
-                    {categoryFilter === "All Categories"
-                      ? "All Categories"
-                      : ""}
-                    {categories.map((category) =>
-                      categoryFilter === category.title ? category.title : ""
-                    )}
+                    {categoryFilter}
                   </span>
                   <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() => handleCategorySelect("All Categories")}
-                >
+                <DropdownMenuItem onClick={() => handleCategorySelect("All Categories")}>
                   All Categories
                 </DropdownMenuItem>
-                {categories.map((category) => {
-                  const categoryProducts = filteredProducts.filter(
-                    (p) => p.category === category.title
-                  );
-                  const hasProducts = categoryProducts.length > 0;
-                  const allSelected =
-                    hasProducts &&
-                    categoryProducts.every((p) =>
-                      selectedProducts.includes(p.id)
-                    );
-
-                  return (
-                    <DropdownMenuItem
-                      key={category.id}
-                      onSelect={() =>
-                        hasProducts && handleSelectByCategory(category.title)
-                      }
-                      className={
-                        !hasProducts ? "opacity-50 cursor-not-allowed" : ""
-                      }
-                    >
-                      {allSelected && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-2"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                      {category.title}
-                      {!hasProducts && (
-                        <span className="ml-2 text-xs text-gray-500">
-                          (no products)
-                        </span>
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
+                {categories.map((category) => (
+                  <DropdownMenuItem
+                    key={category.id}
+                    onClick={() => handleCategorySelect(category.title)}
+                  >
+                    {category.title}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
             {/* Stock Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -269,9 +290,7 @@ export default function ProductPage() {
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">
-                    {stockStatuses.map((status) =>
-                      StockFilter === status ? status : ""
-                    )}
+                    {stockFilter}
                   </span>
                   <ChevronDown size={16} />
                 </Button>
@@ -288,119 +307,55 @@ export default function ProductPage() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+        </div>
 
-          {/* Selection and Applying Discount */}
-          <div className="flex items-center  pt-1 mt-4 gap-6">
-            <DropdownMenu
-              open={selectionDropdownOpen}
-              onOpenChange={setSelectionDropdownOpen}
-            >
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-logo-txt hover:bg-logo-light-button-hover border-logo-border"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-blue-600 mr-2"
-                    checked={selectedProducts.length > 0}
-                    readOnly
-                  />
-                  {selectedProducts.length > 0
-                    ? `${selectedProducts.length} Selected`
-                    : null}
-                  <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={handleSelectAll}>
-                  Select All ({filteredProducts.length})
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedProducts([])}>
-                  Select None
-                </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <span>Select by Category</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      {categories.map((category) => {
-                        const categoryProducts = filteredProducts.filter(
-                          (p) => p.category === category.title
-                        );
-                        const hasProducts = categoryProducts.length > 0;
-                        const allSelected =
-                          hasProducts &&
-                          categoryProducts.every((p) =>
-                            selectedProducts.includes(p.id)
-                          );
-
-                        return (
-                          <DropdownMenuItem
-                            key={category.id}
-                            onSelect={() =>
-                              hasProducts &&
-                              handleSelectByCategory(category.title)
-                            }
-                            className={
-                              !hasProducts
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }
-                          >
-                            {allSelected && (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                            {category.title}
-                            {!hasProducts && (
-                              <span className="ml-2 text-xs text-gray-500">
-                                (no products)
-                              </span>
-                            )}
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {selectedProducts.length > 0 && (
-              <ApplyDiscountDialog products={selectedProducts} />
-            )}
-          </div>
-
-          {/* Product listing table (responsive) */}
-          <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
-            <table className="min-w-full divide-y divide-logo-border">
-              <ProductTableHeader />
-              <tbody className="bg-white divide-y divide-logo-border">
-                {/* Sample product rows */}
-                {filteredProducts.map((product) => (
-                  <ProductRecord
-                    key={product.id}
+        {/* Product listing table */}
+        <div className="border rounded-lg border-logo-border overflow-hidden mt-6">
+          <table className="min-w-full divide-y divide-logo-border">
+            <ProductTableHeader 
+              selectAll={selectAll}
+              onSelectAll={handleSelectAll}
+              selectedProducts={selectedProducts}
+            />
+            <tbody className="bg-white divide-y divide-logo-border">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <ProductRecord 
+                    key={product.id} 
                     product={product}
                     isSelected={selectedProducts.includes(product.id)}
-                    onSelect={handleSelectProduct}
+                    onSelect={() => handleSelectProduct(product.id)}
                   />
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    {products.length === 0
+                      ? "No products found. Try adding your first product."
+                      : "No products match your filters."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+
+        {/* Refresh button for fallback */}
+        {products.length === 0 && !isLoading && (
+          <div className="mt-6 text-center">
+            <Button
+              variant="outline"
+              onClick={fetchProducts}
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              <span>Refresh Products</span>
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );
