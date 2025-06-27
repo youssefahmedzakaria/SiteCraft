@@ -3,8 +3,8 @@
 import { SiteCraftNavbar } from "@/components/SiteCraft/siteCraftNavbar";
 import { SiteCraftFooter } from "@/components/SiteCraft/siteCraftFooter";
 import { usePathname } from "next/navigation";
-import Navbar from "../e-commerce/navbar/Navbar";
-import { Footer } from "../e-commerce/footer/Footer";
+import Navbar from "./e-commerce/navbar/Navbar";
+import { Footer } from "./e-commerce/footer/Footer";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
