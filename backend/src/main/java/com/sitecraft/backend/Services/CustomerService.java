@@ -67,6 +67,8 @@ public class CustomerService {
             }
 
             customer.setStatus("inactive");
+            customer.setUpdatedAt(LocalDateTime.now());
+            customerRepo.save(customer);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Access denied: " + e.getMessage());
         } catch (Exception e) {
@@ -111,6 +113,7 @@ public class CustomerService {
             if (updatedCustomer.getName() != null) customer.setName(updatedCustomer.getName());
             if (updatedCustomer.getPhone() != null) customer.setPhone(updatedCustomer.getPhone());
             if (updatedCustomer.getGender() != null) customer.setGender(updatedCustomer.getGender());
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update customer info: " + e.getMessage());
@@ -136,6 +139,7 @@ public class CustomerService {
             }
 
             customer.setPassword(encoder.encode(newPassword));
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
 
         } catch (Exception e) {
