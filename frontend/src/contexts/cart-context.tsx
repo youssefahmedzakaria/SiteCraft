@@ -4,12 +4,11 @@ import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
 
 export interface CartItem {
-  id: string
   name: string
   price: number
   quantity: number
   image: string
-  slug: string
+  id: string
 }
 
 interface CartState {

@@ -109,7 +109,7 @@ export function FeaturedGridProductTemplate({
 
           {/* Regular Products */}
           {regularProducts.map((product) => (
-            <div className="group w-full" key={product._id || product.slug}>
+            <div className="group w-full" key={product.id}>
               <div className={cn("relative h-64 bg-slate-100 overflow-hidden w-full", borderRadius)}>
                 <Image
                   src={product.media?.mainMedia?.image?.url || "/placeholder.svg?height=256&width=256"}

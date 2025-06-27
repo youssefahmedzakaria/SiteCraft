@@ -1,12 +1,23 @@
 "use client"
 import { useState } from "react"
-import {GridProductTemplate,HorizontalScrollProductTemplate,ListViewProductTemplate,FeaturedGridProductTemplate} from "@/components/product-lists";
+import {
+  GridProductTemplate,
+  HorizontalScrollProductTemplate,
+  ListViewProductTemplate,
+  FeaturedGridProductTemplate,
+} from "@/components/e-commerce/product-lists";
 import { ChevronLeft, ChevronRight, Filter, Search, User, ShoppingCart, Heart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/e-commerce/ui/button"
+import { Input } from "@/components/e-commerce/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/e-commerce/ui/select";
+import { Slider } from "@/components/e-commerce/ui/slider";
+import { Checkbox } from "@/components/e-commerce/ui/checkbox";
 import { cn } from "@/lib/utils"
 
 const products = [
@@ -16,7 +27,6 @@ const products = [
     price: { value: 299.99 },
     category: "Rings",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "diamond-solitaire-ring",
     description: "Elegant diamond solitaire ring crafted in 18k gold",
     inStock: true,
   },
@@ -26,7 +36,6 @@ const products = [
     price: { value: 199.99 },
     category: "Earrings",
     media: { mainMedia: { image: { url: "/earing.jpg" } } },
-    slug: "pearl-drop-earrings",
     description: "Classic pearl drop earrings with sterling silver",
     inStock: true,
   },
@@ -36,7 +45,6 @@ const products = [
     price: { value: 399.99 },
     category: "Necklaces",
     media: { mainMedia: { image: { url: "/neckless.jpg" } } },
-    slug: "gold-chain-necklace",
     description: "Luxurious 14k gold chain necklace",
     inStock: true,
   },
@@ -46,7 +54,6 @@ const products = [
     price: { value: 89.99 },
     category: "Earrings",
     media: { mainMedia: { image: { url: "/earing.jpg" } } },
-    slug: "silver-hoop-earrings",
     description: "Modern silver hoop earrings for everyday wear",
     inStock: false,
   },
@@ -56,7 +63,6 @@ const products = [
     price: { value: 599.99 },
     category: "Rings",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "ruby-engagement-ring",
     description: "Stunning ruby engagement ring with diamond accents",
     inStock: true,
   },
@@ -66,7 +72,6 @@ const products = [
     price: { value: 449.99 },
     category: "Necklaces",
     media: { mainMedia: { image: { url: "/neckless.jpg" } } },
-    slug: "vintage-pearl-necklace",
     description: "Vintage-inspired pearl necklace with gold clasp",
     inStock: true,
   },
@@ -76,7 +81,6 @@ const products = [
     price: { value: 799.99 },
     category: "Bracelets",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "tennis-bracelet",
     description: "Classic diamond tennis bracelet in white gold",
     inStock: true,
   },
@@ -86,7 +90,6 @@ const products = [
     price: { value: 1299.99 },
     category: "Watches",
     media: { mainMedia: { image: { url: "/earing.jpg" } } },
-    slug: "luxury-watch",
     description: "Swiss-made luxury watch with leather strap",
     inStock: true,
   },
@@ -96,7 +99,6 @@ const products = [
     price: { value: 249.99 },
     category: "Pendants",
     media: { mainMedia: { image: { url: "/neckless.jpg" } } },
-    slug: "heart-pendant",
     description: "Romantic heart pendant with diamond accent",
     inStock: true,
   },
@@ -106,7 +108,6 @@ const products = [
     price: { value: 129.99 },
     category: "Anklets",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "charm-anklet",
     description: "Delicate anklet with multiple charms",
     inStock: true,
   },
@@ -116,7 +117,6 @@ const products = [
     price: { value: 349.99 },
     category: "Chains",
     media: { mainMedia: { image: { url: "/earing.jpg" } } },
-    slug: "gold-chain",
     description: "18k gold chain for layering",
     inStock: true,
   },
@@ -126,7 +126,6 @@ const products = [
     price: { value: 79.99 },
     category: "Charms",
     media: { mainMedia: { image: { url: "/neckless.jpg" } } },
-    slug: "lucky-charm",
     description: "Sterling silver lucky charm pendant",
     inStock: true,
   },
@@ -136,7 +135,6 @@ const products = [
     price: { value: 179.99 },
     category: "Rings",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "rose-gold-ring",
     description: "Beautiful rose gold ring with intricate design",
     inStock: true,
   },
@@ -146,7 +144,6 @@ const products = [
     price: { value: 129.99 },
     category: "Earrings",
     media: { mainMedia: { image: { url: "/earing.jpg" } } },
-    slug: "crystal-earrings",
     description: "Sparkling crystal drop earrings",
     inStock: true,
   },
@@ -156,7 +153,6 @@ const products = [
     price: { value: 219.99 },
     category: "Necklaces",
     media: { mainMedia: { image: { url: "/neckless.jpg" } } },
-    slug: "infinity-necklace",
     description: "Elegant infinity symbol necklace in silver",
     inStock: true,
   },
@@ -166,7 +162,6 @@ const products = [
     price: { value: 329.99 },
     category: "Bracelets",
     media: { mainMedia: { image: { url: "/ring2.jpg" } } },
-    slug: "statement-bracelet",
     description: "Bold statement bracelet with gemstones",
     inStock: false,
   },

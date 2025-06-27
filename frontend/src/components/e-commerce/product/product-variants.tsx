@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
-import type { VariantGroup } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
-import Image from "next/image"
+"use client";
+import { cn } from "@/lib/utils";
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type { VariantGroup } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import Image from "next/image";
 
 interface ProductVariantsProps {
-  variantGroups: VariantGroup[]
-  selectedVariants: Record<string, string> // groupId -> optionId
-  onVariantChange: (groupId: string, optionId: string, productImages?: string[]) => void
-  theme: ThemeConfig
-  className?: string
+  variantGroups: VariantGroup[];
+  selectedVariants: Record<string, string>; // groupId -> optionId
+  onVariantChange: (
+    groupId: string,
+    optionId: string,
+    productImages?: string[]
+  ) => void;
+  theme: ThemeConfig;
+  className?: string;
 }
 
 export function ProductVariants({
@@ -21,18 +25,18 @@ export function ProductVariants({
   className,
 }: ProductVariantsProps) {
   const handleVariantChange = (groupId: string, optionId: string) => {
-    const group = variantGroups.find((g) => g.id === groupId)
-    const option = group?.options.find((o) => o.id === optionId)
+    const group = variantGroups.find((g) => g.id === groupId);
+    const option = group?.options.find((o) => o.id === optionId);
 
     // If this variant changes images, pass them to the parent
-    const productImages = option?.productImages
-    onVariantChange(groupId, optionId, productImages)
-  }
+    const productImages = option?.productImages;
+    onVariantChange(groupId, optionId, productImages);
+  };
 
   const renderColorVariant = (group: VariantGroup) => (
     <div className="flex flex-wrap gap-3">
       {group.options.map((option) => {
-        const isSelected = selectedVariants[group.id] === option.id
+        const isSelected = selectedVariants[group.id] === option.id;
 
         return (
           <button
@@ -42,7 +46,7 @@ export function ProductVariants({
               "w-12 h-12 rounded-full flex items-center justify-center border-2 group relative transition-all",
               isSelected
                 ? "border-current ring-2 ring-offset-2 ring-current/20"
-                : "border-gray-200 hover:border-gray-300",
+                : "border-gray-200 hover:border-gray-300"
             )}
             title={option.label}
           >
@@ -63,17 +67,19 @@ export function ProductVariants({
               <span className="text-xs font-medium">{option.value}</span>
             )}
 
-            {isSelected && <div className="absolute inset-0 rounded-full border-2 border-white shadow-sm" />}
+            {isSelected && (
+              <div className="absolute inset-0 rounded-full border-2 border-white shadow-sm" />
+            )}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 
   const renderButtonVariant = (group: VariantGroup) => (
     <div className="flex flex-wrap gap-2">
       {group.options.map((option) => {
-        const isSelected = selectedVariants[group.id] === option.id
+        const isSelected = selectedVariants[group.id] === option.id;
 
         return (
           <button
@@ -84,25 +90,27 @@ export function ProductVariants({
               theme.borderRadius,
               isSelected
                 ? "border-current bg-current/10 text-current"
-                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
+                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
             )}
           >
             {option.label}
-            {option.metadata?.priceAdjustment && option.metadata.priceAdjustment !== 0 && (
-              <span className="ml-1 text-xs opacity-75">
-                {option.metadata.priceAdjustment > 0 ? "+" : ""}${option.metadata.priceAdjustment}
-              </span>
-            )}
+            {option.metadata?.priceAdjustment &&
+              option.metadata.priceAdjustment !== 0 && (
+                <span className="ml-1 text-xs opacity-75">
+                  {option.metadata.priceAdjustment > 0 ? "+" : ""}$
+                  {option.metadata.priceAdjustment}
+                </span>
+              )}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 
   const renderImageGridVariant = (group: VariantGroup) => (
     <div className="grid grid-cols-4 gap-3">
       {group.options.map((option) => {
-        const isSelected = selectedVariants[group.id] === option.id
+        const isSelected = selectedVariants[group.id] === option.id;
 
         return (
           <button
@@ -113,7 +121,7 @@ export function ProductVariants({
               theme.borderRadius,
               isSelected
                 ? "border-current ring-2 ring-offset-2 ring-current/20"
-                : "border-gray-200 hover:border-gray-300",
+                : "border-gray-200 hover:border-gray-300"
             )}
             title={option.label}
           >
@@ -127,14 +135,20 @@ export function ProductVariants({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                <span className="text-xs font-medium text-center px-1">{option.label}</span>
+                <span className="text-xs font-medium text-center px-1">
+                  {option.label}
+                </span>
               </div>
             )}
 
             {isSelected && (
               <div className="absolute inset-0 bg-current/10 flex items-center justify-center">
                 <div className="w-6 h-6 bg-current rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <svg
+                    className="w-3 h-3 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -145,13 +159,15 @@ export function ProductVariants({
               </div>
             )}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 
   const renderDropdownVariant = (group: VariantGroup) => {
-    const selectedOption = group.options.find((o) => o.id === selectedVariants[group.id])
+    const selectedOption = group.options.find(
+      (o) => o.id === selectedVariants[group.id]
+    );
 
     return (
       <select
@@ -160,7 +176,7 @@ export function ProductVariants({
         className={cn(
           "w-full px-3 py-2 border border-gray-200 bg-white text-sm",
           theme.borderRadius,
-          "focus:outline-none focus:ring-2 focus:ring-current/20 focus:border-current",
+          "focus:outline-none focus:ring-2 focus:ring-current/20 focus:border-current"
         )}
       >
         <option value="">Select {group.name}</option>
@@ -173,28 +189,32 @@ export function ProductVariants({
           </option>
         ))}
       </select>
-    )
-  }
+    );
+  };
 
   const renderVariantGroup = (group: VariantGroup) => {
-    const displayStyle = group.displayStyle || (group.type === "color" ? "color-circles" : "buttons")
+    const displayStyle =
+      group.displayStyle ||
+      (group.type === "color" ? "color-circles" : "buttons");
 
     switch (displayStyle) {
       case "color-circles":
-        return renderColorVariant(group)
+        return renderColorVariant(group);
       case "dropdown":
-        return renderDropdownVariant(group)
+        return renderDropdownVariant(group);
       case "image-grid":
-        return renderImageGridVariant(group)
+        return renderImageGridVariant(group);
       default:
-        return renderButtonVariant(group)
+        return renderButtonVariant(group);
     }
-  }
+  };
 
   return (
     <div className={cn("space-y-6", className)}>
       {variantGroups.map((group) => {
-        const selectedOption = group.options.find((o) => o.id === selectedVariants[group.id])
+        const selectedOption = group.options.find(
+          (o) => o.id === selectedVariants[group.id]
+        );
 
         return (
           <div key={group.id}>
@@ -203,7 +223,11 @@ export function ProductVariants({
                 {group.name}
                 {group.required && <span className="text-red-500 ml-1">*</span>}
               </label>
-              {group.changesImages && <span className="text-xs text-gray-500">Changes product images</span>}
+              {group.changesImages && (
+                <span className="text-xs text-gray-500">
+                  Changes product images
+                </span>
+              )}
             </div>
 
             {renderVariantGroup(group)}
@@ -213,18 +237,20 @@ export function ProductVariants({
                 <p>Selected: {selectedOption.label}</p>
                 {selectedOption.metadata && (
                   <div className="text-xs text-gray-500 mt-1">
-                    {Object.entries(selectedOption.metadata).map(([key, value]) => (
-                      <span key={key} className="mr-3">
-                        {key}: {String(value)}
-                      </span>
-                    ))}
+                    {Object.entries(selectedOption.metadata).map(
+                      ([key, value]) => (
+                        <span key={key} className="mr-3">
+                          {key}: {String(value)}
+                        </span>
+                      )
+                    )}
                   </div>
                 )}
               </div>
             )}
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

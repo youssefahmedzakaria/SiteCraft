@@ -14,7 +14,7 @@ const categories = [
         },
       },
     },
-    slug: "rings",
+    id: "rings",
   },
   {
     name: "Earrings",
@@ -25,7 +25,7 @@ const categories = [
         },
       },
     },
-    slug: "earrings",
+    id: "earrings",
   },
   {
     name: "Necklaces",
@@ -36,7 +36,7 @@ const categories = [
         },
       },
     },
-    slug: "necklaces",
+    id: "necklaces",
   },
   {
     name: "Bracelets",
@@ -47,7 +47,7 @@ const categories = [
         },
       },
     },
-    slug: "bracelets",
+    id: "bracelets",
   },
   {
     name: "Watches",
@@ -58,7 +58,7 @@ const categories = [
         },
       },
     },
-    slug: "watches",
+    id: "watches",
   },
   {
     name: "Pendants",
@@ -69,7 +69,7 @@ const categories = [
         },
       },
     },
-    slug: "pendants",
+    id: "pendants",
   },
   {
     name: "Anklets",
@@ -80,7 +80,7 @@ const categories = [
         },
       },
     },
-    slug: "anklets",
+    id: "anklets",
   },
   {
     name: "Chains",
@@ -91,7 +91,7 @@ const categories = [
         },
       },
     },
-    slug: "chains",
+    id: "chains",
   },
   {
     name: "Charms",
@@ -102,7 +102,7 @@ const categories = [
         },
       },
     },
-    slug: "charms",
+    id: "charms",
   },
   {
     name: "Cufflinks",
@@ -113,7 +113,7 @@ const categories = [
         },
       },
     },
-    slug: "cufflinks",
+    id: "cufflinks",
   },
   {
     name: "Brooches",
@@ -124,7 +124,7 @@ const categories = [
         },
       },
     },
-    slug: "brooches",
+    id: "brooches",
   },
   {
     name: "Toe Rings",
@@ -135,7 +135,7 @@ const categories = [
         },
       },
     },
-    slug: "toe-rings",
+    id: "toe-rings",
   },
   {
     name: "Hair Accessories",
@@ -146,7 +146,7 @@ const categories = [
         },
       },
     },
-    slug: "hair-accessories",
+    id: "hair-accessories",
   },
   {
     name: "Body Jewelry",
@@ -157,7 +157,7 @@ const categories = [
         },
       },
     },
-    slug: "body-jewelry",
+    id: "body-jewelry",
   },
   {
     name: "Wedding Sets",
@@ -168,7 +168,7 @@ const categories = [
         },
       },
     },
-    slug: "wedding-sets",
+    id: "wedding-sets",
   },
   {
     name: "Vintage Collections",
@@ -179,7 +179,7 @@ const categories = [
         },
       },
     },
-    slug: "vintage-collections",
+    id: "vintage-collections",
   },
   {
     name: "Custom Jewelry",
@@ -190,7 +190,7 @@ const categories = [
         },
       },
     },
-    slug: "custom-jewelry",
+    id: "custom-jewelry",
   },
   {
     name: "Gift Sets",
@@ -201,7 +201,7 @@ const categories = [
         },
       },
     },
-    slug: "gift-sets",
+    id: "gift-sets",
   },
   {
     name: "Men's Collection",
@@ -212,7 +212,7 @@ const categories = [
         },
       },
     },
-    slug: "mens-collection",
+    id: "mens-collection",
   },
   {
     name: "Kids Jewelry",
@@ -223,7 +223,7 @@ const categories = [
         },
       },
     },
-    slug: "kids-jewelry",
+    id: "kids-jewelry",
   },
 ]
 

@@ -3,9 +3,9 @@
 import type React from "react"
 import { useState, type FormEvent } from "react"
 import { Eye, EyeOff } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/e-commerce/ui/button";
+import { Input } from "@/components/e-commerce/ui/input";
+import { Label } from "@/components/e-commerce/ui/label";
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -79,7 +79,7 @@ export default function RegisterPage() {
 
     // Mock registration success
     localStorage.setItem("token", "mock-token-" + Date.now())
-    router.push("/profile")
+    router.push("/e-commerce/TODO/profile")
 
     setIsLoading(false)
   }

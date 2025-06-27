@@ -3,12 +3,17 @@
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { User, Package, Settings, MapPin, Bell, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/e-commerce/ui/button"
+import { Input } from "@/components/e-commerce/ui/input";
+import { Label } from "@/components/e-commerce/ui/label";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/e-commerce/ui/tabs";
+import { Separator } from "@/components/e-commerce/ui/separator";
+import { Switch } from "@/components/e-commerce/ui/switch";
 import { useRouter } from "next/navigation"
 
 // Theme configuration matching product page
@@ -129,7 +134,7 @@ export default function ProfilePage() {
     // Check if user is authenticated (simplified)
     const token = localStorage.getItem("token")
     if (!token) {
-      router.push("/login")
+      router.push("/e-commerce/TODO/login")
       return
     }
 
@@ -170,7 +175,7 @@ export default function ProfilePage() {
 
   const handleLogout = (): void => {
     localStorage.removeItem("token")
-    router.push("/login")
+    router.push("/e-commerce/TODO/login")
   }
 
   const handleSaveProfile = () => {

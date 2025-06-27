@@ -105,7 +105,7 @@ export function GridCategoryTemplate({
             fontFamily={fontFamily}
             cardShadow={cardShadow}
             hoverEffect={hoverEffect}
-            linkPath={`/list?cat=${category.slug}`}
+            linkPath={`/list?cat=${category.id}`}
           />
         ))}
       </div>

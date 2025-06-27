@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LayoutWrapper } from "@/components/SiteCraft/layout-wrapper";
+import { CartProvider } from "@/contexts/cart-context";
+import { FavoritesProvider } from "@/contexts/favorites-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +34,11 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <LayoutWrapper> {children}</LayoutWrapper>
+        <CartProvider>
+          <FavoritesProvider>
+            <LayoutWrapper> {children}</LayoutWrapper>
+          </FavoritesProvider>
+        </CartProvider>
       </body>
     </html>
   );

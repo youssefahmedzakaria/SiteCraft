@@ -1,30 +1,52 @@
-"use client"
+"use client";
 
-import { Star, ShoppingCart, Heart, Share2, Check, ShoppingBag } from "lucide-react"
-import { Button } from "@/components/e-commerce/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/e-commerce/ui/tabs"
-import { ProductVariants } from "@/components/e-commerce/product/product-variants"
-import { cn } from "@/lib/utils"
-import type { ThemeConfig, VariantGroup } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
-import type { Product, ProductVariant } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
+import {
+  Star,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Check,
+  ShoppingBag,
+} from "lucide-react";
+import { Button } from "@/components/e-commerce/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/e-commerce/ui/tabs";
+import { ProductVariants } from "@/components/e-commerce/product/product-variants";
+import { cn } from "@/lib/utils";
+import type {
+  ThemeConfig,
+  VariantGroup,
+} from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type {
+  Product,
+  ProductVariant,
+} from "@/app/e-commerce/[subdomain]/product/[id]/product";
 
 interface ProductInfoProps {
-  product: Product
-  currentVariant: ProductVariant
-  quantity: number
-  onQuantityChange: (quantity: number) => void
-  onAddToCart: () => void
-  onAddToFavorites: () => void
-  onShare: () => void
-  theme: ThemeConfig
-  selectedVariants: Record<string, string>
-  onVariantChange: (groupId: string, optionId: string, productImages?: string[]) => void
-  variantGroups: VariantGroup[]
-  isInCart: boolean
-  isInFavorites: boolean
-  justAddedToCart: boolean
-  justAddedToFavorites: boolean
-  shareClicked: boolean
+  product: Product;
+  currentVariant: ProductVariant;
+  quantity: number;
+  onQuantityChange: (quantity: number) => void;
+  onAddToCart: () => void;
+  onAddToFavorites: () => void;
+  onShare: () => void;
+  theme: ThemeConfig;
+  selectedVariants: Record<string, string>;
+  onVariantChange: (
+    groupId: string,
+    optionId: string,
+    productImages?: string[]
+  ) => void;
+  variantGroups: VariantGroup[];
+  isInCart: boolean;
+  isInFavorites: boolean;
+  justAddedToCart: boolean;
+  justAddedToFavorites: boolean;
+  shareClicked: boolean;
 }
 
 export function ProductInfo({
@@ -55,11 +77,23 @@ export function ProductInfo({
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={cn("w-5 h-5", i < Math.floor(product.rating) ? "fill-current" : "text-gray-300")}
-                style={{ color: i < Math.floor(product.rating) ? theme.secondaryColor : undefined }}
+                className={cn(
+                  "w-5 h-5",
+                  i < Math.floor(product.rating)
+                    ? "fill-current"
+                    : "text-gray-300"
+                )}
+                style={{
+                  color:
+                    i < Math.floor(product.rating)
+                      ? theme.secondaryColor
+                      : undefined,
+                }}
               />
             ))}
-            <span className="ml-2 text-sm opacity-75">({product.reviewCount} reviews)</span>
+            <span className="ml-2 text-sm opacity-75">
+              ({product.reviewCount} reviews)
+            </span>
           </div>
         </div>
       </div>
@@ -68,10 +102,15 @@ export function ProductInfo({
       <div className="flex items-baseline gap-4">
         <span className="text-3xl font-bold">${currentVariant.price}</span>
         {currentVariant.compareAtPrice && (
-          <span className="text-xl opacity-75 line-through">${currentVariant.compareAtPrice}</span>
+          <span className="text-xl opacity-75 line-through">
+            ${currentVariant.compareAtPrice}
+          </span>
         )}
         {currentVariant.compareAtPrice && (
-          <span className="text-sm font-medium" style={{ color: theme.secondaryColor }}>
+          <span
+            className="text-sm font-medium"
+            style={{ color: theme.secondaryColor }}
+          >
             Save ${currentVariant.compareAtPrice - currentVariant.price}
           </span>
         )}
@@ -88,7 +127,10 @@ export function ProductInfo({
       {/* Quantity and Add to Cart Section */}
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <div className={cn("flex items-center border", theme.borderRadius)} style={{ borderColor: theme.secondaryColor }}>
+          <div
+            className={cn("flex items-center border", theme.borderRadius)}
+            style={{ borderColor: theme.secondaryColor }}
+          >
             <button
               onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
               className="px-4 py-2 hover:bg-white/20 border-r group relative"
@@ -96,7 +138,10 @@ export function ProductInfo({
             >
               -
               <div
-                className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity", "bg-black/5")}
+                className={cn(
+                  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                  "bg-black/5"
+                )}
               />
             </button>
             <span className="px-4 py-2">{quantity}</span>
@@ -107,11 +152,14 @@ export function ProductInfo({
             >
               +
               <div
-                className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity", "bg-black/5")}
+                className={cn(
+                  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                  "bg-black/5"
+                )}
               />
             </button>
           </div>
-          
+
           {/* Add to Cart Button with Enhanced States */}
           <Button
             onClick={onAddToCart}
@@ -120,9 +168,13 @@ export function ProductInfo({
               justAddedToCart && "scale-105",
               isInCart && "ring-2 ring-green-400"
             )}
-            style={{ 
-              backgroundColor: justAddedToCart ? "#10B981" : (isInCart ? "#059669" : theme.secondaryColor),
-              color: theme.backgroundColor 
+            style={{
+              backgroundColor: justAddedToCart
+                ? "#10B981"
+                : isInCart
+                ? "#059669"
+                : theme.secondaryColor,
+              color: theme.backgroundColor,
             }}
             disabled={!currentVariant.inStock}
           >
@@ -145,11 +197,11 @@ export function ProductInfo({
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </Button>
-          
+
           {/* Add to Favorites Button with Enhanced States */}
           <Button
             variant="outline"
@@ -161,28 +213,30 @@ export function ProductInfo({
             )}
             style={{
               borderColor: isInFavorites ? "#F87171" : theme.secondaryColor,
-              backgroundColor: isInFavorites ? "#FEF2F2" : undefined
+              backgroundColor: isInFavorites ? "#FEF2F2" : undefined,
             }}
-            aria-label={isInFavorites ? "Remove from favorites" : "Add to favorites"}
+            aria-label={
+              isInFavorites ? "Remove from favorites" : "Add to favorites"
+            }
           >
-            <Heart 
+            <Heart
               className={cn(
                 "w-5 h-5 transition-all duration-300",
                 isInFavorites ? "fill-red-500 text-red-500" : "text-current",
                 justAddedToFavorites && "animate-pulse"
-              )} 
+              )}
             />
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </Button>
-          
+
           {/* Share Button with Enhanced States */}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={onShare}
             className={cn(
               "h-12 w-12 p-0 group relative transition-all duration-300",
@@ -191,16 +245,16 @@ export function ProductInfo({
             style={{ borderColor: theme.secondaryColor }}
             aria-label="Share product"
           >
-            <Share2 
+            <Share2
               className={cn(
                 "w-5 h-5 transition-all duration-300",
                 shareClicked && "text-blue-500"
-              )} 
+              )}
             />
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </Button>
@@ -227,7 +281,10 @@ export function ProductInfo({
           {product.features.map((feature, index) => (
             <div
               key={index}
-              className={cn("flex items-center gap-3 p-4 group relative", theme.borderRadius)}
+              className={cn(
+                "flex items-center gap-3 p-4 group relative",
+                theme.borderRadius
+              )}
               style={{ backgroundColor: `${theme.secondaryColor}20` }}
             >
               <feature.icon className="w-5 h-5" />
@@ -239,7 +296,7 @@ export function ProductInfo({
                 className={cn(
                   "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
                   theme.borderRadius,
-                  "bg-black/5",
+                  "bg-black/5"
                 )}
               />
             </div>
@@ -250,30 +307,39 @@ export function ProductInfo({
       {/* Product Information Tabs */}
       <Tabs defaultValue="description" className="w-full">
         <TabsList className="w-full justify-start bg-white/20">
-          <TabsTrigger value="description" className="group relative data-[state=active]:bg-white/30">
+          <TabsTrigger
+            value="description"
+            className="group relative data-[state=active]:bg-white/30"
+          >
             Description
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </TabsTrigger>
-          <TabsTrigger value="specifications" className="group relative data-[state=active]:bg-white/30">
+          <TabsTrigger
+            value="specifications"
+            className="group relative data-[state=active]:bg-white/30"
+          >
             Specifications
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </TabsTrigger>
-          <TabsTrigger value="shipping" className="group relative data-[state=active]:bg-white/30">
+          <TabsTrigger
+            value="shipping"
+            className="group relative data-[state=active]:bg-white/30"
+          >
             Shipping & Returns
             <div
               className={cn(
                 "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5",
+                "bg-black/5"
               )}
             />
           </TabsTrigger>
@@ -284,16 +350,22 @@ export function ProductInfo({
         <TabsContent value="specifications" className="mt-6">
           <div className="space-y-4">
             <p className="opacity-90 whitespace-pre-line">
-              {product.additionalInfoSections.find((section) => section.title === "specifications")?.description}
+              {
+                product.additionalInfoSections.find(
+                  (section) => section.title === "specifications"
+                )?.description
+              }
             </p>
           </div>
         </TabsContent>
         <TabsContent value="shipping" className="mt-6">
           <div className="space-y-4">
-            <p className="opacity-90">Estimated delivery: {product.shipping.estimatedDays} business days</p>
             <p className="opacity-90">
-              If you are not completely satisfied with your purchase, you can return it within 30 days for a full
-              refund.
+              Estimated delivery: {product.shipping.estimatedDays} business days
+            </p>
+            <p className="opacity-90">
+              If you are not completely satisfied with your purchase, you can
+              return it within 30 days for a full refund.
             </p>
           </div>
         </TabsContent>
@@ -310,11 +382,11 @@ export function ProductInfo({
             transform: translateY(0);
           }
         }
-        
+
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
         }
       `}</style>
     </div>
-  )
+  );
 }

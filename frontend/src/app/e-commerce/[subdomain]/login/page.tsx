@@ -44,7 +44,7 @@ export default function LoginPage() {
     if (email && password) {
       // Store mock token
       localStorage.setItem("token", "mock-token-" + Date.now())
-      router.push("/profile")
+      router.push("/e-commerce/TODO/profile")
     } else {
       setError("Invalid credentials")
     }

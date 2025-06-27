@@ -138,7 +138,7 @@ export default function FlexibleCard({
       : "text-blue-600"
 
   // Determine the link path based on the item type
-  const href = linkPath || (type === "product" ? `/${item.slug}` : `/list?cat=${item.slug}`)
+  const href = linkPath || (type === "product" ? `/${item.id}` : `/list?cat=${item.id}`)
 
   // Get item description
   const description =

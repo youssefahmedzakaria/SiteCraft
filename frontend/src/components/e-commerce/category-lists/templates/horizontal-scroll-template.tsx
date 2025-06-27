@@ -150,7 +150,7 @@ export function HorizontalScrollCategoryTemplate({
           `}</style>
           <div className="flex gap-4 md:gap-6 pb-4">
             {categories.map((category) => (
-              <div key={category._id || category.slug} className={cn("flex-shrink-0", cardWidth)}>
+              <div key={category._id || category.id} className={cn("flex-shrink-0", cardWidth)}>
                 <FlexibleCard
                   item={category}
                   type="category"
@@ -169,7 +169,7 @@ export function HorizontalScrollCategoryTemplate({
                   fontFamily={fontFamily}
                   cardShadow={cardShadow}
                   hoverEffect={hoverEffect}
-                  linkPath={`/list?cat=${category.slug}`}
+                  linkPath={`/list?cat=${category.id}`}
                 />
               </div>
             ))}

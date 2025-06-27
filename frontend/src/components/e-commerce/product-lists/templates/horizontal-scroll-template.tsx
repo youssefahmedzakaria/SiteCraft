@@ -155,7 +155,7 @@ export function HorizontalScrollProductTemplate({
           `}</style>
           <div className="flex gap-4 md:gap-6 pb-4">
             {products.map((product) => (
-              <div key={product._id || product.slug} className={cn("flex-shrink-0", cardWidth)}>
+              <div key={product._id || product.id} className={cn("flex-shrink-0", cardWidth)}>
                 <FlexibleCard
                   item={product}
                   type="product"
@@ -176,7 +176,7 @@ export function HorizontalScrollProductTemplate({
                   hoverEffect={hoverEffect}
                   onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
                   onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-                  linkPath={`/product/${product.slug}`}
+                  linkPath={`/product/${product.id}`}
                 />
               </div>
             ))}

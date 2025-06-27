@@ -98,7 +98,7 @@ export function GridProductTemplate({
       <div className={cn("grid", gridCols, gap)}>
         {products.map((product) => (
           <FlexibleCard
-            key={product._id || product.slug}
+            key={product._id || product.id}
             item={product}
             type="product"
             variant={cardVariant}
@@ -118,7 +118,7 @@ export function GridProductTemplate({
             hoverEffect={hoverEffect}
             onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
             onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-            linkPath={`/product/${product.slug}`}
+            linkPath={`/product/${product.id}`}
           />
         ))}
       </div>

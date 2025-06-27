@@ -1,27 +1,36 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 
 interface ProductImageGalleryProps {
-  images: string[]
-  productName: string
-  theme: ThemeConfig
+  images: string[];
+  productName: string;
+  theme: ThemeConfig;
 }
 
-export function ProductImageGallery({ images, productName, theme }: ProductImageGalleryProps) {
-  const [selectedImage, setSelectedImage] = useState(0)
+export function ProductImageGallery({
+  images,
+  productName,
+  theme,
+}: ProductImageGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState(0);
 
   // Reset selected image when images change
   useEffect(() => {
-    setSelectedImage(0)
-  }, [images])
+    setSelectedImage(0);
+  }, [images]);
 
   return (
     <div className="space-y-6">
-      <div className={cn("relative aspect-square overflow-hidden", theme.borderRadius)}>
+      <div
+        className={cn(
+          "relative aspect-square overflow-hidden",
+          theme.borderRadius
+        )}
+      >
         <Image
           src={images[selectedImage] || "/placeholder.svg?height=600&width=600"}
           alt={productName}
@@ -38,10 +47,13 @@ export function ProductImageGallery({ images, productName, theme }: ProductImage
             className={cn(
               "relative aspect-square overflow-hidden bg-white transition-all group",
               theme.borderRadius,
-              selectedImage === index ? `ring-2 ring-[${theme.secondaryColor}]` : "hover:ring-2 hover:ring-gray-300",
+              selectedImage === index
+                ? `ring-2 ring-[${theme.secondaryColor}]`
+                : "hover:ring-2 hover:ring-gray-300"
             )}
             style={{
-              borderColor: selectedImage === index ? theme.secondaryColor : undefined,
+              borderColor:
+                selectedImage === index ? theme.secondaryColor : undefined,
             }}
           >
             <Image
@@ -51,11 +63,14 @@ export function ProductImageGallery({ images, productName, theme }: ProductImage
               className="object-cover"
             />
             <div
-              className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity", "bg-black/5")}
+              className={cn(
+                "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                "bg-black/5"
+              )}
             />
           </button>
         ))}
       </div>
     </div>
-  )
+  );
 }

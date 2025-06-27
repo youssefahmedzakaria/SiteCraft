@@ -30,7 +30,7 @@ const products = [
 export default function CategoryPage({
   params,
 }: {
-  params: { slug: string }
+  params: { id: string }
 }) {
   const { addToCart } = useCart()
   const { addToFavorites } = useFavorites()
@@ -45,7 +45,7 @@ export default function CategoryPage({
 
   return (
     <div>
-      <h1>Category: {params.slug}</h1>
+      <h1>Category: {params.id}</h1>
       <GridCategoryTemplate
         categories={products}
       />

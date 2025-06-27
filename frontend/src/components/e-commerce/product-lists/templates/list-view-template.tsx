@@ -82,7 +82,7 @@ export function ListViewProductTemplate({
       <div className={cn("flex flex-col", gap)}>
         {products.map((product) => (
           <FlexibleCard
-            key={product._id || product.slug}
+            key={product._id || product.id}
             item={product}
             type="product"
             variant={cardVariant}
@@ -102,7 +102,7 @@ export function ListViewProductTemplate({
             hoverEffect={hoverEffect}
             onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
             onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-            linkPath={`/product/${product.slug}`}
+            linkPath={`/product/${product.id}`}
           />
         ))}
       </div>

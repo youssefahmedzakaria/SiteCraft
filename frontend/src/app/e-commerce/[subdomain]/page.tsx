@@ -64,7 +64,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-1"
+            id: "product-1"
           },
           {
             name: "Product 2",
@@ -79,7 +79,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-2"
+            id: "product-2"
           },
           {
             name: "Product 3",
@@ -94,7 +94,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-3"
+            id: "product-3"
           },
           {
             name: "Product 4",
@@ -109,7 +109,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-4"
+            id: "product-4"
           },
           {
             name: "Product 5",
@@ -124,7 +124,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-4"
+            id: "product-5"
           },
           {
             name: "Product 6",
@@ -139,7 +139,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-4"
+            id: "product-6"
           },
           {
             name: "Product 7",
@@ -154,7 +154,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-4"
+            id: "product-7"
           },
           {
             name: "Product 8",
@@ -169,7 +169,7 @@ export default function Home() {
               price: 100
             },
             description: "This is a description of the product",
-            slug: "product-4"
+            id: "product-8"
           }
         ]}
         template="featured"
@@ -208,7 +208,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "rings"
+            id: "1"
           },
           {
             name: "Earrings",
@@ -219,7 +219,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "earrings"
+            id: "2"
           },
           {
             name: "Necklaces",
@@ -230,7 +230,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "necklaces"
+            id: "3"
           },
           {
             name: "Rings",
@@ -241,7 +241,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "rings"
+            id: "4"
           },
           {
             name: "Earrings",
@@ -252,7 +252,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "earrings"
+            id: "5"
           },
           {
             name: "Necklaces",
@@ -263,7 +263,7 @@ export default function Home() {
                 }
               }
             },
-            slug: "necklaces"
+            id: "6"
           }
 
         ]}
@@ -284,7 +284,7 @@ export default function Home() {
         showMorebuttonTextColor="text-white"
       />
       <TopImageAbout
-        id="about-us"
+        id="about"
         backgroundColor="bg-white"
         title="About Us"
         titleColor="text-black"

@@ -17,9 +17,9 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
   orientation = 'horizontal' 
 }) => {
   const icons = [
-    { Icon: User, label: 'Profile', href: '/profile' },
-    { Icon: ShoppingBag, label: 'Cart', href: '/cart' },
-    { Icon: Heart, label: 'Favorites', href: '/favorites' },
+    { Icon: User, label: "Profile", href: "/e-commerce/TODO/profile" },
+    { Icon: ShoppingBag, label: "Cart", href: "/e-commerce/TODO/cart" },
+    { Icon: Heart, label: "Favorites", href: "/e-commerce/TODO/favorites" },
   ];
 
   return (

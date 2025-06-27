@@ -8,7 +8,6 @@ export interface FavoriteItem {
   name: string
   price: number
   image: string
-  slug: string
 }
 
 interface FavoritesState {

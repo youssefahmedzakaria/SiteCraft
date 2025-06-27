@@ -26,7 +26,7 @@ const defaultTheme = {
 }
 
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
+export default function ProductPage({ params }: { params: { id: string } }) {
   const [theme] = useState<ThemeConfig>(defaultTheme)
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
   const [quantity, setQuantity] = useState(1)
@@ -100,7 +100,6 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
       name: productData.name,
       price: currentPrice,
       image: currentImages[0] || productData.defaultImages[0] || "",
-      slug: params.slug,
     });
     setIsInCart(true);
     setJustAddedToCart(true);
@@ -112,11 +111,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   // Handle add to favorites
   const handleAddToFavorites = () => {
     const productItem: FavoriteItem = {
-      id: productData.id,
       name: productData.name,
       price: currentPrice,
       image: currentImages[0] || productData.defaultImages[0] || "",
-      slug: params.slug,
+      id: params.id,
     };
     if (isInFavorites) {
       removeFromFavorites(productData.id);

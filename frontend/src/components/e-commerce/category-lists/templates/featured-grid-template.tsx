@@ -82,7 +82,7 @@ export default function FeaturedGridCategoryTemplate({
         {/* Featured large category */}
         {featuredCategory && (
           <Link
-            href={`/list?cat=${featuredCategory.slug}`}
+            href={`/list?cat=${featuredCategory.id}`}
             className="md:col-span-2 md:row-span-2 group w-full"
             key={featuredCategory._id}
           >
@@ -108,7 +108,7 @@ export default function FeaturedGridCategoryTemplate({
 
         {/* All remaining categories */}
         {remainingCategories.map((category) => (
-          <Link href={`/list?cat=${category.slug}`} className="group w-full" key={category._id}>
+          <Link href={`/list?cat=${category.id}`} className="group w-full" key={category.id}>
             <div className={cn("relative h-64 bg-slate-100 overflow-hidden w-full", borderRadius)}>
               <Image
                 src={category.media?.mainMedia?.image?.url || "/placeholder.svg?height=256&width=256"}
