@@ -39,7 +39,7 @@ export function AboutUs({
   secondaryDescription,
 }: AboutUsProps) {
   const variants = {
-    centered: {
+    "centered": {
       container: "py-8 md:py-16",
       content: "container mx-auto px-4",
       title: "text-2xl md:text-4xl lg:text-6xl font-light text-center mb-6 md:mb-12",

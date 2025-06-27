@@ -1,0 +1,11 @@
+{  "template": "topImageAbout",
+    "title": "About Us",
+    "titleColor": "#000000",
+    "description": "Learn more about our company, our values, and our mission.",
+    "secondaryDescription": "We are committed to providing the best service and products to our customers.",
+    "descriptionColor": "#000000",
+    "backgroundColor": "#ffffff",
+    "image": "about.jpg",
+    "imageAlt": "About Us Image",
+    "imageObjectFit": "cover"
+}

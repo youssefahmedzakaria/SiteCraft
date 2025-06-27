@@ -14,6 +14,7 @@ import { ProductList } from "@/components/product-lists";
 export default function Home() {
   return (
     
+    
         <div className="min-h-screen flex flex-col">
         
         <CenteredPromo
@@ -36,7 +37,7 @@ export default function Home() {
             imageAlt: "New arrivals collection"
           },
         ]}
-        backgroundColor="bg-[#F5ECD5]"
+        backgroundColor="bg-white"
         titleFont="font-sans"
         titleColor="text-white"
         titleSize="text-4xl"
@@ -170,13 +171,14 @@ export default function Home() {
             slug: "product-4"
           }
         ]}
+        template="featured"
         title="Featured Products"
         titleColor="text-black"
         titlePosition="top"
         titleFontSize="text-2xl"
         titleFont="font-bold"
-        columns={{ sm: 2, md: 3, lg: 3}}
-        bgColor="bg-[#F5ECD5]"
+        columns={{ sm: 2, md: 3, lg: 4}}
+        bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"
         showTitle={true}
@@ -190,8 +192,8 @@ export default function Home() {
         cornerRadius="medium"
         cardShadow="shadow-lg"
         showMoreText="All Products"
-        showMorebuttonBgColor="bg-[#4A102A]"
-        showMorebuttonTextColor="text-[#F5ECD5]"
+        showMorebuttonBgColor="bg-black"
+        showMorebuttonTextColor="text-white"
       />
       
       <FeaturedGridCategoryTemplate
@@ -265,7 +267,7 @@ export default function Home() {
 
         ]}
         
-        bgColor="bg-[#F5ECD5]"
+        bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"
         showTitle={true}
@@ -277,12 +279,12 @@ export default function Home() {
         overlayColor="bg-black/30"
         showMoreButton={true}
         showMoreText="Show More"
-        showMorebuttonBgColor="bg-[#4A102A]"
-        showMorebuttonTextColor="text-[#F5ECD5]"
+        showMorebuttonBgColor="bg-black"
+        showMorebuttonTextColor="text-white"
       />
       <TopImageAbout
         id="about-us"
-        backgroundColor="bg-[#F5ECD5]"
+        backgroundColor="bg-white"
         title="About Us"
         titleColor="text-black"
         descriptionColor="text-gray-600"
@@ -294,12 +296,12 @@ export default function Home() {
       />
       <CenteredNewCollection
         id="new-collection"
-        backgroundColor="bg-[#F5ECD5]"
+        backgroundColor="bg-white"
         title="New Collection"
         buttonText="View Collection"
         buttonLink="/products"
-        buttonColor="bg-[#F5ECD5]"
-        titleColor="text-[#F5ECD5]"
+        buttonColor="bg-white"
+        titleColor="text-white"
         image="/hand.jpg"
         imageAlt="New arrivals collection"
         imageObjectFit="cover"
@@ -307,13 +309,13 @@ export default function Home() {
       <MinimalRightContact
         id="contact"
         imageUrl="/ring.jpg"
-        backgroundColor="bg-[#F5ECD5]"
-        titleColor="text-[#4A102A]"
+        backgroundColor="bg-white"
+        titleColor="text-black"
         contentFont="font-semibold"
         contentSize="text-lg"
         titleFont="font-bold"
         titleSize="text-3xl"
-        contentColor="text-[#4A102A]"
+        contentColor="text-black"
         showMap={true}
         title="Contact Us"
         address="masr el gedida, cairo, egypt"
@@ -329,17 +331,17 @@ export default function Home() {
       />
       <TitleLeftContentCenterPolicies
         id="policies"
-        backgroundColor="bg-[#F5ECD5]"
+        backgroundColor="bg-white"
         title="Our Policies"
         titleFont="font-sans"
-        titleFontWeight="font-bold"
-        titleSize="text-4xl"
-        titleColor="text-[#4A102A]"
-        sectionTitleColor="text-[#4A102A]"
+        titleFontWeight="font-normal"
+        titleSize="text-xl"
+        titleColor="text-black"
+        sectionTitleColor="text-black"
         sectionTitleSize="text-lg"
         sectionTitleFont="font-sans"    
         sectionTitleFontWeight="font-normal"
-        sectionContentColor="text-[#4A102A]"
+        sectionContentColor="text-black"
         sectionContentSize="text-xl"
         sectionContentFont="font-sans"
         sectionContentFontWeight="font-normal"

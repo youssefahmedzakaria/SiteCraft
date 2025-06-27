@@ -1,9 +1,26 @@
 "use client"
 
-import React, { useState, createContext, useContext, type ReactNode, type FormEvent } from "react"
-import { User, Package, Settings, MapPin, Bell, LogOut, Eye, EyeOff, CreditCard } from "lucide-react"
+import Image from "next/image"
+import { useState, useEffect } from "react"
+import { User, Package, Settings, MapPin, Bell, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { useRouter } from "next/navigation"
 
-// Types
+// Theme configuration matching product page
+const defaultTheme = {
+  backgroundColor: "#F5ECD5",
+  textColor: "#4A102A",
+  accentColor: "#F5ECD5",
+  secondaryColor: "#4A102A",
+  borderRadius: "rounded-lg",
+  fontFamily: "font-sans",
+}
+
 interface UserData {
   id: number
   firstName: string
@@ -13,594 +30,75 @@ interface UserData {
   avatar: string
 }
 
-interface AuthContextType {
-  user: UserData | null
-  login: (email: string, password: string) => Promise<{ success: boolean }>
-  register: (userData: Partial<UserData>) => Promise<{ success: boolean }>
-  logout: () => void
-  isLoading: boolean
+interface Order {
+  id: string
+  date: string
+  status: string
+  total: number
+  items: Array<{
+    name: string
+    quantity: number
+    price: number
+  }>
 }
 
-interface CartContextType {
-  state: { items: any[] }
-  addToCart: (item: any) => void
+interface Address {
+  id: string
+  type: string
+  street: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+  isDefault: boolean
 }
 
-interface FavoritesContextType {
-  state: { items: any[] }
-  removeFromFavorites: (id: string) => void
-}
-
-// Auth Context
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-// Auth Provider
-function AuthProvider({ children }: { children: ReactNode }) {
+export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const login = async (email: string, password: string): Promise<{ success: boolean }> => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Mock successful login
-    const mockUser: UserData = {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: email,
-      phone: "+1 234 567 890",
-      avatar: "/placeholder.svg?height=100&width=100",
-    }
-    setUser(mockUser)
-    setIsLoading(false)
-    return { success: true }
-  }
-
-  const register = async (userData: Partial<UserData>): Promise<{ success: boolean }> => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Mock successful registration
-    const newUser: UserData = {
-      id: Date.now(),
-      firstName: userData.firstName || "",
-      lastName: userData.lastName || "",
-      email: userData.email || "",
-      phone: userData.phone || "",
-      avatar: "/placeholder.svg?height=100&width=100",
-    }
-    setUser(newUser)
-    setIsLoading(false)
-    return { success: true }
-  }
-
-  const logout = (): void => {
-    setUser(null)
-  }
-
-  return <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>{children}</AuthContext.Provider>
-}
-
-// Hook to use auth context
-function useAuth(): AuthContextType {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-  return context
-}
-
-// Mock Cart Context
-const CartContext = createContext<CartContextType | undefined>(undefined)
-function useCart(): CartContextType {
-  const context = useContext(CartContext)
-  return context || { state: { items: [] }, addToCart: () => {} }
-}
-
-// Mock Favorites Context
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined)
-function useFavorites(): FavoritesContextType {
-  const context = useContext(FavoritesContext)
-  return context || { state: { items: [] }, removeFromFavorites: () => {} }
-}
-
-// UI Components
-type ButtonVariant = "default" | "outline" | "destructive";
-type ButtonSize = "default" | "sm" | "lg";
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  className?: string;
-  children: React.ReactNode;
-}
-
-function Button({
-  children,
-  className = "",
-  variant = "default",
-  size = "default",
-  disabled = false,
-  type = "button",
-  onClick,
-  ...props
-}: ButtonProps) {
-  const baseStyles =
-    "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
-  const variants: Record<ButtonVariant, string> = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
-    outline: "border border-gray-300 bg-white hover:bg-gray-50 text-gray-700",
-    destructive: "bg-red-600 text-white hover:bg-red-700",
-  }
-  const sizes: Record<ButtonSize, string> = {
-    default: "h-10 py-2 px-4",
-    sm: "h-8 px-3 text-sm",
-    lg: "h-12 px-8",
-  }
-
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
-
-function Input({ className = "", ...props }: any) {
-  return (
-    <input
-      className={`flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      {...props}
-    />
-  )
-}
-
-function Label({ children, className = "", ...props }: any) {
-  return (
-    <label
-      className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
-      {...props}
-    >
-      {children}
-    </label>
-  )
-}
-
-function Tabs({ children, value, onValueChange, className = "" }: any) {
-  return (
-    <div
-      className={className}
-      data-value={value}
-      onClick={(e: any) => {
-        const trigger = e.target.closest("[data-trigger]")
-        if (trigger && onValueChange) {
-          onValueChange(trigger.dataset.trigger)
-        }
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-function TabsList({ children, className = "" }: any) {
-  return (
-    <div
-      className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 ${className}`}
-    >
-      {children}
-    </div>
-  )
-}
-
-function TabsTrigger({ children, value, className = "" }: any) {
-  return (
-    <button
-      data-trigger={value}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-950 data-[state=active]:shadow-sm hover:bg-white hover:text-gray-900 ${className}`}
-    >
-      {children}
-    </button>
-  )
-}
-
-function TabsContent({ children, value, className = "" }: any) {
-  return (
-    <div
-      className={`mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${className}`}
-    >
-      {children}
-    </div>
-  )
-}
-
-function Separator({ className = "" }: any) {
-  return <div className={`shrink-0 bg-gray-200 h-[1px] w-full ${className}`} />
-}
-
-function Switch({ checked, onCheckedChange, className = "" }: any) {
-  return (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onCheckedChange(!checked)}
-      className={`peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${checked ? "bg-blue-600" : "bg-gray-200"} ${className}`}
-    >
-      <span
-        className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`}
-      />
-    </button>
-  )
-}
-
-// Login Component Props
-interface LoginPageProps {
-  backgroundColor?: string
-  textColor?: string
-  onSwitchToRegister: () => void
-}
-
-function LoginPage({ backgroundColor = "bg-white", textColor = "text-gray-900", onSwitchToRegister }: LoginPageProps) {
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const { login, isLoading } = useAuth()
-
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-
-    if (!email || !password) {
-      setError("Please fill in all fields")
-      return
-    }
-
-    try {
-      const result = await login(email, password)
-      if (!result.success) {
-        setError("Invalid credentials")
-      }
-    } catch (err) {
-      setError("Login failed. Please try again.")
-    }
-  }
-
-  return (
-    <div className={`min-h-screen flex items-center justify-center ${backgroundColor} px-4`}>
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className={`text-3xl font-bold ${textColor}`}>Welcome Back</h2>
-          <p className={`mt-2 ${textColor} opacity-60`}>Sign in to your account</p>
-        </div>
-
-        <form onSubmit={handleLogin} className="mt-8 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email" className={textColor}>
-                Email address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e: any) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="mt-1"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="password" className={textColor}>
-                Password
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e: any) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <button type="button" className={`text-sm ${textColor} opacity-60 hover:opacity-100`}>
-              Forgot your password?
-            </button>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Button>
-
-          <div className="text-center">
-            <p className={`text-sm ${textColor} opacity-60`}>
-              {"Don't have an account? "}
-              <button type="button" onClick={onSwitchToRegister} className={`font-medium ${textColor} hover:underline`}>
-                Sign up
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-// Register Component Props
-interface RegisterPageProps {
-  backgroundColor?: string
-  textColor?: string
-  onSwitchToLogin: () => void
-}
-
-interface FormData {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  password: string
-  confirmPassword: string
-}
-
-function RegisterPage({
-  backgroundColor = "bg-white",
-  textColor = "text-gray-900",
-  onSwitchToLogin,
-}: RegisterPageProps) {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const { register, isLoading } = useAuth()
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-
-    // Validation
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      setError("Please fill in all required fields")
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long")
-      return
-    }
-
-    try {
-      const result = await register(formData)
-      if (!result.success) {
-        setError("Registration failed")
-      }
-    } catch (err) {
-      setError("Registration failed. Please try again.")
-    }
-  }
-
-  return (
-    <div className={`min-h-screen flex items-center justify-center ${backgroundColor} px-4 py-8`}>
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className={`text-3xl font-bold ${textColor}`}>Create Account</h2>
-          <p className={`mt-2 ${textColor} opacity-60`}>Join us today</p>
-        </div>
-
-        <form onSubmit={handleRegister} className="mt-8 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName" className={textColor}>
-                  First Name *
-                </Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName" className={textColor}>
-                  Last Name *
-                </Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  className="mt-1"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="email" className={textColor}>
-                Email address *
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                className="mt-1"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="phone" className={textColor}>
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter your phone number"
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="password" className={textColor}>
-                Password *
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Create a password"
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword" className={textColor}>
-                Confirm Password *
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Create account"}
-          </Button>
-
-          <div className="text-center">
-            <p className={`text-sm ${textColor} opacity-60`}>
-              Already have an account?{" "}
-              <button type="button" onClick={onSwitchToLogin} className={`font-medium ${textColor} hover:underline`}>
-                Sign in
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-// Enhanced Profile Component
-function ProfileContent() {
-  const { user, logout } = useAuth()
-  const { state: cartState, addToCart } = useCart()
-  const { state: favoritesState, removeFromFavorites } = useFavorites()
   const [activeTab, setActiveTab] = useState<string>("profile")
-  const [profileData, setProfileData] = useState<UserData | null>(user)
+  const [profileData, setProfileData] = useState<UserData | null>(null)
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
     promotions: false,
     newsletter: true,
   })
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  const [showAddAddress, setShowAddAddress] = useState(false)
+  const [addresses, setAddresses] = useState<Address[]>([
+    {
+      id: "1",
+      type: "Home",
+      street: "ahmed shafeek street",
+      city: "hdaek el kobba",
+      state: "Cairo",
+      zipCode: "12345",
+      country: "Egypt",
+      isDefault: true,
+    },
+  ])
+  const [newAddress, setNewAddress] = useState({
+    type: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+  })
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [editAddress, setEditAddress] = useState({
+    type: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+  })
 
   // Mock orders data
-  const mockOrders = [
+  const mockOrders: Order[] = [
     {
       id: "ORD-001",
       date: "2024-01-15",
@@ -627,6 +125,28 @@ function ProfileContent() {
     },
   ]
 
+  useEffect(() => {
+    // Check if user is authenticated (simplified)
+    const token = localStorage.getItem("token")
+    if (!token) {
+      router.push("/login")
+      return
+    }
+
+    // Set mock user data directly
+    const mockUser: UserData = {
+      id: 1,
+      firstName: "amna",
+      lastName: "yahia",
+      email: "amnayahia@gmail.com",
+      phone: "+201117518970",
+      avatar: "/placeholder.svg?height=100&width=100",
+    }
+    setUser(mockUser)
+    setProfileData(mockUser)
+    setIsLoading(false)
+  }, [router])
+
   const handleProfileUpdate = (field: keyof UserData, value: string) => {
     setProfileData((prev) => (prev ? { ...prev, [field]: value } : null))
   }
@@ -649,355 +169,836 @@ function ProfileContent() {
   }
 
   const handleLogout = (): void => {
-    logout()
+    localStorage.removeItem("token")
+    router.push("/login")
   }
 
   const handleSaveProfile = () => {
-    // Here you would typically make an API call to save the profile data
+    setUser(profileData)
     alert("Profile updated successfully!")
   }
 
+  const handleAddAddress = () => {
+    if (!newAddress.type || !newAddress.street || !newAddress.city) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    const addressToAdd = {
+      id: Date.now().toString(),
+      ...newAddress,
+      isDefault: addresses.length === 0,
+    }
+
+    setAddresses([...addresses, addressToAdd])
+    setNewAddress({
+      type: "",
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    })
+    setShowAddAddress(false)
+    alert("Address added successfully!")
+  }
+
+  const handleDeleteAddress = (addressId: string) => {
+    setAddresses(addresses.filter((addr) => addr.id !== addressId))
+  }
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddressId(address.id)
+    setEditAddress({
+      type: address.type,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      country: address.country,
+    })
+  }
+
+  const handleUpdateAddress = () => {
+    if (!editAddress.type || !editAddress.street || !editAddress.city) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    setAddresses(addresses.map((addr) => (addr.id === editingAddressId ? { ...addr, ...editAddress } : addr)))
+
+    setEditingAddressId(null)
+    setEditAddress({
+      type: "",
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    })
+    alert("Address updated successfully!")
+  }
+
+  const handleCancelEdit = () => {
+    setEditingAddressId(null)
+    setEditAddress({
+      type: "",
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    })
+  }
+
+  const handleViewOrderDetails = (orderId: string) => {
+    setSelectedOrderId(orderId)
+    setActiveTab("order-details")
+  }
+
+  const handleBackToOrders = () => {
+    setSelectedOrderId(null)
+    setActiveTab("orders")
+  }
+
+  if (isLoading) {
+    return (
+      <div
+        className={`min-h-screen flex items-center justify-center ${defaultTheme.fontFamily}`}
+        style={{ backgroundColor: defaultTheme.backgroundColor }}
+      >
+        <div className="text-center">
+          <div
+            className="animate-spin rounded-full h-32 w-32 border-b-2 mx-auto"
+            style={{ borderColor: defaultTheme.secondaryColor }}
+          ></div>
+          <p className="mt-4" style={{ color: defaultTheme.textColor }}>
+            Loading...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className={`min-h-screen pt-20 ${defaultTheme.fontFamily}`}
+      style={{ backgroundColor: defaultTheme.backgroundColor }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div
+                className={`w-16 h-16 ${defaultTheme.borderRadius} flex items-center justify-center`}
+                style={{ background: `linear-gradient(135deg, ${defaultTheme.secondaryColor} 0%, #8B4A6B 100%)` }}
+              >
                 <User className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold" style={{ color: defaultTheme.textColor }}>
                   {profileData?.firstName} {profileData?.lastName}
                 </h1>
-                <p className="text-gray-600">{profileData?.email}</p>
+                <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>{profileData?.email}</p>
               </div>
             </div>
-            <Button onClick={handleLogout} variant="destructive" className="flex items-center gap-2">
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className={`flex items-center gap-2 ${defaultTheme.borderRadius} border-2`}
+              style={{
+                backgroundColor: defaultTheme.backgroundColor,
+                borderColor: defaultTheme.secondaryColor,
+                color: defaultTheme.textColor,
+              }}
+            >
               <LogOut className="w-4 h-4" />
               Logout
             </Button>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="profile" className="flex items-center gap-2">
+            <TabsList
+              className={`grid w-full grid-cols-3 ${defaultTheme.borderRadius}`}
+              style={{ backgroundColor: defaultTheme.secondaryColor }}
+            >
+              <TabsTrigger
+                value="profile"
+                className="flex items-center gap-2 text-white data-[state=active]:bg-white data-[state=active]:text-black"
+              >
                 <User className="w-4 h-4" />
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="orders" className="flex items-center gap-2">
+              <TabsTrigger
+                value="orders"
+                className="flex items-center gap-2 text-white data-[state=active]:bg-white data-[state=active]:text-black"
+              >
                 <Package className="w-4 h-4" />
                 Orders
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
+              <TabsTrigger
+                value="settings"
+                className="flex items-center gap-2 text-white data-[state=active]:bg-white data-[state=active]:text-black"
+              >
                 <Settings className="w-4 h-4" />
                 Settings
               </TabsTrigger>
             </TabsList>
 
-            {activeTab === "profile" && (
-              <TabsContent value="profile" className="space-y-6">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold">Personal Information</h2>
-                    <p className="text-gray-600">Update your personal details</p>
+            <TabsContent value="profile" className="space-y-6">
+              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                    Personal Information
+                  </h2>
+                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Update your personal details</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName" style={{ color: defaultTheme.textColor }}>
+                        First Name
+                      </Label>
+                      <Input
+                        id="firstName"
+                        value={profileData?.firstName || ""}
+                        onChange={(e) => handleProfileUpdate("firstName", e.target.value)}
+                        className={`border-2 ${defaultTheme.borderRadius}`}
+                        style={{ borderColor: defaultTheme.secondaryColor }}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName" style={{ color: defaultTheme.textColor }}>
+                        Last Name
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={profileData?.lastName || ""}
+                        onChange={(e) => handleProfileUpdate("lastName", e.target.value)}
+                        className={`border-2 ${defaultTheme.borderRadius}`}
+                        style={{ borderColor: defaultTheme.secondaryColor }}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input
-                          id="firstName"
-                          value={profileData?.firstName || ""}
-                          onChange={(e: any) => handleProfileUpdate("firstName", e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          value={profileData?.lastName || ""}
-                          onChange={(e: any) => handleProfileUpdate("lastName", e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={profileData?.email || ""}
-                        onChange={(e: any) => handleProfileUpdate("email", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={profileData?.phone || ""}
-                        onChange={(e: any) => handleProfileUpdate("phone", e.target.value)}
-                      />
-                    </div>
-                    <Button onClick={handleSaveProfile}>Save Changes</Button>
+                  <div>
+                    <Label htmlFor="email" style={{ color: defaultTheme.textColor }}>
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profileData?.email || ""}
+                      onChange={(e) => handleProfileUpdate("email", e.target.value)}
+                      className={`border-2 ${defaultTheme.borderRadius}`}
+                      style={{ borderColor: defaultTheme.secondaryColor }}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone" style={{ color: defaultTheme.textColor }}>
+                      Phone
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={profileData?.phone || ""}
+                      onChange={(e) => handleProfileUpdate("phone", e.target.value)}
+                      className={`border-2 ${defaultTheme.borderRadius}`}
+                      style={{ borderColor: defaultTheme.secondaryColor }}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSaveProfile}
+                    className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                    style={{ backgroundColor: defaultTheme.secondaryColor }}
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+
+              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                <div className="flex items-center gap-2 mb-6">
+                  <MapPin className="w-5 h-5" style={{ color: defaultTheme.textColor }} />
+                  <div>
+                    <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                      Addresses
+                    </h2>
+                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Manage your shipping addresses</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="w-5 h-5" />
-                    <div>
-                      <h2 className="text-xl font-semibold">Addresses</h2>
-                      <p className="text-gray-600">Manage your shipping addresses</p>
-                    </div>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">Home</p>
-                        <p className="text-sm text-gray-600">
-                          123 Main Street
-                          <br />
-                          New York, NY 10001
-                          <br />
-                          United States
-                        </p>
+                <div className="space-y-4">
+                  {addresses.map((address) => (
+                    <div key={address.id} className="space-y-4">
+                      <div
+                        className={`border ${defaultTheme.borderRadius} p-4`}
+                        style={{ borderColor: defaultTheme.secondaryColor }}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                                {address.type}
+                              </p>
+                              {address.isDefault && (
+                                <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm mt-1" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                              {address.street}
+                              <br />
+                              {address.city}, {address.state} {address.zipCode}
+                              <br />
+                              {address.country}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`border-2 ${defaultTheme.borderRadius}`}
+                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                              onClick={() => handleEditAddress(address)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 ${defaultTheme.borderRadius}`}
+                              onClick={() => handleDeleteAddress(address.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                      <Button variant="outline" size="sm">
-                        Edit
+
+                      {editingAddressId === address.id && (
+                        <div
+                          className={`p-4 border ${defaultTheme.borderRadius}`}
+                          style={{
+                            borderColor: defaultTheme.secondaryColor,
+                            backgroundColor: defaultTheme.accentColor,
+                          }}
+                        >
+                          <h4 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                            Edit Address
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="editAddressType" style={{ color: defaultTheme.textColor }}>
+                                Address Type *
+                              </Label>
+                              <Input
+                                id="editAddressType"
+                                value={editAddress.type}
+                                onChange={(e) => setEditAddress({ ...editAddress, type: e.target.value })}
+                                placeholder="e.g., Home, Work, Office"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editCountry" style={{ color: defaultTheme.textColor }}>
+                                Country
+                              </Label>
+                              <Input
+                                id="editCountry"
+                                value={editAddress.country}
+                                onChange={(e) => setEditAddress({ ...editAddress, country: e.target.value })}
+                                placeholder="Country"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div className="md:col-span-2">
+                              <Label htmlFor="editStreet" style={{ color: defaultTheme.textColor }}>
+                                Street Address *
+                              </Label>
+                              <Input
+                                id="editStreet"
+                                value={editAddress.street}
+                                onChange={(e) => setEditAddress({ ...editAddress, street: e.target.value })}
+                                placeholder="Street address"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editCity" style={{ color: defaultTheme.textColor }}>
+                                City *
+                              </Label>
+                              <Input
+                                id="editCity"
+                                value={editAddress.city}
+                                onChange={(e) => setEditAddress({ ...editAddress, city: e.target.value })}
+                                placeholder="City"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editState" style={{ color: defaultTheme.textColor }}>
+                                State/Province
+                              </Label>
+                              <Input
+                                id="editState"
+                                value={editAddress.state}
+                                onChange={(e) => setEditAddress({ ...editAddress, state: e.target.value })}
+                                placeholder="State/Province"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editZipCode" style={{ color: defaultTheme.textColor }}>
+                                ZIP/Postal Code
+                              </Label>
+                              <Input
+                                id="editZipCode"
+                                value={editAddress.zipCode}
+                                onChange={(e) => setEditAddress({ ...editAddress, zipCode: e.target.value })}
+                                placeholder="ZIP/Postal Code"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-4">
+                            <Button
+                              onClick={handleUpdateAddress}
+                              className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                              style={{ backgroundColor: defaultTheme.secondaryColor }}
+                            >
+                              Update Address
+                            </Button>
+                            <Button
+                              onClick={handleCancelEdit}
+                              variant="outline"
+                              className={`border-2 ${defaultTheme.borderRadius}`}
+                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {!showAddAddress ? (
+                  <Button
+                    onClick={() => setShowAddAddress(true)}
+                    variant="outline"
+                    className={`mt-4 border-2 ${defaultTheme.borderRadius}`}
+                    style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                  >
+                    Add New Address
+                  </Button>
+                ) : (
+                  <div
+                    className={`mt-6 p-4 border ${defaultTheme.borderRadius}`}
+                    style={{ borderColor: defaultTheme.secondaryColor, backgroundColor: defaultTheme.accentColor }}
+                  >
+                    <h3 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                      Add New Address
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="addressType" style={{ color: defaultTheme.textColor }}>
+                          Address Type *
+                        </Label>
+                        <Input
+                          id="addressType"
+                          value={newAddress.type}
+                          onChange={(e) => setNewAddress({ ...newAddress, type: e.target.value })}
+                          placeholder="e.g., Home, Work, Office"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="country" style={{ color: defaultTheme.textColor }}>
+                          Country
+                        </Label>
+                        <Input
+                          id="country"
+                          value={newAddress.country}
+                          onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                          placeholder="Country"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="street" style={{ color: defaultTheme.textColor }}>
+                          Street Address *
+                        </Label>
+                        <Input
+                          id="street"
+                          value={newAddress.street}
+                          onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
+                          placeholder="Street address"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="city" style={{ color: defaultTheme.textColor }}>
+                          City *
+                        </Label>
+                        <Input
+                          id="city"
+                          value={newAddress.city}
+                          onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                          placeholder="City"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state" style={{ color: defaultTheme.textColor }}>
+                          State/Province
+                        </Label>
+                        <Input
+                          id="state"
+                          value={newAddress.state}
+                          onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                          placeholder="State/Province"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode" style={{ color: defaultTheme.textColor }}>
+                          ZIP/Postal Code
+                        </Label>
+                        <Input
+                          id="zipCode"
+                          value={newAddress.zipCode}
+                          onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
+                          placeholder="ZIP/Postal Code"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        onClick={handleAddAddress}
+                        className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                        style={{ backgroundColor: defaultTheme.secondaryColor }}
+                      >
+                        Save Address
+                      </Button>
+                      <Button
+                        onClick={() => setShowAddAddress(false)}
+                        variant="outline"
+                        className={`border-2 ${defaultTheme.borderRadius}`}
+                        style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                      >
+                        Cancel
                       </Button>
                     </div>
                   </div>
-                  <Button variant="outline" className="mt-4">
-                    Add New Address
-                  </Button>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="orders" className="space-y-6">
+              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                    Order History
+                  </h2>
+                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                    View your past orders and track current ones
+                  </p>
                 </div>
-              </TabsContent>
-            )}
-
-            {activeTab === "orders" && (
-              <TabsContent value="orders" className="space-y-6">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold">Order History</h2>
-                    <p className="text-gray-600">View your past orders and track current ones</p>
-                  </div>
-                  <div className="space-y-4">
-                    {mockOrders.map((order) => (
-                      <div key={order.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <p className="font-medium">Order {order.id}</p>
-                            <p className="text-sm text-gray-600">
-                              Placed on {new Date(order.date).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
-                            >
-                              {order.status}
-                            </span>
-                            <p className="text-lg font-semibold mt-1">${order.total}</p>
-                          </div>
+                <div className="space-y-4">
+                  {mockOrders.map((order) => (
+                    <div
+                      key={order.id}
+                      className={`border ${defaultTheme.borderRadius} p-4 hover:shadow-md transition-shadow`}
+                      style={{ borderColor: defaultTheme.secondaryColor }}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                            Order {order.id}
+                          </p>
+                          <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                            Placed on {new Date(order.date).toLocaleDateString()}
+                          </p>
                         </div>
-                        <div className="space-y-1">
-                          {order.items.map((item, index) => (
-                            <p key={index} className="text-sm text-gray-600">
-                              {item.name} × {item.quantity}
-                            </p>
-                          ))}
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
-                          {order.status === "Delivered" && (
-                            <Button variant="outline" size="sm">
-                              Reorder
-                            </Button>
-                          )}
+                        <div className="text-right">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                          >
+                            {order.status}
+                          </span>
+                          <p className="text-lg font-semibold mt-1" style={{ color: defaultTheme.textColor }}>
+                            ${order.total}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-            )}
-
-            {activeTab === "settings" && (
-              <TabsContent value="settings" className="space-y-6">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Bell className="w-5 h-5" />
-                    <div>
-                      <h2 className="text-xl font-semibold">Notifications</h2>
-                      <p className="text-gray-600">Manage your notification preferences</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Order Updates</p>
-                        <p className="text-sm text-gray-600">Get notified about order status changes</p>
+                      <div className="space-y-1">
+                        {order.items.map((item, index) => (
+                          <p key={index} className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                            {item.name} × {item.quantity}
+                          </p>
+                        ))}
                       </div>
-                      <Switch
-                        checked={notifications.orderUpdates}
-                        onCheckedChange={(checked: boolean) => handleNotificationChange("orderUpdates", checked)}
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Promotions</p>
-                        <p className="text-sm text-gray-600">Receive promotional offers and discounts</p>
-                      </div>
-                      <Switch
-                        checked={notifications.promotions}
-                        onCheckedChange={(checked: boolean) => handleNotificationChange("promotions", checked)}
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Newsletter</p>
-                        <p className="text-sm text-gray-600">Stay updated with our latest news</p>
-                      </div>
-                      <Switch
-                        checked={notifications.newsletter}
-                        onCheckedChange={(checked: boolean) => handleNotificationChange("newsletter", checked)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <CreditCard className="w-5 h-5" />
-                    <div>
-                      <h2 className="text-xl font-semibold">Payment Methods</h2>
-                      <p className="text-gray-600">Manage your payment options</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {/* Existing Card */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-gradient-to-r from-blue-500 to-purple-500 w-12 h-8 rounded-md flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">VISA</span>
-                          </div>
-                          <div>
-                            <p className="font-medium">Visa ending in 4242</p>
-                            <p className="text-sm text-gray-600">Expires 12/25</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          onClick={() => handleViewOrderDetails(order.id)}
+                          variant="outline"
+                          size="sm"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                        >
+                          View Details
+                        </Button>
+                        {order.status === "Delivered" && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className={`border-2 ${defaultTheme.borderRadius}`}
+                            style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
                           >
-                            Remove
+                            Reorder
                           </Button>
-                        </div>
+                        )}
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
 
-                    {/* Another Card Example */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-gradient-to-r from-gray-700 to-gray-900 w-12 h-8 rounded-md flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">MC</span>
-                          </div>
-                          <div>
-                            <p className="font-medium">Mastercard ending in 8888</p>
-                            <p className="text-sm text-gray-600">Expires 09/26</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
+            <TabsContent value="settings" className="space-y-6">
+              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                <div className="flex items-center gap-2 mb-6">
+                  <Bell className="w-5 h-5" style={{ color: defaultTheme.textColor }} />
+                  <div>
+                    <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                      Notifications
+                    </h2>
+                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Manage your notification preferences</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                        Order Updates
+                      </p>
+                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                        Get notified about order status changes
+                      </p>
                     </div>
+                    <Switch
+                      checked={notifications.orderUpdates}
+                      onCheckedChange={(checked: boolean) => handleNotificationChange("orderUpdates", checked)}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                        Promotions
+                      </p>
+                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                        Receive promotional offers and discounts
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notifications.promotions}
+                      onCheckedChange={(checked: boolean) => handleNotificationChange("promotions", checked)}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                        Newsletter
+                      </p>
+                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                        Stay updated with our latest news
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notifications.newsletter}
+                      onCheckedChange={(checked: boolean) => handleNotificationChange("newsletter", checked)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
 
-                    {/* Add New Payment Method Button */}
-                    <Button className="w-full flex items-center justify-center gap-2">
-                      <span className="text-lg">+</span> Add New Payment Method
+            <TabsContent value="order-details" className="space-y-6">
+              {selectedOrderId && (
+                <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <Button
+                      onClick={handleBackToOrders}
+                      variant="outline"
+                      size="sm"
+                      className={`border-2 ${defaultTheme.borderRadius}`}
+                      style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                    >
+                      ← Back to Orders
                     </Button>
+                    <div>
+                      <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                        Order Details - {selectedOrderId}
+                      </h2>
+                    </div>
                   </div>
+
+                  {(() => {
+                    const order = mockOrders.find((o) => o.id === selectedOrderId)
+                    if (!order) return null
+
+                    const shipping = order.total > 500 ? 0 : 25
+                    const tax = order.total * 0.08
+                    const subtotal = order.total - tax - shipping
+
+                    return (
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Order Items */}
+                        <div className="lg:col-span-2 space-y-6">
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                              Order Items ({order.items.length})
+                            </h3>
+                            <div className="space-y-4">
+                              {order.items.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className={`flex items-center gap-4 p-4 border ${defaultTheme.borderRadius}`}
+                                  style={{
+                                    backgroundColor: `${defaultTheme.secondaryColor}20`,
+                                    borderColor: defaultTheme.secondaryColor,
+                                  }}
+                                >
+                                  <div
+                                    className={`relative w-20 h-20 bg-gray-100 ${defaultTheme.borderRadius} overflow-hidden`}
+                                  >
+                                    <Image
+                                      src="/placeholder.svg?height=80&width=80"
+                                      alt={item.name}
+                                      width={80}
+                                      height={80}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className="font-medium" style={{ color: defaultTheme.textColor }}>
+                                      {item.name}
+                                    </h4>
+                                    <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                                      Quantity: {item.quantity}
+                                    </p>
+                                    <p className="text-lg font-semibold" style={{ color: defaultTheme.textColor }}>
+                                      ${item.price}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-semibold" style={{ color: defaultTheme.textColor }}>
+                                      ${(item.price * item.quantity).toFixed(2)}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="lg:col-span-1">
+                          <div
+                            className={`p-6 ${defaultTheme.borderRadius} sticky top-24`}
+                            style={{ backgroundColor: `${defaultTheme.secondaryColor}20` }}
+                          >
+                            <h3 className="text-xl font-semibold mb-6" style={{ color: defaultTheme.textColor }}>
+                              Order Summary
+                            </h3>
+
+                            <div className="space-y-4">
+                              <div className="flex justify-between">
+                                <span style={{ color: defaultTheme.textColor }}>Subtotal</span>
+                                <span style={{ color: defaultTheme.textColor }}>${subtotal.toFixed(2)}</span>
+                              </div>
+
+                              <div className="flex justify-between">
+                                <span style={{ color: defaultTheme.textColor }}>Shipping</span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-between">
+                                <span style={{ color: defaultTheme.textColor }}>Tax</span>
+                                <span style={{ color: defaultTheme.textColor }}>${tax.toFixed(2)}</span>
+                              </div>
+
+                              <hr style={{ borderColor: defaultTheme.secondaryColor }} />
+
+                              <div className="flex justify-between text-lg font-semibold">
+                                <span style={{ color: defaultTheme.textColor }}>Total</span>
+                                <span style={{ color: defaultTheme.textColor }}>${order.total.toFixed(2)}</span>
+                              </div>
+                            </div>
+
+                            <div className="mt-6 space-y-4">
+                              <div>
+                                <h4 className="font-medium mb-2" style={{ color: defaultTheme.textColor }}>
+                                  Order Status
+                                </h4>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}
+                                >
+                                  {order.status}
+                                </span>
+                              </div>
+
+                              <div>
+                                <h4 className="font-medium mb-2" style={{ color: defaultTheme.textColor }}>
+                                  Order Date
+                                </h4>
+                                <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                                  {new Date(order.date).toLocaleDateString()}
+                                </p>
+                              </div>
+
+                              {order.status === "Delivered" && (
+                                <Button
+                                  className={`w-full text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                                  style={{ backgroundColor: defaultTheme.secondaryColor }}
+                                >
+                                  Reorder Items
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
-              </TabsContent>
-            )}
+              )}
+            </TabsContent>
           </Tabs>
         </div>
       </div>
     </div>
-  )
-}
-
-// Main App Component with Navigation Logic
-function StoreApp() {
-  const { user } = useAuth()
-  const [currentView, setCurrentView] = useState<"profile" | "login" | "register">("profile")
-
-  // Navigation logic: if user is not logged in and tries to access profile, show login
-  React.useEffect(() => {
-    if (!user && currentView === "profile") {
-      setCurrentView("login")
-    }
-  }, [user, currentView])
-
-  const handleSwitchToLogin = () => setCurrentView("login")
-  const handleSwitchToRegister = () => setCurrentView("register")
-
-  // If user is logged in, always show profile
-  if (user) {
-    return <ProfileContent />
-  }
-
-  // If user is not logged in, show login or register based on current view
-  if (currentView === "login") {
-    return (
-      <LoginPage
-        backgroundColor="bg-gradient-to-br from-blue-50 to-indigo-100"
-        textColor="text-gray-800"
-        onSwitchToRegister={handleSwitchToRegister}
-      />
-    )
-  }
-
-  if (currentView === "register") {
-    return (
-      <RegisterPage
-        backgroundColor="bg-gradient-to-br from-purple-50 to-pink-100"
-        textColor="text-gray-800"
-        onSwitchToLogin={handleSwitchToLogin}
-      />
-    )
-  }
-
-  return null
-}
-
-// Main Export Component
-export default function Component() {
-  return (
-    <AuthProvider>
-      <StoreApp />
-    </AuthProvider>
   )
 }

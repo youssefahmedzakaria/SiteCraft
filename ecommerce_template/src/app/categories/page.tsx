@@ -233,9 +233,9 @@ export default function CategoriesPage({
   ctaText = "Explore Collection",
   
   // Background and styling props
-  bgColor = "bg-[#F5ECD5]",
-  pageTitleColor = "text-[#4A102A]",
-  subtitleColor = "text-[#4A102A]/80",
+  bgColor = "bg-white",
+  pageTitleColor = "text-black",
+  subtitleColor = "text-black/80",
   fontFamily = "font-serif",
   titleFont = "font-bold",
   accentColor = "bg-black/20",
