@@ -7,10 +7,11 @@ import com.sitecraft.backend.Repositories.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 
@@ -95,6 +96,103 @@ public class CustomerService {
             return addresses;
         }catch (Exception e) {
             throw new RuntimeException("Failed to get customer addresses: " + e.getMessage());
+        }
+    }
+
+    public void updateCustomerInfo(Long customerId, Customer updatedCustomer) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            if (updatedCustomer.getName() != null) customer.setName(updatedCustomer.getName());
+            if (updatedCustomer.getPhone() != null) customer.setPhone(updatedCustomer.getPhone());
+            if (updatedCustomer.getGender() != null) customer.setGender(updatedCustomer.getGender());
+            customerRepo.save(customer);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update customer info: " + e.getMessage());
+        }
+    }
+
+    public void changePassword(Long customerId, Map<String, String> passwords) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            String currentPassword = passwords.get("currentPassword");
+            String newPassword = passwords.get("newPassword");
+
+            if (newPassword.length() < 8) {
+                throw new RuntimeException("New password must be at least 8 characters long.");
+            }
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (!encoder.matches(currentPassword, customer.getPassword())) {
+                throw new RuntimeException("Current password is incorrect.");
+            }
+
+            customer.setPassword(encoder.encode(newPassword));
+            customerRepo.save(customer);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update password: " + e.getMessage());
+        }
+    }
+
+    public void addAddress(Long customerId, Address newAddress) {
+        try {
+            Customer customer = customerRepo.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            Address address = new Address();
+            address.setTitle(newAddress.getTitle());
+            address.setCity(newAddress.getCity());
+            address.setStreetNum(newAddress.getStreetNum());
+            address.setBuildingNum(newAddress.getBuildingNum());
+            address.setFloorNum(newAddress.getFloorNum());
+            address.setApartmentNum(newAddress.getApartmentNum());
+            address.setLandmark(newAddress.getLandmark());
+            address.setCustomer(customer);
+            addressRepo.save(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add address: " + e.getMessage());
+        }
+    }
+
+    public void updateAddress(Long customerId, Long addressId, Address updatedAddress) {
+        try {
+            Address address = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+
+            if (!address.getCustomer().getId().equals(customerId)) {
+                throw new RuntimeException("Unauthorized access to this address.");
+            }
+
+            if (updatedAddress.getTitle() != null) address.setTitle(updatedAddress.getTitle());
+            if (updatedAddress.getCity() != null) address.setCity(updatedAddress.getCity());
+            if (updatedAddress.getStreetNum() != null) address.setStreetNum(updatedAddress.getStreetNum());
+            if (updatedAddress.getBuildingNum() != null) address.setBuildingNum(updatedAddress.getBuildingNum());
+            if (updatedAddress.getFloorNum() != null) address.setFloorNum(updatedAddress.getFloorNum());
+            if (updatedAddress.getApartmentNum() != null) address.setApartmentNum(updatedAddress.getApartmentNum());
+            if (updatedAddress.getLandmark() != null) address.setLandmark(updatedAddress.getLandmark());
+            addressRepo.save(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update address: " + e.getMessage());
+        }
+    }
+
+    public void deleteAddress(Long customerId, Long addressId) {
+        try {
+            Address address = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+
+            if (!address.getCustomer().getId().equals(customerId)) {
+                throw new RuntimeException("Unauthorized access to this address.");
+            }
+
+            addressRepo.delete(address);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete address: " + e.getMessage());
         }
     }
 
