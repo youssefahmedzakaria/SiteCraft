@@ -29,10 +29,7 @@ public class CartService {
 
     public ShoppingCart getCartByCustomerId(Long customerId) {
         Optional<Customer> customerOpt = customerRepo.findById(customerId);
-        if (customerOpt.isPresent()) {
-            return customerOpt.get().getShoppingCart();
-        }
-        return null;
+        return customerOpt.map(Customer::getShoppingCart).orElse(null);
     }
 
     public List<CartProduct> getCartProducts(Long cartId) {

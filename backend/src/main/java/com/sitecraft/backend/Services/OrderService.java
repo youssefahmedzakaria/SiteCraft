@@ -25,18 +25,18 @@ public class OrderService {
     @Autowired
     private OrderProductRepo orderProductRepo;
     @Autowired
-    private CustomerRepo customerRepo;
-    @Autowired
     private AddressRepo addressRepo;
     @Autowired
     private PaymentLogRepo paymentLogRepo;
     @Autowired
     private ShippingInfoRepo shippingInfoRepo;
+    @Autowired
+    private CartService cartService;
 
 
     public List<Order> getAllOrders(Long storeId) {
         Store existingStore = storeRepo.findById(storeId)
-            .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new RuntimeException("Store not found"));
 
         return orderRepo.findByStoreId(existingStore.getId());
     }
@@ -124,21 +124,17 @@ public class OrderService {
 
     // -------------------------------------Create Order-------------------------------------------
 
-    public ShoppingCart getCartByCustomerId(Long customerId) {
-        Optional<Customer> customerOpt = customerRepo.findById(customerId);
-        return customerOpt.map(Customer::getShoppingCart).orElse(null);
-    }
-
     public void createOrder(Long customerId, Long addressId, Long storeId) {
         try {
-            // Get Customer Data
+            // 1. Get Customer Data
             Customer customer = new Customer();
             customer.setId(customerId);
 
-            // Get Store Data
+            // 2. Get Store Data
             Store store = new Store();
             store.setId(storeId);
 
+            // 3. Create Empty Order
             Order order = new Order();
             order.setStatus("Pending");
             order.setStore(store);
@@ -146,13 +142,13 @@ public class OrderService {
 
             orderRepo.save(order);
 
-            ShoppingCart cart = getCartByCustomerId(customerId);
+            // 4. Get Cart
+            ShoppingCart cart = cartService.getCartByCustomerId(customerId);
 
-            // Handle Order Products
+            // 5. Create Order Products
             List<OrderProduct> orderProducts = new ArrayList<>();
             for(CartProduct cartProduct : cart.getCartProducts()) {
                 OrderProduct orderProduct = new OrderProduct();
-//                TODO
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(cartProduct.getProduct());
                 orderProduct.setSku(cartProduct.getSku());
@@ -169,7 +165,7 @@ public class OrderService {
             }
             orderProductRepo.saveAll(orderProducts);
 
-            // Handle Shipping Data
+            // 6. Create Shipping Data
             Address address = addressRepo.findById(addressId)
                     .orElseThrow(() -> new RuntimeException("Address not found"));
             ShippingInfo shippingInfo = shippingInfoRepo.findByStoreIdAndGovernmentName(storeId, address.getCity());
@@ -183,20 +179,22 @@ public class OrderService {
             shipping.setShippingDate(null);
             shippingRepo.save(shipping);
 
+            // 7. Process Payment
 //            TODO
-            // process order payment here
 //            PaymentLog paymentLog = new PaymentLog();
 //            paymentLog.setTransactionId(paymentId);
-            //            paymentLogRepo.save(paymentLog);
+//            paymentLogRepo.save(paymentLog);
 
+            // 8. Add Order Data
             order.setPrice(cart.getTotalPrice().doubleValue());
             order.setIssueDate(LocalDateTime.now());
 //            order.setPaymentLog(paymentLog);
             order.setShipping(shipping);
             order.setOrderProducts(orderProducts);
 
-
+            // 9. Save Order and Clear Shopping cart
             orderRepo.save(order);
+            cartService.clearCart(customerId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
