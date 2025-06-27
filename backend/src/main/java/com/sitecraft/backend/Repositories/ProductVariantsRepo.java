@@ -13,4 +13,6 @@ public interface ProductVariantsRepo extends JpaRepository<ProductVariants, Long
     @Modifying
     @Query(value = "DELETE FROM ProductVariants WHERE product_id = ?1", nativeQuery = true)
     void deleteByProductId(Long productId);
+
+    ProductVariants findBySku(String sku);
 }

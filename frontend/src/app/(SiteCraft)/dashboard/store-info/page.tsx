@@ -1,0 +1,79 @@
+import Link from "next/link";
+import { Button } from "@/components/SiteCraft/ui/button";
+import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
+import Image from "next/image";
+import { StorePolicyTableHeader } from "@/components/SiteCraft/dashboard/storeInfo/policyTableHeader";
+import { StoreAboutTableHeader } from "@/components/SiteCraft/dashboard/storeInfo/aboutTableHeader";
+import { PolicyRecord } from "@/components/SiteCraft/dashboard/storeInfo/policyRecord";
+import { AboutRecord } from "@/components/SiteCraft/dashboard/storeInfo/aboutRecord";
+import { policies, aboutSections } from "@/lib/store-info";
+import { Plus } from "lucide-react";
+
+export default function StoreInfoPage() {
+  return (
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar />
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Store Info</h1>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-600">
+            Manage store policies and about us content
+          </h2>
+        </div>
+
+        {/* Policies Table */}
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Store Policies</h3>
+            <div className="flex justify-end">
+              <Link href="/dashboard/store-info/policy-add">
+                <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  <Plus size={16} />
+                  <span className="ml-2">Add New Policy</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+            <table className="min-w-full divide-y divide-logo-border">
+              <StorePolicyTableHeader />
+              <tbody className="bg-white divide-y divide-logo-border">
+                {policies.map((policy) => (
+                  <PolicyRecord key={policy.id} policy={policy} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* About Us Table */}
+        <div className="mt-10">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">About Us</h3>
+            <div className="flex justify-end">
+              <Link href="/dashboard/store-info/about-add">
+                <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                  <Plus size={16} />
+                  <span className="ml-2">Add New Section</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
+            <table className="min-w-full divide-y divide-logo-border">
+              <StoreAboutTableHeader />
+              <tbody className="bg-white divide-y divide-logo-border">
+                {aboutSections.map((section) => (
+                  <AboutRecord key={section.id} section={section} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

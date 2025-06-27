@@ -1,20 +1,17 @@
 package com.sitecraft.backend.Models;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String email;
     private String password;
@@ -22,44 +19,30 @@ public class Customer {
     private String phone;
     private String status;
 
-    @Column(name = "wishlist_id")
-    private Long wishlistId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wishlist_id")
+    @JsonIgnore
+    private WishList wishList;
 
-    @Column(name = "cart_id")
-    private Long cartId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    @JsonIgnore
+    private ShoppingCart shoppingCart;
 
-    @Column(name = "store_id")
-    private Long storeId;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    @JsonIgnore
+    private Store store;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Order> orders;
 
-    public Customer() {}
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Review> reviews;
 
-    public Customer(
-        Long id,
-        String name,
-        String email,
-        String password,
-        String gender,
-        String phone,
-        String status,
-        Long wishlistId,
-        Long cartId,
-        Long storeId,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        List<Order> orders
-    ) {
+    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -67,52 +50,110 @@ public class Customer {
         this.gender = gender;
         this.phone = phone;
         this.status = status;
-        this.wishlistId = wishlistId;
-        this.cartId = cartId;
-        this.storeId = storeId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.wishList = wishList;
+        this.shoppingCart = shoppingCart;
+        this.store = store;
+        this.orders = orders;
+        this.reviews = reviews;
+    }
+
+    public Customer() {
+
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public WishList getWishList() {
+        return wishList;
+    }
+
+    public void setWishList(WishList wishList) {
+        this.wishList = wishList;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 
-    // getters & setters
+    public List<Review> getReviews() {
+        return reviews;
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
-
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public Long getWishlistId() { return wishlistId; }
-    public void setWishlistId(Long wishlistId) { this.wishlistId = wishlistId; }
-
-    public Long getCartId() { return cartId; }
-    public void setCartId(Long cartId) { this.cartId = cartId; }
-
-    public Long getStoreId() { return storeId; }
-    public void setStoreId(Long storeId) { this.storeId = storeId; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public List<Order> getOrders() { return orders; }
-    public void setOrders(List<Order> orders) { this.orders = orders; }
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
 }

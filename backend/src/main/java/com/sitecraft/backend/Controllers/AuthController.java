@@ -17,14 +17,20 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping(path = "/register")
-    public ResponseEntity register(@RequestBody Users users) throws Exception {
+    public ResponseEntity register(@RequestBody Users user) throws Exception {
         try {
-            boolean isExist = userService.isUserExists(users.getEmail());
+            boolean isExist = userService.isUserExists(user.getEmail());
             if (isExist) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("User with this email exists.");
             }
-            userService.register(users);
+
+            if (user.getPassword() == null || user.getPassword().length() < 8) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Password must be at least 8 characters long."));
+            }
+
+            userService.register(user);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body("User registered successfully.");
         } catch (Exception e) {
@@ -38,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session, @RequestParam Long storeId) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
             boolean isExist = userService.isUserExists(loginRequest.getEmail());
 
@@ -74,6 +80,83 @@ public class AuthController {
     public ResponseEntity logout(HttpSession session) {
         session.invalidate(); // clears all attributes and invalidates the session
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("User logged out successfully.");
+    }
+
+    @PostMapping("forgotPassword/sendOTP")
+    public ResponseEntity forgotPassword(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            if (!userService.isUserExists(email)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "No User with this email exists."));
+            }
+
+            userService.sendOTP(email);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "OTP sent successfully"
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("forgotPassword/verifyOTP")
+    public ResponseEntity<?> verifyOTP(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            String code = body.get("otp");
+            if (!userService.isUserExists(email)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "No User with this email exists."));
+            }
+
+            userService.verifyOTP(email, code);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully"
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+
+    }
+
+    @PostMapping("forgotPassword/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            String newPassword = body.get("newPassword");
+
+
+
+            if (newPassword == null || newPassword.length() < 8) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Password must be at least 8 characters long."));
+            }
+
+            userService.resetPassword(email, newPassword);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Password reset successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
     }
 
     @GetMapping("/getSession")

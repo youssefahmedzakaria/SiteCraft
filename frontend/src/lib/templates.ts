@@ -1,4 +1,4 @@
-import type { Template } from '@/components/templates/TemplateCard'
+import type { Template } from '@/components/SiteCraft/templates/TemplateCard'
 
 export const suggestedTemplates: Template[] = [
   {
