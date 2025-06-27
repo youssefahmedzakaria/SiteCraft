@@ -137,6 +137,10 @@ public class EcommerceAuthController {
             }
 
             Customer updatedCustomer = ecommerceAuthService.updateCustomerProfile(customerId, storeId, customerUpdate);
+            if (updatedCustomer == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("success", false, "message", "Update failed"));
+            }
             updatedCustomer.setPassword(null); // Don't send password back
             
             return ResponseEntity.ok(updatedCustomer);

@@ -17,11 +17,18 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping("/{customerId}")
-    public ResponseEntity<ShoppingCart> getCart(@PathVariable Long customerId) {
+    @GetMapping
+    public ResponseEntity<?> getCartSummary(HttpSession session) {
+        Long customerId = (Long) session.getAttribute("customerId");
+        if (customerId == null) {
+            return ResponseEntity.status(401).build();
+        }
         ShoppingCart cart = cartService.getCartByCustomerId(customerId);
         if (cart == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(java.util.Map.of(
+            "id", cart.getId(),
+            "totalPrice", cart.getTotalPrice()
+        ));
     }
 
     @GetMapping("/products")
@@ -38,15 +45,36 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity<CartProductDTO> addProductToCart(HttpSession session, @RequestBody AddCartProductRequest req) {
-        Long customerId = (Long) session.getAttribute("customerId");
-        if (customerId == null) {
-            return ResponseEntity.status(401).build();
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                System.err.println("Customer ID not found in session");
+                return ResponseEntity.status(401).build();
+            }
+            
+            CartProduct cp = cartService.addProductToCart(customerId, req.productId, req.sku, req.quantity);
+            if (cp == null) {
+                System.err.println("Failed to add product to cart - service returned null");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            System.err.println("Product added successfully, creating DTO for cart product ID: " + cp.getId());
+            
+            // Create DTO directly from the cart product to avoid serialization issues
+            CartProductDTO dto = cartService.createCartProductDTO(cp);
+            if (dto == null) {
+                System.err.println("Failed to create CartProductDTO - DTO creation returned null");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            System.err.println("DTO created successfully, returning response");
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            // Log the exception for debugging
+            System.err.println("Error in addProductToCart: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
-        CartProduct cp = cartService.addProductToCart(customerId, req.productId, req.sku, req.quantity);
-        if (cp == null) return ResponseEntity.badRequest().build();
-        ShoppingCart cart = cartService.getCartByCustomerId(customerId);
-        CartProductDTO dto = cartService.getCartProductDTOs(cart.getId()).stream().filter(d -> d.getCartProductId().equals(cp.getId())).findFirst().orElse(null);
-        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/remove/{cartProductId}")
@@ -81,19 +109,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getCartSummary(HttpSession session) {
-        Long customerId = (Long) session.getAttribute("customerId");
-        if (customerId == null) {
-            return ResponseEntity.status(401).build();
-        }
-        ShoppingCart cart = cartService.getCartByCustomerId(customerId);
-        if (cart == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(java.util.Map.of(
-            "id", cart.getId(),
-            "totalPrice", cart.getTotalPrice()
-        ));
-    }
+   
 }
 
 class UpdateCartProductRequest {

@@ -42,14 +42,28 @@ public class CartService {
 
     @Transactional
     public CartProduct addProductToCart(Long customerId, Long productId, String sku, int quantity) {
+        // Validate quantity
+        if (quantity <= 0) return null;
+        
         ShoppingCart cart = getCartByCustomerId(customerId);
         if (cart == null) return null;
         Product product = productRepo.findById(productId).orElse(null);
         if (product == null) return null;
         ProductVariants variant = productVariantsRepo.findAll().stream().filter(v -> v.getSku().equals(sku)).findFirst().orElse(null);
-        if (variant == null || variant.getStock() < quantity) return null;
+        if (variant == null) return null;
+        
         // Check if product already in cart
         CartProduct existing = cart.getCartProducts().stream().filter(cp -> cp.getSku().equals(sku)).findFirst().orElse(null);
+        
+        // Calculate total quantity (existing + new)
+        int totalQuantity = quantity;
+        if (existing != null) {
+            totalQuantity += existing.getQuantity();
+        }
+        
+        // Check if total quantity doesn't exceed available stock
+        if (variant.getStock() < totalQuantity) return null;
+        
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + quantity);
             cartProductRepo.save(existing);
@@ -86,10 +100,17 @@ public class CartService {
         if (cart == null) return false;
         CartProduct cp = cartProductRepo.findById(cartProductId).orElse(null);
         if (cp == null || !cart.getCartProducts().contains(cp)) return false;
+        
         if (newQuantity <= 0) {
             cart.getCartProducts().remove(cp);
             cartProductRepo.delete(cp);
         } else {
+            // Check if new quantity doesn't exceed available stock
+            ProductVariants variant = productVariantsRepo.findAll().stream()
+                .filter(v -> v.getSku().equals(cp.getSku()))
+                .findFirst().orElse(null);
+            if (variant == null || variant.getStock() < newQuantity) return false;
+            
             cp.setQuantity(newQuantity);
             cartProductRepo.save(cp);
         }
@@ -115,10 +136,76 @@ public class CartService {
         for (CartProduct cp : cart.getCartProducts()) {
             ProductVariants variant = productVariantsRepo.findAll().stream().filter(v -> v.getSku().equals(cp.getSku())).findFirst().orElse(null);
             if (variant != null) {
-                total = total.add(variant.getPrice().multiply(BigDecimal.valueOf(cp.getQuantity())));
+                // Calculate discounted price for this product
+                BigDecimal discountedPrice = calculateDiscountedPrice(cp.getProduct(), variant.getPrice());
+                total = total.add(discountedPrice.multiply(BigDecimal.valueOf(cp.getQuantity())));
             }
         }
         cart.setTotalPrice(total);
+    }
+
+    /**
+     * Calculate the discounted price for a product based on its discount settings
+     */
+    public BigDecimal calculateDiscountedPrice(Product product, BigDecimal originalPrice) {
+        if (originalPrice == null) {
+            System.err.println("Warning: originalPrice is null in calculateDiscountedPrice for product: " + (product != null ? product.getId() : "null"));
+            return BigDecimal.ZERO;
+        }
+        if (product == null || product.getDiscountType() == null || product.getDiscountValue() == null) {
+            return originalPrice; // No discount applied
+        }
+
+        String discountType = product.getDiscountType().toLowerCase();
+        BigDecimal discountValue = product.getDiscountValue();
+        BigDecimal minCap = product.getMinCap();
+        BigDecimal percentageMax = product.getPercentageMax();
+        BigDecimal maxCap = product.getMaxCap();
+
+        BigDecimal discountedPrice = originalPrice;
+
+        switch (discountType) {
+            case "percentage":
+                // Calculate percentage discount
+                BigDecimal percentageDiscount = originalPrice.multiply(discountValue).divide(BigDecimal.valueOf(100));
+                
+                // Apply percentage max if set
+                if (percentageMax != null && percentageDiscount.compareTo(percentageMax) > 0) {
+                    percentageDiscount = percentageMax;
+                }
+                
+                discountedPrice = originalPrice.subtract(percentageDiscount);
+                break;
+
+            case "amount":
+            case "fixed":
+                // Check if minimum purchase threshold is met
+                if (minCap != null && originalPrice.compareTo(minCap) < 0) {
+                    return originalPrice; // No discount applied if minimum threshold not met
+                }
+                
+                // Calculate fixed amount discount
+                BigDecimal amountDiscount = discountValue;
+                
+                // Apply max cap if set
+                if (maxCap != null && amountDiscount.compareTo(maxCap) > 0) {
+                    amountDiscount = maxCap;
+                }
+                
+                discountedPrice = originalPrice.subtract(amountDiscount);
+                break;
+
+            default:
+                // Unknown discount type, return original price
+                return originalPrice;
+        }
+
+        // Ensure price doesn't go below zero
+        if (discountedPrice.compareTo(BigDecimal.ZERO) < 0) {
+            discountedPrice = BigDecimal.ZERO;
+        }
+
+        return discountedPrice;
     }
 
     public List<CartProductDTO> getCartProductDTOs(Long cartId) {
@@ -131,7 +218,7 @@ public class CartService {
             ProductVariants variant = productVariantsRepo.findAll().stream()
                 .filter(v -> v.getSku().equals(cp.getSku()))
                 .findFirst().orElse(null);
-            ProductVariantDTO variantDTO = (variant != null) ? mapVariantToDTO(variant) : null;
+            ProductVariantDTO variantDTO = (variant != null) ? mapVariantToDTO(variant, product) : null;
             dtos.add(new CartProductDTO(
                 cp.getId(),
                 cp.getQuantity(),
@@ -141,6 +228,96 @@ public class CartService {
             ));
         }
         return dtos;
+    }
+
+    public CartProductDTO createCartProductDTO(CartProduct cp) {
+        if (cp == null) return null;
+        
+        try {
+            // Get the product with proper error handling
+            Product product = cp.getProduct();
+            if (product == null) {
+                System.err.println("CartProduct has null product");
+                return null;
+            }
+            
+            // Create a simplified ProductDTO to avoid lazy loading issues
+            ProductDTO productDTO = createSimplifiedProductDTO(product);
+            
+            // Find the variant
+            ProductVariants variant = productVariantsRepo.findAll().stream()
+                .filter(v -> v.getSku().equals(cp.getSku()))
+                .findFirst().orElse(null);
+                
+            ProductVariantDTO variantDTO = null;
+            if (variant != null) {
+                variantDTO = createSimplifiedVariantDTO(variant, product);
+            }
+            
+            return new CartProductDTO(
+                cp.getId(),
+                cp.getQuantity(),
+                cp.getSku(),
+                productDTO,
+                variantDTO
+            );
+        } catch (Exception e) {
+            System.err.println("Error creating CartProductDTO: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private ProductDTO createSimplifiedProductDTO(Product product) {
+        try {
+            // Create minimal ProductDTO to avoid lazy loading issues
+            List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
+            if (product.getImages() != null) {
+                for (ProductImage img : product.getImages()) {
+                    imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
+                }
+            }
+            
+            // Don't include variants in the product DTO to avoid circular references
+            List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
+            
+            return new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getDiscountType(),
+                product.getDiscountValue(),
+                product.getMinCap(),
+                product.getPercentageMax(),
+                product.getMaxCap(),
+                imageDTOs,
+                variantDTOs
+            );
+        } catch (Exception e) {
+            System.err.println("Error creating simplified ProductDTO: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private ProductVariantDTO createSimplifiedVariantDTO(ProductVariants variant, Product product) {
+        try {
+            // Calculate discounted price
+            BigDecimal discountedPrice = calculateDiscountedPrice(product, variant.getPrice());
+            
+            return new ProductVariantDTO(
+                variant.getId(),
+                variant.getSku(),
+                variant.getStock(),
+                variant.getPrice(),
+                discountedPrice,
+                variant.getProductionCost()
+            );
+        } catch (Exception e) {
+            System.err.println("Error creating simplified ProductVariantDTO: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private ProductDTO mapProductToDTO(Product product) {
@@ -154,7 +331,9 @@ public class CartService {
         List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
         if (product.getVariants() != null) {
             for (ProductVariants v : product.getVariants()) {
-                variantDTOs.add(mapVariantToDTO(v));
+                if (v.getPrice() != null) {
+                    variantDTOs.add(mapVariantToDTO(v, product));
+                }
             }
         }
         return new ProductDTO(
@@ -171,13 +350,18 @@ public class CartService {
         );
     }
 
-    private ProductVariantDTO mapVariantToDTO(ProductVariants variant) {
+    private ProductVariantDTO mapVariantToDTO(ProductVariants variant, Product product) {
         if (variant == null) return null;
+        
+        // Calculate discounted price
+        BigDecimal discountedPrice = calculateDiscountedPrice(product, variant.getPrice());
+        
         return new ProductVariantDTO(
             variant.getId(),
             variant.getSku(),
             variant.getStock(),
             variant.getPrice(),
+            discountedPrice,
             variant.getProductionCost()
         );
     }
