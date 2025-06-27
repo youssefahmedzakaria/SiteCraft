@@ -4,20 +4,14 @@
   <meta charset="UTF-8"/>
   <title th:text="${reportName}"></title>
 
-  <!-- Tailwind CSS for colors/spacing/etc -->
+  <!-- Tailwind CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
     rel="stylesheet"/>
 
   <style>
-    /* 1) Make Chrome Headless trim margins and size to content */
     @page { size: auto; margin: 0; }
-    html, body {
-      margin: 0;
-      padding: 0;
-    }
-
-    /* 2) Your custom colors */
+    html, body { margin: 0; padding: 0; }
     .bg-logo-left-nav { background-color: #263238; }
     .border-logo-border { border-color: #cc78604d; }
     .text-logo-txt { color: #cc7860f2; }
@@ -25,6 +19,7 @@
   </style>
 </head>
 <body class="bg-gray-100">
+
   <!-- Top nav: logo only, flush left -->
   <nav class="bg-logo-left-nav flex items-center" style="height:44px; padding-left:24px;">
     <img
@@ -32,43 +27,52 @@
       alt="SiteCraft Logo"
       style="height:100%;"/>
   </nav>
-  <!-- Container with padding on all sides for rounded corners -->
-  <div class="container mx-auto bg-white mx-6 mt-6 mb-6 rounded-lg shadow" style="padding:24px;">
 
-    <!-- Title & subtitle -->
-    <h1 class="text-2xl font-bold text-center mb-2" th:text="${reportName}"></h1>
-    <h2 class="text-lg text-gray-600 text-center mb-6" th:text="${reportDescription}"></h2>
+  <!-- Main wrapper -->
+  <div class="container mx-auto mx-6 mt-6">
 
-    <!-- Data table with fixed layout -->
-    <div class="overflow-x-auto">
-      <table
-        class="min-w-full table-fixed border border-logo-border divide-y divide-logo-border"
-      >
-        <thead class="bg-gray-200">
-          <tr>
-            <!-- Center headers -->
-            <th
-              th:each="col : ${columns}"
-              th:text="${col}"
-              class="px-4 py-2 text-center text-xs font-semibold uppercase text-logo-txt"
-            ></th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-logo-border">
-          <tr
-            th:each="row : ${rows}"
-            class="hover:bg-logo-light-button-hover"
-          >
-            <td
-              th:each="cell : ${row}"
-              th:text="${cell}"
-              class="px-4 py-2 text-center text-sm text-gray-900"
-            ></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Card: table + insights -->
+    <div class="bg-white rounded-lg shadow border border-logo-border overflow-hidden">
+
+      <!-- Table section -->
+      <div class="overflow-x-auto p-6">
+        <h1 class="text-2xl font-bold text-center mb-2" th:text="${reportName}"></h1>
+        <h2 class="text-lg text-gray-600 text-center mb-6" th:text="${reportDescription}"></h2>
+        <table class="min-w-full table-fixed divide-y divide-logo-border border border-logo-border">
+          <thead class="bg-gray-200">
+            <tr>
+              <th
+                th:each="col : ${columns}"
+                th:text="${col}"
+                class="px-4 py-2 text-center text-xs font-semibold uppercase text-logo-txt">
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-logo-border">
+            <tr th:each="row : ${rows}" class="hover:bg-logo-light-button-hover">
+              <td
+                th:each="cell : ${row}"
+                th:text="${cell}"
+                class="px-4 py-2 text-center text-sm text-gray-900">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Insights & Recommendations section -->
+      <div class="bg-white p-6 border-t border-logo-border">
+        <h3 class="text-xl font-bold mb-4 text-gray-800">Insights &amp; Recommendations</h3>
+        <!-- iterate the list built in Java -->
+        <div th:each="line : ${reportInsightsList}">
+          <p class="text-base text-gray-700 mb-2">
+            <strong th:text="${line.substring(0, line.indexOf(':') + 1)}"></strong>
+            <span   th:text="${line.substring(line.indexOf(':') + 1)}"></span>
+          </p>
+        </div>
+      </div>
+
     </div>
-
   </div>
 </body>
 </html>

@@ -7,7 +7,6 @@ import com.sitecraft.backend.DTOs.SalesSummaryRow;
 import com.sitecraft.backend.DTOs.InventoryStatusRow;
 import com.sitecraft.backend.Services.ReportService;
 import com.sitecraft.backend.Services.ChromePdfService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +36,10 @@ public class ReportController {
             @SessionAttribute("storeId") Long storeId,
             @RequestBody DateRangeDTO request
     ) {
-        LocalDate       start  = request.getStartDate();
-        LocalDate       end    = request.getEndDate();
-        LocalDateTime   sdt    = start.atStartOfDay();
-        LocalDateTime   edt    = end.atTime(LocalTime.MAX);
+        LocalDate     start = request.getStartDate();
+        LocalDate     end   = request.getEndDate();
+        LocalDateTime sdt   = start.atStartOfDay();
+        LocalDateTime edt   = end.atTime(LocalTime.MAX);
 
         List<ReportService.SessionCount> data =
             reportService.getSessionCounts(storeId, sdt, edt);
@@ -56,21 +55,31 @@ public class ReportController {
         }
         model.put("rows", rows);
 
-        byte[] pdf = chromePdfService.generatePdf("report", model);
+        // build and add insights list
+        String rawInsights =
+            "What it shows: A daily count of new sessions started in your store.\n" +
+            "Why it matters: Helps you spot your busiest and slowest days at a glance.\n" +
+            "How to use it: Plan marketing pushes (email, social ads) just before peak days to capture more visitors, and run targeted re-engagement offers on slower days to boost overall traffic.";
+        List<String> insightsList = Arrays.asList(rawInsights.split("\\n"));
+        model.put("reportInsightsList", insightsList);
+
+        byte[] pdfBytes = chromePdfService.generatePdf("report", model);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "session-creation-report.pdf");
-        return ResponseEntity.ok().headers(headers).body(pdf);
-    }    // ─── Product Analytics (PDF) ─────────────────────────────────────────────
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
+    }
+
+    // ─── Product Analytics (PDF) ─────────────────────────────────────────────
     @PostMapping(value = "/product-analytics/report.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadProductAnalyticsPdf(
             @SessionAttribute("storeId") Long storeId,
             @RequestBody DateRangeDTO request
     ) {
-        LocalDate       start  = request.getStartDate();
-        LocalDate       end    = request.getEndDate();
-        LocalDateTime   sdt    = start.atStartOfDay();
-        LocalDateTime   edt    = end.atTime(LocalTime.MAX);
+        LocalDate     start = request.getStartDate();
+        LocalDate     end   = request.getEndDate();
+        LocalDateTime sdt   = start.atStartOfDay();
+        LocalDateTime edt   = end.atTime(LocalTime.MAX);
 
         List<ProductAnalyticsRow> data =
             reportService.getProductAnalytics(storeId, sdt, edt);
@@ -86,21 +95,30 @@ public class ReportController {
         }
         model.put("rows", rows);
 
-        byte[] pdf = chromePdfService.generatePdf("report", model);
+        String rawInsights =
+            "What it shows: Units sold and total revenue for each product.\n" +
+            "Why it matters: Pinpoints which items drive your revenue and which lag behind.\n" +
+            "How to use it: Feature your top sellers in promotions or bundle them with underperformers to lift their sales, and adjust restocking levels based on real demand.";
+        List<String> insightsList = Arrays.asList(rawInsights.split("\\n"));
+        model.put("reportInsightsList", insightsList);
+
+        byte[] pdfBytes = chromePdfService.generatePdf("report", model);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "product-analytics-report.pdf");
-        return ResponseEntity.ok().headers(headers).body(pdf);
-    }    // ─── Customer Engagement (PDF) ────────────────────────────────────────────
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
+    }
+
+    // ─── Customer Engagement (PDF) ────────────────────────────────────────────
     @PostMapping(value = "/customer-engagement/report.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadEngagementPdf(
             @SessionAttribute("storeId") Long storeId,
             @RequestBody DateRangeDTO request
     ) {
-        LocalDate       start  = request.getStartDate();
-        LocalDate       end    = request.getEndDate();
-        LocalDateTime   sdt    = start.atStartOfDay();
-        LocalDateTime   edt    = end.atTime(LocalTime.MAX);
+        LocalDate     start = request.getStartDate();
+        LocalDate     end   = request.getEndDate();
+        LocalDateTime sdt   = start.atStartOfDay();
+        LocalDateTime edt   = end.atTime(LocalTime.MAX);
 
         List<EngagementReportRow> data =
             reportService.getEngagementMetrics(storeId, sdt, edt);
@@ -121,21 +139,30 @@ public class ReportController {
         }
         model.put("rows", rows);
 
-        byte[] pdf = chromePdfService.generatePdf("report", model);
+        String rawInsights =
+            "What it shows: Counts of user actions (clicks, add-to-cart, conversions) and average session duration.\n" +
+            "Why it matters: Reveals how deeply customers interact with your site.\n" +
+            "How to use it: On days with high engagement but few conversions, tweak your checkout flow or calls-to-action; on low-engagement days, send targeted reminders or flash-sale alerts to re-engage users.";
+        List<String> insightsList = Arrays.asList(rawInsights.split("\\n"));
+        model.put("reportInsightsList", insightsList);
+
+        byte[] pdfBytes = chromePdfService.generatePdf("report", model);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "customer-engagement-report.pdf");
-        return ResponseEntity.ok().headers(headers).body(pdf);
-    }    // ─── Sales Summary (PDF) ─────────────────────────────────────────────────
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
+    }
+
+    // ─── Sales Summary (PDF) ─────────────────────────────────────────────────
     @PostMapping(value = "/sales-summary/report.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadSalesSummaryPdf(
             @SessionAttribute("storeId") Long storeId,
             @RequestBody DateRangeDTO request
     ) {
-        LocalDate       start  = request.getStartDate();
-        LocalDate       end    = request.getEndDate();
-        LocalDateTime   sdt    = start.atStartOfDay();
-        LocalDateTime   edt    = end.atTime(LocalTime.MAX);
+        LocalDate       start = request.getStartDate();
+        LocalDate       end   = request.getEndDate();
+        LocalDateTime   sdt   = start.atStartOfDay();
+        LocalDateTime   edt   = end.atTime(LocalTime.MAX);
 
         SalesSummaryRow summary =
             reportService.getSalesSummary(storeId, sdt, edt);
@@ -155,14 +182,21 @@ public class ReportController {
         );
         model.put("rows", rows);
 
-        byte[] pdf = chromePdfService.generatePdf("report", model);
+        String rawInsights =
+            "What it shows: Total orders, gross revenue, average order size, and your top product.\n" +
+            "Why it matters: Gives you a quick health check of sales performance over any period.\n" +
+            "How to use it: If average order value dips below your target, add upsell recommendations or free-shipping thresholds; use revenue trends to adjust marketing spend and inventory budgets.";
+        List<String> insightsList = Arrays.asList(rawInsights.split("\\n"));
+        model.put("reportInsightsList", insightsList);
+
+        byte[] pdfBytes = chromePdfService.generatePdf("report", model);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "sales-summary-report.pdf");
-        return ResponseEntity.ok().headers(headers).body(pdf);
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
     }
 
-      // ─── Inventory Status (PDF) ───────────────────────────────────────────────
+    // ─── Inventory Status (PDF) ───────────────────────────────────────────────
     @PostMapping(value = "/inventory-status/report.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadInventoryStatusPdf(
             @SessionAttribute("storeId") Long storeId
@@ -177,17 +211,21 @@ public class ReportController {
 
         List<List<Object>> rows = new ArrayList<>();
         for (InventoryStatusRow r : data) {
-            rows.add(Arrays.asList(
-                r.getCategoryName(),
-                r.getTotalStock()    // fixed: use getTotalStock()
-            ));
+            rows.add(Arrays.asList(r.getCategoryName(), r.getTotalStock()));
         }
         model.put("rows", rows);
 
-        byte[] pdf = chromePdfService.generatePdf("report", model);
+        String rawInsights =
+            "What it shows: Current stock levels in each product category.\n" +
+            "Why it matters: Ensures you have enough inventory to meet demand without overspending.\n" +
+            "How to use it: Reorder categories running low before they sell out, and run bundle or clearance deals on overstocked categories to free up warehouse space.";
+        List<String> insightsList = Arrays.asList(rawInsights.split("\\n"));
+        model.put("reportInsightsList", insightsList);
+
+        byte[] pdfBytes = chromePdfService.generatePdf("report", model);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "inventory-status-report.pdf");
-        return ResponseEntity.ok().headers(headers).body(pdf);
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
     }
 }
