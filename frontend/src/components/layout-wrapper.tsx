@@ -51,7 +51,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       {isEcommercePage && (
         <Footer
           companyName="Jewelry"
-          textColor="text-[#4A102A]"
+          textColor="text-black"
           companyLogo={{
             src: "/logo.png",
             alt: "Custom Logo",
@@ -64,14 +64,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
               href: "/e-commerce/TODO/#policies",
               font: "font-serif",
               fontSize: "text-lg",
-              fontColor: "text-[#4A102A]",
+              fontColor: "text-black",
             },
             {
               label: "About Us",
               href: "/e-commerce/TODO/#about",
               font: "font-serif",
               fontSize: "text-lg",
-              fontColor: "text-[#4A102A]",
+              fontColor: "text-black",
             },
           ]}
           socialMedia={{
@@ -81,16 +81,16 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           }}
           socialMediaStyles={{
             iconSize: 24,
-            iconColor: "text-[#4A102A]",
-            hoverColor: "text-[#4A102A]",
+            iconColor: "text-black",
+            hoverColor: "text-black",
           }}
           copyrightStyles={{
             font: "font-sans",
             fontSize: "text-s",
             fontWeight: "font-light",
-            fontColor: "text-[#4A102A]",
+            fontColor: "text-black",
           }}
-          backgroundColor="bg-[#F5ECD5]"
+          backgroundColor="bg-white"
         />
       )}
     </div>

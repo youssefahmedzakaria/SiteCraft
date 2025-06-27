@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { cn } from "@/lib/utils";
 
 export interface PoliciesProps {
@@ -91,7 +91,7 @@ export function Policies({
   };
   const style = variants[variant];
   return (
-    <div className={cn("w-full flex-shrink-0", backgroundColor)}>
+    <div id={id} className={cn("w-full flex-shrink-0", backgroundColor)}>
       <div className={cn("container mx-auto px-4 py-8 md:py-16", style.container)}>
         <h2
           className={cn(

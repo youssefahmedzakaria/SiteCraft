@@ -18,10 +18,10 @@ import { useRouter } from "next/navigation"
 
 // Theme configuration matching product page
 const defaultTheme = {
-  backgroundColor: "#F5ECD5",
-  textColor: "#4A102A",
-  accentColor: "#F5ECD5",
-  secondaryColor: "#4A102A",
+  backgroundColor: "white",
+  textColor: "black",
+  accentColor: "white",
+  secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
 }

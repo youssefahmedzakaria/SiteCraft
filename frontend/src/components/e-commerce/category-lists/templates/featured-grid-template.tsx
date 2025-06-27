@@ -76,7 +76,7 @@ export default function FeaturedGridCategoryTemplate({
     <div className={cn("w-full flex-shrink-0", bgColor)}>
       <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
         {showTitle && (
-          <h2 className={cn("text-4xl md:text-4xl font-bold text-center mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>
+          <h2 className={cn("text-4xl md:text-4xl font-bold text-center mb-6")}>{title || "Shop Our Collections"}</h2>
         )}
       <div className={cn("grid grid-cols-1 md:grid-cols-3 w-full", gap)}>
         {/* Featured large category */}

@@ -120,7 +120,7 @@ export default function CheckoutPage() {
           color: theme.textColor,
         }}
       >
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-2xl pt-16 mx-auto text-center">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
             style={{ backgroundColor: theme.accentColor }}

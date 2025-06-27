@@ -85,6 +85,7 @@ export function OverlayPromo({
           buttonTextColor={buttonTextColor}
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
+          imageObjectFit={imageObjectFit}
         />
       </div>
     </section>

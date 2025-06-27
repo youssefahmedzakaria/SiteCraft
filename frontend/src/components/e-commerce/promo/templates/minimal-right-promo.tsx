@@ -26,8 +26,6 @@ export interface MinimalRightPromoProps {
   backgroundColor?: string
   imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
-  scrollEffect?: "zoom-out" | "sticky" | "parallax" | "none"
-  scrollSpeed?: number
 }
 
 export function MinimalRightPromo({ 
@@ -67,8 +65,6 @@ export function MinimalRightPromo({
   descriptionSize,
   backgroundColor,
   imageObjectFit,
-  scrollEffect,
-  scrollSpeed,
 }: MinimalRightPromoProps) {
   return (
     <section id={id} className={cn("w-full", backgroundColor)}>
@@ -90,8 +86,6 @@ export function MinimalRightPromo({
           descriptionColor={descriptionColor}
           descriptionSize={descriptionSize}
           imageObjectFit={imageObjectFit}
-          scrollEffect={scrollEffect}
-          scrollSpeed={scrollSpeed}
         />
       </div>
     </section>
