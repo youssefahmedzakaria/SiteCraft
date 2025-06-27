@@ -59,10 +59,16 @@ export default function LoginPage() {
     >
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold" style={{ color: defaultTheme.textColor }}>
+          <h2
+            className="text-3xl font-bold"
+            style={{ color: defaultTheme.textColor }}
+          >
             Welcome Back
           </h2>
-          <p className="mt-2 opacity-60" style={{ color: defaultTheme.textColor }}>
+          <p
+            className="mt-2 opacity-60"
+            style={{ color: defaultTheme.textColor }}
+          >
             Sign in to your account
           </p>
         </div>
@@ -92,7 +98,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Label htmlFor="password" style={{ color: defaultTheme.textColor }}>
+              <Label
+                htmlFor="password"
+                style={{ color: defaultTheme.textColor }}
+              >
                 Password
               </Label>
               <div className="relative mt-1">
@@ -112,9 +121,15 @@ export default function LoginPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <EyeOff
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   ) : (
-                    <Eye className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <Eye
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   )}
                 </button>
               </div>
@@ -122,7 +137,11 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center justify-between">
-            <Link href="/forgot-password" className="text-sm hover:underline" style={{ color: defaultTheme.textColor }}>
+            <Link
+              href="/forgot-password"
+              className="text-sm hover:underline"
+              style={{ color: defaultTheme.textColor }}
+            >
               Forgot your password?
             </Link>
           </div>
@@ -137,9 +156,16 @@ export default function LoginPage() {
           </Button>
 
           <div className="text-center">
-            <p className="text-sm opacity-60" style={{ color: defaultTheme.textColor }}>
+            <p
+              className="text-sm opacity-60"
+              style={{ color: defaultTheme.textColor }}
+            >
               {"Don't have an account? "}
-              <Link href="/register" className="font-medium hover:underline" style={{ color: defaultTheme.textColor }}>
+              <Link
+                href="/e-commerce/TODO/register"
+                className="font-medium hover:underline"
+                style={{ color: defaultTheme.textColor }}
+              >
                 Sign up
               </Link>
             </p>
@@ -147,5 +173,5 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }

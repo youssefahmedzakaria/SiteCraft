@@ -80,26 +80,55 @@ export function FeaturedGridProductTemplate({
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
-      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
         {showTitle && (
-          <h2 className={cn("text-4xl md:text-4xl font-bold text-center pb-4 mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>
+          <h2
+            className={cn(
+              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
+            )}
+          >
+            {title}
+          </h2>
         )}
 
         <div className={cn("grid grid-cols-1 md:grid-cols-3 w-full", gap)}>
           {/* Featured Product */}
           {featuredProduct && (
             <div className="md:col-span-2 md:row-span-2 group w-full">
-              <div className={cn("relative h-96 md:h-full bg-slate-100 overflow-hidden w-full", borderRadius)}>
+              <div
+                className={cn(
+                  "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
+                  borderRadius
+                )}
+              >
                 <Image
-                  src={featuredProduct.media?.mainMedia?.image?.url || "/placeholder.svg?height=600&width=800"}
+                  src={
+                    featuredProduct.media?.mainMedia?.image?.url ||
+                    "/placeholder.svg?height=600&width=800"
+                  }
                   alt={featuredProduct.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 66vw"
-                  className={cn("object-cover", hoverEffect && "transition-transform duration-500 group-hover:scale-105")}
+                  className={cn(
+                    "object-cover",
+                    hoverEffect &&
+                      "transition-transform duration-500 group-hover:scale-105"
+                  )}
                 />
-                <div className={cn("absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent")}> 
+                <div
+                  className={cn(
+                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                  )}
+                >
                   <div className="p-6">
-                    <h3 className="text-white text-2xl font-bold">{featuredProduct.name}</h3>
+                    <h3 className="text-white text-2xl font-bold">
+                      {featuredProduct.name}
+                    </h3>
                     {showCta && <p className="text-white/80 mt-2">{ctaText}</p>}
                   </div>
                 </div>
@@ -110,18 +139,38 @@ export function FeaturedGridProductTemplate({
           {/* Regular Products */}
           {regularProducts.map((product) => (
             <div className="group w-full" key={product.id}>
-              <div className={cn("relative h-64 bg-slate-100 overflow-hidden w-full", borderRadius)}>
+              <div
+                className={cn(
+                  "relative h-64 bg-slate-100 overflow-hidden w-full",
+                  borderRadius
+                )}
+              >
                 <Image
-                  src={product.media?.mainMedia?.image?.url || "/placeholder.svg?height=256&width=256"}
+                  src={
+                    product.media?.mainMedia?.image?.url ||
+                    "/placeholder.svg?height=256&width=256"
+                  }
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className={cn("object-cover", hoverEffect && "transition-transform duration-500 group-hover:scale-105")}
+                  className={cn(
+                    "object-cover",
+                    hoverEffect &&
+                      "transition-transform duration-500 group-hover:scale-105"
+                  )}
                 />
-                <div className={cn("absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent")}> 
+                <div
+                  className={cn(
+                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                  )}
+                >
                   <div className="p-4">
-                    <h3 className="text-white text-lg font-medium">{product.name}</h3>
-                    {showCta && <p className="text-white/80 text-sm mt-1">{ctaText}</p>}
+                    <h3 className="text-white text-lg font-medium">
+                      {product.name}
+                    </h3>
+                    {showCta && (
+                      <p className="text-white/80 text-sm mt-1">{ctaText}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -130,25 +179,36 @@ export function FeaturedGridProductTemplate({
         </div>
         {/* Show More Button */}
         {showMoreButton && (
-        <div className="flex justify-end mt-6">
-          <Link 
-            href="/products" 
-            className={cn(
-              "inline-flex items-center px-6 py-2",
-              "hover:bg-opacity-80 transition-colors duration-300",
-              "rounded-lg text-sm font-medium",
-              showMorebuttonBgColor,
-              showMorebuttonTextColor
-            )}
-          >
-            {showMoreText}
-            <svg className="ml-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
+          <div className="flex justify-end mt-6">
+            <Link
+              href="/e-commerce/TODO/products"
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+                showMorebuttonBgColor,
+                showMorebuttonTextColor
+              )}
+            >
+              {showMoreText}
+              <svg
+                className="ml-2 w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          </div>
         )}
       </div>
     </div>
-  )
+  );
 }

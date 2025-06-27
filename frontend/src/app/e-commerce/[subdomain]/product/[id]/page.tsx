@@ -92,7 +92,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   // Handle add to cart
   const handleAddToCart = () => {
     if (isInCart) {
-      router.push("/cart");
+      router.push("/e-commerce/TODO/cart");
       return;
     }
     addToCart({

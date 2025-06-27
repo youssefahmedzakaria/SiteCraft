@@ -59,8 +59,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div className={`fixed inset-0 z-50 flex backdrop-blur`}>
-      <div className={`w-64 ${backgroundColor} ${textColor} h-full shadow-lg`} onClick={(e) => e.stopPropagation()}>
-        <div className={`${dividerColor} flex items-center justify-between p-4`}>
+      <div
+        className={`w-64 ${backgroundColor} ${textColor} h-full shadow-lg`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className={`${dividerColor} flex items-center justify-between p-4`}
+        >
           <h2 className="text-xl font-semibold">Menu</h2>
           <div className="flex items-center gap-2">
             {/* Search Icon Button */}
@@ -92,15 +97,29 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         )}
 
         <div className={`${dividerColor} px-4 py-3`}>
-          <Navigation menuItems={NavMenuItems} textColor={textColor} orientation="vertical" onClick={onClose} />
+          <Navigation
+            menuItems={NavMenuItems}
+            textColor={textColor}
+            orientation="vertical"
+            onClick={onClose}
+          />
           <div className="py-1 overflow-y-auto"></div>
-          <Link href="/profile" className=" block py-2 text-sm hover:underline ">
+          <Link
+            href="/e-commerce/TODO/profile"
+            className=" block py-2 text-sm hover:underline "
+          >
             Profile
           </Link>
-          <Link href="/cart" className=" block py-2 text-sm hover:underline ">
+          <Link
+            href="/e-commerce/TODO/cart"
+            className=" block py-2 text-sm hover:underline "
+          >
             Cart
           </Link>
-          <Link href="/favorites" className="block py-2 text-sm hover:underline ">
+          <Link
+            href="/e-commerce/TODO/favorites"
+            className="block py-2 text-sm hover:underline "
+          >
             Favorites
           </Link>
         </div>
@@ -120,7 +139,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       </div>
       <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={onClose} />
     </div>
-  )
+  );
 }
 
 export default MobileMenu

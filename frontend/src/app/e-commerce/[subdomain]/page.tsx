@@ -14,28 +14,27 @@ import { ProductList } from "@/components/e-commerce/product-lists";
 
 export default function Home() {
   return (
-    
-    
-        <div className="min-h-screen flex flex-col">
-        
-        <CenteredPromo
+    <div className="min-h-screen flex flex-col">
+      <CenteredPromo
         id="home"
         slides={[
           {
             title: "Welcome to Our Store",
-            description: "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
+            description:
+              "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
             buttonText: "Shop Now",
             buttonLink: "#new-collection",
             image: "/girl.jpg",
-            imageAlt: "Welcome to our store"
+            imageAlt: "Welcome to our store",
           },
           {
             title: "New Collection",
-            description: "Check out our newest products. Limited time offers with free shipping on all orders.",
+            description:
+              "Check out our newest products. Limited time offers with free shipping on all orders.",
             buttonText: "View Collection",
             buttonLink: "#new-collection",
             image: "/hand.jpg",
-            imageAlt: "New arrivals collection"
+            imageAlt: "New arrivals collection",
           },
         ]}
         backgroundColor="bg-white"
@@ -56,121 +55,121 @@ export default function Home() {
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-1"
+            id: "product-1",
           },
           {
             name: "Product 2",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-2"
+            id: "product-2",
           },
           {
             name: "Product 3",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-3"
+            id: "product-3",
           },
           {
             name: "Product 4",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-4"
+            id: "product-4",
           },
           {
             name: "Product 5",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-5"
+            id: "product-5",
           },
           {
             name: "Product 6",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-6"
+            id: "product-6",
           },
           {
             name: "Product 7",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-7"
+            id: "product-7",
           },
           {
             name: "Product 8",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
             price: {
-              price: 100
+              price: 100,
             },
             description: "This is a description of the product",
-            id: "product-8"
-          }
+            id: "product-8",
+          },
         ]}
         template="featured"
         title="Featured Products"
@@ -178,7 +177,7 @@ export default function Home() {
         titlePosition="top"
         titleFontSize="text-2xl"
         titleFont="font-bold"
-        columns={{ sm: 2, md: 3, lg: 4}}
+        columns={{ sm: 2, md: 3, lg: 4 }}
         bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"
@@ -196,7 +195,7 @@ export default function Home() {
         showMorebuttonBgColor="bg-black"
         showMorebuttonTextColor="text-white"
       />
-      
+
       <FeaturedGridCategoryTemplate
         categories={[
           {
@@ -204,70 +203,68 @@ export default function Home() {
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
-            id: "1"
+            id: "1",
           },
           {
             name: "Earrings",
             media: {
               mainMedia: {
                 image: {
-                  url: "/earing.jpg"
-                }
-              }
+                  url: "/earing.jpg",
+                },
+              },
             },
-            id: "2"
+            id: "2",
           },
           {
             name: "Necklaces",
             media: {
               mainMedia: {
                 image: {
-                  url: "/neckless.jpg"
-                }
-              }
+                  url: "/neckless.jpg",
+                },
+              },
             },
-            id: "3"
+            id: "3",
           },
           {
             name: "Rings",
             media: {
               mainMedia: {
                 image: {
-                  url: "/ring2.jpg"
-                }
-              }
+                  url: "/ring2.jpg",
+                },
+              },
             },
-            id: "4"
+            id: "4",
           },
           {
             name: "Earrings",
             media: {
               mainMedia: {
                 image: {
-                  url: "/earing.jpg"
-                }
-              }
+                  url: "/earing.jpg",
+                },
+              },
             },
-            id: "5"
+            id: "5",
           },
           {
             name: "Necklaces",
             media: {
               mainMedia: {
                 image: {
-                  url: "/neckless.jpg"
-                }
-              }
+                  url: "/neckless.jpg",
+                },
+              },
             },
-            id: "6"
-          }
-
+            id: "6",
+          },
         ]}
-        
         bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"
@@ -300,7 +297,7 @@ export default function Home() {
         backgroundColor="bg-white"
         title="New Collection"
         buttonText="View Collection"
-        buttonLink="/products"
+        buttonLink="/e-commerce/TODO/products"
         buttonColor="bg-white"
         titleColor="text-white"
         image="/hand.jpg"
@@ -327,7 +324,7 @@ export default function Home() {
         socialLinks={{
           facebook: "https://www.facebook.com",
           instagram: "https://www.instagram.com",
-          twitter: "https://www.x.com"
+          twitter: "https://www.x.com",
         }}
       />
       <TitleLeftContentCenterPolicies
@@ -340,7 +337,7 @@ export default function Home() {
         titleColor="text-black"
         sectionTitleColor="text-black"
         sectionTitleSize="text-lg"
-        sectionTitleFont="font-sans"    
+        sectionTitleFont="font-sans"
         sectionTitleFontWeight="font-normal"
         sectionContentColor="text-black"
         sectionContentSize="text-xl"
@@ -349,19 +346,21 @@ export default function Home() {
         sections={[
           {
             title: "Shipping Policy",
-            content: "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days."
+            content:
+              "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
           },
           {
             title: "Return Policy",
-            content: "30-day return policy for unused items in original packaging."
+            content:
+              "30-day return policy for unused items in original packaging.",
           },
           {
             title: "Privacy Policy",
-            content: "We respect your privacy and protect your personal information."
-          }
+            content:
+              "We respect your privacy and protect your personal information.",
+          },
         ]}
-      /> 
-        </div>
-    
+      />
+    </div>
   );
 };

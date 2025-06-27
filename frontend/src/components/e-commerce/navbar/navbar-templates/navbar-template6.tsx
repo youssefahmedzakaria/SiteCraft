@@ -59,7 +59,9 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav
+        className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16">
@@ -78,15 +80,24 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
                 backgroundColor="bg-white/20"
                 textColor={textColor}
               />
-              
+
               <div className="flex items-center space-x-6">
-                <Link href="/profile" className={`text-sm hover:underline transition-all ${textColor}`}>
+                <Link
+                  href="/e-commerce/TODO/profile"
+                  className={`text-sm hover:underline transition-all ${textColor}`}
+                >
                   Profile
                 </Link>
-                <Link href="/cart" className={`text-sm hover:underline transition-all ${textColor}`}>
+                <Link
+                  href="/e-commerce/TODO/cart"
+                  className={`text-sm hover:underline transition-all ${textColor}`}
+                >
                   Shopping Cart
                 </Link>
-                <Link href="/favorites" className={`text-sm hover:underline transition-all ${textColor}`}>
+                <Link
+                  href="/e-commerce/TODO/favorites"
+                  className={`text-sm hover:underline transition-all ${textColor}`}
+                >
                   Favorites
                 </Link>
               </div>

@@ -77,8 +77,19 @@ export function ListViewProductTemplate({
   onAddToFavorite,
 }: ListViewProductTemplateProps) {
   return (
-      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
-        {showTitle && <h2 className={cn("text-4xl md:text-4xl font-bold text-center pb-4 mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
+    <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+      {showTitle && (
+        <h2
+          className={cn(
+            "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+            titleColor,
+            titleFontSize,
+            titleFont
+          )}
+        >
+          {title}
+        </h2>
+      )}
       <div className={cn("flex flex-col", gap)}>
         {products.map((product) => (
           <FlexibleCard
@@ -101,30 +112,31 @@ export function ListViewProductTemplate({
             cardShadow={cardShadow}
             hoverEffect={hoverEffect}
             onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
-            onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-            linkPath={`/product/${product.id}`}
+            onAddToFavorite={
+              onAddToFavorite ? () => onAddToFavorite(product) : undefined
+            }
+            linkPath={`/e-commerce/TODO/product/${product.id}`}
           />
         ))}
       </div>
 
       {/* Show More Button */}
       {showMoreButton && (
-        
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/products" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            "hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor
-          )}
-        >
-          {showMoreText}
-        </Link>
-      </div>
+        <div className="flex justify-end mt-6">
+          <Link
+            href="/e-commerce/TODO/products"
+            className={cn(
+              "inline-flex items-center px-6 py-2",
+              "hover:bg-opacity-80 transition-colors duration-300",
+              "rounded-lg text-sm font-medium",
+              showMorebuttonBgColor,
+              showMorebuttonTextColor
+            )}
+          >
+            {showMoreText}
+          </Link>
+        </div>
       )}
     </div>
-  )
+  );
 }

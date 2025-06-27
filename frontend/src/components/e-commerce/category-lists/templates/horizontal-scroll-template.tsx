@@ -110,11 +110,22 @@ export function HorizontalScrollCategoryTemplate({
   const imageRatio = imageHeight.includes("h-") ? "portrait" : "square";
 
   return (
-      <div className={cn("w-full flex-shrink-0", bgColor)}>
-      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+    <div className={cn("w-full flex-shrink-0", bgColor)}>
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
         {showTitle && (
           <div className="flex items-center mb-6 justify-center">
-            <h2 className={cn("text-4xl md:text-6xl font-bold text-center", titleColor, titleFontSize, titleFont)}>{title}</h2>
+            <h2
+              className={cn(
+                "text-4xl md:text-6xl font-bold text-center",
+                titleColor,
+                titleFontSize,
+                titleFont
+              )}
+            >
+              {title}
+            </h2>
           </div>
         )}
         {/* Overlay Arrows */}
@@ -130,7 +141,12 @@ export function HorizontalScrollCategoryTemplate({
             </button>
             <button
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 shadow-md"
-              style={{ display: scroll.left + scroll.width < scroll.scrollWidth ? "block" : "none" }}
+              style={{
+                display:
+                  scroll.left + scroll.width < scroll.scrollWidth
+                    ? "block"
+                    : "none",
+              }}
               onClick={() => scrollBy(300)}
               aria-label="Scroll Right"
             >
@@ -141,7 +157,11 @@ export function HorizontalScrollCategoryTemplate({
         <div
           ref={scrollRef}
           className="overflow-x-auto"
-          style={{ scrollBehavior: "smooth", scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{
+            scrollBehavior: "smooth",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
         >
           <style jsx>{`
             div[ref]::-webkit-scrollbar {
@@ -150,7 +170,10 @@ export function HorizontalScrollCategoryTemplate({
           `}</style>
           <div className="flex gap-4 md:gap-6 pb-4">
             {categories.map((category) => (
-              <div key={category._id || category.id} className={cn("flex-shrink-0", cardWidth)}>
+              <div
+                key={category._id || category.id}
+                className={cn("flex-shrink-0", cardWidth)}
+              >
                 <FlexibleCard
                   item={category}
                   type="category"
@@ -177,34 +200,42 @@ export function HorizontalScrollCategoryTemplate({
         </div>
         {/* Custom minimal scrollbar */}
         {showScrollbar && (
-          <div className={`w-full h-1 mt-2 ${scrollBarBgColor} overflow-hidden`}>
+          <div
+            className={`w-full h-1 mt-2 ${scrollBarBgColor} overflow-hidden`}
+          >
             <div
               className={`h-full ${scrollBarSliderColor} transition-all`}
               style={{
-                width: scroll.scrollWidth > 0 ? `${(scroll.width / scroll.scrollWidth) * 100}%` : "0%",
-                marginLeft: scroll.scrollWidth > 0 ? `${(scroll.left / scroll.scrollWidth) * 100}%` : "0%",
+                width:
+                  scroll.scrollWidth > 0
+                    ? `${(scroll.width / scroll.scrollWidth) * 100}%`
+                    : "0%",
+                marginLeft:
+                  scroll.scrollWidth > 0
+                    ? `${(scroll.left / scroll.scrollWidth) * 100}%`
+                    : "0%",
               }}
             />
           </div>
         )}
       </div>
-            {/* Show More Button */}
-       {showMoreButton && ( 
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/categories" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            " hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor
-          )}
-        >
-          {showMoreText}
-        </Link>
-      </div>
+      {/* Show More Button */}
+      {showMoreButton && (
+        <div className="flex justify-end mt-6">
+          <Link
+            href="/e-commerce/TODO/categories"
+            className={cn(
+              "inline-flex items-center px-6 py-2",
+              " hover:bg-opacity-80 transition-colors duration-300",
+              "rounded-lg text-sm font-medium",
+              showMorebuttonBgColor,
+              showMorebuttonTextColor
+            )}
+          >
+            {showMoreText}
+          </Link>
+        </div>
       )}
     </div>
-  )
+  );
 }

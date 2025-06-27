@@ -114,7 +114,18 @@ export function ListViewCategoryTemplate({
   // Standard list view implementation
   return (
     <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
-        {showTitle && <h2 className={cn("text-4xl md:text-4xl font-bold text-center pb-4 mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
+      {showTitle && (
+        <h2
+          className={cn(
+            "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+            titleColor,
+            titleFontSize,
+            titleFont
+          )}
+        >
+          {title}
+        </h2>
+      )}
       <div className={gap}>
         {categories.map((category) => (
           <Link
@@ -123,13 +134,16 @@ export function ListViewCategoryTemplate({
               "flex items-center gap-4 p-4 border",
               borderColor,
               borderRadius,
-              hoverEffect && "hover:bg-slate-50 transition-colors",
+              hoverEffect && "hover:bg-slate-50 transition-colors"
             )}
             key={category._id}
           >
             <div className="relative w-16 h-16 bg-slate-100 rounded-md overflow-hidden flex-shrink-0">
               <Image
-                src={category.media?.mainMedia?.image?.url || "/placeholder.svg?height=64&width=64"}
+                src={
+                  category.media?.mainMedia?.image?.url ||
+                  "/placeholder.svg?height=64&width=64"
+                }
                 alt={category.name}
                 fill
                 sizes="64px"
@@ -138,29 +152,33 @@ export function ListViewCategoryTemplate({
             </div>
             <div className="flex-grow">
               <h3 className="font-medium">{category.name}</h3>
-              {showDescription && <p className="text-sm text-gray-500">Browse products</p>}
+              {showDescription && (
+                <p className="text-sm text-gray-500">Browse products</p>
+              )}
             </div>
-            {showIcon && <ArrowRight className={cn("w-5 h-5", iconColorClass)} />}
+            {showIcon && (
+              <ArrowRight className={cn("w-5 h-5", iconColorClass)} />
+            )}
           </Link>
         ))}
       </div>
-            {/* Show More Button */}
+      {/* Show More Button */}
       {showMoreButton && categories.length > 0 && (
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/categories" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            "hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor
-          )}
-        >
-          {showMoreText}
-        </Link>
-      </div>
+        <div className="flex justify-end mt-6">
+          <Link
+            href="/e-commerce/TODO/categories"
+            className={cn(
+              "inline-flex items-center px-6 py-2",
+              "hover:bg-opacity-80 transition-colors duration-300",
+              "rounded-lg text-sm font-medium",
+              showMorebuttonBgColor,
+              showMorebuttonTextColor
+            )}
+          >
+            {showMoreText}
+          </Link>
+        </div>
       )}
     </div>
-  )
+  );
 }

@@ -91,10 +91,16 @@ export default function RegisterPage() {
     >
       <div className="max-w-md pt-8 w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold" style={{ color: defaultTheme.textColor }}>
+          <h2
+            className="text-3xl font-bold"
+            style={{ color: defaultTheme.textColor }}
+          >
             Create Account
           </h2>
-          <p className="mt-2 opacity-60" style={{ color: defaultTheme.textColor }}>
+          <p
+            className="mt-2 opacity-60"
+            style={{ color: defaultTheme.textColor }}
+          >
             Join us today
           </p>
         </div>
@@ -109,7 +115,10 @@ export default function RegisterPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName" style={{ color: defaultTheme.textColor }}>
+                <Label
+                  htmlFor="firstName"
+                  style={{ color: defaultTheme.textColor }}
+                >
                   First Name *
                 </Label>
                 <Input
@@ -125,7 +134,10 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" style={{ color: defaultTheme.textColor }}>
+                <Label
+                  htmlFor="lastName"
+                  style={{ color: defaultTheme.textColor }}
+                >
                   Last Name *
                 </Label>
                 <Input
@@ -176,7 +188,10 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="password" style={{ color: defaultTheme.textColor }}>
+              <Label
+                htmlFor="password"
+                style={{ color: defaultTheme.textColor }}
+              >
                 Password *
               </Label>
               <div className="relative mt-1">
@@ -197,16 +212,25 @@ export default function RegisterPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <EyeOff
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   ) : (
-                    <Eye className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <Eye
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   )}
                 </button>
               </div>
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword" style={{ color: defaultTheme.textColor }}>
+              <Label
+                htmlFor="confirmPassword"
+                style={{ color: defaultTheme.textColor }}
+              >
                 Confirm Password *
               </Label>
               <div className="relative mt-1">
@@ -227,9 +251,15 @@ export default function RegisterPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <EyeOff
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   ) : (
-                    <Eye className="h-4 w-4" style={{ color: defaultTheme.textColor }} />
+                    <Eye
+                      className="h-4 w-4"
+                      style={{ color: defaultTheme.textColor }}
+                    />
                   )}
                 </button>
               </div>
@@ -246,9 +276,16 @@ export default function RegisterPage() {
           </Button>
 
           <div className="text-center">
-            <p className="text-sm opacity-60" style={{ color: defaultTheme.textColor }}>
+            <p
+              className="text-sm opacity-60"
+              style={{ color: defaultTheme.textColor }}
+            >
               Already have an account?{" "}
-              <Link href="/login" className="font-medium hover:underline" style={{ color: defaultTheme.textColor }}>
+              <Link
+                href="/e-commerce/TODO/login"
+                className="font-medium hover:underline"
+                style={{ color: defaultTheme.textColor }}
+              >
                 Sign in
               </Link>
             </p>
@@ -256,5 +293,5 @@ export default function RegisterPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }

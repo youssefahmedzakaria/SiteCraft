@@ -82,51 +82,70 @@ export function GridCategoryTemplate({
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
-      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
-        {showTitle && titlePosition === "top" && <h2 className={cn("text-4xl md:text-6xl font-bold text-center mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
-      <div className={cn("grid", gridCols, gap)}>
-        {categories.map((category) => (
-          <FlexibleCard
-            key={category._id}
-            item={category}
-            type="category"
-            variant={cardVariant}
-            imageRatio={imageHeight === "aspect-square" ? "square" : imageHeight === "aspect-[3/4]" ? "portrait" : "landscape"}
-            cornerRadius={cornerRadius}
-            showTitle={showCardTitle}
-            showSubtitle={showSubtitle}
-            showCta={showCta}
-            ctaText={ctaText}
-            bgColor={bgColor}
-            textColor={textColor}
-            accentColor={accentColor}
-            borderColor={borderColor}
-            overlayColor={overlayColor}
-            fontFamily={fontFamily}
-            cardShadow={cardShadow}
-            hoverEffect={hoverEffect}
-            linkPath={`/list?cat=${category.id}`}
-          />
-        ))}
-      </div>
-            {/* Show More Button */}
-      {showMoreButton && (
-        <div className="flex justify-end mt-6">
-          <Link 
-            href="/categories" 
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
+        {showTitle && titlePosition === "top" && (
+          <h2
             className={cn(
-              "inline-flex items-center px-6 py-2",
-              "hover:bg-opacity-80 transition-colors duration-300",
-              "rounded-lg text-sm font-medium",
-              showMorebuttonBgColor,
-              showMorebuttonTextColor
+              "text-4xl md:text-6xl font-bold text-center mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
             )}
           >
-            {showMoreText}
-          </Link>
+            {title}
+          </h2>
+        )}
+        <div className={cn("grid", gridCols, gap)}>
+          {categories.map((category) => (
+            <FlexibleCard
+              key={category._id}
+              item={category}
+              type="category"
+              variant={cardVariant}
+              imageRatio={
+                imageHeight === "aspect-square"
+                  ? "square"
+                  : imageHeight === "aspect-[3/4]"
+                  ? "portrait"
+                  : "landscape"
+              }
+              cornerRadius={cornerRadius}
+              showTitle={showCardTitle}
+              showSubtitle={showSubtitle}
+              showCta={showCta}
+              ctaText={ctaText}
+              bgColor={bgColor}
+              textColor={textColor}
+              accentColor={accentColor}
+              borderColor={borderColor}
+              overlayColor={overlayColor}
+              fontFamily={fontFamily}
+              cardShadow={cardShadow}
+              hoverEffect={hoverEffect}
+              linkPath={`/list?cat=${category.id}`}
+            />
+          ))}
         </div>
-      )}
+        {/* Show More Button */}
+        {showMoreButton && (
+          <div className="flex justify-end mt-6">
+            <Link
+              href="/e-commerce/TODO/categories"
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+                showMorebuttonBgColor,
+                showMorebuttonTextColor
+              )}
+            >
+              {showMoreText}
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-  )
+  );
 }

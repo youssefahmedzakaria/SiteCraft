@@ -115,104 +115,143 @@ export function HorizontalScrollProductTemplate({
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
-          <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
-            {showTitle && (
-              <div className="flex items-center mb-6 justify-center">
-                <h2 className={cn("text-4xl md:text-6xl font-bold text-center", titleColor, titleFontSize, titleFont)}>{title}</h2>
-              </div>
-            )}
-      <div className="relative">
-        {/* Overlay Arrows */}
-        {showControls && (
-          <>
-            <button
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-black rounded-full p-2 shadow-md"
-              style={{ display: scroll.left > 0 ? "block" : "none" }}
-              onClick={() => scrollBy(-300)}
-              aria-label="Scroll Left"
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
+        {showTitle && (
+          <div className="flex items-center mb-6 justify-center">
+            <h2
+              className={cn(
+                "text-4xl md:text-6xl font-bold text-center",
+                titleColor,
+                titleFontSize,
+                titleFont
+              )}
             >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-black rounded-full p-2 shadow-md"
-              style={{ display: scroll.left + scroll.width < scroll.scrollWidth ? "block" : "none" }}
-              onClick={() => scrollBy(300)}
-              aria-label="Scroll Right"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </>
-        )}
-        <div
-          ref={scrollRef}
-          className="overflow-x-auto"
-          style={{ scrollBehavior: "smooth", scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <style jsx>{`
-            div[ref]::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          <div className="flex gap-4 md:gap-6 pb-4">
-            {products.map((product) => (
-              <div key={product._id || product.id} className={cn("flex-shrink-0", cardWidth)}>
-                <FlexibleCard
-                  item={product}
-                  type="product"
-                  variant={cardVariant}
-                  imageRatio={imageHeight.includes("h-") ? "portrait" : "square"}
-                  cornerRadius={cornerRadius}
-                  showTitle={showCardTitle}
-                  showSubtitle={showSubtitle}
-                  showCta={showCta}
-                  ctaText={ctaText}
-                  bgColor="bg-transparent"
-                  textColor={textColor}
-                  accentColor={accentColor}
-                  borderColor={borderColor}
-                  overlayColor={overlayColor}
-                  fontFamily={fontFamily}
-                  cardShadow={cardShadow}
-                  hoverEffect={hoverEffect}
-                  onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
-                  onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-                  linkPath={`/product/${product.id}`}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Custom minimal scrollbar */}
-        {showScrollbar && (
-          <div className={`w-full h-1 mt-2 ${scrollBarBgColor} overflow-hidden`}>
-            <div
-              className={`h-full ${scrollBarSliderColor} transition-all`}
-              style={{
-                width: scroll.scrollWidth > 0 ? `${(scroll.width / scroll.scrollWidth) * 100}%` : "0%",
-                marginLeft: scroll.scrollWidth > 0 ? `${(scroll.left / scroll.scrollWidth) * 100}%` : "0%",
-              }}
-            />
+              {title}
+            </h2>
           </div>
         )}
-      </div>
-      {/* Show More Button */}
-      {showMoreButton &&(
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/products" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            "hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor 
+        <div className="relative">
+          {/* Overlay Arrows */}
+          {showControls && (
+            <>
+              <button
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-black rounded-full p-2 shadow-md"
+                style={{ display: scroll.left > 0 ? "block" : "none" }}
+                onClick={() => scrollBy(-300)}
+                aria-label="Scroll Left"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-black rounded-full p-2 shadow-md"
+                style={{
+                  display:
+                    scroll.left + scroll.width < scroll.scrollWidth
+                      ? "block"
+                      : "none",
+                }}
+                onClick={() => scrollBy(300)}
+                aria-label="Scroll Right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
           )}
-        >
-          {showMoreText}
-        </Link>
+          <div
+            ref={scrollRef}
+            className="overflow-x-auto"
+            style={{
+              scrollBehavior: "smooth",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            <style jsx>{`
+              div[ref]::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <div className="flex gap-4 md:gap-6 pb-4">
+              {products.map((product) => (
+                <div
+                  key={product._id || product.id}
+                  className={cn("flex-shrink-0", cardWidth)}
+                >
+                  <FlexibleCard
+                    item={product}
+                    type="product"
+                    variant={cardVariant}
+                    imageRatio={
+                      imageHeight.includes("h-") ? "portrait" : "square"
+                    }
+                    cornerRadius={cornerRadius}
+                    showTitle={showCardTitle}
+                    showSubtitle={showSubtitle}
+                    showCta={showCta}
+                    ctaText={ctaText}
+                    bgColor="bg-transparent"
+                    textColor={textColor}
+                    accentColor={accentColor}
+                    borderColor={borderColor}
+                    overlayColor={overlayColor}
+                    fontFamily={fontFamily}
+                    cardShadow={cardShadow}
+                    hoverEffect={hoverEffect}
+                    onAddToCart={
+                      onAddToCart ? () => onAddToCart(product) : undefined
+                    }
+                    onAddToFavorite={
+                      onAddToFavorite
+                        ? () => onAddToFavorite(product)
+                        : undefined
+                    }
+                    linkPath={`/e-commerce/TODO/product/${product.id}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Custom minimal scrollbar */}
+          {showScrollbar && (
+            <div
+              className={`w-full h-1 mt-2 ${scrollBarBgColor} overflow-hidden`}
+            >
+              <div
+                className={`h-full ${scrollBarSliderColor} transition-all`}
+                style={{
+                  width:
+                    scroll.scrollWidth > 0
+                      ? `${(scroll.width / scroll.scrollWidth) * 100}%`
+                      : "0%",
+                  marginLeft:
+                    scroll.scrollWidth > 0
+                      ? `${(scroll.left / scroll.scrollWidth) * 100}%`
+                      : "0%",
+                }}
+              />
+            </div>
+          )}
+        </div>
+        {/* Show More Button */}
+        {showMoreButton && (
+          <div className="flex justify-end mt-6">
+            <Link
+              href="/e-commerce/TODO/products"
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+                showMorebuttonBgColor,
+                showMorebuttonTextColor
+              )}
+            >
+              {showMoreText}
+            </Link>
+          </div>
+        )}
       </div>
-      )}
     </div>
-    </div>
-  )
+  );
 }

@@ -93,53 +93,68 @@ export function GridProductTemplate({
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
-      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
-        {showTitle && <h2 className={cn("text-4xl md:text-4xl font-bold text-center pb-4 mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
-      <div className={cn("grid", gridCols, gap)}>
-        {products.map((product) => (
-          <FlexibleCard
-            key={product._id || product.id}
-            item={product}
-            type="product"
-            variant={cardVariant}
-            imageRatio={imageHeight.includes("h-") ? "portrait" : "square"}
-            cornerRadius={cornerRadius}
-            showTitle={showCardTitle}
-            showSubtitle={showSubtitle}
-            showCta={showCta}
-            ctaText={ctaText}
-            bgColor="bg-transparent"
-            textColor={textColor}
-            accentColor={accentColor}
-            borderColor={borderColor}
-            overlayColor={overlayColor}
-            fontFamily={fontFamily}
-            cardShadow={cardShadow}
-            hoverEffect={hoverEffect}
-            onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
-            onAddToFavorite={onAddToFavorite ? () => onAddToFavorite(product) : undefined}
-            linkPath={`/product/${product.id}`}
-          />
-        ))}
-      </div>
-      {/* Show More Button */}
-      {showMoreButton && (
-        <div className="flex justify-end mt-6">
-          <Link 
-            href="/products" 
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
+        {showTitle && (
+          <h2
             className={cn(
-              "inline-flex items-center px-6 py-2",
-              "hover:bg-opacity-80 transition-colors duration-300",
-              "rounded-lg text-sm font-medium",
-              showMorebuttonBgColor,
-              showMorebuttonTextColor
+              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
             )}
           >
-            {showMoreText}
-          </Link>
+            {title}
+          </h2>
+        )}
+        <div className={cn("grid", gridCols, gap)}>
+          {products.map((product) => (
+            <FlexibleCard
+              key={product._id || product.id}
+              item={product}
+              type="product"
+              variant={cardVariant}
+              imageRatio={imageHeight.includes("h-") ? "portrait" : "square"}
+              cornerRadius={cornerRadius}
+              showTitle={showCardTitle}
+              showSubtitle={showSubtitle}
+              showCta={showCta}
+              ctaText={ctaText}
+              bgColor="bg-transparent"
+              textColor={textColor}
+              accentColor={accentColor}
+              borderColor={borderColor}
+              overlayColor={overlayColor}
+              fontFamily={fontFamily}
+              cardShadow={cardShadow}
+              hoverEffect={hoverEffect}
+              onAddToCart={onAddToCart ? () => onAddToCart(product) : undefined}
+              onAddToFavorite={
+                onAddToFavorite ? () => onAddToFavorite(product) : undefined
+              }
+              linkPath={`/e-commerce/TODO/product/${product.id}`}
+            />
+          ))}
         </div>
-      )}
+        {/* Show More Button */}
+        {showMoreButton && (
+          <div className="flex justify-end mt-6">
+            <Link
+              href="/e-commerce/TODO/products"
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+                showMorebuttonBgColor,
+                showMorebuttonTextColor
+              )}
+            >
+              {showMoreText}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

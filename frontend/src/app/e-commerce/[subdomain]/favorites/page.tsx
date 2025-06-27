@@ -55,7 +55,7 @@ export default function FavoritesPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Save items you love to easily find them later.
           </p>
-          <Link href="/products">
+          <Link href="/e-commerce/TODO/products">
             <Button
               size="lg"
               style={{
@@ -122,7 +122,7 @@ export default function FavoritesPage() {
             </div>
 
             <div className="p-4">
-              <Link href={`/product/${item.id}`}>
+              <Link href={`/e-commerce/TODO/product/${item.id}`}>
                 <h3
                   className="font-medium hover:underline"
                   style={{ color: theme.textColor }}
@@ -168,7 +168,7 @@ export default function FavoritesPage() {
       </div>
 
       <div className="mt-12 text-center">
-        <Link href="/products">
+        <Link href="/e-commerce/TODO/products">
           <Button
             variant="outline"
             size="lg"

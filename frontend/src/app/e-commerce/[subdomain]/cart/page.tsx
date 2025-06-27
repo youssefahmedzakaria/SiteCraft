@@ -68,7 +68,7 @@ export default function CartPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Looks like you have not added any items to your cart yet.
           </p>
-          <Link href="/products">
+          <Link href="/e-commerce/TODO/products">
             <Button
               size="lg"
               style={{
@@ -291,7 +291,7 @@ export default function CartPage() {
               )}
             </div>
 
-            <Link href="/checkout" className="block mt-6">
+            <Link href="/e-commerce/TODO/checkout" className="block mt-6">
               <Button
                 className="w-full"
                 size="lg"

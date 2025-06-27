@@ -43,7 +43,7 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
                 <Link
-                  href={`/product/${product.id}`}
+                  href={`/e-commerce/TODO/product/${product.id}`}
                   className="font-medium hover:underline line-clamp-2 flex-1"
                 >
                   {product.name}

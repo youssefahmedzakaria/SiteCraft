@@ -94,7 +94,7 @@ export default function CheckoutPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Your cart is empty. Add some items before proceeding to checkout.
           </p>
-          <Link href="/products">
+          <Link href="/e-commerce/TODO/products">
             <Button
               size="lg"
               style={{
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
             </p>
           </div>
           <div className="flex gap-4 justify-center">
-            <Link href="/products">
+            <Link href="/e-commerce/TODO/products">
               <Button
                 size="lg"
                 style={{
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
                 Continue Shopping
               </Button>
             </Link>
-            <Link href="/profile">
+            <Link href="/e-commerce/TODO/profile">
               <Button
                 size="lg"
                 style={{
