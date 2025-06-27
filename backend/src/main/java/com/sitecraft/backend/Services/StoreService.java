@@ -58,7 +58,7 @@ public class StoreService {
         if (updatedData.getStoreName() != null) existingStore.setStoreName(updatedData.getStoreName());
         if (updatedData.getStoreType() != null) existingStore.setStoreType(updatedData.getStoreType());
         if (updatedData.getLogo() != null) existingStore.setLogo(updatedData.getLogo());
-        if (updatedData.getWebAddress() != null) existingStore.setWebAddress(updatedData.getWebAddress());
+        if (updatedData.getSubdomain() != null) existingStore.setSubdomain(updatedData.getSubdomain());
         if (updatedData.getDescription() != null) existingStore.setDescription(updatedData.getDescription());
         if (updatedData.getPhoneNumber() != null) existingStore.setPhoneNumber(updatedData.getPhoneNumber());
         if (updatedData.getEmailAddress() != null) existingStore.setEmailAddress(updatedData.getEmailAddress());

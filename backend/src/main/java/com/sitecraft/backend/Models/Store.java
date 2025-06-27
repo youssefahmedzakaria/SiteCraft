@@ -18,7 +18,7 @@ public class Store {
 
     private String logo;
 
-    private String webAddress;
+    private String subdomain;
 
     private String description;
 
@@ -51,12 +51,12 @@ public class Store {
     public Store() {
     }
 
-    public Store(Long id, String storeName, String storeType, String logo, String webAddress, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
+    public Store(Long id, String storeName, String storeType, String logo, String subdomain, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
         this.id = id;
         this.storeName = storeName;
         this.storeType = storeType;
         this.logo = logo;
-        this.webAddress = webAddress;
+        this.subdomain = subdomain;
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
@@ -104,12 +104,12 @@ public class Store {
         this.logo = logo;
     }
 
-    public String getWebAddress() {
-        return webAddress;
+    public String getSubdomain() {
+        return subdomain;
     }
 
-    public void setWebAddress(String webAddress) {
-        this.webAddress = webAddress;
+    public void setSubdomain(String webAddress) {
+        this.subdomain = webAddress;
     }
 
     public String getDescription() {
