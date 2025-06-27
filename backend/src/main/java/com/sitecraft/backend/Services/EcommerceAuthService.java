@@ -66,6 +66,11 @@ public class EcommerceAuthService {
         // Set default status
         customer.setStatus("active");
 
+        // Set creation and update timestamps
+        LocalDateTime now = LocalDateTime.now();
+        customer.setCreatedAt(now);
+        customer.setUpdatedAt(now);
+
         // Create wishlist and shopping cart for the customer
         WishList wishList = new WishList();
         wishList.setNumberOfProducts(0);
@@ -128,6 +133,9 @@ public class EcommerceAuthService {
             customer.setPassword(encodedPassword);
         }
 
+        // Set update timestamp
+        customer.setUpdatedAt(LocalDateTime.now());
+
         return customerRepo.save(customer);
     }
 
@@ -181,6 +189,7 @@ public class EcommerceAuthService {
             }
             String encodedPassword = passwordEncoder.encode(newPassword);
             customer.setPassword(encodedPassword);
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to reset password: " + e.getMessage(), e);
