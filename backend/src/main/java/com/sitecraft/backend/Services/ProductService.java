@@ -1,0 +1,487 @@
+package com.sitecraft.backend.Services;
+
+import com.sitecraft.backend.DTOs.ProductCreateDTO;
+import com.sitecraft.backend.DTOs.ProductVariantDTO;
+import com.sitecraft.backend.DTOs.ProductAttributeDTO;
+import com.sitecraft.backend.DTOs.VariantAttributeDTO;
+import com.sitecraft.backend.Models.*;
+import com.sitecraft.backend.Repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
+
+@Service
+public class ProductService {
+    
+    @Autowired
+    private ProductRepo productRepo;
+    
+    @Autowired
+    private ProductVariantsRepo productVariantsRepo;
+      @Autowired
+    private ProductImageRepo productImageRepo;
+    
+    @Autowired
+    private CategoryRepo categoryRepo;
+    
+    @Autowired
+    private StoreRepo storeRepo;
+ 
+    @Autowired
+    private OrderRepo orderRepo;
+    @Autowired
+    private OrderProductRepo orderProductRepo;
+    @Autowired
+    private WishListProductRepo wishListProductRepo;
+    @Autowired
+    private CartProductRepo cartProductRepo;
+    @Autowired
+    private CategoryProductRepo categoryProductRepo;
+    @Autowired
+    private ReviewRepo reviewRepo;
+    @Autowired
+    private AttributeValueRepo attributeValueRepo;
+    @Autowired
+    private ProductAttributeRepo productAttributeRepo;
+    @Autowired
+    private VariantAttributeValueRepo variantAttributeValueRepo;
+
+    public List<Product> getAllProducts(Long storeId) {
+        return productRepo.findByStoreId(storeId);
+    }
+
+    public Product getProductById(Long id, Long storeId) {
+        return productRepo.findByIdAndStoreId(id, storeId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
+    @Transactional
+    public Product createProduct(ProductCreateDTO productDTO, Long storeId) {
+        Store store = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        Category category = categoryRepo.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setDiscountType(productDTO.getDiscountType());
+        product.setDiscountValue(
+            productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
+        );
+        product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
+        product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
+        product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
+        product.setCategory(category);
+        product.setStore(store);
+
+        Product savedProduct = productRepo.save(product);
+
+        Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
+
+        if (productDTO.getAttributes() != null && !productDTO.getAttributes().isEmpty()) {
+            for (ProductAttributeDTO attrDTO : productDTO.getAttributes()) {
+                ProductAttribute productAttribute = new ProductAttribute();
+                productAttribute.setProduct(savedProduct);
+                productAttribute.setAttributeName(attrDTO.getName());
+
+                Map<String, AttributeValue> valueMap = new HashMap<>();
+                List<AttributeValue> attributeValues = new ArrayList<>();
+
+                for (String value : attrDTO.getValues()) {
+                    AttributeValue attributeValue = new AttributeValue();
+                    attributeValue.setAttributeValue(value);
+                    attributeValue.setProductAttribute(productAttribute);
+                    attributeValues.add(attributeValue);
+                    valueMap.put(value, attributeValue);
+                }
+                productAttribute.setAttributeValues(attributeValues);
+                productAttributeRepo.save(productAttribute);
+                createdAttributes.put(attrDTO.getName(), valueMap);
+            }
+        }
+
+        if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+            for (ProductVariantDTO variantDTO : productDTO.getVariants()) {
+                ProductVariants variant = new ProductVariants();
+                variant.setStock(variantDTO.getStock());
+                variant.setPrice(variantDTO.getPrice());
+                variant.setProductionCost(variantDTO.getProductionCost());
+                variant.setProduct(savedProduct);
+
+                ProductVariants savedVariant = productVariantsRepo.save(variant);
+                List<String> attributePairsForSku = new ArrayList<>();
+
+                if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
+                    for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
+                        AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
+                        VariantAttributeValue vav = new VariantAttributeValue();
+                        vav.setVariant(savedVariant);
+                        vav.setAttributeValue(av);
+                        variantAttributeValueRepo.save(vav);
+                        attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                    }
+                }
+
+                Collections.sort(attributePairsForSku);
+                String attributesString = String.join("|", attributePairsForSku);
+                String generatedSku = savedProduct.getStore().getId() + "|" + savedProduct.getId();
+                if (!attributesString.isEmpty()) {
+                    generatedSku += "|" + attributesString;
+                }
+                variant.setSku(generatedSku);
+                productVariantsRepo.save(variant);
+            }
+        }
+
+        if (productDTO.getImageUrls() != null && !productDTO.getImageUrls().isEmpty()) {
+            for (String imageUrl : productDTO.getImageUrls()) {
+                ProductImage image = new ProductImage();
+                image.setImageUrl(imageUrl);
+                image.setAlt(savedProduct.getName() + " image");
+                image.setProduct(savedProduct);
+                productImageRepo.save(image);
+            }
+        }
+
+        return savedProduct;
+    }
+
+    @Transactional
+    public Product updateProduct(Long id, ProductCreateDTO productDTO, Long storeId) {
+        Product product = productRepo.findByIdAndStoreId(id, storeId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (productDTO.getName() != null) product.setName(productDTO.getName());
+        if (productDTO.getDescription() != null) product.setDescription(productDTO.getDescription());
+        if (productDTO.getDiscountType() != null) product.setDiscountType(productDTO.getDiscountType());
+        if (productDTO.getDiscountValue() != null) product.setDiscountValue(
+            productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
+        );
+        if (productDTO.getMinCap() != null) product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
+        if (productDTO.getPercentageMax() != null) product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
+        if (productDTO.getMaxCap() != null) product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
+        
+        if (productDTO.getCategoryId() != null) {
+            Category category = categoryRepo.findById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            product.setCategory(category);
+        }
+
+        // Only update variants and attributes if they are provided in the DTO
+        if (productDTO.getAttributes() != null) {
+            // Delete old attributes and variants in the correct order
+            List<ProductVariants> variantsToDelete = new ArrayList<>(product.getVariants());
+            for (ProductVariants variant : variantsToDelete) {
+                List<VariantAttributeValue> vavsToDelete = variantAttributeValueRepo.findByVariant(variant);
+                variantAttributeValueRepo.deleteAll(vavsToDelete);
+            }
+            productVariantsRepo.deleteAll(variantsToDelete);
+            productAttributeRepo.deleteAll(product.getAttributes());
+
+            product.getAttributes().clear();
+            product.getVariants().clear();
+
+            // Re-create attributes and variants
+            Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
+
+            if (productDTO.getAttributes() != null && !productDTO.getAttributes().isEmpty()) {
+                for (ProductAttributeDTO attrDTO : productDTO.getAttributes()) {
+                    ProductAttribute productAttribute = new ProductAttribute();
+                    productAttribute.setProduct(product);
+                    productAttribute.setAttributeName(attrDTO.getName());
+
+                    Map<String, AttributeValue> valueMap = new HashMap<>();
+                    List<AttributeValue> attributeValues = new ArrayList<>();
+
+                    for (String value : attrDTO.getValues()) {
+                        AttributeValue attributeValue = new AttributeValue();
+                        attributeValue.setAttributeValue(value);
+                        attributeValue.setProductAttribute(productAttribute);
+                        attributeValues.add(attributeValue);
+                        valueMap.put(value, attributeValue);
+                    }
+                    productAttribute.setAttributeValues(attributeValues);
+                    productAttributeRepo.save(productAttribute);
+                    product.getAttributes().add(productAttribute);
+                    createdAttributes.put(attrDTO.getName(), valueMap);
+                }
+            }
+
+            if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+                for (ProductVariantDTO variantDTO : productDTO.getVariants()) {
+                    ProductVariants variant = new ProductVariants();
+                    variant.setStock(variantDTO.getStock());
+                    variant.setPrice(variantDTO.getPrice());
+                    variant.setProductionCost(variantDTO.getProductionCost());
+                    variant.setProduct(product);
+
+                    ProductVariants savedVariant = productVariantsRepo.save(variant);
+                    product.getVariants().add(savedVariant);
+                    List<String> attributePairsForSku = new ArrayList<>();
+
+                    if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
+                        for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
+                            AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
+                            VariantAttributeValue vav = new VariantAttributeValue();
+                            vav.setVariant(savedVariant);
+                            vav.setAttributeValue(av);
+                            variantAttributeValueRepo.save(vav);
+                            attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                        }
+                    }
+
+                    Collections.sort(attributePairsForSku);
+                    String attributesString = String.join("|", attributePairsForSku);
+                    String generatedSku = product.getStore().getId() + "|" + product.getId();
+                     if (!attributesString.isEmpty()) {
+                        generatedSku += "|" + attributesString;
+                    }
+                    variant.setSku(generatedSku);
+                    productVariantsRepo.save(variant);
+                }
+            }
+        }
+
+        return productRepo.save(product);
+    }
+
+    @Transactional
+    public void deleteProduct(Long id, Long storeId) {
+        try {
+            Product product = productRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            // 1. Set productId to null in OrderProduct
+            List<OrderProduct> orderProducts = orderProductRepo.findByProductId(id);
+            for (OrderProduct op : orderProducts) {
+                op.setProduct(null);
+            }
+            orderProductRepo.saveAll(orderProducts);
+
+            // 2. Delete dependent entities in correct order
+            // a. VariantAttributeValue (via ProductVariants)
+            List<ProductVariants> variants = productVariantsRepo.findByProductId(id);
+            for (ProductVariants variant : variants) {
+                variantAttributeValueRepo.deleteAll(variantAttributeValueRepo.findAll().stream().filter(vav -> vav.getVariant().getId().equals(variant.getId())).toList());
+            }
+            // b. WishListProduct
+            wishListProductRepo.deleteAll(wishListProductRepo.findAll().stream().filter(wlp -> wlp.getProduct().getId().equals(id)).toList());
+            // c. CartProduct
+            cartProductRepo.deleteAll(cartProductRepo.findAll().stream().filter(cp -> cp.getProduct().getId().equals(id)).toList());
+            // d. CategoryProduct
+            categoryProductRepo.deleteAll(categoryProductRepo.findAll().stream().filter(cp -> cp.getProduct().getId().equals(id)).toList());
+            // e. Review
+            reviewRepo.deleteAll(reviewRepo.findAll().stream().filter(r -> r.getProduct().getId().equals(id)).toList());
+            // f. AttributeValue (via ProductAttribute)
+            List<ProductAttribute> attributes = productAttributeRepo.findAll().stream().filter(attr -> attr.getProduct().getId().equals(id)).toList();
+            for (ProductAttribute attr : attributes) {
+                attributeValueRepo.deleteAll(attributeValueRepo.findAll().stream().filter(av -> av.getProductAttribute().getId().equals(attr.getId())).toList());
+            }
+            // g. ProductAttribute
+            productAttributeRepo.deleteAll(attributes);
+            // h. ProductVariants
+            productVariantsRepo.deleteAll(variants);
+            // i. ProductImage
+            productImageRepo.deleteAll(productImageRepo.findByProductId(id));
+
+            // 3. Delete the product itself
+            productRepo.delete(product);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting product: " + e.getMessage(), e);
+        }
+    }
+
+    /*
+    public List<Product> filterProducts(String category, String stockStatus, String search, Long storeId) {
+        Long categoryId = null;
+        if (category != null && !category.isEmpty()) {
+            Optional<Category> categoryEntity = categoryRepo.findByNameAndStoreId(category, storeId);
+            if (categoryEntity.isPresent()) {
+                categoryId = categoryEntity.get().getId();
+            }
+        }
+
+        return productRepo.findProductsWithFilters(storeId, categoryId, search);
+    }
+    */
+
+    public Map<String, Object> getProductStatistics(Long storeId) {
+        Map<String, Object> stats = new HashMap<>();
+        
+        List<Product> allProducts = productRepo.findByStoreId(storeId);
+        stats.put("totalProducts", allProducts.size());
+        
+        // Calculate low stock and out of stock
+        int lowStockCount = 0;
+        int outOfStockCount = 0;
+        
+        for (Product product : allProducts) {
+            List<ProductVariants> variants = productVariantsRepo.findByProductId(product.getId());
+            int totalStock = variants.stream().mapToInt(ProductVariants::getStock).sum();
+            
+            if (totalStock == 0) {
+                outOfStockCount++;
+            } else if (totalStock < 10) {
+                lowStockCount++;
+            }
+        }
+        
+        stats.put("lowStockCount", lowStockCount);
+        stats.put("outOfStockCount", outOfStockCount);
+        
+        return stats;
+    }
+
+    public List<Product> getLowStockItems(Long storeId) {
+        List<Product> allProducts = productRepo.findByStoreId(storeId);
+        return allProducts.stream()
+                .filter(product -> {
+                    List<ProductVariants> variants = productVariantsRepo.findByProductId(product.getId());
+                    int totalStock = variants.stream().mapToInt(ProductVariants::getStock).sum();
+                    return totalStock > 0 && totalStock < 10;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Product> getOutOfStockItems(Long storeId) {
+        List<Product> allProducts = productRepo.findByStoreId(storeId);
+        return allProducts.stream()
+                .filter(product -> {
+                    List<ProductVariants> variants = productVariantsRepo.findByProductId(product.getId());
+                    int totalStock = variants.stream().mapToInt(ProductVariants::getStock).sum();
+                    return totalStock == 0;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Map<String, Object> applyDiscountToProducts(List<Long> productIds, String discountType, 
+                                                      Double discountValue, Double minCap, 
+                                                      Double percentageMax, Double maxCap, Long storeId) {
+        List<Product> products = productRepo.findAllById(productIds);
+        products = products.stream()
+                .filter(p -> p.getStore().getId().equals(storeId))
+                .collect(Collectors.toList());
+
+        for (Product product : products) {
+            product.setDiscountType(discountType);
+            product.setDiscountValue(
+                discountValue == null ? null : BigDecimal.valueOf(discountValue)
+            );
+            product.setMinCap(minCap == null ? null : BigDecimal.valueOf(minCap));
+            product.setPercentageMax(percentageMax == null ? null : BigDecimal.valueOf(percentageMax));
+            product.setMaxCap(maxCap == null ? null : BigDecimal.valueOf(maxCap));
+        }
+
+        productRepo.saveAll(products);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("updatedProducts", products.size());
+        result.put("message", "Discount applied successfully to " + products.size() + " products");
+
+        return result;
+    }
+
+    @Transactional
+    public List<String> uploadProductImages(Long productId, List<MultipartFile> images, Long storeId) {
+        try {
+            Product product = productRepo.findByIdAndStoreId(productId, storeId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            List<String> imageUrls = new ArrayList<>();
+
+            for (MultipartFile image : images) {
+                // Validate the file
+                if (image.isEmpty()) {
+                    continue;
+                }
+                
+                // Check file type
+                String contentType = image.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new RuntimeException("File must be an image");
+                }
+                
+                // Generate unique filename
+                String originalFilename = image.getOriginalFilename();
+                String extension = originalFilename != null ? 
+                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                String filename = "product_" + productId + "_" + System.currentTimeMillis() + extension;
+                
+                // For now, simulate file storage (replace with actual file upload logic)
+                String imageUrl = "/uploads/products/" + "product" + productId + "/" + filename;
+                
+                // Save to database
+                ProductImage productImage = new ProductImage();
+                productImage.setImageUrl(imageUrl);
+                productImage.setAlt(product.getName() + " image");
+                productImage.setProduct(product);
+                productImageRepo.save(productImage);
+
+                imageUrls.add(imageUrl);
+            }
+
+            return imageUrls;
+        } catch (Exception e) {
+            throw new RuntimeException("Error uploading images: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public Product createProductWithImages(ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
+        Product product = createProduct(productDTO, storeId);
+        if (images != null && !images.isEmpty()) {
+            saveProductImages(product.getStore().getId(), product.getId(), images, product);
+        }
+        return getProductById(product.getId(), storeId);
+    }
+
+    @Transactional
+    public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
+        Product product = updateProduct(id, productDTO, storeId);
+        if (images != null) {
+            // Remove old images
+            List<ProductImage> oldImages = productImageRepo.findByProductId(id);
+            for (ProductImage img : oldImages) {
+                String path = System.getProperty("user.dir") + img.getImageUrl();
+                File file = new File(path);
+                if (file.exists()) file.delete();
+            }
+            productImageRepo.deleteAll(oldImages);
+            // Save new images
+            if (!images.isEmpty()) {
+                saveProductImages(product.getStore().getId(), product.getId(), images, product);
+            }
+        }
+        return getProductById(product.getId(), storeId);
+    }
+
+    private void saveProductImages(Long storeId, Long productId, List<MultipartFile> images, Product product) throws IOException {
+        String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId + "/products/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        int count = 1;
+        String productNameSlug = product.getName().toLowerCase().replaceAll("[^a-z0-9]+", "-");
+        for (MultipartFile image : images) {
+            if (image.isEmpty()) continue;
+            String filename = productNameSlug + "_" + storeId + "_" + productId + "_img" + count + ".png";
+            File destFile = new File(dir, filename);
+            image.transferTo(destFile);
+            ProductImage productImage = new ProductImage();
+            productImage.setImageUrl("/uploads/stores/" + storeId + "/products/" + filename);
+            productImage.setAlt(product.getName() + " image " + count);
+            productImage.setProduct(product);
+            productImageRepo.save(productImage);
+            count++;
+        }
+    }
+}
