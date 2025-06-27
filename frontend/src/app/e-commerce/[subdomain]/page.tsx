@@ -7,7 +7,6 @@ import "@/app/globals.css";
 import { CenteredPromo, LeftAlignedPromo, MinimalRightPromo, MinimalLeftPromo, OverlayPromo, RightAlignedPromo, SplitPromo} from "@/components/e-commerce/promo";
 import { CenteredContact, LeftAlignedContact, MinimalLeftContact, MinimalRightContact, RightAlignedContact } from "@/components/e-commerce/contact";
 import { cn } from "@/lib/utils";
-import { RightAlignedNewCollection, LeftAlignedNewCollection, OverlayNewCollection, CenteredNewCollection ,MinimalRightNewCollection, MinimalLeftNewCollection } from "@/components/e-commerce/new-collection";
 import { TitleLeftContentCenterPolicies, CenteredPolicies, LeftPolicies, DefaultPolicies } from "@/components/e-commerce/policies";
 import { RightAlignedAbout, CenteredAbout, LeftAlignedAbout,TopImageAbout } from "@/components/e-commerce/about-us";
 import { GridCategoryTemplate, FeaturedGridCategoryTemplate, HorizontalScrollCategoryTemplate, ListViewCategoryTemplate } from "@/components/e-commerce/category-lists";
@@ -295,18 +294,6 @@ export default function Home() {
         secondaryDescription="With years of experience in the industry, we understand what our customers need and strive to exceed their expectations."
         image="/about.jpg"
         imageAlt="About our company"
-        imageObjectFit="cover"
-      />
-      <CenteredNewCollection
-        id="new-collection"
-        backgroundColor="bg-white"
-        title="New Collection"
-        buttonText="View Collection"
-        buttonLink={`/e-commerce/${subdomain}/products`}
-        buttonColor="bg-white"
-        titleColor="text-white"
-        image="/hand.jpg"
-        imageAlt="New arrivals collection"
         imageObjectFit="cover"
       />
       <MinimalRightContact
