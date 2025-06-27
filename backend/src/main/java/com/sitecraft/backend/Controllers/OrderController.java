@@ -127,7 +127,7 @@ public class OrderController {
             orderService.createOrder(customerId, addressId, storeId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Order canceled successfully"
+                    "message", "Order created successfully"
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
