@@ -1,0 +1,36 @@
+{
+    "template": "FeaturedGridCategoryTemplate",
+    "backgroundColor": "bg-white",
+    "textColor": "text-black",
+    "categories": [
+        {
+            "id": "category1",
+            "title": "Category 1",
+            "image": "/category1.jpg",
+            "imageAlt": "Category 1 Image",
+            "link": "/category1"
+        }
+    ],
+    "showCategoryTitle": "true",
+    "borderRadius": "rounded-lg",
+    "fontFamily": "font-sans",
+    "hoverEffect": true,
+    "cardVariant": "featured",
+    "showSubtitle": true,
+    "cornerRadius": "medium",
+    "cardShadow": "shadow-lg",
+    "accentColor": "bg-blue-500",
+    "borderColor": "border-blue-500",
+    "title": "Featured Categories",
+    "showTitle": true,
+    "titleFont": "font-serif",
+    "titleColor": "text-blue-500",
+    "titleFontSize": "text-lg",
+    "showCta": true,
+    "ctaText": "Shop Now",
+    "overlayColor": "bg-black/30",
+    "showMoreButton": true,
+    "showMoreText": "Show More",
+    "showMorebuttonBgColor": "bg-black",
+    "showMorebuttonTextColor": "text-white"
+}
