@@ -108,13 +108,13 @@ export function HorizontalScrollCategoryTemplate({
   const imageRatio = imageHeight.includes("h-") ? "portrait" : "square";
 
   return (
-    <div className={cn("w-full px-4 py-8 relative", bgColor, textColor, fontFamily)}>
-      {showTitle && (
-        <div className="flex items-center mb-6">
-          <h2 className={cn("text-2xl font-bold", titleColor, titleFontSize, titleFont)}>{title}</h2>
-        </div>
-      )}
-      <div className="relative">
+      <div className={cn("w-full flex-shrink-0", bgColor)}>
+      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+        {showTitle && (
+          <div className="flex items-center mb-6 justify-center">
+            <h2 className={cn("text-4xl md:text-6xl font-bold text-center", titleColor, titleFontSize, titleFont)}>{title}</h2>
+          </div>
+        )}
         {/* Overlay Arrows */}
         {showControls && (
           <>

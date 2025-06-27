@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils"
 import type { ThemeConfig } from "@/app/product/[slug]/product"
 
 const defaultTheme: ThemeConfig = {
-  backgroundColor: "#F5ECD5",
-  textColor: "#4A102A",
-  accentColor: "#F5ECD5",
-  secondaryColor: "#4A102A",
+  backgroundColor: "white",
+  textColor: "black",
+  accentColor: "black",
+  secondaryColor: "white",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
 }

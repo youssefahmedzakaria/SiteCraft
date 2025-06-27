@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { ProductImageGallery } from "@/components/product/product-image-gallery"
 import { ProductInfo } from "@/components/product/product-info"
-import { ProductReviews } from "@/components/product/product-reviews"
 import { RelatedProducts } from "@/components/product/related-products"
 import { productData, reviewsData, relatedProducts } from "./sample-data"
 import type { ThemeConfig } from "./product"
@@ -16,14 +15,15 @@ import type { CartItem } from "@/contexts/cart-context"
 import type { FavoriteItem } from "@/contexts/favorites-context"
 
 // Theme configuration
-const defaultTheme: ThemeConfig = {
-  backgroundColor: "#F5ECD5",
-  textColor: "#4A102A",
-  accentColor: "#F5ECD5",
-  secondaryColor: "#4A102A",
+const defaultTheme = {
+  backgroundColor: "white",
+  textColor: "black",
+  accentColor: "white",
+  secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
 }
+
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
   const [theme] = useState<ThemeConfig>(defaultTheme)
@@ -214,9 +214,6 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
         {/* Related Products Section */}
         <RelatedProducts products={relatedProducts} theme={theme} />
-
-        {/* Reviews Section */}
-        <ProductReviews reviews={reviewsData} theme={theme} />
       </div>
     </div>
   )
