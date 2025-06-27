@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NewCollectionSlide } from "../slide"
 import type { NewCollectionSlideProps } from "../slide"
 import { cn } from "@/lib/utils"

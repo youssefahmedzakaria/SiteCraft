@@ -3,12 +3,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Star, ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/e-commerce/ui/button"
+import { Card, CardContent } from "@/components/e-commerce/ui/card"
+import { Badge } from "@/components/e-commerce/ui/badge"
 import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/product/[slug]/product"
-import type { RelatedProduct } from "@/app/product/[slug]/product"
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
+import type { RelatedProduct } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
 
 interface RelatedProductsProps {
   products: RelatedProduct[]

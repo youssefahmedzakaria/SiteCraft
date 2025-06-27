@@ -1,12 +1,12 @@
 "use client"
 
 import { Star, ShoppingCart, Heart, Share2, Check, ShoppingBag } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ProductVariants } from "@/components/product/product-variants"
+import { Button } from "@/components/e-commerce/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/e-commerce/ui/tabs"
+import { ProductVariants } from "@/components/e-commerce/product/product-variants"
 import { cn } from "@/lib/utils"
-import type { ThemeConfig, VariantGroup } from "@/app/product/[slug]/product"
-import type { Product, ProductVariant } from "@/app/product/[slug]/product"
+import type { ThemeConfig, VariantGroup } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
+import type { Product, ProductVariant } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
 
 interface ProductInfoProps {
   product: Product

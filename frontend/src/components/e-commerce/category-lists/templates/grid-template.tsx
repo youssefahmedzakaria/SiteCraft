@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/card/card-templates"
+import FlexibleCard from "@/components/e-commerce/card/card-templates"
 
 interface GridCategoryTemplateProps {
   categories: any[]
@@ -79,9 +81,9 @@ export function GridCategoryTemplate({
   )
 
   return (
-    <div className={cn("w-full px-4 py-8", bgColor, textColor, fontFamily)}>
-      {showTitle && titlePosition === "top" && <h2 className={cn("text-2xl font-bold mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
-
+    <div className={cn("w-full flex-shrink-0", bgColor)}>
+      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+        {showTitle && titlePosition === "top" && <h2 className={cn("text-4xl md:text-6xl font-bold text-center mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
       <div className={cn("grid", gridCols, gap)}>
         {categories.map((category) => (
           <FlexibleCard
@@ -125,5 +127,6 @@ export function GridCategoryTemplate({
         </div>
       )}
     </div>
+  </div>
   )
 }

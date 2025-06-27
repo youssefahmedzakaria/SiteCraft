@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { SiteCraftNavbar } from "@/components/SiteCraft/siteCraftNavbar";

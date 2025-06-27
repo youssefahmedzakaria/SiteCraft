@@ -1,10 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { PromoSlide } from "./promo-slide"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/e-commerce/ui/button"
 
 export interface PromoSliderProps {
   slides: {

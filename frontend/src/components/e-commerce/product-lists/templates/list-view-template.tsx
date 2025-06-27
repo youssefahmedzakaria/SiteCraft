@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/card/card-templates"
+import FlexibleCard from "@/components/e-commerce/card/card-templates"
 
 interface ListViewProductTemplateProps {
   products: any[]
@@ -75,11 +77,8 @@ export function ListViewProductTemplate({
   onAddToFavorite,
 }: ListViewProductTemplateProps) {
   return (
-    <div className={cn("w-full px-4 py-8", bgColor, textColor, fontFamily)}>
-      {showTitle && (
-        <h2 className={cn("text-2xl font-bold mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>
-      )}
-
+      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+        {showTitle && <h2 className={cn("text-4xl md:text-4xl font-bold text-center pb-4 mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
       <div className={cn("flex flex-col", gap)}>
         {products.map((product) => (
           <FlexibleCard

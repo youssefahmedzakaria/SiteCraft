@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/product/[slug]/product"
-import type { VariantGroup } from "@/app/product/[slug]/product"
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
+import type { VariantGroup } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
 import Image from "next/image"
 
 interface ProductVariantsProps {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 

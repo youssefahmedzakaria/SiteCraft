@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/product/[slug]/product"
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[slug]/product"
 
 interface ProductImageGalleryProps {
   images: string[]

@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Image from "next/image"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/card/card-templates"
+import FlexibleCard from "@/components/e-commerce/card/card-templates"
 interface FeaturedGridCategoryTemplateProps {
   categories: any[]
   bgColor?: string
@@ -71,9 +73,11 @@ export default function FeaturedGridCategoryTemplate({
     : "bg-gradient-to-t from-black/60 to-transparent"
 
   return (
-    <div className={cn("w-full px-4 py-8", bgColor, textColor, fontFamily)}>
-      {showTitle && <h2 className="text-2xl font-bold mb-6">Shop Our Collections</h2>}
-
+    <div className={cn("w-full flex-shrink-0", bgColor)}>
+      <div className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
+        {showTitle && (
+          <h2 className={cn("text-4xl md:text-4xl font-bold text-center mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>
+        )}
       <div className={cn("grid grid-cols-1 md:grid-cols-3 w-full", gap)}>
         {/* Featured large category */}
         {featuredCategory && (
@@ -143,6 +147,7 @@ export default function FeaturedGridCategoryTemplate({
         </Link>
       </div>
       )}
+    </div>
     </div>
   )
 }
