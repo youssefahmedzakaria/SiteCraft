@@ -18,8 +18,6 @@ public class Store {
 
     private String logo;
 
-    private String subdomain;
-
     private String description;
 
     private String phoneNumber;
@@ -46,17 +44,18 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
+    @Column(name = "subdomain", unique = true)
+    private String subdomain;
 
     // Constructors
     public Store() {
     }
 
-    public Store(Long id, String storeName, String storeType, String logo, String subdomain, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
+    public Store(Long id, String storeName, String storeType, String logo, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
         this.id = id;
         this.storeName = storeName;
         this.storeType = storeType;
         this.logo = logo;
-        this.subdomain = subdomain;
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
@@ -108,8 +107,8 @@ public class Store {
         return subdomain;
     }
 
-    public void setSubdomain(String webAddress) {
-        this.subdomain = webAddress;
+    public void setSubdomain(String subdomain) {
+        this.subdomain = subdomain;
     }
 
     public String getDescription() {
