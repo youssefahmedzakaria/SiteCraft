@@ -134,7 +134,7 @@ export function ListViewCategoryTemplate({
               fontFamily={fontFamily}
               cardShadow={cardShadow}
               hoverEffect={hoverEffect}
-              linkPath={`/list?cat=${category.id}`}
+              linkPath={`/e-commerce/${subdomain}/products`}
             />
           ))}
         </div>
@@ -160,7 +160,7 @@ export function ListViewCategoryTemplate({
       <div className={gap}>
         {categories.map((category) => (
           <Link
-            href={`/list?cat=${category.id}`}
+            href={`/e-commerce/${subdomain}/products`}
             className={cn(
               "flex items-center gap-4 p-4 border",
               borderColor,

@@ -99,7 +99,7 @@ export default function FeaturedGridCategoryTemplate({
           {/* Featured large category */}
           {featuredCategory && (
             <Link
-              href={`/list?cat=${featuredCategory.id}`}
+              href={`/e-commerce/${subdomain}/products`}
               className="md:col-span-2 md:row-span-2 group w-full"
               key={featuredCategory._id}
             >
@@ -147,7 +147,7 @@ export default function FeaturedGridCategoryTemplate({
           {/* All remaining categories */}
           {remainingCategories.map((category) => (
             <Link
-              href={`/list?cat=${category.id}`}
+              href={`/e-commerce/${subdomain}/products`}
               className="group w-full"
               key={category.id}
             >
