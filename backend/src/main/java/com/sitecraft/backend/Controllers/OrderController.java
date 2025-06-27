@@ -113,4 +113,27 @@ public class OrderController {
             ));
         }
     }
+
+    @PostMapping("/create/{addressId}")
+    public ResponseEntity<?> createOrder(HttpSession session, @PathVariable("addressId") Long addressId) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+
+            orderService.createOrder(customerId, addressId, storeId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Order created successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }

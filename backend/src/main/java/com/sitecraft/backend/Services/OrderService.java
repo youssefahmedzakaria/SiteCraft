@@ -6,31 +6,37 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class OrderService {
-
     @Autowired
     private OrderRepo orderRepo;
-
     @Autowired
     private StoreRepo storeRepo;
-
     @Autowired
     private ShippingRepo shippingRepo;
-
     @Autowired
     private ProductVariantsRepo productVariantsRepo;
-
     @Autowired
     private OrderProductRepo orderProductRepo;
+    @Autowired
+    private AddressRepo addressRepo;
+    @Autowired
+    private PaymentLogRepo paymentLogRepo;
+    @Autowired
+    private ShippingInfoRepo shippingInfoRepo;
+    @Autowired
+    private CartService cartService;
+
 
     public List<Order> getAllOrders(Long storeId) {
         Store existingStore = storeRepo.findById(storeId)
-            .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new RuntimeException("Store not found"));
 
         return orderRepo.findByStoreId(existingStore.getId());
     }
@@ -63,7 +69,7 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    //--------------------------------------------------------------------------------------------------
+    //----------------------------------------Cancel Order------------------------------------
 
     @Transactional
     public void cancelOrder(Long orderId) {
@@ -116,4 +122,81 @@ public class OrderService {
         return order.getCustomer().getId();
     }
 
+    // -------------------------------------Create Order-------------------------------------------
+
+    public void createOrder(Long customerId, Long addressId, Long storeId) {
+        try {
+            // 1. Get Customer Data
+            Customer customer = new Customer();
+            customer.setId(customerId);
+
+            // 2. Get Store Data
+            Store store = new Store();
+            store.setId(storeId);
+
+            // 3. Create Empty Order
+            Order order = new Order();
+            order.setStatus("Pending");
+            order.setStore(store);
+            order.setCustomer(customer);
+
+            orderRepo.save(order);
+
+            // 4. Get Cart
+            ShoppingCart cart = cartService.getCartByCustomerId(customerId);
+
+            // 5. Create Order Products
+            List<OrderProduct> orderProducts = new ArrayList<>();
+            for(CartProduct cartProduct : cart.getCartProducts()) {
+                OrderProduct orderProduct = new OrderProduct();
+                orderProduct.setOrder(order);
+                orderProduct.setProduct(cartProduct.getProduct());
+                orderProduct.setSku(cartProduct.getSku());
+
+                // Quantity Validations
+                ProductVariants variant = productVariantsRepo.findAll().stream().filter(v -> v.getSku().equals(cartProduct.getSku())).findFirst().orElseThrow(() -> new RuntimeException("Product variant not found."));;
+                if (variant.getStock() < cartProduct.getQuantity()) {
+                    throw new RuntimeException("Product stock is low.");
+                }
+
+                orderProduct.setQuantity(cartProduct.getQuantity());
+                orderProduct.setPrice(variant.getPrice().doubleValue());
+                orderProducts.add(orderProduct);
+            }
+            orderProductRepo.saveAll(orderProducts);
+
+            // 6. Create Shipping Data
+            Address address = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+            ShippingInfo shippingInfo = shippingInfoRepo.findByStoreIdAndGovernmentName(storeId, address.getCity());
+            if (shippingInfo == null) {
+                throw new RuntimeException("Shipping info to this city not found.");
+            }
+            Shipping shipping = new Shipping();
+            shipping.setAddress(address);
+            shipping.setCost(shippingInfo.getShippingPrice().doubleValue());
+            shipping.setStatus("Pending");
+            shipping.setShippingDate(null);
+            shippingRepo.save(shipping);
+
+            // 7. Process Payment
+//            TODO
+//            PaymentLog paymentLog = new PaymentLog();
+//            paymentLog.setTransactionId(paymentId);
+//            paymentLogRepo.save(paymentLog);
+
+            // 8. Add Order Data
+            order.setPrice(cart.getTotalPrice().doubleValue());
+            order.setIssueDate(LocalDateTime.now());
+//            order.setPaymentLog(paymentLog);
+            order.setShipping(shipping);
+            order.setOrderProducts(orderProducts);
+
+            // 9. Save Order and Clear Shopping cart
+            orderRepo.save(order);
+            cartService.clearCart(customerId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
+        }
+    }
 }

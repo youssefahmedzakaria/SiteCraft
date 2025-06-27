@@ -6,10 +6,22 @@ import { Heart, ShoppingCart, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useFavorites } from "@/contexts/favorites-context"
 import { useCart } from "@/contexts/cart-context"
+import { cn } from "@/lib/utils"
+import type { ThemeConfig } from "@/app/product/[slug]/product"
+
+const defaultTheme: ThemeConfig = {
+  backgroundColor: "#F5ECD5",
+  textColor: "#4A102A",
+  accentColor: "#F5ECD5",
+  secondaryColor: "#4A102A",
+  borderRadius: "rounded-lg",
+  fontFamily: "font-sans",
+}
 
 export default function FavoritesPage() {
   const { state, removeFromFavorites } = useFavorites()
   const { addToCart } = useCart()
+  const theme = defaultTheme;
 
   const handleAddToCart = (item: any) => {
     addToCart({
@@ -23,13 +35,13 @@ export default function FavoritesPage() {
 
   if (state.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8 pt-20 mt-20">
+      <div className={cn("min-h-screen pt-20 px-8", theme.fontFamily)} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
         <div className="text-center py-16">
-          <Heart className="w-24 h-24 mx-auto text-gray-300 mb-6" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Your favorites list is empty</h1>
-          <p className="text-gray-600 mb-8">Save items you love to easily find them later.</p>
+          <Heart className="w-24 h-24 mx-auto mb-6" style={{ color: theme.secondaryColor }} />
+          <h1 className="text-3xl font-bold mb-4" style={{ color: theme.textColor }}>Your favorites list is empty</h1>
+          <p className="mb-8" style={{ color: theme.secondaryColor }}>Save items you love to easily find them later.</p>
           <Link href="/products">
-            <Button size="lg">Browse Products</Button>
+            <Button size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>Browse Products</Button>
           </Link>
         </div>
       </div>
@@ -37,17 +49,18 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-20">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Favorites</h1>
-        <p className="text-gray-600">{state.items.length} items</p>
+    <div className={cn("min-h-screen pt-20 px-8", theme.fontFamily)} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
+      <div className="flex justify-between items-center pt-8 mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: theme.textColor }}>My Favorites</h1>
+        <p style={{ color: theme.secondaryColor }}>{state.items.length} items</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {state.items.map((item) => (
           <div
             key={item.id}
-            className="group relative bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+            className={cn("group relative border overflow-hidden hover:shadow-lg transition-shadow", theme.borderRadius)}
+            style={{ backgroundColor: theme.accentColor, borderColor: theme.secondaryColor }}
           >
             <div className="relative aspect-square bg-gray-100">
               <Image
@@ -58,20 +71,21 @@ export default function FavoritesPage() {
               />
               <button
                 onClick={() => removeFromFavorites(item.id)}
-                className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
+                className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md transition-colors"
+                style={{ color: theme.secondaryColor }}
               >
-                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                <Heart className="w-4 h-4" style={{ stroke: theme.secondaryColor, fill: theme.secondaryColor, strokeWidth: 2 }} />
               </button>
             </div>
 
             <div className="p-4">
               <Link href={`/product/${item.slug}`}>
-                <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors">{item.name}</h3>
+                <h3 className="font-medium hover:underline" style={{ color: theme.textColor }}>{item.name}</h3>
               </Link>
-              <p className="text-lg font-semibold text-gray-900 mt-2">${item.price}</p>
+              <p className="text-lg font-semibold mt-2" style={{ color: theme.textColor }}>${item.price}</p>
 
               <div className="flex gap-2 mt-4">
-                <Button onClick={() => handleAddToCart(item)} className="flex-1" size="sm">
+                <Button onClick={() => handleAddToCart(item)} className="flex-1" size="sm" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>
@@ -79,7 +93,7 @@ export default function FavoritesPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => removeFromFavorites(item.id)}
-                  className="text-red-500 hover:text-red-700"
+                  style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -91,7 +105,7 @@ export default function FavoritesPage() {
 
       <div className="mt-12 text-center">
         <Link href="/products">
-          <Button variant="outline" size="lg">
+          <Button variant="outline" size="lg" style={{ backgroundColor: theme.secondaryColor, color: theme.backgroundColor }}>
             Continue Shopping
           </Button>
         </Link>
