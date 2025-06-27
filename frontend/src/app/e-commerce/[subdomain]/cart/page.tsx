@@ -10,6 +10,7 @@ import { Input } from "@/components/e-commerce/ui/input";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { usePathname } from "next/navigation";
 
 const defaultTheme: ThemeConfig = {
   backgroundColor: "bg-white",
@@ -21,6 +22,10 @@ const defaultTheme: ThemeConfig = {
 };
 
 export default function CartPage() {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const { state, updateQuantity, removeFromCart, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -68,7 +73,7 @@ export default function CartPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Looks like you have not added any items to your cart yet.
           </p>
-          <Link href="/e-commerce/TODO/products">
+          <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
@@ -291,7 +296,10 @@ export default function CartPage() {
               )}
             </div>
 
-            <Link href="/e-commerce/TODO/checkout" className="block mt-6">
+            <Link
+              href={`/e-commerce/${subdomain}/checkout`}
+              className="block mt-6"
+            >
               <Button
                 className="w-full"
                 size="lg"

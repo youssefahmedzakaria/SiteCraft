@@ -9,6 +9,7 @@ import { Badge } from "@/components/e-commerce/ui/badge";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import type { RelatedProduct } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { usePathname } from "next/navigation";
 
 interface RelatedProductsProps {
   products: RelatedProduct[];
@@ -16,6 +17,10 @@ interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ products, theme }: RelatedProductsProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   return (
     <section className="mt-20">
       <h2 className="text-2xl font-bold mb-8">Related Products</h2>
@@ -43,7 +48,7 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
                 <Link
-                  href={`/e-commerce/TODO/product/${product.id}`}
+                  href={`/e-commerce/${subdomain}/product/${product.id}`}
                   className="font-medium hover:underline line-clamp-2 flex-1"
                 >
                   {product.name}

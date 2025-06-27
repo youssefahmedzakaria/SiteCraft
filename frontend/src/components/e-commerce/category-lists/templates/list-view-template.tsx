@@ -1,41 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/e-commerce/card/card-templates"
-import Image from "next/image"
-import Link from "next/link"
+"use client";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import FlexibleCard from "@/components/e-commerce/card/card-templates";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 interface ListViewCategoryTemplateProps {
-  categories: any[]
-  bgColor?: string
-  textColor?: string
-  accentColor?: string
-  borderColor?: string
-  borderRadius?: string
-  showTitle?: boolean
-  showDescription?: boolean
-  showIcon?: boolean
-  gap?: string
-  fontFamily?: string
-  hoverEffect?: boolean
+  categories: any[];
+  bgColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderColor?: string;
+  borderRadius?: string;
+  showTitle?: boolean;
+  showDescription?: boolean;
+  showIcon?: boolean;
+  gap?: string;
+  fontFamily?: string;
+  hoverEffect?: boolean;
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showCardTitle?: boolean
-  showSubtitle?: boolean
-  showCta?: boolean
-  ctaText?: string
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  cardShadow?: string
-  overlayColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
-  imageFit?: "cover" | "contain" | "fill" 
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showCardTitle?: boolean;
+  showSubtitle?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  cardShadow?: string;
+  overlayColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
+  imageFit?: "cover" | "contain" | "fill";
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export function ListViewCategoryTemplate({
@@ -52,7 +60,7 @@ export function ListViewCategoryTemplate({
   fontFamily = "",
   hoverEffect = true,
   // Card related props - using these for custom look or falling back to standard list view
-  cardVariant = "default", 
+  cardVariant = "default",
   showCardTitle = true,
   showSubtitle = false,
   showCta = false,
@@ -70,17 +78,41 @@ export function ListViewCategoryTemplate({
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
 }: ListViewCategoryTemplateProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+  
   // Generate accent color for icon
-  const iconColorClass = accentColor.startsWith("text-") ? accentColor : "text-gray-400"
+  const iconColorClass = accentColor.startsWith("text-")
+    ? accentColor
+    : "text-gray-400";
 
   // If cardVariant is set to anything other than default, we'll use the FlexibleCard component
   const useCardComponent = cardVariant !== "default";
 
   if (useCardComponent) {
     return (
-      <div className={cn("w-full mx-auto px-4 py-8", bgColor, textColor, fontFamily)}>
-        {showTitle && <h2 className={cn("text-2xl font-bold mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
-        
+      <div
+        className={cn(
+          "w-full mx-auto px-4 py-8",
+          bgColor,
+          textColor,
+          fontFamily
+        )}
+      >
+        {showTitle && (
+          <h2
+            className={cn(
+              "text-2xl font-bold mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
+            )}
+          >
+            {title}
+          </h2>
+        )}
+
         <div className={gap}>
           {categories.map((category) => (
             <FlexibleCard
@@ -103,7 +135,6 @@ export function ListViewCategoryTemplate({
               cardShadow={cardShadow}
               hoverEffect={hoverEffect}
               linkPath={`/list?cat=${category.id}`}
-
             />
           ))}
         </div>
@@ -166,7 +197,7 @@ export function ListViewCategoryTemplate({
       {showMoreButton && categories.length > 0 && (
         <div className="flex justify-end mt-6">
           <Link
-            href="/e-commerce/TODO/categories"
+            href={`/e-commerce/${subdomain}/categories`}
             className={cn(
               "inline-flex items-center px-6 py-2",
               "hover:bg-opacity-80 transition-colors duration-300",

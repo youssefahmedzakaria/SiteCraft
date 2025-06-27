@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
@@ -11,8 +13,12 @@ import { RightAlignedAbout, CenteredAbout, LeftAlignedAbout,TopImageAbout } from
 import { GridCategoryTemplate, FeaturedGridCategoryTemplate, HorizontalScrollCategoryTemplate, ListViewCategoryTemplate } from "@/components/e-commerce/category-lists";
 import {GridProductTemplate,HorizontalScrollProductTemplate,ListViewProductTemplate,FeaturedGridProductTemplate} from "@/components/e-commerce/product-lists";
 import { ProductList } from "@/components/e-commerce/product-lists";
+import { usePathname } from "next/navigation";
 
 export default function Home() {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
   return (
     <div className="min-h-screen flex flex-col">
       <CenteredPromo
@@ -195,7 +201,6 @@ export default function Home() {
         showMorebuttonBgColor="bg-black"
         showMorebuttonTextColor="text-white"
       />
-
       <FeaturedGridCategoryTemplate
         categories={[
           {
@@ -297,7 +302,7 @@ export default function Home() {
         backgroundColor="bg-white"
         title="New Collection"
         buttonText="View Collection"
-        buttonLink="/e-commerce/TODO/products"
+        buttonLink={`/e-commerce/${subdomain}/products`}
         buttonColor="bg-white"
         titleColor="text-white"
         image="/hand.jpg"

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
-import Link from 'next/link';
-import { Logo } from '../navbar-components/logo';
-import { Navigation } from '../navbar-components/navigation';
-import { SearchBar } from '../navbar-components/search-bar';
-import MobileMenu from '../navbar-components/mobile-menu';
+"use client";
+import React, { useState } from "react";
+import { Menu } from "lucide-react";
+import Link from "next/link";
+import { Logo } from "../navbar-components/logo";
+import { Navigation } from "../navbar-components/navigation";
+import { SearchBar } from "../navbar-components/search-bar";
+import MobileMenu from "../navbar-components/mobile-menu";
+import { usePathname } from "next/navigation";
 
 export interface NavbarTemplate6Props {
   brandName?: string | React.ReactNode;
@@ -32,16 +34,20 @@ export interface NavbarTemplate6Props {
 
 export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
   brandName,
-  backgroundColor = 'bg-white',
-  textColor = 'text-black',
-  fontFamily = 'font-sans',
+  backgroundColor = "bg-white",
+  textColor = "text-black",
+  fontFamily = "font-sans",
   logo,
   menuItems = [],
   MobileMenuItems = [],
-  iconColor = 'text-black',
-  dividerColor = 'border-gray-200',
-  searchIconColor = 'text-gray-400',
+  iconColor = "text-black",
+  dividerColor = "border-gray-200",
+  searchIconColor = "text-gray-400",
 }) => {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -83,19 +89,19 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
 
               <div className="flex items-center space-x-6">
                 <Link
-                  href="/e-commerce/TODO/profile"
+                  href={`/e-commerce/${subdomain}/profile`}
                   className={`text-sm hover:underline transition-all ${textColor}`}
                 >
                   Profile
                 </Link>
                 <Link
-                  href="/e-commerce/TODO/cart"
+                  href={`/e-commerce/${subdomain}/cart`}
                   className={`text-sm hover:underline transition-all ${textColor}`}
                 >
                   Shopping Cart
                 </Link>
                 <Link
-                  href="/e-commerce/TODO/favorites"
+                  href={`/e-commerce/${subdomain}/favorites`}
                   className={`text-sm hover:underline transition-all ${textColor}`}
                 >
                   Favorites

@@ -1,44 +1,53 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/e-commerce/card/card-templates"
+"use client";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import FlexibleCard from "@/components/e-commerce/card/card-templates";
+import { usePathname } from "next/navigation";
 
 interface GridCategoryTemplateProps {
-  categories: any[]
+  categories: any[];
   columns?: {
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-  gap?: string
-  bgColor?: string
-  textColor?: string
-  borderRadius?: string
-  showTitle?: boolean
-  titlePosition?: "top" | "bottom" | "overlay"
-  imageHeight?: string
-  fontFamily?: string
-  hoverEffect?: boolean
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showCardTitle?: boolean
-  showSubtitle?: boolean
-  showCta?: boolean
-  ctaText?: string
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  cardShadow?: string
-  accentColor?: string
-  borderColor?: string
-  overlayColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: string;
+  bgColor?: string;
+  textColor?: string;
+  borderRadius?: string;
+  showTitle?: boolean;
+  titlePosition?: "top" | "bottom" | "overlay";
+  imageHeight?: string;
+  fontFamily?: string;
+  hoverEffect?: boolean;
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showCardTitle?: boolean;
+  showSubtitle?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  cardShadow?: string;
+  accentColor?: string;
+  borderColor?: string;
+  overlayColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export function GridCategoryTemplate({
@@ -72,13 +81,17 @@ export function GridCategoryTemplate({
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
 }: GridCategoryTemplateProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   // Generate dynamic grid classes based on columns prop
   const gridCols = cn(
     `grid-cols-${columns.sm || 2}`,
     columns.md && `md:grid-cols-${columns.md}`,
     columns.lg && `lg:grid-cols-${columns.lg}`,
-    columns.xl && `xl:grid-cols-${columns.xl}`,
-  )
+    columns.xl && `xl:grid-cols-${columns.xl}`
+  );
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
@@ -132,7 +145,7 @@ export function GridCategoryTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href="/e-commerce/TODO/categories"
+              href={`/e-commerce/${subdomain}/categories`}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

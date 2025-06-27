@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
-import { ProductImageGallery } from "@/components/e-commerce/product/product-image-gallery"
-import { ProductInfo } from "@/components/e-commerce/product/product-info"
-import { RelatedProducts } from "@/components/e-commerce/product/related-products"
-import { productData, reviewsData, relatedProducts } from "./sample-data"
-import type { ThemeConfig } from "./product"
-import { useCart } from "@/contexts/cart-context"
-import { useFavorites } from "@/contexts/favorites-context"
-import { useRouter } from "next/navigation"
-import type { Product } from "./product"
-import type { CartItem } from "@/contexts/cart-context"
-import type { FavoriteItem } from "@/contexts/favorites-context"
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { ProductImageGallery } from "@/components/e-commerce/product/product-image-gallery";
+import { ProductInfo } from "@/components/e-commerce/product/product-info";
+import { RelatedProducts } from "@/components/e-commerce/product/related-products";
+import { productData, reviewsData, relatedProducts } from "./sample-data";
+import type { ThemeConfig } from "./product";
+import { useCart } from "@/contexts/cart-context";
+import { useFavorites } from "@/contexts/favorites-context";
+import { usePathname, useRouter } from "next/navigation";
+import type { Product } from "./product";
+import type { CartItem } from "@/contexts/cart-context";
+import type { FavoriteItem } from "@/contexts/favorites-context";
 
 // Theme configuration
 const defaultTheme = {
@@ -23,76 +23,95 @@ const defaultTheme = {
   secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
-}
-
+};
 
 export default function ProductPage({ params }: { params: { id: string } }) {
-  const [theme] = useState<ThemeConfig>(defaultTheme)
-  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
-  const [quantity, setQuantity] = useState(1)
-  const [currentImages, setCurrentImages] = useState<string[]>(productData.defaultImages)
-  const [currentPrice, setCurrentPrice] = useState(productData.basePrice)
-  
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
+  const [theme] = useState<ThemeConfig>(defaultTheme);
+  const [selectedVariants, setSelectedVariants] = useState<
+    Record<string, string>
+  >({});
+  const [quantity, setQuantity] = useState(1);
+  const [currentImages, setCurrentImages] = useState<string[]>(
+    productData.defaultImages
+  );
+  const [currentPrice, setCurrentPrice] = useState(productData.basePrice);
+
   // Action states
-  const [isInCart, setIsInCart] = useState(false)
-  const [isInFavorites, setIsInFavorites] = useState(false)
-  const [justAddedToCart, setJustAddedToCart] = useState(false)
-  const [justAddedToFavorites, setJustAddedToFavorites] = useState(false)
-  const [shareClicked, setShareClicked] = useState(false)
-  
+  const [isInCart, setIsInCart] = useState(false);
+  const [isInFavorites, setIsInFavorites] = useState(false);
+  const [justAddedToCart, setJustAddedToCart] = useState(false);
+  const [justAddedToFavorites, setJustAddedToFavorites] = useState(false);
+  const [shareClicked, setShareClicked] = useState(false);
+
   const { addToCart, state: cartState } = useCart();
-  const { addToFavorites, removeFromFavorites, state: favoritesState } = useFavorites();
+  const {
+    addToFavorites,
+    removeFromFavorites,
+    state: favoritesState,
+  } = useFavorites();
   const router = useRouter();
 
   // Initialize default selections
   useEffect(() => {
-    const defaultSelections: Record<string, string> = {}
+    const defaultSelections: Record<string, string> = {};
     productData.variantGroups.forEach((group) => {
       if (group.required && group.options.length > 0) {
-        defaultSelections[group.id] = group.options[0].id
+        defaultSelections[group.id] = group.options[0].id;
       }
-    })
-    setSelectedVariants(defaultSelections)
-  }, [])
+    });
+    setSelectedVariants(defaultSelections);
+  }, []);
 
   // Check if product is already in cart or favorites
   useEffect(() => {
-    const inCart = cartState.items.some((item: CartItem) => item.id === productData.id)
-    const inFavorites = favoritesState.items.some((item: FavoriteItem) => item.id === productData.id)
-    setIsInCart(inCart)
-    setIsInFavorites(inFavorites)
-  }, [cartState.items, favoritesState.items])
+    const inCart = cartState.items.some(
+      (item: CartItem) => item.id === productData.id
+    );
+    const inFavorites = favoritesState.items.some(
+      (item: FavoriteItem) => item.id === productData.id
+    );
+    setIsInCart(inCart);
+    setIsInFavorites(inFavorites);
+  }, [cartState.items, favoritesState.items]);
 
   // Calculate price based on selected variants
   useEffect(() => {
-    let price = productData.basePrice
+    let price = productData.basePrice;
     Object.entries(selectedVariants).forEach(([groupId, optionId]) => {
-      const group = productData.variantGroups.find((g) => g.id === groupId)
-      const option = group?.options.find((o) => o.id === optionId)
+      const group = productData.variantGroups.find((g) => g.id === groupId);
+      const option = group?.options.find((o) => o.id === optionId);
       if (option?.metadata?.priceAdjustment) {
-        price += option.metadata.priceAdjustment
+        price += option.metadata.priceAdjustment;
       }
-    })
-    setCurrentPrice(price)
-  }, [selectedVariants])
+    });
+    setCurrentPrice(price);
+  }, [selectedVariants]);
 
   // Handle variant change
-  const handleVariantChange = (groupId: string, optionId: string, productImages?: string[]) => {
+  const handleVariantChange = (
+    groupId: string,
+    optionId: string,
+    productImages?: string[]
+  ) => {
     setSelectedVariants((prev) => ({
       ...prev,
       [groupId]: optionId,
-    }))
+    }));
 
     // Update images if this variant changes them
     if (productImages) {
-      setCurrentImages(productImages)
+      setCurrentImages(productImages);
     }
-  }
+  };
 
   // Handle add to cart
   const handleAddToCart = () => {
     if (isInCart) {
-      router.push("/e-commerce/TODO/cart");
+      router.push(`/e-commerce/${subdomain}/cart`);
       return;
     }
     addToCart({
@@ -149,21 +168,21 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         // Fallback to clipboard
         await navigator.clipboard.writeText(url);
         // You could also open a share dialog here
-        alert('Product link copied to clipboard!');
+        alert("Product link copied to clipboard!");
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.error("Error sharing:", error);
       // Fallback to clipboard
       try {
         await navigator.clipboard.writeText(url);
-        alert('Product link copied to clipboard!');
+        alert("Product link copied to clipboard!");
       } catch (clipboardError) {
-        console.error('Clipboard error:', clipboardError);
+        console.error("Clipboard error:", clipboardError);
         // Final fallback - just show the URL
-        prompt('Copy this link to share:', url);
+        prompt("Copy this link to share:", url);
       }
     }
-    
+
     // Reset share state after 1 second
     setTimeout(() => {
       setShareClicked(false);
@@ -175,7 +194,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     price: currentPrice,
     compareAtPrice: productData.compareAtPrice,
     inStock: true,
-  }
+  };
 
   return (
     <div
@@ -186,7 +205,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         {/* Product Main Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Product Images */}
-          <ProductImageGallery images={currentImages} productName={productData.name} theme={theme} />
+          <ProductImageGallery
+            images={currentImages}
+            productName={productData.name}
+            theme={theme}
+          />
 
           {/* Product Info with Variants positioned under price */}
           <div className="space-y-8">
@@ -215,5 +238,5 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <RelatedProducts products={relatedProducts} theme={theme} />
       </div>
     </div>
-  )
+  );
 }

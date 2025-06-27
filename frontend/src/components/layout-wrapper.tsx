@@ -8,6 +8,9 @@ import { Footer } from "./e-commerce/footer/Footer";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const pathSegments = pathname.split("/");
+  const subdomain = pathSegments[2];
+
   const isAuthPage =
     pathname?.includes("/login") ||
     pathname?.includes("/signup") ||
@@ -34,10 +37,10 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             height: 50,
           }}
           menuItems={[
-            { label: "Home", href: "/e-commerce/TODO" },
-            { label: "Products", href: "/e-commerce/TODO/products" },
-            { label: "About Us", href: "/e-commerce/TODO/#about" },
-            { label: "Contact Us", href: "/e-commerce/TODO/#contact" },
+            { label: "Home", href: `/e-commerce/${subdomain}` },
+            { label: "Products", href: `/e-commerce/${subdomain}/products` },
+            { label: "About Us", href: `/e-commerce/${subdomain}/#about` },
+            { label: "Contact Us", href: `/e-commerce/${subdomain}/#contact` },
           ]}
           iconColor="text-white"
           dividerColor="border-gray-200"
@@ -61,14 +64,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           aboutLinks={[
             {
               label: "Policies",
-              href: "/e-commerce/TODO/#policies",
+              href: `/e-commerce/${subdomain}/#policies`,
               font: "font-serif",
               fontSize: "text-lg",
               fontColor: "text-black",
             },
             {
               label: "About Us",
-              href: "/e-commerce/TODO/#about",
+              href: `/e-commerce/${subdomain}/#about`,
               font: "font-serif",
               fontSize: "text-lg",
               fontColor: "text-black",

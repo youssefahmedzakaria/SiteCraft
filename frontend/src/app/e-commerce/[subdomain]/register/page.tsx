@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, type FormEvent } from "react"
-import { Eye, EyeOff } from "lucide-react"
+import type React from "react";
+import { useState, type FormEvent } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/e-commerce/ui/button";
 import { Input } from "@/components/e-commerce/ui/input";
 import { Label } from "@/components/e-commerce/ui/label";
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -17,18 +17,22 @@ const defaultTheme = {
   secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
-}
+};
 
 interface FormData {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  password: string
-  confirmPassword: string
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export default function RegisterPage() {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -36,53 +40,59 @@ export default function RegisterPage() {
     phone: "",
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const router = useRouter()
+  });
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Validation
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      setError("Please fill in all required fields")
-      setIsLoading(false)
-      return
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setError("Please fill in all required fields");
+      setIsLoading(false);
+      return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long")
-      setIsLoading(false)
-      return
+      setError("Password must be at least 6 characters long");
+      setIsLoading(false);
+      return;
     }
 
     // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Mock registration success
-    localStorage.setItem("token", "mock-token-" + Date.now())
-    router.push("/e-commerce/TODO/profile")
+    localStorage.setItem("token", "mock-token-" + Date.now());
+    router.push(`/e-commerce/${subdomain}/profile`);
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <div
@@ -282,7 +292,7 @@ export default function RegisterPage() {
             >
               Already have an account?{" "}
               <Link
-                href="/e-commerce/TODO/login"
+                href={`/e-commerce/${subdomain}/login`}
                 className="font-medium hover:underline"
                 style={{ color: defaultTheme.textColor }}
               >

@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import FlexibleCard from "@/components/e-commerce/card/card-templates"
+import { usePathname } from "next/navigation"
 
 interface GridProductTemplateProps {
   products: any[]
@@ -83,6 +84,10 @@ export function GridProductTemplate({
   onAddToCart,
   onAddToFavorite,
 }: GridProductTemplateProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+  
   // Generate dynamic grid classes based on columns prop
   const gridCols = cn(
     `grid-cols-${columns.sm || 2}`,
@@ -133,7 +138,7 @@ export function GridProductTemplate({
               onAddToFavorite={
                 onAddToFavorite ? () => onAddToFavorite(product) : undefined
               }
-              linkPath={`/e-commerce/TODO/product/${product.id}`}
+              linkPath={`/e-commerce/${subdomain}/product/${product.id}`}
             />
           ))}
         </div>
@@ -141,7 +146,7 @@ export function GridProductTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href="/e-commerce/TODO/products"
+              href={`/e-commerce/${subdomain}/products`}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

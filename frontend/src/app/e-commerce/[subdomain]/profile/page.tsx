@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import { User, Package, Settings, MapPin, Bell, LogOut } from "lucide-react"
-import { Button } from "@/components/e-commerce/ui/button"
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { User, Package, Settings, MapPin, Bell, LogOut } from "lucide-react";
+import { Button } from "@/components/e-commerce/ui/button";
 import { Input } from "@/components/e-commerce/ui/input";
 import { Label } from "@/components/e-commerce/ui/label";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/e-commerce/ui/tabs";
 import { Separator } from "@/components/e-commerce/ui/separator";
 import { Switch } from "@/components/e-commerce/ui/switch";
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -24,53 +24,57 @@ const defaultTheme = {
   secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
-}
+};
 
 interface UserData {
-  id: number
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  avatar: string
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  avatar: string;
 }
 
 interface Order {
-  id: string
-  date: string
-  status: string
-  total: number
+  id: string;
+  date: string;
+  status: string;
+  total: number;
   items: Array<{
-    name: string
-    quantity: number
-    price: number
-  }>
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
 }
 
 interface Address {
-  id: string
-  type: string
-  street: string
-  city: string
-  state: string
-  zipCode: string
-  country: string
-  isDefault: boolean
+  id: string;
+  type: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  isDefault: boolean;
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserData | null>(null)
-  const [activeTab, setActiveTab] = useState<string>("profile")
-  const [profileData, setProfileData] = useState<UserData | null>(null)
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
+  const [user, setUser] = useState<UserData | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("profile");
+  const [profileData, setProfileData] = useState<UserData | null>(null);
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
     promotions: false,
     newsletter: true,
-  })
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  const [showAddAddress, setShowAddAddress] = useState(false)
+  const [showAddAddress, setShowAddAddress] = useState(false);
   const [addresses, setAddresses] = useState<Address[]>([
     {
       id: "1",
@@ -82,7 +86,7 @@ export default function ProfilePage() {
       country: "Egypt",
       isDefault: true,
     },
-  ])
+  ]);
   const [newAddress, setNewAddress] = useState({
     type: "",
     street: "",
@@ -90,9 +94,9 @@ export default function ProfilePage() {
     state: "",
     zipCode: "",
     country: "",
-  })
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
-  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  });
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [editAddress, setEditAddress] = useState({
     type: "",
     street: "",
@@ -100,7 +104,7 @@ export default function ProfilePage() {
     state: "",
     zipCode: "",
     country: "",
-  })
+  });
 
   // Mock orders data
   const mockOrders: Order[] = [
@@ -128,14 +132,14 @@ export default function ProfilePage() {
       total: 149.99,
       items: [{ name: "Silver Bracelet", quantity: 1, price: 149.99 }],
     },
-  ]
+  ];
 
   useEffect(() => {
     // Check if user is authenticated (simplified)
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/e-commerce/TODO/login")
-      return
+      router.push(`/e-commerce/${subdomain}/login`);
+      return;
     }
 
     // Set mock user data directly
@@ -146,56 +150,56 @@ export default function ProfilePage() {
       email: "amnayahia@gmail.com",
       phone: "+201117518970",
       avatar: "/placeholder.svg?height=100&width=100",
-    }
-    setUser(mockUser)
-    setProfileData(mockUser)
-    setIsLoading(false)
-  }, [router])
+    };
+    setUser(mockUser);
+    setProfileData(mockUser);
+    setIsLoading(false);
+  }, [router]);
 
   const handleProfileUpdate = (field: keyof UserData, value: string) => {
-    setProfileData((prev) => (prev ? { ...prev, [field]: value } : null))
-  }
+    setProfileData((prev) => (prev ? { ...prev, [field]: value } : null));
+  };
 
   const handleNotificationChange = (field: string, value: boolean) => {
-    setNotifications((prev) => ({ ...prev, [field]: value }))
-  }
+    setNotifications((prev) => ({ ...prev, [field]: value }));
+  };
 
   const getStatusColor = (status: string): string => {
     switch (status) {
       case "Delivered":
-        return "text-green-600 bg-green-100"
+        return "text-green-600 bg-green-100";
       case "Shipped":
-        return "text-blue-600 bg-blue-100"
+        return "text-blue-600 bg-blue-100";
       case "Processing":
-        return "text-yellow-600 bg-yellow-100"
+        return "text-yellow-600 bg-yellow-100";
       default:
-        return "text-gray-600 bg-gray-100"
+        return "text-gray-600 bg-gray-100";
     }
-  }
+  };
 
   const handleLogout = (): void => {
-    localStorage.removeItem("token")
-    router.push("/e-commerce/TODO/login")
-  }
+    localStorage.removeItem("token");
+    router.push(`/e-commerce/${subdomain}/login`);
+  };
 
   const handleSaveProfile = () => {
-    setUser(profileData)
-    alert("Profile updated successfully!")
-  }
+    setUser(profileData);
+    alert("Profile updated successfully!");
+  };
 
   const handleAddAddress = () => {
     if (!newAddress.type || !newAddress.street || !newAddress.city) {
-      alert("Please fill in all required fields")
-      return
+      alert("Please fill in all required fields");
+      return;
     }
 
     const addressToAdd = {
       id: Date.now().toString(),
       ...newAddress,
       isDefault: addresses.length === 0,
-    }
+    };
 
-    setAddresses([...addresses, addressToAdd])
+    setAddresses([...addresses, addressToAdd]);
     setNewAddress({
       type: "",
       street: "",
@@ -203,17 +207,17 @@ export default function ProfilePage() {
       state: "",
       zipCode: "",
       country: "",
-    })
-    setShowAddAddress(false)
-    alert("Address added successfully!")
-  }
+    });
+    setShowAddAddress(false);
+    alert("Address added successfully!");
+  };
 
   const handleDeleteAddress = (addressId: string) => {
-    setAddresses(addresses.filter((addr) => addr.id !== addressId))
-  }
+    setAddresses(addresses.filter((addr) => addr.id !== addressId));
+  };
 
   const handleEditAddress = (address: Address) => {
-    setEditingAddressId(address.id)
+    setEditingAddressId(address.id);
     setEditAddress({
       type: address.type,
       street: address.street,
@@ -221,18 +225,22 @@ export default function ProfilePage() {
       state: address.state,
       zipCode: address.zipCode,
       country: address.country,
-    })
-  }
+    });
+  };
 
   const handleUpdateAddress = () => {
     if (!editAddress.type || !editAddress.street || !editAddress.city) {
-      alert("Please fill in all required fields")
-      return
+      alert("Please fill in all required fields");
+      return;
     }
 
-    setAddresses(addresses.map((addr) => (addr.id === editingAddressId ? { ...addr, ...editAddress } : addr)))
+    setAddresses(
+      addresses.map((addr) =>
+        addr.id === editingAddressId ? { ...addr, ...editAddress } : addr
+      )
+    );
 
-    setEditingAddressId(null)
+    setEditingAddressId(null);
     setEditAddress({
       type: "",
       street: "",
@@ -240,12 +248,12 @@ export default function ProfilePage() {
       state: "",
       zipCode: "",
       country: "",
-    })
-    alert("Address updated successfully!")
-  }
+    });
+    alert("Address updated successfully!");
+  };
 
   const handleCancelEdit = () => {
-    setEditingAddressId(null)
+    setEditingAddressId(null);
     setEditAddress({
       type: "",
       street: "",
@@ -253,18 +261,18 @@ export default function ProfilePage() {
       state: "",
       zipCode: "",
       country: "",
-    })
-  }
+    });
+  };
 
   const handleViewOrderDetails = (orderId: string) => {
-    setSelectedOrderId(orderId)
-    setActiveTab("order-details")
-  }
+    setSelectedOrderId(orderId);
+    setActiveTab("order-details");
+  };
 
   const handleBackToOrders = () => {
-    setSelectedOrderId(null)
-    setActiveTab("orders")
-  }
+    setSelectedOrderId(null);
+    setActiveTab("orders");
+  };
 
   if (isLoading) {
     return (
@@ -282,11 +290,11 @@ export default function ProfilePage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -300,15 +308,22 @@ export default function ProfilePage() {
             <div className="flex items-center gap-4">
               <div
                 className={`w-16 h-16 ${defaultTheme.borderRadius} flex items-center justify-center`}
-                style={{ background: `linear-gradient(135deg, ${defaultTheme.secondaryColor} 0%, #8B4A6B 100%)` }}
+                style={{
+                  background: `linear-gradient(135deg, ${defaultTheme.secondaryColor} 0%, #8B4A6B 100%)`,
+                }}
               >
                 <User className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold" style={{ color: defaultTheme.textColor }}>
+                <h1
+                  className="text-3xl font-bold"
+                  style={{ color: defaultTheme.textColor }}
+                >
                   {profileData?.firstName} {profileData?.lastName}
                 </h1>
-                <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>{profileData?.email}</p>
+                <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                  {profileData?.email}
+                </p>
               </div>
             </div>
             <Button
@@ -326,7 +341,11 @@ export default function ProfilePage() {
             </Button>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
             <TabsList
               className={`grid w-full grid-cols-3 ${defaultTheme.borderRadius}`}
               style={{ backgroundColor: defaultTheme.secondaryColor }}
@@ -355,61 +374,88 @@ export default function ProfilePage() {
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
-              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+              <div
+                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+              >
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                  <h2
+                    className="text-xl font-semibold"
+                    style={{ color: defaultTheme.textColor }}
+                  >
                     Personal Information
                   </h2>
-                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Update your personal details</p>
+                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                    Update your personal details
+                  </p>
                 </div>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName" style={{ color: defaultTheme.textColor }}>
+                      <Label
+                        htmlFor="firstName"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         First Name
                       </Label>
                       <Input
                         id="firstName"
                         value={profileData?.firstName || ""}
-                        onChange={(e) => handleProfileUpdate("firstName", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileUpdate("firstName", e.target.value)
+                        }
                         className={`border-2 ${defaultTheme.borderRadius}`}
                         style={{ borderColor: defaultTheme.secondaryColor }}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" style={{ color: defaultTheme.textColor }}>
+                      <Label
+                        htmlFor="lastName"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         Last Name
                       </Label>
                       <Input
                         id="lastName"
                         value={profileData?.lastName || ""}
-                        onChange={(e) => handleProfileUpdate("lastName", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileUpdate("lastName", e.target.value)
+                        }
                         className={`border-2 ${defaultTheme.borderRadius}`}
                         style={{ borderColor: defaultTheme.secondaryColor }}
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="email" style={{ color: defaultTheme.textColor }}>
+                    <Label
+                      htmlFor="email"
+                      style={{ color: defaultTheme.textColor }}
+                    >
                       Email
                     </Label>
                     <Input
                       id="email"
                       type="email"
                       value={profileData?.email || ""}
-                      onChange={(e) => handleProfileUpdate("email", e.target.value)}
+                      onChange={(e) =>
+                        handleProfileUpdate("email", e.target.value)
+                      }
                       className={`border-2 ${defaultTheme.borderRadius}`}
                       style={{ borderColor: defaultTheme.secondaryColor }}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone" style={{ color: defaultTheme.textColor }}>
+                    <Label
+                      htmlFor="phone"
+                      style={{ color: defaultTheme.textColor }}
+                    >
                       Phone
                     </Label>
                     <Input
                       id="phone"
                       value={profileData?.phone || ""}
-                      onChange={(e) => handleProfileUpdate("phone", e.target.value)}
+                      onChange={(e) =>
+                        handleProfileUpdate("phone", e.target.value)
+                      }
                       className={`border-2 ${defaultTheme.borderRadius}`}
                       style={{ borderColor: defaultTheme.secondaryColor }}
                     />
@@ -424,14 +470,24 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+              <div
+                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+              >
                 <div className="flex items-center gap-2 mb-6">
-                  <MapPin className="w-5 h-5" style={{ color: defaultTheme.textColor }} />
+                  <MapPin
+                    className="w-5 h-5"
+                    style={{ color: defaultTheme.textColor }}
+                  />
                   <div>
-                    <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                    <h2
+                      className="text-xl font-semibold"
+                      style={{ color: defaultTheme.textColor }}
+                    >
                       Addresses
                     </h2>
-                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Manage your shipping addresses</p>
+                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                      Manage your shipping addresses
+                    </p>
                   </div>
                 </div>
 
@@ -445,7 +501,10 @@ export default function ProfilePage() {
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                              <p
+                                className="font-medium"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 {address.type}
                               </p>
                               {address.isDefault && (
@@ -454,7 +513,13 @@ export default function ProfilePage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm mt-1" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                            <p
+                              className="text-sm mt-1"
+                              style={{
+                                color: defaultTheme.textColor,
+                                opacity: 0.7,
+                              }}
+                            >
                               {address.street}
                               <br />
                               {address.city}, {address.state} {address.zipCode}
@@ -467,7 +532,10 @@ export default function ProfilePage() {
                               variant="outline"
                               size="sm"
                               className={`border-2 ${defaultTheme.borderRadius}`}
-                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                              style={{
+                                borderColor: defaultTheme.secondaryColor,
+                                color: defaultTheme.textColor,
+                              }}
                               onClick={() => handleEditAddress(address)}
                             >
                               Edit
@@ -492,86 +560,149 @@ export default function ProfilePage() {
                             backgroundColor: defaultTheme.accentColor,
                           }}
                         >
-                          <h4 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                          <h4
+                            className="text-lg font-semibold mb-4"
+                            style={{ color: defaultTheme.textColor }}
+                          >
                             Edit Address
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor="editAddressType" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editAddressType"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 Address Type *
                               </Label>
                               <Input
                                 id="editAddressType"
                                 value={editAddress.type}
-                                onChange={(e) => setEditAddress({ ...editAddress, type: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    type: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Home, Work, Office"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editCountry" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editCountry"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 Country
                               </Label>
                               <Input
                                 id="editCountry"
                                 value={editAddress.country}
-                                onChange={(e) => setEditAddress({ ...editAddress, country: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    country: e.target.value,
+                                  })
+                                }
                                 placeholder="Country"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <Label htmlFor="editStreet" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editStreet"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 Street Address *
                               </Label>
                               <Input
                                 id="editStreet"
                                 value={editAddress.street}
-                                onChange={(e) => setEditAddress({ ...editAddress, street: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    street: e.target.value,
+                                  })
+                                }
                                 placeholder="Street address"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editCity" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editCity"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 City *
                               </Label>
                               <Input
                                 id="editCity"
                                 value={editAddress.city}
-                                onChange={(e) => setEditAddress({ ...editAddress, city: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    city: e.target.value,
+                                  })
+                                }
                                 placeholder="City"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editState" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editState"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 State/Province
                               </Label>
                               <Input
                                 id="editState"
                                 value={editAddress.state}
-                                onChange={(e) => setEditAddress({ ...editAddress, state: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    state: e.target.value,
+                                  })
+                                }
                                 placeholder="State/Province"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editZipCode" style={{ color: defaultTheme.textColor }}>
+                              <Label
+                                htmlFor="editZipCode"
+                                style={{ color: defaultTheme.textColor }}
+                              >
                                 ZIP/Postal Code
                               </Label>
                               <Input
                                 id="editZipCode"
                                 value={editAddress.zipCode}
-                                onChange={(e) => setEditAddress({ ...editAddress, zipCode: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    zipCode: e.target.value,
+                                  })
+                                }
                                 placeholder="ZIP/Postal Code"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
                               />
                             </div>
                           </div>
@@ -579,7 +710,9 @@ export default function ProfilePage() {
                             <Button
                               onClick={handleUpdateAddress}
                               className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                              style={{ backgroundColor: defaultTheme.secondaryColor }}
+                              style={{
+                                backgroundColor: defaultTheme.secondaryColor,
+                              }}
                             >
                               Update Address
                             </Button>
@@ -587,7 +720,10 @@ export default function ProfilePage() {
                               onClick={handleCancelEdit}
                               variant="outline"
                               className={`border-2 ${defaultTheme.borderRadius}`}
-                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                              style={{
+                                borderColor: defaultTheme.secondaryColor,
+                                color: defaultTheme.textColor,
+                              }}
                             >
                               Cancel
                             </Button>
@@ -603,92 +739,149 @@ export default function ProfilePage() {
                     onClick={() => setShowAddAddress(true)}
                     variant="outline"
                     className={`mt-4 border-2 ${defaultTheme.borderRadius}`}
-                    style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                    style={{
+                      borderColor: defaultTheme.secondaryColor,
+                      color: defaultTheme.textColor,
+                    }}
                   >
                     Add New Address
                   </Button>
                 ) : (
                   <div
                     className={`mt-6 p-4 border ${defaultTheme.borderRadius}`}
-                    style={{ borderColor: defaultTheme.secondaryColor, backgroundColor: defaultTheme.accentColor }}
+                    style={{
+                      borderColor: defaultTheme.secondaryColor,
+                      backgroundColor: defaultTheme.accentColor,
+                    }}
                   >
-                    <h3 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                    <h3
+                      className="text-lg font-semibold mb-4"
+                      style={{ color: defaultTheme.textColor }}
+                    >
                       Add New Address
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="addressType" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="addressType"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           Address Type *
                         </Label>
                         <Input
                           id="addressType"
                           value={newAddress.type}
-                          onChange={(e) => setNewAddress({ ...newAddress, type: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              type: e.target.value,
+                            })
+                          }
                           placeholder="e.g., Home, Work, Office"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="country" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="country"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           Country
                         </Label>
                         <Input
                           id="country"
                           value={newAddress.country}
-                          onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              country: e.target.value,
+                            })
+                          }
                           placeholder="Country"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor="street" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="street"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           Street Address *
                         </Label>
                         <Input
                           id="street"
                           value={newAddress.street}
-                          onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              street: e.target.value,
+                            })
+                          }
                           placeholder="Street address"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="city"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           City *
                         </Label>
                         <Input
                           id="city"
                           value={newAddress.city}
-                          onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              city: e.target.value,
+                            })
+                          }
                           placeholder="City"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="state" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="state"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           State/Province
                         </Label>
                         <Input
                           id="state"
                           value={newAddress.state}
-                          onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              state: e.target.value,
+                            })
+                          }
                           placeholder="State/Province"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="zipCode" style={{ color: defaultTheme.textColor }}>
+                        <Label
+                          htmlFor="zipCode"
+                          style={{ color: defaultTheme.textColor }}
+                        >
                           ZIP/Postal Code
                         </Label>
                         <Input
                           id="zipCode"
                           value={newAddress.zipCode}
-                          onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              zipCode: e.target.value,
+                            })
+                          }
                           placeholder="ZIP/Postal Code"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
@@ -707,7 +900,10 @@ export default function ProfilePage() {
                         onClick={() => setShowAddAddress(false)}
                         variant="outline"
                         className={`border-2 ${defaultTheme.borderRadius}`}
-                        style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                        style={{
+                          borderColor: defaultTheme.secondaryColor,
+                          color: defaultTheme.textColor,
+                        }}
                       >
                         Cancel
                       </Button>
@@ -718,9 +914,14 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="orders" className="space-y-6">
-              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+              <div
+                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+              >
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                  <h2
+                    className="text-xl font-semibold"
+                    style={{ color: defaultTheme.textColor }}
+                  >
                     Order History
                   </h2>
                   <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
@@ -736,27 +937,49 @@ export default function ProfilePage() {
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                          <p
+                            className="font-medium"
+                            style={{ color: defaultTheme.textColor }}
+                          >
                             Order {order.id}
                           </p>
-                          <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
-                            Placed on {new Date(order.date).toLocaleDateString()}
+                          <p
+                            className="text-sm"
+                            style={{
+                              color: defaultTheme.textColor,
+                              opacity: 0.7,
+                            }}
+                          >
+                            Placed on{" "}
+                            {new Date(order.date).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                              order.status
+                            )}`}
                           >
                             {order.status}
                           </span>
-                          <p className="text-lg font-semibold mt-1" style={{ color: defaultTheme.textColor }}>
+                          <p
+                            className="text-lg font-semibold mt-1"
+                            style={{ color: defaultTheme.textColor }}
+                          >
                             ${order.total}
                           </p>
                         </div>
                       </div>
                       <div className="space-y-1">
                         {order.items.map((item, index) => (
-                          <p key={index} className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                          <p
+                            key={index}
+                            className="text-sm"
+                            style={{
+                              color: defaultTheme.textColor,
+                              opacity: 0.7,
+                            }}
+                          >
                             {item.name} × {item.quantity}
                           </p>
                         ))}
@@ -767,7 +990,10 @@ export default function ProfilePage() {
                           variant="outline"
                           size="sm"
                           className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                          style={{
+                            borderColor: defaultTheme.secondaryColor,
+                            color: defaultTheme.textColor,
+                          }}
                         >
                           View Details
                         </Button>
@@ -776,7 +1002,10 @@ export default function ProfilePage() {
                             variant="outline"
                             size="sm"
                             className={`border-2 ${defaultTheme.borderRadius}`}
-                            style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                            style={{
+                              borderColor: defaultTheme.secondaryColor,
+                              color: defaultTheme.textColor,
+                            }}
                           >
                             Reorder
                           </Button>
@@ -789,59 +1018,93 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-              <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+              <div
+                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+              >
                 <div className="flex items-center gap-2 mb-6">
-                  <Bell className="w-5 h-5" style={{ color: defaultTheme.textColor }} />
+                  <Bell
+                    className="w-5 h-5"
+                    style={{ color: defaultTheme.textColor }}
+                  />
                   <div>
-                    <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                    <h2
+                      className="text-xl font-semibold"
+                      style={{ color: defaultTheme.textColor }}
+                    >
                       Notifications
                     </h2>
-                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>Manage your notification preferences</p>
+                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                      Manage your notification preferences
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                      <p
+                        className="font-medium"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         Order Updates
                       </p>
-                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                      <p
+                        className="text-sm"
+                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
+                      >
                         Get notified about order status changes
                       </p>
                     </div>
                     <Switch
                       checked={notifications.orderUpdates}
-                      onCheckedChange={(checked: boolean) => handleNotificationChange("orderUpdates", checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleNotificationChange("orderUpdates", checked)
+                      }
                     />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                      <p
+                        className="font-medium"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         Promotions
                       </p>
-                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                      <p
+                        className="text-sm"
+                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
+                      >
                         Receive promotional offers and discounts
                       </p>
                     </div>
                     <Switch
                       checked={notifications.promotions}
-                      onCheckedChange={(checked: boolean) => handleNotificationChange("promotions", checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleNotificationChange("promotions", checked)
+                      }
                     />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium" style={{ color: defaultTheme.textColor }}>
+                      <p
+                        className="font-medium"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         Newsletter
                       </p>
-                      <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                      <p
+                        className="text-sm"
+                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
+                      >
                         Stay updated with our latest news
                       </p>
                     </div>
                     <Switch
                       checked={notifications.newsletter}
-                      onCheckedChange={(checked: boolean) => handleNotificationChange("newsletter", checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleNotificationChange("newsletter", checked)
+                      }
                     />
                   </div>
                 </div>
@@ -850,38 +1113,51 @@ export default function ProfilePage() {
 
             <TabsContent value="order-details" className="space-y-6">
               {selectedOrderId && (
-                <div className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}>
+                <div
+                  className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+                >
                   <div className="flex items-center gap-4 mb-6">
                     <Button
                       onClick={handleBackToOrders}
                       variant="outline"
                       size="sm"
                       className={`border-2 ${defaultTheme.borderRadius}`}
-                      style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}
+                      style={{
+                        borderColor: defaultTheme.secondaryColor,
+                        color: defaultTheme.textColor,
+                      }}
                     >
                       ← Back to Orders
                     </Button>
                     <div>
-                      <h2 className="text-xl font-semibold" style={{ color: defaultTheme.textColor }}>
+                      <h2
+                        className="text-xl font-semibold"
+                        style={{ color: defaultTheme.textColor }}
+                      >
                         Order Details - {selectedOrderId}
                       </h2>
                     </div>
                   </div>
 
                   {(() => {
-                    const order = mockOrders.find((o) => o.id === selectedOrderId)
-                    if (!order) return null
+                    const order = mockOrders.find(
+                      (o) => o.id === selectedOrderId
+                    );
+                    if (!order) return null;
 
-                    const shipping = order.total > 500 ? 0 : 25
-                    const tax = order.total * 0.08
-                    const subtotal = order.total - tax - shipping
+                    const shipping = order.total > 500 ? 0 : 25;
+                    const tax = order.total * 0.08;
+                    const subtotal = order.total - tax - shipping;
 
                     return (
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Order Items */}
                         <div className="lg:col-span-2 space-y-6">
                           <div>
-                            <h3 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                            <h3
+                              className="text-lg font-semibold mb-4"
+                              style={{ color: defaultTheme.textColor }}
+                            >
                               Order Items ({order.items.length})
                             </h3>
                             <div className="space-y-4">
@@ -906,18 +1182,33 @@ export default function ProfilePage() {
                                     />
                                   </div>
                                   <div className="flex-1">
-                                    <h4 className="font-medium" style={{ color: defaultTheme.textColor }}>
+                                    <h4
+                                      className="font-medium"
+                                      style={{ color: defaultTheme.textColor }}
+                                    >
                                       {item.name}
                                     </h4>
-                                    <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                                    <p
+                                      className="text-sm"
+                                      style={{
+                                        color: defaultTheme.textColor,
+                                        opacity: 0.7,
+                                      }}
+                                    >
                                       Quantity: {item.quantity}
                                     </p>
-                                    <p className="text-lg font-semibold" style={{ color: defaultTheme.textColor }}>
+                                    <p
+                                      className="text-lg font-semibold"
+                                      style={{ color: defaultTheme.textColor }}
+                                    >
                                       ${item.price}
                                     </p>
                                   </div>
                                   <div className="text-right">
-                                    <p className="font-semibold" style={{ color: defaultTheme.textColor }}>
+                                    <p
+                                      className="font-semibold"
+                                      style={{ color: defaultTheme.textColor }}
+                                    >
                                       ${(item.price * item.quantity).toFixed(2)}
                                     </p>
                                   </div>
@@ -931,55 +1222,94 @@ export default function ProfilePage() {
                         <div className="lg:col-span-1">
                           <div
                             className={`p-6 ${defaultTheme.borderRadius} sticky top-24`}
-                            style={{ backgroundColor: `${defaultTheme.secondaryColor}20` }}
+                            style={{
+                              backgroundColor: `${defaultTheme.secondaryColor}20`,
+                            }}
                           >
-                            <h3 className="text-xl font-semibold mb-6" style={{ color: defaultTheme.textColor }}>
+                            <h3
+                              className="text-xl font-semibold mb-6"
+                              style={{ color: defaultTheme.textColor }}
+                            >
                               Order Summary
                             </h3>
 
                             <div className="space-y-4">
                               <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>Subtotal</span>
-                                <span style={{ color: defaultTheme.textColor }}>${subtotal.toFixed(2)}</span>
-                              </div>
-
-                              <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>Shipping</span>
                                 <span style={{ color: defaultTheme.textColor }}>
-                                  {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                                  Subtotal
+                                </span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  ${subtotal.toFixed(2)}
                                 </span>
                               </div>
 
                               <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>Tax</span>
-                                <span style={{ color: defaultTheme.textColor }}>${tax.toFixed(2)}</span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  Shipping
+                                </span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  {shipping === 0
+                                    ? "Free"
+                                    : `$${shipping.toFixed(2)}`}
+                                </span>
                               </div>
 
-                              <hr style={{ borderColor: defaultTheme.secondaryColor }} />
+                              <div className="flex justify-between">
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  Tax
+                                </span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  ${tax.toFixed(2)}
+                                </span>
+                              </div>
+
+                              <hr
+                                style={{
+                                  borderColor: defaultTheme.secondaryColor,
+                                }}
+                              />
 
                               <div className="flex justify-between text-lg font-semibold">
-                                <span style={{ color: defaultTheme.textColor }}>Total</span>
-                                <span style={{ color: defaultTheme.textColor }}>${order.total.toFixed(2)}</span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  Total
+                                </span>
+                                <span style={{ color: defaultTheme.textColor }}>
+                                  ${order.total.toFixed(2)}
+                                </span>
                               </div>
                             </div>
 
                             <div className="mt-6 space-y-4">
                               <div>
-                                <h4 className="font-medium mb-2" style={{ color: defaultTheme.textColor }}>
+                                <h4
+                                  className="font-medium mb-2"
+                                  style={{ color: defaultTheme.textColor }}
+                                >
                                   Order Status
                                 </h4>
                                 <span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}
+                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                                    order.status
+                                  )}`}
                                 >
                                   {order.status}
                                 </span>
                               </div>
 
                               <div>
-                                <h4 className="font-medium mb-2" style={{ color: defaultTheme.textColor }}>
+                                <h4
+                                  className="font-medium mb-2"
+                                  style={{ color: defaultTheme.textColor }}
+                                >
                                   Order Date
                                 </h4>
-                                <p className="text-sm" style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                                <p
+                                  className="text-sm"
+                                  style={{
+                                    color: defaultTheme.textColor,
+                                    opacity: 0.7,
+                                  }}
+                                >
                                   {new Date(order.date).toLocaleDateString()}
                                 </p>
                               </div>
@@ -987,7 +1317,10 @@ export default function ProfilePage() {
                               {order.status === "Delivered" && (
                                 <Button
                                   className={`w-full text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                                  style={{ backgroundColor: defaultTheme.secondaryColor }}
+                                  style={{
+                                    backgroundColor:
+                                      defaultTheme.secondaryColor,
+                                  }}
                                 >
                                   Reorder Items
                                 </Button>
@@ -996,7 +1329,7 @@ export default function ProfilePage() {
                           </div>
                         </div>
                       </div>
-                    )
+                    );
                   })()}
                 </div>
               )}
@@ -1005,5 +1338,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

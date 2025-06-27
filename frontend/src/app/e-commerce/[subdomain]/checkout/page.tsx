@@ -24,6 +24,7 @@ import { Separator } from "@/components/e-commerce/ui/separator";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { usePathname } from "next/navigation";
 
 const defaultTheme: ThemeConfig = {
   backgroundColor: "white",
@@ -35,6 +36,10 @@ const defaultTheme: ThemeConfig = {
 };
 
 export default function CheckoutPage() {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const { state, clearCart } = useCart();
   const [step, setStep] = useState(1); // 1: Shipping, 2: Payment, 3: Confirmation
   const [formData, setFormData] = useState({
@@ -94,7 +99,7 @@ export default function CheckoutPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Your cart is empty. Add some items before proceeding to checkout.
           </p>
-          <Link href="/e-commerce/TODO/products">
+          <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
@@ -159,7 +164,7 @@ export default function CheckoutPage() {
             </p>
           </div>
           <div className="flex gap-4 justify-center">
-            <Link href="/e-commerce/TODO/products">
+            <Link href={`/e-commerce/${subdomain}/products`}>
               <Button
                 size="lg"
                 style={{
@@ -170,7 +175,7 @@ export default function CheckoutPage() {
                 Continue Shopping
               </Button>
             </Link>
-            <Link href="/e-commerce/TODO/profile">
+            <Link href={`/e-commerce/${subdomain}/profile`}>
               <Button
                 size="lg"
                 style={{

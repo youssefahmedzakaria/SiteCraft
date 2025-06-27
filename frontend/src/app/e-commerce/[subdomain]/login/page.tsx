@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, type FormEvent } from "react"
-import { Eye, EyeOff } from "lucide-react"
-import { Button } from "@/components/e-commerce/ui/button"
-import { Input } from "@/components/e-commerce/ui/input"
-import { Label } from "@/components/e-commerce/ui/label"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useState, type FormEvent } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/e-commerce/ui/button";
+import { Input } from "@/components/e-commerce/ui/input";
+import { Label } from "@/components/e-commerce/ui/label";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -16,41 +16,45 @@ const defaultTheme = {
   secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
-}
+};
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const router = useRouter()
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     if (!email || !password) {
-      setError("Please fill in all fields")
-      setIsLoading(false)
-      return
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
     }
 
     // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Mock authentication - accept any email/password
     if (email && password) {
       // Store mock token
-      localStorage.setItem("token", "mock-token-" + Date.now())
-      router.push("/e-commerce/TODO/profile")
+      localStorage.setItem("token", "mock-token-" + Date.now());
+      router.push(`/e-commerce/${subdomain}/profile`);
     } else {
-      setError("Invalid credentials")
+      setError("Invalid credentials");
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <div
@@ -162,7 +166,7 @@ export default function LoginPage() {
             >
               {"Don't have an account? "}
               <Link
-                href="/e-commerce/TODO/register"
+                href={`/e-commerce/${subdomain}/register`}
                 className="font-medium hover:underline"
                 style={{ color: defaultTheme.textColor }}
               >

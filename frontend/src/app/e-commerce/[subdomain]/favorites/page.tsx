@@ -8,6 +8,7 @@ import { useFavorites } from "@/contexts/favorites-context";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { usePathname } from "next/navigation";
 
 const defaultTheme: ThemeConfig = {
   backgroundColor: "white",
@@ -19,6 +20,10 @@ const defaultTheme: ThemeConfig = {
 };
 
 export default function FavoritesPage() {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const { state, removeFromFavorites } = useFavorites();
   const { addToCart } = useCart();
   const theme = defaultTheme;
@@ -55,7 +60,7 @@ export default function FavoritesPage() {
           <p className="mb-8" style={{ color: theme.secondaryColor }}>
             Save items you love to easily find them later.
           </p>
-          <Link href="/e-commerce/TODO/products">
+          <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
@@ -122,7 +127,7 @@ export default function FavoritesPage() {
             </div>
 
             <div className="p-4">
-              <Link href={`/e-commerce/TODO/product/${item.id}`}>
+              <Link href={`/e-commerce/${subdomain}/product/${item.id}`}>
                 <h3
                   className="font-medium hover:underline"
                   style={{ color: theme.textColor }}
@@ -168,7 +173,7 @@ export default function FavoritesPage() {
       </div>
 
       <div className="mt-12 text-center">
-        <Link href="/e-commerce/TODO/products">
+        <Link href={`/e-commerce/${subdomain}/products`}>
           <Button
             variant="outline"
             size="lg"

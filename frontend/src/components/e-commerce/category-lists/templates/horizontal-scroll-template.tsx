@@ -1,45 +1,53 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import Link from "next/link"
-import { useRef, useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import FlexibleCard  from "@/components/e-commerce/card/card-templates"
+"use client";
+import Link from "next/link";
+import { useRef, useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import FlexibleCard from "@/components/e-commerce/card/card-templates";
+import { usePathname } from "next/navigation";
 
 interface HorizontalScrollCategoryTemplateProps {
-  categories: any[]
-  bgColor?: string
-  textColor?: string
-  accentColor?: string
-  borderRadius?: string
-  showTitle?: boolean
-  showControls?: boolean
-  imageHeight?: string
-  cardWidth?: string
-  fontFamily?: string
-  hoverEffect?: boolean
-  scrollBarSliderColor?: string
-  scrollBarBgColor?: string
-  showScrollbar?: boolean
+  categories: any[];
+  bgColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderRadius?: string;
+  showTitle?: boolean;
+  showControls?: boolean;
+  imageHeight?: string;
+  cardWidth?: string;
+  fontFamily?: string;
+  hoverEffect?: boolean;
+  scrollBarSliderColor?: string;
+  scrollBarBgColor?: string;
+  showScrollbar?: boolean;
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showCardTitle?: boolean
-  showSubtitle?: boolean
-  showCta?: boolean
-  ctaText?: string
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  cardShadow?: string
-  borderColor?: string
-  overlayColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showCardTitle?: boolean;
+  showSubtitle?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  cardShadow?: string;
+  borderColor?: string;
+  overlayColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export function HorizontalScrollCategoryTemplate({
@@ -71,12 +79,16 @@ export function HorizontalScrollCategoryTemplate({
   titleFontSize = "text-2xl",
   title = "Shop by Category",
   titleFont = "font-bold",
-  // Show more button props 
+  // Show more button props
   showMoreButton = true,
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
 }: HorizontalScrollCategoryTemplateProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scroll, setScroll] = useState({ left: 0, width: 0, scrollWidth: 0 });
 
@@ -223,7 +235,7 @@ export function HorizontalScrollCategoryTemplate({
       {showMoreButton && (
         <div className="flex justify-end mt-6">
           <Link
-            href="/e-commerce/TODO/categories"
+            href={`/e-commerce/${subdomain}/categories`}
             className={cn(
               "inline-flex items-center px-6 py-2",
               " hover:bg-opacity-80 transition-colors duration-300",
