@@ -6,27 +6,43 @@ import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import Image from "next/image";
 import { categories } from "@/lib/categories";
+import { ProductCreateDTO } from "@/lib/products";
 import { ChevronDown, ChevronUp, Upload } from "lucide-react";
 
-export function ProductInfoSection() {
-  {
-    /* For images */
-  }
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+interface ProductInfoSectionProps {
+  formData: ProductCreateDTO;
+  updateFormData: (updates: Partial<ProductCreateDTO>) => void;
+  imageFiles: File[];
+  updateImageFiles: (files: File[]) => void;
+}
+
+export function ProductInfoSection({ 
+  formData, 
+  updateFormData, 
+  imageFiles, 
+  updateImageFiles 
+}: ProductInfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-
-  {
-    /* For categories */
-  }
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [openCategories, setOpenCategories] = useState(false);
 
-  {
-    /* For images */
-  }
+  // Handle form field changes
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateFormData({ name: e.target.value });
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateFormData({ description: e.target.value });
+  };
+
+  const handleCategoryChange = (categoryId: number) => {
+    updateFormData({ categoryId });
+    setOpenCategories(false);
+  };
+
+  // Image handling
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -46,7 +62,7 @@ export function ProductInfoSection() {
     });
 
     // Add files to state
-    setImageFiles((prev) => [...prev, ...newFiles]);
+    updateImageFiles([...imageFiles, ...newFiles]);
   };
 
   const handleBrowseClick = () => {
@@ -66,8 +82,10 @@ export function ProductInfoSection() {
   };
 
   const removeImage = (index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    const newImageFiles = imageFiles.filter((_, i) => i !== index);
+    const newImagePreviews = imagePreviews.filter((_, i) => i !== index);
+    updateImageFiles(newImageFiles);
+    setImagePreviews(newImagePreviews);
   };
 
   const handleImageDragStart = (index: number) => {
@@ -97,7 +115,7 @@ export function ProductInfoSection() {
       newImagePreviews.splice(dragOverIndex, 0, movedPreview);
 
       // Update state
-      setImageFiles(newImageFiles);
+      updateImageFiles(newImageFiles);
       setImagePreviews(newImagePreviews);
     }
 
@@ -106,20 +124,13 @@ export function ProductInfoSection() {
     setDragOverIndex(null);
   };
 
-  {
-    /* For categories */
-  }
-  const toggleCategoriesOption = (option: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
+  // Get selected category name
+  const getSelectedCategoryName = () => {
+    if (formData.categoryId === 0) return "Select category";
+    const category = categories.find(c => c.id === formData.categoryId.toString());
+    return category ? category.title : "Select category";
   };
 
-  {
-    /* Product Info */
-  }
   return (
     <div className="space-y-4">
       <div className="mb-2">
@@ -140,6 +151,8 @@ export function ProductInfoSection() {
           <Input
             id="name"
             name="name"
+            value={formData.name}
+            onChange={handleNameChange}
             placeholder="e.g. T-Shirt"
             className="w-full"
             required
@@ -149,18 +162,18 @@ export function ProductInfoSection() {
         {/* Product Category */}
         <div className="relative flex-1 space-y-2">
           <label
-            htmlFor="name"
+            htmlFor="category"
             className="block text-sm font-medium text-gray-700"
           >
-            Category
+            Category <span className="text-red-500">*</span>
           </label>
           <div
-            className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between"
+            className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between cursor-pointer"
             onClick={() => setOpenCategories(!openCategories)}
           >
-            {selectedCategories.length > 0
-              ? selectedCategories.join(", ")
-              : "Select options"}
+            <span className={formData.categoryId === 0 ? "text-gray-500" : ""}>
+              {getSelectedCategoryName()}
+            </span>
             {openCategories ? (
               <ChevronUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             ) : (
@@ -169,20 +182,15 @@ export function ProductInfoSection() {
           </div>
 
           {openCategories && (
-            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow">
-              {categories.map((option) => (
-                <label
-                  key={option.id}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleCategoryChange(parseInt(category.id))}
                 >
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={selectedCategories.includes(option.title)}
-                    onChange={() => toggleCategoriesOption(option.title)}
-                  />
-                  {option.title}
-                </label>
+                  {category.title}
+                </div>
               ))}
             </div>
           )}
@@ -195,128 +203,83 @@ export function ProductInfoSection() {
           htmlFor="description"
           className="block text-sm font-medium text-gray-700"
         >
-          Description
+          Description <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="description"
           name="description"
-          placeholder="Describe this product..."
-          rows={4}
-          className="w-full"
+          value={formData.description}
+          onChange={handleDescriptionChange}
+          placeholder="Describe your product..."
+          className="w-full min-h-[100px]"
+          required
         />
-        <p className="text-xs text-gray-400">
-          A brief description of this product to help customers understand what
-          products to expect.
-        </p>
       </div>
 
-      {/* Product Gallery */}
+      {/* Product Images */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Product Gallery
+          Product Images
         </label>
+        <div
+          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
+          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleBrowseClick}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Browse files
+            </button>
+            <span className="text-gray-500"> or drag and drop</span>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            PNG, JPG, GIF up to 10MB
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+        </div>
 
-        {/* Gallery Container */}
-        <div className="p-4 border border-gray-200 rounded-lg">
-          {/* Gallery Preview */}
-          <div className="flex flex-wrap gap-4">
-            {imagePreviews.map((preview, index) => (
+        {/* Image Previews */}
+        {imageFiles.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            {imageFiles.map((file, index) => (
               <div
                 key={index}
-                className={`relative w-24 h-24 group cursor-move ${
-                  dragOverIndex === index ? "border-2 border-blue-500" : ""
-                }`}
+                className="relative group"
                 draggable
                 onDragStart={() => handleImageDragStart(index)}
-                onDragOver={(e) => e.preventDefault()}
                 onDragEnter={() => handleImageDragEnter(index)}
                 onDragEnd={handleImageDragEnd}
               >
                 <Image
-                  src={preview}
-                  alt={`Product image ${index + 1}`}
-                  fill
-                  className="object-cover rounded-md"
+                  src={imagePreviews[index] || URL.createObjectURL(file)}
+                  alt={`Preview ${index + 1}`}
+                  width={200}
+                  height={200}
+                  className="w-full h-32 object-cover rounded-lg"
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 rounded-md">
-                  <span className="text-white text-xs font-medium">
-                    Drag to move
-                  </span>
-                </div>
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-logo-dark-button text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  ✕
+                  ×
                 </button>
-                {index === 0 && (
-                  <div className="absolute -top-2 -left-2 bg-logo-dark-button text-white text-xs rounded-full px-2 py-1">
-                    Main
-                  </div>
-                )}
               </div>
             ))}
-
-            {/* Add Image Button */}
-            {imagePreviews.length != 0 && (
-              <div
-                className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
-                onClick={handleBrowseClick}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                <div className="flex flex-col items-center">
-                  <span className="text-2xl text-gray-400">+</span>
-                  <span className="text-xs text-gray-500">Add</span>
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* Drop Area (only shown when no images) */}
-          {imagePreviews.length === 0 && (
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <div className="flex flex-col items-center justify-center gap-2">
-                <Upload size={40} />
-                <p className="text-sm text-gray-500">
-                  Drag and drop your images here, or{" "}
-                  <span
-                    className="text-logo-txt cursor-pointer hover:text-logo-txt-hover"
-                    onClick={handleBrowseClick}
-                  >
-                    browse
-                  </span>
-                </p>
-                <p className="text-xs text-gray-400">
-                  Recommended: 512x512px, PNG or JPG
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Hidden File Input */}
-          <input
-            ref={fileInputRef}
-            id="image"
-            name="image"
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleImageChange}
-          />
-        </div>
-
-        {/* Help Text */}
-        <p className="text-xs text-gray-400">
-          You can upload multiple images. The first image will be used as the
-          main product image.
-        </p>
+        )}
       </div>
     </div>
   );

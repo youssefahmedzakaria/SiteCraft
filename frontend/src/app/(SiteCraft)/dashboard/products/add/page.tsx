@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { Card, CardContent, CardTitle } from "@/components/SiteCraft/ui/card";
@@ -9,6 +10,8 @@ import { PricingSection } from "@/components/SiteCraft/dashboard/products/add/pr
 import { LowStockSection } from "@/components/SiteCraft/dashboard/products/add/lowStockSection";
 import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
 import { CustomVariationSection } from "@/components/SiteCraft/dashboard/products/add/customVariationSection";
+import { useProductManagement } from "@/hooks/useProductManagement";
+import { ProductCreateDTO } from "@/lib/products";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +20,12 @@ import {
 } from "@/components/SiteCraft/ui/dialog";
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 export default function AddProductPage() {
+  const router = useRouter();
+  const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
+  
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
     | "Product's Options and Variations"
@@ -29,6 +36,22 @@ export default function AddProductPage() {
     "Product's Options and Variations",
     "Stock Management",
   ];
+
+  // Form state
+  const [formData, setFormData] = useState<ProductCreateDTO>({
+    name: '',
+    description: '',
+    price: 0,
+    stock: 0,
+    categoryId: 0,
+    discountType: undefined,
+    discountValue: undefined,
+    minCap: undefined,
+    percentageMax: undefined,
+    maxCap: undefined,
+  });
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Initialize with default variations
   const [customVariations, setCustomVariations] = useState<
@@ -134,6 +157,43 @@ export default function AddProductPage() {
     setDragOverVariationIndex(null);
   };
 
+  // Form submission handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      // Validate required fields
+      if (!formData.name || !formData.description || formData.price <= 0 || formData.categoryId === 0) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Create product
+      const newProduct = await handleCreateProduct(formData, imageFiles);
+      
+      // Show success dialog
+      setShowSuccessDialog(true);
+      
+      // Redirect to products page after a short delay
+      setTimeout(() => {
+        router.push('/dashboard/products');
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Error creating product:', err);
+    }
+  };
+
+  // Update form data handler
+  const updateFormData = (updates: Partial<ProductCreateDTO>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update image files handler
+  const updateImageFiles = (files: File[]) => {
+    setImageFiles(files);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
@@ -147,6 +207,24 @@ export default function AddProductPage() {
             Create a new product for your store
           </h2>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="flex mb-1 ml-3">
           {tabs.map((tab) => (
@@ -166,17 +244,28 @@ export default function AddProductPage() {
 
         <Card className="flex flex-col gap-4 bg-white">
           <CardContent className="py-2">
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {activeTab === "Product's Overview" && (
                 <>
                   {/* Product Info */}
-                  <ProductInfoSection />
+                  <ProductInfoSection 
+                    formData={formData}
+                    updateFormData={updateFormData}
+                    imageFiles={imageFiles}
+                    updateImageFiles={updateImageFiles}
+                  />
 
                   {/* Pricing Section */}
-                  <PricingSection />
+                  <PricingSection 
+                    formData={formData}
+                    updateFormData={updateFormData}
+                  />
 
                   {/* Low Stock Settings Section */}
-                  <LowStockSection />
+                  <LowStockSection 
+                    formData={formData}
+                    updateFormData={updateFormData}
+                  />
                 </>
               )}
 
@@ -198,21 +287,12 @@ export default function AddProductPage() {
                         key={index}
                         className={`mb-4 p-4 rounded-lg border transition-all ${
                           dragOverVariationIndex === index
-                            ? "border-blue-300 bg-blue-50"
-                            : "border-transparent hover:border-gray-200"
-                        } ${
-                          draggedVariationIndex === index ? "shadow-lg" : ""
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200"
                         }`}
-                        //   onDragStart={() => handleSizeDragStart(index)} <---------------
-                        //   onDragOver={(e) => e.preventDefault()} <------------
-                        //   onDragEnter={() => handleSizeDragEnter(index)}  <------------
-                        //   onDragEnd={handleSizeDragEnd}
                         draggable
                         onDragStart={() => handleVariationDragStart(index)}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          handleVariationDragOver(e, index);
-                        }}
+                        onDragOver={(e) => handleVariationDragOver(e, index)}
                         onDragEnd={handleVariationDragEnd}
                       >
                         <CustomVariationSection
@@ -220,12 +300,8 @@ export default function AddProductPage() {
                           index={index}
                           values={variation.values}
                           onDelete={() => handleDeleteVariation(index)}
-                          onChange={(name) =>
-                            handleVariationNameChange(index, name)
-                          }
-                          onValuesChange={(values) =>
-                            handleValuesChange(index, values)
-                          }
+                          onChange={(name) => handleVariationNameChange(index, name)}
+                          onValuesChange={(values) => handleValuesChange(index, values)}
                           onAddDefaults={() => handleAddDefaults(index)}
                           showDefaults={index === 0}
                           isDragging={draggedVariationIndex === index}
@@ -233,48 +309,36 @@ export default function AddProductPage() {
                       </div>
                     ))}
 
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
                       onClick={handleAddVariation}
-                      className="flex items-center gap-1 text-logo-dark-button hover:underline text-md"
+                      className="w-full"
                     >
-                      + Add Variation Type
-                    </button>
+                      + Add Variation
+                    </Button>
                   </div>
                 </>
               )}
 
               {activeTab === "Stock Management" && (
-                <>
-                  <div className="mb-2">
-                    <CardTitle className="font-bold text-2xl">
-                      Handle Stock Levels
-                    </CardTitle>
-                    <p className="text-gray-500">
-                      Management of stock levels of different options and
-                      variation.
-                    </p>
-                  </div>
-
-                  <StockManagementSection />
-                </>
+                <StockManagementSection />
               )}
 
-              {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  type="submit"
-                  className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
-                >
-                  Save Product
-                </Button>
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-4 pt-6 border-t">
                 <Link href="/dashboard/products">
-                  <Button
-                    variant="outline"
-                    className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  >
+                  <Button type="button" variant="outline">
                     Cancel
                   </Button>
                 </Link>
+                <Button 
+                  type="submit" 
+                  disabled={isCreating}
+                  className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+                >
+                  {isCreating ? 'Creating Product...' : 'Create Product'}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -284,22 +348,49 @@ export default function AddProductPage() {
         <Dialog open={showStockModal} onOpenChange={setShowStockModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Set Stock Levels</DialogTitle>
+              <DialogTitle>Set Stock for Variations</DialogTitle>
             </DialogHeader>
-
             <div className="space-y-4">
               {stockValues.map((item, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <Label className="w-24">{item.value}</Label>
+                <div key={index} className="flex items-center space-x-4">
+                  <Label className="flex-1">{item.value}</Label>
                   <Input
                     type="number"
                     value={item.stock}
                     onChange={(e) => handleStockChange(index, e.target.value)}
-                    min="0"
+                    className="w-24"
                   />
                 </div>
               ))}
-              <Button onClick={handleSaveStock}>Save Stock Values</Button>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowStockModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveStock}>Save</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Success Dialog */}
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Product Created Successfully!</span>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="text-center py-4">
+              <p className="text-gray-600">
+                Your product has been created and is now available in your store.
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Redirecting to products page...
+              </p>
             </div>
           </DialogContent>
         </Dialog>

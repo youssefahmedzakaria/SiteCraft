@@ -1,4 +1,12 @@
-export function ProductTableHeader() {
+export function ProductTableHeader({
+  selectAll = false,
+  onSelectAll,
+  selectedProducts = []
+}: {
+  selectAll?: boolean;
+  onSelectAll?: () => void;
+  selectedProducts?: number[];
+}) {
     return (
         <thead className="bg-logo-light-button">
             <tr>
@@ -6,6 +14,12 @@ export function ProductTableHeader() {
                 scope="col"
                 className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider"
                 >
+                <input
+                  type="checkbox"
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                  checked={selectAll}
+                  onChange={onSelectAll}
+                />
                 </th>
                 <th
                 scope="col"

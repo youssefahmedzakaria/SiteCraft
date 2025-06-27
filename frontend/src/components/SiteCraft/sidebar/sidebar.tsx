@@ -73,7 +73,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex flex-col space-y-2 mt-6">
+        <nav className="flex flex-col space-y-1">
           {sidebarElements.map((element) => (
             <div key={element.id}>
               {/* Add a divider before Account Settings */}
@@ -81,9 +81,17 @@ export function Sidebar() {
                 <div className="border-t border-primary-foreground my-2 mx-4"></div>
               )}
 
-              <Link href={element.destination} onClick={() => setIsOpen(false)}>
-                <SidebarElementComponent element={element} />
-              </Link>
+              {/* Handle logout differently - don't wrap in Link */}
+              {element.title === 'Log Out' ? (
+                <div onClick={() => setIsOpen(false)}>
+                  <SidebarElementComponent element={element} />
+                </div>
+              ) : (
+                <Link href={element.destination} onClick={() => setIsOpen(false)}>
+                  <SidebarElementComponent element={element} />
+                </Link>
+              )}
+              
               {element.destination === "/dashboard/analytics" &&
                 pathname.startsWith("/dashboard/analytics") && (
                   <Link

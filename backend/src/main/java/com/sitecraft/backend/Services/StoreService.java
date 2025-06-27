@@ -31,19 +31,26 @@ public class StoreService {
     private AboutUsRepo aboutUsRepository;
 
     public Store createStore(Store store, Long userId) {
+        System.out.println("🏪 StoreService.createStore called for user ID: " + userId);
         try {
             store.setCreationDate(LocalDateTime.now());
+            System.out.println("📅 Store creation date set");
 
             Store savedStore = storeRepo.save(store);
+            System.out.println("✅ Store saved with ID: " + savedStore.getId());
+            
             Users tempUser = new Users();
             tempUser.setId(userId);
 
             UserRole ownerRole = new UserRole("owner", tempUser, savedStore.getId());
             userRoleRepo.save(ownerRole);
+            System.out.println("👑 Owner role created for user ID: " + userId + " and store ID: " + savedStore.getId());
 
             return storeRepo.save(savedStore);
 
         } catch (Exception e) {
+            System.out.println("💥 Error creating store: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to create store: " + e.getMessage());
         }
     }

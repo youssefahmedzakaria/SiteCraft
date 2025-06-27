@@ -13,6 +13,215 @@ export interface Policy {
     type: 'Text' | 'Image' | 'Mission' | 'Team' | 'History';
     status: 'Visible' | 'Hidden';
   }
+
+  // Store interface for API integration
+  export interface Store {
+    id?: number;
+    storeName: string;
+    storeType?: string;
+    logo?: string;
+    description?: string;
+    phoneNumber?: string;
+    emailAddress?: string;
+    address?: string;
+    addressLink?: string;
+    openingHours?: string;
+    subdomain?: string;
+    socialMediaAccounts?: SocialMedia[];
+  }
+
+  export interface SocialMedia {
+    id?: number;
+    platform: string;
+    url: string;
+  }
+
+  // Staff member interface for API integration
+  export interface StaffMember {
+    id?: number;
+    name: string;
+    email: string;
+    gender: 'Male' | 'Female';
+    phone: string;
+    role?: string;
+    storeId?: number;
+  }
+
+  // Store API functions
+  export async function getStoreSettings() {
+    console.log('🏪 Getting store settings...');
+    
+    const res = await fetch('http://localhost:8080/api/store/getStoreSettings', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    
+    console.log('📡 Get store settings response status:', res.status);
+    console.log('📡 Get store settings response ok:', res.ok);
+    
+    if (!res.ok) {
+      let msg = 'Failed to get store settings';
+      try { 
+        const data = await res.json();
+        msg = data.message || data || msg; 
+        console.log('❌ Get store settings error response:', data);
+      } catch {
+        try {
+          msg = await res.text() || msg;
+          console.log('❌ Get store settings error text:', msg);
+        } catch {
+          console.log('❌ Get store settings failed with unknown error');
+        }
+      }
+      throw new Error(msg);
+    }
+    
+    const data = await res.json();
+    console.log('✅ Store settings retrieved successfully!', data);
+    return data.store;
+  }
+
+  export async function updateStoreInfo(storeData: Partial<Store>, logo?: File) {
+    console.log('🏪 Updating store info...', { storeData, logo });
+    
+    const formData = new FormData();
+    formData.append('store', JSON.stringify(storeData));
+    
+    if (logo) {
+      formData.append('logo', logo);
+    }
+    
+    const res = await fetch('http://localhost:8080/api/store/updateStoreInfo', {
+      method: 'PUT',
+      credentials: 'include',
+      body: formData,
+    });
+    
+    console.log('📡 Update store info response status:', res.status);
+    console.log('📡 Update store info response ok:', res.ok);
+    
+    if (!res.ok) {
+      let msg = 'Failed to update store info';
+      try { 
+        const data = await res.json();
+        msg = data.message || data || msg; 
+        console.log('❌ Update store info error response:', data);
+      } catch {
+        try {
+          msg = await res.text() || msg;
+          console.log('❌ Update store info error text:', msg);
+        } catch {
+          console.log('❌ Update store info failed with unknown error');
+        }
+      }
+      throw new Error(msg);
+    }
+    
+    const data = await res.json();
+    console.log('✅ Store info updated successfully!', data);
+    return data.store;
+  }
+
+  // Staff Management API functions
+  export async function getStoreStaff() {
+    console.log('👥 Getting store staff...');
+    
+    const res = await fetch('http://localhost:8080/api/store/getStoreStaff', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    
+    console.log('📡 Get store staff response status:', res.status);
+    console.log('📡 Get store staff response ok:', res.ok);
+    
+    if (!res.ok) {
+      let msg = 'Failed to get store staff';
+      try { 
+        const data = await res.json();
+        msg = data.message || data || msg; 
+        console.log('❌ Get store staff error response:', data);
+      } catch {
+        try {
+          msg = await res.text() || msg;
+          console.log('❌ Get store staff error text:', msg);
+        } catch {
+          console.log('❌ Get store staff failed with unknown error');
+        }
+      }
+      throw new Error(msg);
+    }
+    
+    const data = await res.json();
+    console.log('✅ Store staff retrieved successfully!', data);
+    return data.staffMembers;
+  }
+
+  export async function addStaff(staffData: Omit<StaffMember, 'id'>) {
+    console.log('👥 Adding staff member...', staffData);
+    
+    const res = await fetch('http://localhost:8080/api/store/addStaff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(staffData),
+    });
+    
+    console.log('📡 Add staff response status:', res.status);
+    console.log('📡 Add staff response ok:', res.ok);
+    
+    if (!res.ok) {
+      let msg = 'Failed to add staff member';
+      try { 
+        const data = await res.json();
+        msg = data.message || data || msg; 
+        console.log('❌ Add staff error response:', data);
+      } catch {
+        try {
+          msg = await res.text() || msg;
+          console.log('❌ Add staff error text:', msg);
+        } catch {
+          console.log('❌ Add staff failed with unknown error');
+        }
+      }
+      throw new Error(msg);
+    }
+    
+    const data = await res.json();
+    console.log('✅ Staff member added successfully!', data);
+    return data.staffMember;
+  }
+
+  export async function removeStaff(staffId: number) {
+    console.log('👥 Removing staff member...', staffId);
+    
+    const res = await fetch(`http://localhost:8080/api/store/removeStaff/${staffId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    
+    console.log('📡 Remove staff response status:', res.status);
+    console.log('📡 Remove staff response ok:', res.ok);
+    
+    if (!res.ok) {
+      let msg = 'Failed to remove staff member';
+      try { 
+        const data = await res.json();
+        msg = data.message || data || msg; 
+        console.log('❌ Remove staff error response:', data);
+      } catch {
+        try {
+          msg = await res.text() || msg;
+          console.log('❌ Remove staff error text:', msg);
+        } catch {
+          console.log('❌ Remove staff failed with unknown error');
+        }
+      }
+      throw new Error(msg);
+    }
+    
+    console.log('✅ Staff member removed successfully!');
+    return true;
+  }
   
   // Sample policies data
   export const policies: Policy[] = [

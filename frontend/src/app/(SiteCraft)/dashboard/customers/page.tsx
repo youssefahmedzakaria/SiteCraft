@@ -5,11 +5,10 @@ import { useState } from "react";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { CustomerTableHeader } from "@/components/SiteCraft/dashboard/customers/customerHeader";
 import { CustomerRecord } from "@/components/SiteCraft/dashboard/customers/customerRecord";
-import { customers } from "@/lib/customers";
+import { useCustomerManagement } from "@/hooks/useCustomerManagement";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { ChevronDown, UserCheck, UserX, Users } from "lucide-react";
-import Image from "next/image";
+import { ChevronDown, UserCheck, UserX, Users, AlertCircle, RefreshCw } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +22,16 @@ export default function CustomersPage() {
     "All" | "Active" | "Suspended"
   >("All");
 
+  const {
+    customers,
+    isLoading,
+    error,
+    isSuspending,
+    clearError,
+    handleSuspendCustomer,
+    refetchCustomers
+  } = useCustomerManagement();
+
   // Filter customers based on search query and status filter
   const filteredCustomers = customers.filter((customer) => {
     const matchesSearch =
@@ -30,16 +39,36 @@ export default function CustomersPage() {
       customer.email.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
-      statusFilter === "All" || customer.status === statusFilter;
+      statusFilter === "All" || 
+      (statusFilter === "Active" && customer.status === "active") ||
+      (statusFilter === "Suspended" && customer.status === "inactive");
 
     return matchesSearch && matchesStatus;
   });
 
   // Count customers by status
-  const activeCount = customers.filter((c) => c.status === "Active").length;
-  const suspendedCount = customers.filter(
-    (c) => c.status === "Suspended"
-  ).length;
+  const activeCount = customers.filter((c) => c.status === "active").length;
+  const suspendedCount = customers.filter((c) => c.status === "inactive").length;
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading customers...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -53,6 +82,24 @@ export default function CustomersPage() {
             Manage your customer relationships and accounts
           </h2>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -88,10 +135,14 @@ export default function CustomersPage() {
         </div>
 
         {/* Filters and search */}
-        <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3  ">
+        <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            {/* Search Bar - Using the SearchBar component like in products page */}
-            <SearchBar placeholder="Search by name or email..." />
+            {/* Search Bar */}
+            <SearchBar 
+              placeholder="Search by name or email..." 
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
 
             {/* Status Filter */}
             <DropdownMenu>
@@ -120,14 +171,19 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        {/* Customers table  */}
+        {/* Customers table */}
         <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
           <table className="min-w-full divide-y divide-logo-border">
             <CustomerTableHeader />
             <tbody className="bg-white divide-y divide-logo-border">
               {filteredCustomers.length > 0 ? (
                 filteredCustomers.map((customer) => (
-                  <CustomerRecord key={customer.id} customer={customer} />
+                  <CustomerRecord 
+                    key={customer.id} 
+                    customer={customer}
+                    onSuspend={handleSuspendCustomer}
+                    isSuspending={isSuspending === customer.id}
+                  />
                 ))
               ) : (
                 <tr>
@@ -135,13 +191,30 @@ export default function CustomersPage() {
                     colSpan={7}
                     className="px-6 py-10 text-center text-gray-500"
                   >
-                    No customers found matching your search criteria.
+                    {customers.length === 0 
+                      ? "No customers found. Try refreshing the page."
+                      : "No customers found matching your search criteria."
+                    }
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Refresh button for fallback */}
+        {customers.length === 0 && !isLoading && (
+          <div className="mt-6 text-center">
+            <Button
+              onClick={refetchCustomers}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh Customers</span>
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );

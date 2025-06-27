@@ -1,21 +1,35 @@
 import { useState } from 'react'
+import { useAuth } from './useAuth'
+import { useRouter } from 'next/navigation'
 
 export const useLoginForm = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const { login, loginError, isLoading, clearError } = useAuth()
+  const router = useRouter()
 
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault()
-    setIsLoading(true)
+    clearError()
 
-    try {
-      // Add your login logic here
-      await new Promise(resolve => setTimeout(resolve, 3000))
-    } catch (error) {
-      console.error('Login error:', error)
-    } finally {
-      setIsLoading(false)
+    if (!email || !password) {
+      return
+    }
+
+    const success = await login(email, password)
+    if (success) {
+      router.push('/dashboard')
     }
   }
 
-  return { isLoading, onSubmit }
+  return { 
+    email, 
+    setEmail, 
+    password, 
+    setPassword, 
+    isLoading, 
+    loginError, 
+    onSubmit,
+    clearError 
+  }
 } 

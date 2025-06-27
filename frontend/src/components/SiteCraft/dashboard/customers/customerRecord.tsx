@@ -4,13 +4,32 @@ import { useState } from "react";
 import { SuspendConfirmationDialog } from "@/components/SiteCraft/ui/SuspendConfirmationDialog";
 import Link from "next/link";
 
-export function CustomerRecord({ customer }: { customer: Customer }) {
+interface CustomerRecordProps {
+  customer: Customer;
+  onSuspend: (customerId: number) => Promise<void>;
+  isSuspending: boolean;
+}
+
+export function CustomerRecord({ customer, onSuspend, isSuspending }: CustomerRecordProps) {
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
 
-  const handleSuspendCustomer = () => {
-    // Logic to suspend the customer goes here
-    console.log(`Suspending customer: ${customer.name}`);
-    setSuspendDialogOpen(false);
+  const handleSuspendCustomer = async () => {
+    try {
+      await onSuspend(customer.id);
+      setSuspendDialogOpen(false);
+    } catch (error) {
+      console.error('Error suspending customer:', error);
+    }
+  };
+
+  const getStatusDisplay = (status: string) => {
+    return status === 'active' ? 'Active' : 'Suspended';
+  };
+
+  const getStatusClass = (status: string) => {
+    return status === 'active'
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
   };
 
   return (
@@ -30,24 +49,20 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-1/12">
-        <div className="text-sm text-gray-500">{customer.orders}</div>
+        <div className="text-sm text-gray-500">{customer.orderCount || 0}</div>
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-2/12">
         <div className="text-sm text-gray-500">
-          EGP {customer.totalSpent.toLocaleString()}
+          EGP {(customer.totalSpent || 0).toLocaleString()}
         </div>
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-1/12">
         <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            customer.status === "Active"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(customer.status)}`}
         >
-          {customer.status}
+          {getStatusDisplay(customer.status)}
         </span>
       </td>
 
@@ -67,9 +82,9 @@ export function CustomerRecord({ customer }: { customer: Customer }) {
             size="sm"
             className="text-red-600 hover:text-red-900"
             onClick={() => setSuspendDialogOpen(true)}
-            disabled={customer.status === "Suspended"}
+            disabled={customer.status === "inactive" || isSuspending}
           >
-            Suspend
+            {isSuspending ? "Suspending..." : "Suspend"}
           </Button>
         </div>
       </td>

@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import React, { useMemo } from "react";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Customer, customers } from "@/lib/customers";
-import { mockOrders, Order } from "@/lib/orders";
+import { Customer, getCustomers } from "@/lib/customers";
+import { Order, getOrders } from "@/lib/orders";
 import { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import {
@@ -19,13 +19,14 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { CustomerDetailsTableHeader } from "@/components/SiteCraft/dashboard/customers/customerDetailsTableHeader";
 import { CustomerOrderRecord } from "@/components/SiteCraft/dashboard/customers/customerOrderRecord";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
-import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +43,7 @@ export default function CustomerDetailsPage({
   const router = useRouter();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("date-desc");
@@ -49,21 +51,61 @@ export default function CustomerDetailsPage({
     { from: Date; to: Date } | undefined
   >(undefined);
   const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const ordersPerPage = 10;
 
   const { customerId } = React.use(params as any) as { customerId: string };
 
   useEffect(() => {
-    const foundCustomer = customers.find((c) => c.id === customerId);
-    if (foundCustomer) {
-      setCustomer(foundCustomer);
-      const filteredOrders = mockOrders.filter(
-        (order) => order.customer.customerId === customerId
-      );
-      setCustomerOrders(filteredOrders);
-    } else {
-      notFound();
-    }
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError("");
+        
+        // Fetch all customers from API and find the specific one
+        try {
+          const allCustomers = await getCustomers();
+          const foundCustomer = allCustomers.find(c => c.id === parseInt(customerId));
+          if (foundCustomer) {
+            setCustomer(foundCustomer);
+          } else {
+            setError('Customer not found.');
+            setIsLoading(false);
+            return;
+          }
+        } catch (err: any) {
+          console.error('Error fetching customers:', err);
+          setError('Failed to load customer details. Please check if the backend server is running.');
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch orders from API
+        try {
+          const orders = await getOrders();
+          setAllOrders(orders);
+          
+          // Filter orders for this customer
+          const filteredOrders = orders.filter(
+            (order) => order.customer?.id === parseInt(customerId)
+          );
+          setCustomerOrders(filteredOrders);
+        } catch (err: any) {
+          console.error('Error fetching orders:', err);
+          setError('Failed to load orders. Using empty order list.');
+          // Fallback to empty array - no mock orders for specific customer
+          setCustomerOrders([]);
+        }
+      } catch (err: any) {
+        console.error('Error:', err);
+        setError(err.message || 'An error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [customerId]);
 
   const handleBack = () => {
@@ -78,14 +120,14 @@ export default function CustomerDetailsPage({
         }
         if (
           searchQuery &&
-          !order.id.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          !order.paymentMethod.toLowerCase().includes(searchQuery.toLowerCase())
+          !order.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) &&
+          !(order.paymentLog?.method || '').toLowerCase().includes(searchQuery.toLowerCase())
         ) {
           return false;
         }
         if (
           dateRange &&
-          (order.issueDate < dateRange.from || order.issueDate > dateRange.to)
+          (new Date(order.issueDate) < dateRange.from || new Date(order.issueDate) > dateRange.to)
         ) {
           return false;
         }
@@ -93,13 +135,13 @@ export default function CustomerDetailsPage({
       })
       .sort((a, b) => {
         if (sortBy === "date-desc") {
-          return b.issueDate.getTime() - a.issueDate.getTime();
+          return new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime();
         } else if (sortBy === "date-asc") {
-          return a.issueDate.getTime() - b.issueDate.getTime();
+          return new Date(a.issueDate).getTime() - new Date(b.issueDate).getTime();
         } else if (sortBy === "value-desc") {
-          return b.total - a.total;
+          return (b.price || 0) - (a.price || 0);
         } else if (sortBy === "value-asc") {
-          return a.total - b.total;
+          return (a.price || 0) - (b.price || 0);
         }
         return 0;
       });
@@ -135,10 +177,29 @@ export default function CustomerDetailsPage({
     "Cancelled",
   ];
 
+  const clearError = () => setError("");
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100">
+        <div className="flex items-center space-x-2">
+          <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+          <span className="text-lg text-gray-600">Loading customer details...</span>
+        </div>
+      </div>
+    );
+  }
+
   if (!customer) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-logo-dark-button"></div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800">Customer not found</h2>
+          <Button onClick={handleBack} className="mt-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Customers
+          </Button>
+        </div>
       </div>
     );
   }
@@ -154,28 +215,40 @@ export default function CustomerDetailsPage({
           </h2>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-6 flex  items-center justify-between py-6 px-10 ">
-          {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 border-b border-logo-border"> */}
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg shadow overflow-hidden mb-6 flex items-center justify-between py-6 px-10">
           <div className="text-center">
             <p className="text-sm text-muted-foreground">Total Orders</p>
-            <p className="text-2xl font-semibold">{customer.orders}</p>
+            <p className="text-2xl font-semibold">{customerOrders.length}</p>
           </div>
           <div className="text-center">
             <p className="text-sm text-muted-foreground">Total Spent</p>
             <p className="text-lg font-semibold">
-              EGP {customer.totalSpent.toLocaleString()}
+              EGP {customerOrders.reduce((sum, order) => sum + (order.price || 0), 0).toLocaleString()}
             </p>
           </div>
           <div className="text-center">
             <p className="text-sm text-muted-foreground">Avg. Order Value</p>
             <p className="text-lg font-semibold">
               {customerOrders.length > 0
-                ? `EGP ${(
-                    customerOrders.reduce(
-                      (sum, order) => sum + order.total,
-                      0
-                    ) / customerOrders.length
-                  ).toFixed(2)}`
+                ? `EGP ${(customerOrders.reduce((sum, order) => sum + (order.price || 0), 0) / customerOrders.length).toFixed(2)}`
                 : "EGP 0.00"}
             </p>
           </div>
@@ -186,7 +259,7 @@ export default function CustomerDetailsPage({
                 ? format(
                     new Date(
                       Math.max(
-                        ...customerOrders.map((o) => o.issueDate.getTime())
+                        ...customerOrders.map((o) => new Date(o.issueDate).getTime())
                       )
                     ),
                     "MMM d, yyyy"
@@ -194,15 +267,18 @@ export default function CustomerDetailsPage({
                 : "N/A"}
             </p>
           </div>
-          {/* </div> */}
         </div>
 
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4">Order History</h3>
 
-          <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3 ">
+          <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <SearchBar placeholder="Search orders..." />
+              <SearchBar 
+                placeholder="Search orders..." 
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
               <FilterButton
                 onApplyFilters={handleFiltersApply}
                 statuses={orderStatuses}
@@ -274,7 +350,7 @@ export default function CustomerDetailsPage({
                     </button>
                   </div>
                 )}
-                {/* {searchQuery && (
+                {searchQuery && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>Search: {searchQuery}</span>
                     <button
@@ -285,7 +361,7 @@ export default function CustomerDetailsPage({
                       <X size={16} />
                     </button>
                   </div>
-                )} */}
+                )}
                 {dateRange && (
                   <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
                     <span>

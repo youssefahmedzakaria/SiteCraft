@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useSignupForm } from "@/hooks/useSignupForm";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Label } from "@/components/SiteCraft/ui/label";
@@ -11,36 +10,15 @@ import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export function SignupForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [signupError, setError] = useState("");
-  const { signup } = useAuth();
-
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    window.location.href = "/branding";
-    // setIsLoading(true);
-    // setError("");
-
-    // const formData = new FormData(event.currentTarget);
-    // const email = formData.get("email") as string;
-    // const password = formData.get("password") as string;
-    // const confirmPassword = formData.get("confirmPassword") as string;
-
-    // if (password !== confirmPassword) {
-    //   setError("Passwords do not match");
-    //   setIsLoading(false);
-    //   return;
-    // }
-
-    // try {
-    //   await signup(email, password);
-    // } catch (signupError) {
-    //   console.error("Signup failed:", signupError);
-    //   setError("Failed to create account. Please try again.");
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  }
+  const {
+    formData,
+    handleInputChange,
+    errors,
+    signupError,
+    isLoading,
+    onSubmit,
+    clearError
+  } = useSignupForm();
 
   return (
     <form onSubmit={onSubmit} className="w-full space-y-6">
@@ -49,7 +27,7 @@ export function SignupForm() {
           Create an account
         </h1>
         <p className="text-sm text-muted-foreground">
-          Enter your email below to create your account
+          Enter your details below to create your account and store
         </p>
       </div>
 
@@ -72,13 +50,21 @@ export function SignupForm() {
             <Input
               id="name"
               name="name"
-              type="name"
+              type="text"
               placeholder="Full Name"
               autoComplete="name"
               required
               disabled={isLoading}
+              value={formData.name}
+              onChange={(e) => {
+                handleInputChange('name', e.target.value)
+                if (errors.name) clearError()
+              }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
+            {errors.name && (
+              <p className="text-sm text-red-600">{errors.name}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -96,8 +82,16 @@ export function SignupForm() {
               autoComplete="email"
               required
               disabled={isLoading}
+              value={formData.email}
+              onChange={(e) => {
+                handleInputChange('email', e.target.value)
+                if (errors.email) clearError()
+              }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
+            {errors.email && (
+              <p className="text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -115,8 +109,16 @@ export function SignupForm() {
               autoComplete="new-password"
               required
               disabled={isLoading}
+              value={formData.password}
+              onChange={(e) => {
+                handleInputChange('password', e.target.value)
+                if (errors.password) clearError()
+              }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
+            {errors.password && (
+              <p className="text-sm text-red-600">{errors.password}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -134,8 +136,16 @@ export function SignupForm() {
               autoComplete="new-password"
               required
               disabled={isLoading}
+              value={formData.confirmPassword}
+              onChange={(e) => {
+                handleInputChange('confirmPassword', e.target.value)
+                if (errors.confirmPassword) clearError()
+              }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-600">{errors.confirmPassword}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -153,8 +163,16 @@ export function SignupForm() {
               autoComplete="tel"
               required
               disabled={isLoading}
+              value={formData.phone}
+              onChange={(e) => {
+                handleInputChange('phone', e.target.value)
+                if (errors.phone) clearError()
+              }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
+            {errors.phone && (
+              <p className="text-sm text-red-600">{errors.phone}</p>
+            )}
           </div>
 
           {/* Gender Radio Buttons */}
@@ -172,6 +190,11 @@ export function SignupForm() {
                   name="gender"
                   value="male"
                   disabled={isLoading}
+                  checked={formData.gender === 'male'}
+                  onChange={(e) => {
+                    handleInputChange('gender', e.target.value)
+                    if (errors.gender) clearError()
+                  }}
                   className="h-4 w-4 accent-logo-dark-button focus:ring-logo-dark-button"
                 />
                 <span className="ml-2 text-sm text-foreground/90">Male</span>
@@ -182,11 +205,19 @@ export function SignupForm() {
                   name="gender"
                   value="female"
                   disabled={isLoading}
+                  checked={formData.gender === 'female'}
+                  onChange={(e) => {
+                    handleInputChange('gender', e.target.value)
+                    if (errors.gender) clearError()
+                  }}
                   className="h-4 w-4 accent-logo-dark-button focus:ring-logo-dark-button"
                 />
                 <span className="ml-2 text-sm text-foreground/90">Female</span>
               </label>
             </div>
+            {errors.gender && (
+              <p className="text-sm text-red-600">{errors.gender}</p>
+            )}
           </div>
         </div>
       </div>
@@ -225,7 +256,7 @@ export function SignupForm() {
 
       <div className="text-center text-xs text-muted-foreground">
         <p>
-          By creating an account, you agree to our{" "}
+          By continuing, you agree to our{" "}
           <Button
             variant="link"
             className="text-primary hover:text-primary/90 px-1 h-auto text-xs"

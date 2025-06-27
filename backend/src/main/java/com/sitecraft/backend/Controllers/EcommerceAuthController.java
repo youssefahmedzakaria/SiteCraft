@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/ecommerce/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
 public class EcommerceAuthController {
     @Autowired
     private EcommerceAuthService ecommerceAuthService;

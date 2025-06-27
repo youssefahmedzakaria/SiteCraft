@@ -30,6 +30,9 @@ public class UserService {
     @Autowired
     private OTPRepo otpRepo;
 
+    @Autowired
+    private StoreService storeService;
+
     private final JavaMailSender mailSender; // You need to configure this
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -42,15 +45,46 @@ public class UserService {
         return userRepo.findAll();
     }
 
+    @Transactional
     public Users register(Users users) {
+        System.out.println("🔧 UserService.register called for: " + users.getEmail());
+        
+        // Encode password
         String encodedPassword = passwordEncoder.encode(users.getPassword());
         users.setPassword(encodedPassword);
-        return userRepo.save(users);
+        System.out.println("🔐 Password encoded successfully");
+        
+        // Save the user first
+        Users savedUser = userRepo.save(users);
+        System.out.println("✅ User saved with ID: " + savedUser.getId());
+        
+        // Create a default store for the user
+        Store defaultStore = new Store();
+        defaultStore.setStoreName(users.getName() + "'s Store");
+        defaultStore.setStoreType("General");
+        defaultStore.setDescription("Store created for " + users.getName());
+        defaultStore.setEmailAddress(users.getEmail());
+        defaultStore.setPhoneNumber(users.getPhone());
+        defaultStore.setCreationDate(LocalDateTime.now());
+        
+        System.out.println("🏪 Creating store: " + defaultStore.getStoreName());
+        
+        // Create the store and assign user as owner
+        Store createdStore = storeService.createStore(defaultStore, savedUser.getId());
+        System.out.println("✅ Store created with ID: " + createdStore.getId());
+        
+        return savedUser;
     }
 
     public boolean isUserExists(String email) {
         Users users = userRepo.findByEmail(email);
         return users != null;
+    }
+
+    public UserRole getUserRole(Long userId) {
+        Users user = userRepo.findById(userId).orElse(null);
+        if (user == null) return null;
+        return userRoleRepo.findByUser(user);
     }
 
     public Users login(String email, String password) {
@@ -75,18 +109,25 @@ public class UserService {
     }
 
     public void sendOTP(String email) {
+        System.out.println("📧 UserService.sendOTP called for: " + email);
         Users user = userRepo.findByEmail(email);
-        if (user == null) return;
+        if (user == null) {
+            System.out.println("❌ User not found in sendOTP: " + email);
+            return;
+        }
 
+        System.out.println("✅ User found, deactivating old OTPs...");
         // Deactivate old OTPs
         List<OTP> oldOtps = otpRepo.findByUserIdAndActiveTrue(String.valueOf(user.getId()));
         for (OTP o : oldOtps) {
             o.setActive(false);
         }
         otpRepo.saveAll(oldOtps);
+        System.out.println("✅ Old OTPs deactivated");
 
         // 1. Generate a 6-digit random OTP
         String otpCode = String.format("%06d", new Random().nextInt(999999));
+        System.out.println("🔐 Generated OTP code: " + otpCode);
 
         OTP otp = new OTP();
         otp.setCode(otpCode);
@@ -96,6 +137,7 @@ public class UserService {
         otp.setCreatedAt(LocalDateTime.now());
         otp.setExpiresAt(LocalDateTime.now().plusMinutes(5)); // expires in 5 minutes
         otpRepo.save(otp);
+        System.out.println("✅ OTP saved to database");
 
         // 3. Send OTP by email
         SimpleMailMessage message = new SimpleMailMessage();
@@ -103,23 +145,34 @@ public class UserService {
         message.setSubject("Your OTP Code");
         message.setText("Your OTP is: " + otpCode + "\nIt is valid for 5 minutes.");
         mailSender.send(message);
+        System.out.println("✅ OTP email sent to: " + user.getEmail());
     }
 
     public void verifyOTP(String email, String code) {
+        System.out.println("🔐 UserService.verifyOTP called for: " + email + " with code: " + code);
         try {
             Users user = userRepo.findByEmail(email);
+            if (user == null) {
+                System.out.println("❌ User not found in verifyOTP: " + email);
+                throw new RuntimeException("User not found");
+            }
+            
+            System.out.println("✅ User found, searching for valid OTP...");
             OTP otp = otpRepo.findTopByUserIdAndCodeAndActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(String.valueOf(user.getId()), code, LocalDateTime.now());
 
-
             if (otp == null) {
+                System.out.println("❌ Invalid or expired OTP for user: " + email);
                 throw new RuntimeException("Invalid or expired OTP");
             }
 
+            System.out.println("✅ Valid OTP found, deactivating...");
             // Deactivate OTP
             otp.setActive(false);
             otpRepo.save(otp);
+            System.out.println("✅ OTP deactivated successfully");
 
         } catch (Exception e) {
+            System.out.println("💥 Verify OTP error: " + e.getMessage());
             throw new RuntimeException("Failed to verify OTP: " + e.getMessage(), e);
         }
     }
