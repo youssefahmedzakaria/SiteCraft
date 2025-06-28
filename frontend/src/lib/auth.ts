@@ -43,21 +43,31 @@ export async function logout() {
 }
 
 export async function getSession() {
+  console.log('🔐 Getting session from backend...');
   const res = await fetch('http://localhost:8080/auth/getSession', {
     credentials: 'include',
   });
-  if (!res.ok) return null;
-  return res.json();
+  console.log('📡 getSession response status:', res.status);
+  console.log('📡 getSession response ok:', res.ok);
+  
+  if (!res.ok) {
+    console.log('❌ getSession failed');
+    return null;
+  }
+  
+  const sessionData = await res.json();
+  console.log('✅ getSession successful, data:', sessionData);
+  return sessionData;
 }
 
-export async function setSession(userId: number, storeId: number | null) {
-  console.log('🔐 Setting session...', { userId, storeId });
+export async function setSession(userId: number, storeId: number | null, role?: string | null) {
+  console.log('🔐 Setting session...', { userId, storeId, role });
   
   const res = await fetch('http://localhost:8080/auth/setSession', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ userId, storeId }),
+    body: JSON.stringify({ userId, storeId, role }),
   });
   
   console.log('📡 Set session response status:', res.status);
