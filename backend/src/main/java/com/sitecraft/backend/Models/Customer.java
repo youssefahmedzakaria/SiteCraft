@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,12 @@ public class Customer {
     private String gender;
     private String phone;
     private String status;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wishlist_id")
@@ -42,7 +49,7 @@ public class Customer {
     @JsonIgnore
     private List<Review> reviews;
 
-    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
+    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, LocalDateTime createdAt, LocalDateTime updatedAt, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -50,6 +57,8 @@ public class Customer {
         this.gender = gender;
         this.phone = phone;
         this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.wishList = wishList;
         this.shoppingCart = shoppingCart;
         this.store = store;
@@ -115,6 +124,22 @@ public class Customer {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public WishList getWishList() {

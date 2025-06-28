@@ -1,3 +1,4 @@
+// src/main/java/com/sitecraft/backend/Services/CustomerService.java
 package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.Models.Address;
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class CustomerService {
@@ -36,11 +37,14 @@ public class CustomerService {
         LocalDate endDate,
         Long storeId
     ) {
-        return customerRepo.countNewCustomersByDateRange(storeId, startDate, endDate);
+        // inclusive start at 00:00, exclusive end at next day's 00:00
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end   = endDate.plusDays(1).atStartOfDay();
+        return customerRepo.countByStoreIdAndCreatedAtBetween(storeId, start, end);
     }
 
     /**
-     * Count returning customers (who updated profile) within the given date range for the specified store.
+     * Count returning customers (who placed orders before the window and again within it).
      */
     public long countReturningCustomersByDateRange(
         LocalDate startDate,
@@ -58,11 +62,13 @@ public class CustomerService {
 
             // Check if customer belongs to the store
             if (customer.getStore() == null || !customer.getStore().getId().equals(storeId)) {
+
                 throw new IllegalAccessException("Customer does not belong to your store");
             }
 
             customer.setStatus("inactive");
-            // No explicit save() needed due to dirty checking in @Transactional
+            customer.setUpdatedAt(LocalDateTime.now());
+            customerRepo.save(customer);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Access denied: " + e.getMessage());
         } catch (Exception e) {
@@ -107,6 +113,7 @@ public class CustomerService {
             if (updatedCustomer.getName() != null) customer.setName(updatedCustomer.getName());
             if (updatedCustomer.getPhone() != null) customer.setPhone(updatedCustomer.getPhone());
             if (updatedCustomer.getGender() != null) customer.setGender(updatedCustomer.getGender());
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update customer info: " + e.getMessage());
@@ -132,6 +139,7 @@ public class CustomerService {
             }
 
             customer.setPassword(encoder.encode(newPassword));
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
 
         } catch (Exception e) {
@@ -204,4 +212,5 @@ public class CustomerService {
 //        }
 //        return orderRepo.findByCustomerId(customerId);
 //    }
+
 }
