@@ -2,11 +2,15 @@
 import React, { useState } from "react";
 import { Dot } from "lucide-react";
 
-export function HeaderLayoutItems() {
-  {
-    /* For layout selection in design */
-  }
-  const [layoutSelected, setLayoutSelected] = useState<number | null>(1);
+interface HeaderLayoutItemsProps {
+  selectedLayout: number;
+  onLayoutSelect: (layoutId: number) => void;
+}
+
+export function HeaderLayoutItems({
+  selectedLayout,
+  onLayoutSelect,
+}: HeaderLayoutItemsProps) {
   return (
     <div>
       <h3 className="font-medium mb-2">Layout</h3>
@@ -15,31 +19,31 @@ export function HeaderLayoutItems() {
           <button
             key={layoutId}
             className={`aspect-square px-2 rounded border border-gray-200 hover:border-gray-900 transition-colors shadow ${
-              layoutId === layoutSelected
+              layoutId === selectedLayout
                 ? "bg-gray-800 border-gray-500"
                 : "bg-white"
             }`}
-            onClick={() => setLayoutSelected(layoutId)}
+            onClick={() => onLayoutSelect(layoutId)}
           >
             {layoutId === 1 && (
               <div className="flex space-x-0.5 items-center justify-center w-full h-2 px-1 bg-gray-300">
                 <div
                   className={`w-1 h-1 rounded-full ${
-                    1 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-2 h-0.5 ${
-                    1 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-2 h-0.5 ${
-                    1 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
@@ -51,14 +55,14 @@ export function HeaderLayoutItems() {
                 <div className="flex justify-between items-center w-full">
                   <div
                     className={`w-1 h-1 rounded-full ${
-                      2 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-2 h-0.5 ${
-                      2 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
@@ -66,7 +70,7 @@ export function HeaderLayoutItems() {
                 </div>
                 <div
                   className={`w-full h-0.5 ${
-                    2 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
@@ -77,21 +81,21 @@ export function HeaderLayoutItems() {
               <div className="flex space-x-0.5 items-center justify-center w-full h-2 px-1 bg-gray-300">
                 <div
                   className={`w-2 h-0.5 ${
-                    3 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-1 h-1 rounded-full ${
-                    3 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-800 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-2 h-0.5 ${
-                    3 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
@@ -103,21 +107,21 @@ export function HeaderLayoutItems() {
                 <div className="flex justify-between items-center w-full">
                   <div
                     className={`w-2 h-0.5 ${
-                      4 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-1 h-1 rounded-full ${
-                      4 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-2 h-0.5 ${
-                      4 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
@@ -125,7 +129,7 @@ export function HeaderLayoutItems() {
                 </div>
                 <div
                   className={`w-full h-0.5 ${
-                    4 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
@@ -136,21 +140,21 @@ export function HeaderLayoutItems() {
               <div className="flex space-x-0.5 items-center justify-center w-full h-2 px-1 bg-gray-300">
                 <div
                   className={`w-1.5 h-0.5 ${
-                    5 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-1.5 h-0.5 ${
-                    5 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
                 ></div>
                 <div
                   className={`w-1.5 h-0.5 ${
-                    5 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}
@@ -162,7 +166,7 @@ export function HeaderLayoutItems() {
                 <div className="w-1/3 h-full flex items-center justify-center">
                   <div
                     className={`w-1 h-1 rounded-full ${
-                      6 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
@@ -172,21 +176,21 @@ export function HeaderLayoutItems() {
                 <div className="flex flex-col w-1/3 h-full justify-center items-center gap-[1.5px]">
                   <div
                     className={`w-1.5 h-[1px] ${
-                      6 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-1.5 h-[1px] ${
-                      6 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-1.5 h-[1px] ${
-                      6 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
@@ -199,21 +203,21 @@ export function HeaderLayoutItems() {
                 <div className="flex flex-col w-1/3 h-full justify-center items-center gap-[1.5px]">
                   <div
                     className={`w-1.5 h-[1px] ${
-                      7 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-1.5 h-[1px] ${
-                      7 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-1.5 h-[1px] ${
-                      7 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
@@ -222,7 +226,7 @@ export function HeaderLayoutItems() {
                 <div className="w-1/3 h-full flex items-center justify-center">
                   <div
                     className={`w-1 h-1 rounded-full ${
-                      7 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
@@ -236,14 +240,14 @@ export function HeaderLayoutItems() {
                 <div className="flex justify-between items-center w-full">
                   <div
                     className={`w-1 h-1 rounded-full ${
-                      8 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-800 border-gray-500"
                         : "bg-white"
                     }`}
                   ></div>
                   <div
                     className={`w-4 h-0.5 ${
-                      8 === layoutSelected
+                      layoutId === selectedLayout
                         ? "bg-gray-900 border-gray-500"
                         : "bg-white"
                     }`}
@@ -251,7 +255,7 @@ export function HeaderLayoutItems() {
                 </div>
                 <div
                   className={`w-full h-0.5 ${
-                    8 === layoutSelected
+                    layoutId === selectedLayout
                       ? "bg-gray-900 border-gray-500"
                       : "bg-white"
                   }`}

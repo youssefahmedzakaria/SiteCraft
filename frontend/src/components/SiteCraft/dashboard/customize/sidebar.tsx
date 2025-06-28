@@ -17,6 +17,7 @@ import { RenderAboutSection } from "./renderAboutSection";
 import { RenderFooterSection } from "./renderFooterSection";
 import { RenderPoliciesSection } from "./renderPoliciesSection";
 import { RenderContactSection } from "./renderContactSection";
+import { HeaderCustomizationAttributes } from "@/lib/customization";
 
 interface Section {
   id: string;
@@ -25,7 +26,17 @@ interface Section {
   expanded: boolean;
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  headerAttributes: HeaderCustomizationAttributes;
+  updateHeaderAttributes: (
+    updates: Partial<HeaderCustomizationAttributes>
+  ) => void;
+}
+
+export function Sidebar({
+  headerAttributes,
+  updateHeaderAttributes,
+}: SidebarProps) {
   // Define sections in an array to make them orderable
   const [sections, setSections] = useState<Section[]>([
     {
@@ -233,7 +244,11 @@ export function Sidebar() {
 
           {/* Detailed Section Content */}
           {detailedSection.id === "Header&Menu" ? (
-            <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
+            <RenderHeaderSection
+              detailedSectionTab={detailedSectionTab}
+              headerAttributes={headerAttributes}
+              updateHeaderAttributes={updateHeaderAttributes}
+            />
           ) : detailedSection.id === "PromoSlider" ? (
             <RenderPromoSection detailedSectionTab={detailedSectionTab} />
           ) : detailedSection.id === "Policies" ? (
