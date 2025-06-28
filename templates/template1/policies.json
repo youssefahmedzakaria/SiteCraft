@@ -1,0 +1,40 @@
+{
+  "template": "TitleLeftContentCenterPolicies",
+  "id": "policies",
+  "title": "Our Policies",
+  "sections": [
+    {
+      "title": "Privacy Policy",
+      "content": "Your privacy is important to us. We are committed to protecting your personal information and your right to privacy"
+    },
+    {
+      "title": "Terms of Service",
+      "content": "By using our website, you agree to comply with and be bound by these terms of service."
+    },
+    {
+      "title": "Return Policy",
+      "content": "If you are not satisfied, you may return the item within 30 days of receipt for a full refund."
+    },
+    {
+      "title": "Shipping Policy",
+      "content": "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days and shipped via reliable carriers."
+    },
+    {
+      "title": "Warranty Policy",
+      "content": "All our products comes with a lifetime warranty against manufacturing defects."
+    }
+  ],
+  "backgroundColor": "bg-white",
+  "titleColor": "text-black",
+  "titleSize": "text-4xl",
+  "titleFont": "font-sans",
+  "titleFontWeight": "font-bold",
+  "sectionTitleColor": "text-black",
+  "sectionTitleSize": "text-2xl",
+  "sectionTitleFont": "font-serif",
+  "sectionTitleFontWeight": "font-medium",
+  "sectionContentColor": "text-gray-600",
+  "sectionContentSize": "text-lg",
+  "sectionContentFont": "font-serif",
+  "sectionContentFontWeight": "font-medium"
+}

@@ -13,8 +13,8 @@ import { usePathname } from "next/navigation";
 const defaultTheme: ThemeConfig = {
   backgroundColor: "white",
   textColor: "black",
-  accentColor: "black",
-  secondaryColor: "white",
+  accentColor: "white",
+  secondaryColor: "black",
   borderRadius: "rounded-lg",
   fontFamily: "font-sans",
 };
@@ -35,6 +35,7 @@ export default function FavoritesPage() {
       price: item.price,
       image: item.image,
     });
+    removeFromFavorites(item.id);
   };
 
   if (state.items.length === 0) {

@@ -1,9 +1,9 @@
 {
-    "brandName": "Jewelry",
+    "brandName": "brand name",
     "backgroundColor": "#ffffff",
     "textColor": "text-black",
     "Logo": {
-        "src": "/logo.png",
+        "src": null,
         "alt": "Custom Logo"
     },
     "aboutLinks": [

@@ -11,7 +11,6 @@ import type { ThemeConfig } from "./product";
 import { useCart } from "@/contexts/cart-context";
 import { useFavorites } from "@/contexts/favorites-context";
 import { usePathname, useRouter } from "next/navigation";
-import type { Product } from "./product";
 import type { CartItem } from "@/contexts/cart-context";
 import type { FavoriteItem } from "@/contexts/favorites-context";
 
@@ -29,7 +28,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
-
+  const productId = pathSegments[4]; 
   const [theme] = useState<ThemeConfig>(defaultTheme);
   const [selectedVariants, setSelectedVariants] = useState<
     Record<string, string>
@@ -115,7 +114,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       return;
     }
     addToCart({
-      id: productData.id,
+      id: productId,
       name: productData.name,
       price: currentPrice,
       image: currentImages[0] || productData.defaultImages[0] || "",
@@ -133,7 +132,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       name: productData.name,
       price: currentPrice,
       image: currentImages[0] || productData.defaultImages[0] || "",
-      id: params.id,
+      id: productId,
     };
     if (isInFavorites) {
       removeFromFavorites(productData.id);

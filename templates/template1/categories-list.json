@@ -8,9 +8,51 @@
             "title": "Category 1",
             "image": "/category1.jpg",
             "imageAlt": "Category 1 Image",
-            "link": "/category1"
+            "link": "/products"
+        },
+        {
+            "id": "category2",
+            "title": "Category 2",
+            "image": "/category2.jpg",
+            "imageAlt": "Category 2 Image",
+            "link": "/products"
+        },
+        {
+            "id": "category3",
+            "title": "Category 3",
+            "image": "/category3.jpg",
+            "imageAlt": "Category 3 Image",
+            "link": "/products"
+        },
+        {
+            "id": "category4",
+            "title": "Category 4",
+            "image": "/category4.jpg",
+            "imageAlt": "Category 4 Image",
+            "link": "/products"
+        },
+        {
+            "id": "category5",
+            "title": "Category 5",
+            "image": "/category5.jpg",
+            "imageAlt": "Category 5 Image",
+            "link": "/products"
+        },
+        {
+            "id": "category6",
+            "title": "Category 6",
+            "image": "/category6.jpg",
+            "imageAlt": "Category 6 Image",
+            "link": "/products"
         }
     ],
+    "columns": {
+        "sm": 1,
+        "md": 4,
+        "lg": 4,
+        "xl": 4
+    },
+    "gap": "gap-6",
     "showCategoryTitle": "true",
     "borderRadius": "rounded-lg",
     "fontFamily": "font-sans",
@@ -29,8 +71,9 @@
     "showCta": true,
     "ctaText": "Shop Now",
     "overlayColor": "bg-black/30",
-    "showMoreButton": true,
-    "showMoreText": "Show More",
-    "showMorebuttonBgColor": "bg-black",
-    "showMorebuttonTextColor": "text-white"
+    "showScrollbar": false,
+    "scrollBarSliderColor": "bg-gray-400",
+    "scrollBarBgColor": "bg-gray-200"
+   
 }
+  
