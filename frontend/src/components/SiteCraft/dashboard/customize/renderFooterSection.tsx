@@ -39,6 +39,7 @@ interface RenderFooterSectionProps {
 export function RenderFooterSection({
   detailedSectionTab,
 }: RenderFooterSectionProps) {
+  const [copyrightFontWeight, setCopyrightFontWeight] = useState<string>("normal");
   {
     /* content sections */
   }
@@ -567,6 +568,41 @@ export function RenderFooterSection({
               </div>
 
               {/* font weight */}
+              <div className="space-y-2">
+                              <label className="block text-sm mb-2">Font Weight</label>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-between"
+                                  >
+                                    {/* {policiesSettings.sectionTitleFontWeight} */} {copyrightFontWeight}
+                                    <ChevronDown className="ml-2 h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  {["normal", "medium", "semibold", "bold"].map((weight) => (
+                                    <DropdownMenuItem
+                                      key={weight}
+                                      onSelect={(e) => {
+                                        const value = weight;
+                                        if (
+                                          value === "normal" ||
+                                          value === "medium" ||
+                                          value === "semibold" ||
+                                          value === "bold"
+                                        ) {
+                                          // updateSettings("sectionTitleFontWeight", value); 
+                                          setCopyrightFontWeight(value);
+                                        }
+                                      }}
+                                    >
+                                      {weight}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
 
               {/* font color */}
               <div className="color-picker-container">
