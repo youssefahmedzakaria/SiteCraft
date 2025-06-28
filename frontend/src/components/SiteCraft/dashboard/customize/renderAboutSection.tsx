@@ -188,51 +188,19 @@ export function RenderAboutSection({
               />
             </div>
           </div>
-          {/* Title */}
+          {/* Image Alt */}
           <div className="flex-1 space-y-2">
             <label
-              htmlFor="title"
+              htmlFor="imageAlt"
               className="block text-sm font-medium text-gray-700"
             >
-              Title
+              Image Alt
             </label>
             <Input
-              id="title"
-              name="title"
-              placeholder="About us title"
+              id="imageAlt"
+              name="imageAlt"
+              placeholder="About us image alt text"
               className="w-full bg-background"
-            />
-          </div>
-          {/* Description */}
-          <div className="space-y-2">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Describle what this section is about"
-              rows={4}
-              className="w-full"
-            />
-          </div>
-          {/* Secondary Description */}
-          <div className="space-y-2">
-            <label
-              htmlFor="secondaryDescription"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Secondary Description
-            </label>
-            <Textarea
-              id="secondaryDescription"
-              name="secondaryDescription"
-              placeholder="Describle what this section is about"
-              rows={4}
-              className="w-full"
             />
           </div>
         </div>

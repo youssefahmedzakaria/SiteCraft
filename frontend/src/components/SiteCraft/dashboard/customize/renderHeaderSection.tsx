@@ -214,67 +214,6 @@ export function RenderHeaderSection({
     <div>
       {detailedSectionTab === "content" ? (
         <div className="p-4 space-y-6">
-          {/* Site Logo Section */}
-          <div>
-            <h3 className="font-medium mb-2">Site Logo</h3>
-            <div
-              className="flex flex-col items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
-              onDragOver={handleDragOverImage}
-              onDrop={handleDropImage}
-            >
-              <div
-                className={`relative w-16 h-16 rounded ${
-                  imagePreview ? "" : "bg-gray-100"
-                }  overflow-hidden`}
-              >
-                {imagePreview ? (
-                  <Image
-                    src={imagePreview}
-                    alt="Logo preview"
-                    fill
-                    className="object-contain rounded-md"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <ImageIcon />
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-2 rounded">
-                {imagePreview ? (
-                  <p className="text-xs">
-                    Drag and drop your image here to change logo, or{" "}
-                    <span
-                      className="cursor-pointer underline"
-                      onClick={handleBrowseClick}
-                    >
-                      browse
-                    </span>
-                  </p>
-                ) : (
-                  <p className="text-xs">
-                    Drag and drop your logo here, or{" "}
-                    <span
-                      className="cursor-pointer underline"
-                      onClick={handleBrowseClick}
-                    >
-                      browse
-                    </span>
-                  </p>
-                )}
-              </div>
-              <input
-                ref={fileInputRef}
-                id="image"
-                name="image"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageChange}
-              />
-            </div>
-          </div>
-
           {/* Navigation Menu Section */}
           <div>
             <h3 className="font-medium mb-2">Menu Items</h3>

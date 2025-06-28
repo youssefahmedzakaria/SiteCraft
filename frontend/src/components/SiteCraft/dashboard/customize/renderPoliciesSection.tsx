@@ -67,24 +67,6 @@ interface PoliciesSettings {
 export function RenderPoliciesSection({
   detailedSectionTab,
 }: RenderPoliciesSectionProps) {
-  const [expandedPolicies, setExpandedPolicies] = useState<
-    Record<string, boolean>
-  >({});
-
-  const togglePromoSection = (id: string) => {
-    setExpandedPolicies((prev) => {
-      const isCurrentlyOpen = !!prev[id];
-
-      // Close all if already open
-      if (isCurrentlyOpen) {
-        return {};
-      }
-
-      // Open the clicked promo, close others
-      return { [id]: true };
-    });
-  };
-
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
   >({
@@ -116,18 +98,6 @@ export function RenderPoliciesSection({
 
   // Content State
   const [title, setTitle] = useState("Policies");
-  const [policies, setPolicies] = useState<Policy[]>([
-    {
-      id: "1",
-      title: "Privacy Policy",
-      content: "Your privacy is important to us...",
-    },
-    {
-      id: "2",
-      title: "Terms of Service",
-      content: "By using our service, you agree to...",
-    },
-  ]);
 
   // Design State
   const [policiesSettings, setPoliciesSettings] = useState<PoliciesSettings>({
@@ -146,47 +116,6 @@ export function RenderPoliciesSection({
     sectionContentFontSize: "18",
     sectionContentFontWeight: "normal",
   });
-
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-
-    const items = Array.from(policies);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    setPolicies(items);
-  };
-
-  const addPolicy = () => {
-    const newPolicy: Policy = {
-      id: Date.now().toString(),
-      title: "New Policy",
-      content: "Enter policy content here...",
-    };
-    setPolicies([...policies, newPolicy]);
-
-    setExpandedPolicies((prevExpanded) => ({
-      ...prevExpanded,
-      [newPolicy.id]: false,
-    }));
-  };
-
-  const removePolicy = (id: string) => {
-    setPolicies(policies.filter((policy) => policy.id !== id));
-
-    setExpandedPolicies((prevExpanded) => {
-      const { [id]: _, ...rest } = prevExpanded;
-      return rest;
-    });
-  };
-
-  const updatePolicy = (id: string, field: keyof Policy, value: string) => {
-    setPolicies(
-      policies.map((policy) =>
-        policy.id === id ? { ...policy, [field]: value } : policy
-      )
-    );
-  };
 
   const updateSettings = (field: keyof PoliciesSettings, value: string) => {
     setPoliciesSettings((prev) => ({
@@ -207,121 +136,6 @@ export function RenderPoliciesSection({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter section title"
             />
-          </div>
-
-          {/* Policies Sections */}
-          <div className="space-y-3">
-            <h1 className="text-lg font-semibold tracking-tight">
-              Policies Sections
-            </h1>
-            <div className="space-y-3">
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="policies">
-                  {(provided: DroppableProvided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="space-y-3"
-                    >
-                      {policies.map((policy, index) => (
-                        <Draggable
-                          key={policy.id}
-                          draggableId={policy.id}
-                          index={index}
-                        >
-                          {(provided: DraggableProvided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className="p-4 border rounded-lg space-y-4 bg-gray-100"
-                            >
-                              <div
-                                className="flex items-center justify-between"
-                                onClick={() => togglePromoSection(policy.id)}
-                              >
-                                <div className="flex gap-2">
-                                  <div {...provided.dragHandleProps}>
-                                    <GripVertical className="h-5 w-5 text-gray-400" />
-                                  </div>
-                                  <span>{policy.title}</span>
-                                </div>
-                                {expandedPolicies[policy.id] ? (
-                                  <ChevronDown size={18} />
-                                ) : (
-                                  <ChevronRight size={18} />
-                                )}
-                              </div>
-                              {expandedPolicies[policy.id] && (
-                                <div className="space-y-4">
-                                  <div className="space-y-2">
-                                    <label
-                                      htmlFor={`title-${policy.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Title
-                                    </label>
-                                    <Input
-                                      value={policy.title}
-                                      onChange={(e) =>
-                                        updatePolicy(
-                                          policy.id,
-                                          "title",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Policy title"
-                                      className="flex-1 bg-white"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label
-                                      htmlFor={`content-${policy.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Content
-                                    </label>
-                                    <Textarea
-                                      value={policy.content}
-                                      onChange={(e) =>
-                                        updatePolicy(
-                                          policy.id,
-                                          "content",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Policy content"
-                                      className="min-h-[100px]"
-                                    />
-                                  </div>
-
-                                  <div className="flex justify-end mt-1">
-                                    <button
-                                      onClick={() => removePolicy(policy.id)}
-                                      className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
-                                      title="Delete Policy"
-                                    >
-                                      Delete
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-              <button
-                onClick={addPolicy}
-                className="flex items-center justify-center gap-2 bg-gray-100 border border-gray-400 rounded-md w-full h-10"
-              >
-                <Plus size={18} />
-                Add Policy
-              </button>
-            </div>
           </div>
         </div>
       ) : (
