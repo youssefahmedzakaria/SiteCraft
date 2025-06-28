@@ -22,6 +22,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "@/components/SiteCraft/ui/button";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 type SectionName = "image" | "title" | "description" | "button" | "arrows";
 
@@ -31,6 +37,9 @@ interface PromoImage {
   description?: string;
   image?: File | null;
   imagePreview?: string | null;
+  imageAlt?: string;
+  buttonText?: string;
+  buttonLink?: string;
 }
 
 interface PromoSettings {
@@ -191,6 +200,9 @@ export function RenderPromoSection({
       description: undefined,
       image: null,
       imagePreview: null,
+      imageAlt: "First promo image",
+      buttonText: "Shop Now",
+      buttonLink: "new-collection",
     },
     {
       id: "2",
@@ -198,66 +210,36 @@ export function RenderPromoSection({
       description: undefined,
       image: null,
       imagePreview: null,
+      imageAlt: "Second promo image",
+      buttonText: "Shop Now",
+      buttonLink: "best-seller",
     },
   ]);
 
-  const [draggedPromoIndex, setDraggedPromoIndex] = useState<number | null>(
-    null
-  );
-  // Reference for promo DOM elements
-  const promoRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
 
-  // Drag and drop handlers
-  const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
-    setDraggedPromoIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
+    const items = Array.from(promos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
 
-  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
-    if (
-      draggedPromoIndex !== null &&
-      promoRefs.current[promos[draggedPromoIndex].id]
-    ) {
-      const el = promoRefs.current[promos[draggedPromoIndex].id];
-      if (el) {
-        el.classList.remove("opacity-50");
-      }
-    }
-    setDraggedPromoIndex(null);
-  };
-
-  const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
-    e.preventDefault();
-
-    if (draggedPromoIndex === null) return;
-    if (draggedPromoIndex === dropIndex) return;
-
-    const newPromos = [...promos]; // Create a new array
-    const draggedPromo = newPromos[draggedPromoIndex];
-
-    newPromos.splice(draggedPromoIndex, 1);
-    newPromos.splice(dropIndex, 0, draggedPromo);
-
-    setPromos(newPromos); // Set the *new* array as state
-    setDraggedPromoIndex(null);
+    setPromos(items);
   };
 
   {
     /* add and delete promo */
   }
   const handleAddPromo = () => {
-    const newPromoId = parseInt(promos[promos.length - 1].id) + 1;
+    const newPromoId = Date.now().toString();
     const newPromo: PromoImage = {
-      id: newPromoId.toString(),
+      id: newPromoId,
       title: "New Promo",
       description: undefined,
       image: null,
       imagePreview: null,
+      imageAlt: "New promo image",
+      buttonText: "Shop Now",
+      buttonLink: "new-collection",
     };
     setPromos((prevPromos) => [...prevPromos, newPromo]);
     // Optionally expand the new promo
@@ -289,6 +271,33 @@ export function RenderPromoSection({
     );
   };
 
+  // change promo image alt
+  const handleImageAltChange = (promoId: string, newImageAlt: string) => {
+    setPromos((prevPromos) =>
+      prevPromos.map((promo) =>
+        promo.id === promoId ? { ...promo, imageAlt: newImageAlt } : promo
+      )
+    );
+  };
+
+  // change promo button text
+  const handleButtonTextChange = (promoId: string, newButtonText: string) => {
+    setPromos((prevPromos) =>
+      prevPromos.map((promo) =>
+        promo.id === promoId ? { ...promo, buttonText: newButtonText } : promo
+      )
+    );
+  };
+
+  // change promo button link
+  const handleButtonLinkChange = (promoId: string, newButtonLink: string) => {
+    setPromos((prevPromos) =>
+      prevPromos.map((promo) =>
+        promo.id === promoId ? { ...promo, buttonLink: newButtonLink } : promo
+      )
+    );
+  };
+
   return (
     <div>
       {detailedSectionTab === "content" ? (
@@ -296,162 +305,257 @@ export function RenderPromoSection({
           <div className="space-y-1">
             <h1 className="text-lg font-semibold tracking-tight">Slides</h1>
             <div className="space-y-2">
-              {promos.map((promo, index) => (
-                <div key={promo.id} className="justify-end">
-                  <div
-                    className={` bg-gray-100 rounded space-y-2 ${
-                      expandedPromos[promo.id] ? "px-2 pt-2 pb-4" : "p-2"
-                    }`}
-                  >
-                    {/* Promo Card header */}
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="promos">
+                  {(provided) => (
                     <div
-                      ref={(el) => {
-                        promoRefs.current[promo.id] = el;
-                      }}
-                      className={`flex items-center justify-between  ${
-                        draggedPromoIndex === index ? "opacity-50" : ""
-                      }`}
-                      draggable={true}
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragEnd={handleDragEnd}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDrop={(e) => handleDrop(e, index)}
-                      onClick={() => togglePromoSection(promo.id)}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="space-y-2"
                     >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="cursor-grab text-gray-400 hover:text-gray-600"
-                          title="Drag to reorder"
+                      {promos.map((promo, index) => (
+                        <Draggable
+                          key={promo.id}
+                          draggableId={promo.id}
+                          index={index}
                         >
-                          <GripVertical size={18} />
-                        </div>
-                        <span>{promo.title}</span>
-                      </div>
-                      {expandedPromos[promo.id] ? (
-                        <ChevronDown size={18} />
-                      ) : (
-                        <ChevronRight size={18} />
-                      )}
-                    </div>
-                    {/* Promo Card content */}
-                    {expandedPromos[promo.id] && (
-                      <div className="flex-col px-2 bg-gray-100 rounded space-y-2">
-                        {/* Promo Card image */}
-                        <div className="flex-1 space-y-2">
-                          <label
-                            htmlFor="image"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Image
-                          </label>
-                          <div
-                            className="flex flex-col items-center gap-2 bg-background border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
-                            onDragOver={handleDragOverImage}
-                            onDrop={(e) => handleDropImage(promo.id, e)}
-                          >
+                          {(provided, snapshot) => (
+                            <div>
                             <div
-                              className={`relative w-24 h-24 rounded ${
-                                promo.imagePreview ? "" : "bg-gray-100"
-                              } overflow-hidden`}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`bg-gray-100 rounded space-y-2 ${
+                                expandedPromos[promo.id] ? "px-2 pt-2 pb-4" : "p-2"
+                              } ${snapshot.isDragging ? "shadow-lg" : ""}`}
                             >
-                              {promo.imagePreview ? (
-                                <Image
-                                  src={promo.imagePreview}
-                                  alt="Promo preview"
-                                  fill
-                                  className="object-contain rounded-md"
-                                />
-                              ) : (
-                                <div className="flex items-center justify-center w-full h-full">
-                                  <ImageIcon />
+                              {/* Promo Card header */}
+                              <div
+                                className="flex items-center justify-between"
+                                onClick={() => togglePromoSection(promo.id)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    {...provided.dragHandleProps}
+                                    className="cursor-grab text-gray-400 hover:text-gray-600"
+                                    title="Drag to reorder"
+                                  >
+                                    <GripVertical size={18} />
+                                  </div>
+                                  <span>{promo.title}</span>
+                                </div>
+                                {expandedPromos[promo.id] ? (
+                                  <ChevronDown size={18} />
+                                ) : (
+                                  <ChevronRight size={18} />
+                                )}
+                              </div>
+                              {/* Promo Card content */}
+                              {expandedPromos[promo.id] && (
+                                <div className="flex-col px-2 bg-gray-100 rounded space-y-2">
+                                  {/* Promo Card image */}
+                                  <div className="flex-1 space-y-2">
+                                    <label
+                                      htmlFor="image"
+                                      className="block text-sm font-medium text-gray-700"
+                                    >
+                                      Image
+                                    </label>
+                                    <div
+                                      className="flex flex-col items-center gap-2 bg-background border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+                                      onDragOver={handleDragOverImage}
+                                      onDrop={(e) => handleDropImage(promo.id, e)}
+                                    >
+                                      <div
+                                        className={`relative w-24 h-24 rounded ${
+                                          promo.imagePreview ? "" : "bg-gray-100"
+                                        } overflow-hidden`}
+                                      >
+                                        {promo.imagePreview ? (
+                                          <Image
+                                            src={promo.imagePreview}
+                                            alt="Promo preview"
+                                            fill
+                                            className="object-contain rounded-md"
+                                          />
+                                        ) : (
+                                          <div className="flex items-center justify-center w-full h-full">
+                                            <ImageIcon />
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-2 rounded">
+                                        {promo.imagePreview ? (
+                                          <p className="text-xs">
+                                            Drag and drop image here to change, or{" "}
+                                            <span
+                                              className="cursor-pointer underline"
+                                              onClick={() => handleBrowseClick(promo.id)}
+                                            >
+                                              browse
+                                            </span>
+                                          </p>
+                                        ) : (
+                                          <p className="text-xs">
+                                            Drag and drop image here, or{" "}
+                                            <span
+                                              className="cursor-pointer underline"
+                                              onClick={() => handleBrowseClick(promo.id)}
+                                            >
+                                              browse
+                                            </span>
+                                          </p>
+                                        )}
+                                      </div>
+                                      <input
+                                        ref={(el) => {
+                                          fileInputRefs.current[promo.id] = el;
+                                        }}
+                                        id={`image-${promo.id}`}
+                                        name="image"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => handleImageChange(promo.id, e)}
+                                      />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Image Alt */}
+                                  <div className="space-y-2">
+                                    <label
+                                      htmlFor={`imageAlt-${promo.id}`}
+                                      className="block text-sm font-medium text-gray-700"
+                                    >
+                                      Image Alt Text
+                                    </label>
+                                    <Input
+                                      id={`imageAlt-${promo.id}`}
+                                      name="imageAlt"
+                                      placeholder="Describe the image for accessibility"
+                                      defaultValue={promo.imageAlt}
+                                      className="w-full bg-background"
+                                      onChange={(e) =>
+                                        handleImageAltChange(promo.id, e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                  
+                                  {/* Title */}
+                                  <div className="flex-1 space-y-2">
+                                    <label
+                                      htmlFor={`title-${promo.id}`}
+                                      className="block text-sm font-medium text-gray-700"
+                                    >
+                                      Title
+                                    </label>
+                                    <Input
+                                      id={`title-${promo.id}`}
+                                      name="title"
+                                      placeholder="Promo title"
+                                      defaultValue={promo.title}
+                                      className="w-full bg-background"
+                                      onChange={(e) =>
+                                        handleTitleChange(promo.id, e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                  {/* Description */}
+                                  <div className="space-y-2">
+                                    <label
+                                      htmlFor={`description-${promo.id}`}
+                                      className="block text-sm font-medium text-gray-700"
+                                    >
+                                      Description
+                                    </label>
+                                    <Textarea
+                                      id={`description-${promo.id}`}
+                                      name="description"
+                                      placeholder="Attractive description that matches the title"
+                                      rows={4}
+                                      className="w-full"
+                                    />
+                                  </div>
+                                  
+                                  {/* Button Text */}
+                                  <div className="space-y-2">
+                                    <label
+                                      htmlFor={`buttonText-${promo.id}`}
+                                      className="block text-sm font-medium text-gray-700"
+                                    >
+                                      Button Text
+                                    </label>
+                                    <Input
+                                      id={`buttonText-${promo.id}`}
+                                      name="buttonText"
+                                      placeholder="Shop Now"
+                                      defaultValue={promo.buttonText}
+                                      className="w-full bg-background"
+                                      onChange={(e) =>
+                                        handleButtonTextChange(promo.id, e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                  
+                                  {/* Button Link */}
+                                  <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Button Link
+                                    </label>
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          className="w-full justify-between"
+                                        >
+                                          {promo.buttonLink === "new-collection" && "New Collection"}
+                                          {promo.buttonLink === "best-seller" && "Best Seller"}
+                                          {promo.buttonLink === "discount" && "Discount"}
+                                          <ChevronDown className="ml-2 h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                          onSelect={() => handleButtonLinkChange(promo.id, "new-collection")}
+                                        >
+                                          New Collection
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          onSelect={() => handleButtonLinkChange(promo.id, "best-seller")}
+                                        >
+                                          Best Seller
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          onSelect={() => handleButtonLinkChange(promo.id, "discount")}
+                                        >
+                                          Discount
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </div>
                                 </div>
                               )}
+                              
+                              
                             </div>
-                            <div className="flex items-center gap-2 rounded">
-                              {promo.imagePreview ? (
-                                <p className="text-xs">
-                                  Drag and drop image here to change, or{" "}
-                                  <span
-                                    className="cursor-pointer underline"
-                                    onClick={() => handleBrowseClick(promo.id)}
-                                  >
-                                    browse
-                                  </span>
-                                </p>
-                              ) : (
-                                <p className="text-xs">
-                                  Drag and drop image here, or{" "}
-                                  <span
-                                    className="cursor-pointer underline"
-                                    onClick={() => handleBrowseClick(promo.id)}
-                                  >
-                                    browse
-                                  </span>
-                                </p>
-                              )}
-                            </div>
-                            <input
-                              ref={(el) => {
-                                fileInputRefs.current[promo.id] = el;
-                              }}
-                              id={`image-${promo.id}`}
-                              name="image"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => handleImageChange(promo.id, e)}
-                            />
+                            {/* Delete button */}
+                            <div className="flex justify-end mt-1">
+                            <button
+                              onClick={() => handleDeletePromo(promo.id)}
+                              className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
+                              title="Delete Promo"
+                            >
+                              Delete
+                            </button>
                           </div>
-                        </div>
-                        {/* Title */}
-                        <div className="flex-1 space-y-2">
-                          <label
-                            htmlFor={`title-${promo.id}`}
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Title
-                          </label>
-                          <Input
-                            id={`title-${promo.id}`}
-                            name="title"
-                            placeholder="Promo title"
-                            defaultValue={promo.title}
-                            className="w-full bg-background"
-                            onChange={(e) =>
-                              handleTitleChange(promo.id, e.target.value)
-                            }
-                          />
-                        </div>
-                        {/* Description */}
-                        <div className="space-y-2">
-                          <label
-                            htmlFor={`description-${promo.id}`}
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Description
-                          </label>
-                          <Textarea
-                            id={`description-${promo.id}`}
-                            name="description"
-                            placeholder="Attractive description that matches the title"
-                            rows={4}
-                            className="w-full"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex justify-end mt-1">
-                    <button
-                      onClick={() => handleDeletePromo(promo.id)}
-                      className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
-                      title="Delete Promo"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                          </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </div>
           </div>
 
@@ -731,6 +835,35 @@ export function RenderPromoSection({
                       setPromoSettings((s) => ({
                         ...s,
                         buttonTextColor: e.target.value,
+                      }))
+                    }
+                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Button Color Picker */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Button Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={promoSettings.buttonColor}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        buttonColor: e.target.value,
+                      }))
+                    }
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={promoSettings.buttonColor}
+                    onChange={(e) =>
+                      setPromoSettings((s) => ({
+                        ...s,
+                        buttonColor: e.target.value,
                       }))
                     }
                     className="flex-1 border-none bg-transparent focus:outline-none text-sm"
