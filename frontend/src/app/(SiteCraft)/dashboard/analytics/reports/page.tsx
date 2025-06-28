@@ -15,6 +15,7 @@ import {
   ShoppingBag,
   Tags,
 } from "lucide-react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
@@ -40,34 +41,36 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="flex min-h-screen h-full bg-gray-100">
-      <Sidebar />
+    <ProtectedRoute requiredRole="owner">
+      <div className="flex min-h-screen h-full bg-gray-100">
+        <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 h-full overflow-y-auto">
-        {/* Header section */}
-        <div className="mb-6 space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <h2 className="text-lg md:text-xl font-semibold text-gray-600">
-              View and download your store's reports
-            </h2>
-            <DateRangeFilter
-              initialDateRange={dateRange}
-              onApply={setDateRange}
-            />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 h-full overflow-y-auto">
+          {/* Header section */}
+          <div className="mb-6 space-y-2">
+            <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-600">
+                View and download your store's reports
+              </h2>
+              <DateRangeFilter
+                initialDateRange={dateRange}
+                onApply={setDateRange}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {reportsWithIcons.map((report) => (
-            <ReportCard
-              key={report.id}
-              report={report}
-              onDownload={handleDownload}
-            />
-          ))}
-        </div>
-      </main>
-    </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {reportsWithIcons.map((report) => (
+              <ReportCard
+                key={report.id}
+                report={report}
+                onDownload={handleDownload}
+              />
+            ))}
+          </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

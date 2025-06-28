@@ -69,6 +69,11 @@ export const useAuth = create<AuthState>((set, get) => ({
         isLoading: false 
       })
       console.log('✅ Auth state cleared, logout complete');
+      
+      // Redirect to homepage after logout
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }
   },
   

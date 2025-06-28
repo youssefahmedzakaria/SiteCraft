@@ -3,7 +3,8 @@
 
 import { Button } from "@/components/SiteCraft/ui/button";
 import { DeleteConfirmationDialog } from "@/components/SiteCraft/ui/deleteConfirmationDialog";
-import type { Product } from "@/lib/products";
+import type { SimplifiedProduct } from "@/lib/products";
+import { deleteProduct } from "@/lib/products";
 import { categories } from "@/lib/categories";
 import Link from "next/link";
 import { useState } from "react";
@@ -12,17 +13,27 @@ export function ProductRecord({
   product,
   isSelected = false,
   onSelect,
+  fetchProducts
 }: {
-  product: Product;
+  product: SimplifiedProduct;
   isSelected?: boolean;
   onSelect?: (id: number) => void;
+  fetchProducts?: () => void;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = () => {
-    // Implement actual delete logic here
-    console.log(`Deleting product: ${product.name}`);
-    setShowDeleteDialog(false);
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteProduct(product.id);
+      setShowDeleteDialog(false);
+      if (fetchProducts) fetchProducts();
+    } catch (err) {
+      alert('Failed to delete product');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Get category name from categoryId
@@ -95,8 +106,9 @@ export function ProductRecord({
           variant="ghost"
           className="text-red-600 hover:text-red-900"
           onClick={() => setShowDeleteDialog(true)}
+          disabled={isDeleting}
         >
-          Delete
+          {isDeleting ? 'Deleting...' : 'Delete'}
         </Button>
 
         <DeleteConfirmationDialog

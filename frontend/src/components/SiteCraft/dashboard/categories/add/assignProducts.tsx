@@ -6,14 +6,27 @@ import {
   ModalTitle,
   ModalFooter,
 } from "@/components/SiteCraft/ui/modal";
-import { Product, products } from "@/lib/products";
+import { SimplifiedProduct, getProducts } from "@/lib/products";
+import { useProductManagement } from "@/hooks/useProductManagement";
 
-export default function AssignProducts() {
-  const [assignedProducts, setAssignedProducts] = useState<Product[]>([]);
+interface AssignProductsProps {
+  assignedProducts: SimplifiedProduct[];
+  setAssignedProducts: (products: SimplifiedProduct[]) => void;
+}
+
+export default function AssignProducts({ assignedProducts, setAssignedProducts }: AssignProductsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<SimplifiedProduct[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [filteredProducts, setFilteredProducts] = useState<SimplifiedProduct[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  const { products, isLoading } = useProductManagement();
+
+  // Handle client-side rendering to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -23,12 +36,12 @@ export default function AssignProducts() {
       const filtered = products.filter(
         (product) =>
           product.name.toLowerCase().includes(lowercaseQuery) ||
-          product.category.toLowerCase().includes(lowercaseQuery) ||
-          product.id.toLowerCase().includes(lowercaseQuery)
+          (product.category?.title || '').toLowerCase().includes(lowercaseQuery) ||
+          product.id.toString().includes(lowercaseQuery)
       );
       setFilteredProducts(filtered);
     }
-  }, [searchQuery]);
+  }, [searchQuery, products]);
 
   const openModal = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,7 +63,7 @@ export default function AssignProducts() {
     setIsModalOpen(false);
   };
 
-  const toggleProductSelection = (product: Product, e: React.MouseEvent) => {
+  const toggleProductSelection = (product: SimplifiedProduct, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (selectedProducts.some((p) => p.id === product.id)) {
@@ -60,18 +73,18 @@ export default function AssignProducts() {
     }
   };
 
-  const isSelected = (product: Product) => {
+  const isSelected = (product: SimplifiedProduct) => {
     return selectedProducts.some((p) => p.id === product.id);
   };
 
-  const handleRemoveProduct = (productId: string, e: React.MouseEvent) => {
+  const handleRemoveProduct = (productId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setAssignedProducts(assignedProducts.filter((p) => p.id !== productId));
   };
 
   const handleCheckboxChange = (
-    product: Product,
+    product: SimplifiedProduct,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     e.stopPropagation();
@@ -82,9 +95,24 @@ export default function AssignProducts() {
     setSearchQuery(e.target.value);
   };
 
+  // Don't render until client-side rendering is complete
+  if (!isClient) {
+    return (
+      <div className="text-center w-full">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-center w-full">
-      {assignedProducts.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <p className="text-gray-500">Loading products...</p>
+        </div>
+      ) : assignedProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center space-y-4">
           <p className="text-gray-500">No products assigned yet.</p>
           <Button
@@ -119,7 +147,7 @@ export default function AssignProducts() {
                     Category
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                    Price
+                    Stock
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider">
                     Actions
@@ -136,10 +164,10 @@ export default function AssignProducts() {
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
-                      {product.category}
+                      {product.category?.title || 'Uncategorized'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
-                      {product.price}
+                      {product.stock}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-center">
                       <button
@@ -204,7 +232,7 @@ export default function AssignProducts() {
                         Category
                       </th>
                       <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider">
-                        Price
+                        Stock
                       </th>
                     </tr>
                   </thead>
@@ -237,10 +265,10 @@ export default function AssignProducts() {
                             {product.name}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
-                            {product.category}
+                            {product.category?.title || 'Uncategorized'}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
-                            {product.price}
+                            {product.stock}
                           </td>
                         </tr>
                       ))

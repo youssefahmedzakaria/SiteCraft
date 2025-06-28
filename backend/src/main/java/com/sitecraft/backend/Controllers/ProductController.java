@@ -171,8 +171,14 @@ public class ProductController {
     */
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getProductStatistics(@RequestParam Long storeId) {
+    public ResponseEntity<Map<String, Object>> getProductStatistics(HttpSession session) {
         try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
             Map<String, Object> stats = productService.getProductStatistics(storeId);
 
             Map<String, Object> response = new HashMap<>();
@@ -338,6 +344,26 @@ public class ProductController {
             errorResponse.put("message", e.getMessage());
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{productId}/images/{imageId}")
+    public ResponseEntity<?> deleteProductImage(
+        @PathVariable Long productId,
+        @PathVariable Long imageId,
+        HttpSession session
+    ) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+            productService.deleteProductImage(productId, imageId, storeId);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Image deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

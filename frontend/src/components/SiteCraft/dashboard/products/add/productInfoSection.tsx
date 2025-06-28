@@ -1,32 +1,62 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import Image from "next/image";
-import { categories } from "@/lib/categories";
-import { ProductCreateDTO } from "@/lib/products";
 import { ChevronDown, ChevronUp, Upload } from "lucide-react";
+import { deleteProductImage, getCategories } from '@/lib/products';
+
+interface BasicFormData {
+  name: string;
+  description: string;
+  categoryId: number;
+}
 
 interface ProductInfoSectionProps {
-  formData: ProductCreateDTO;
-  updateFormData: (updates: Partial<ProductCreateDTO>) => void;
+  formData: BasicFormData;
+  updateFormData: (updates: Partial<BasicFormData>) => void;
   imageFiles: File[];
   updateImageFiles: (files: File[]) => void;
+  existingImages?: { id: number; imageUrl: string; alt?: string }[];
+  productId?: number;
+  setExistingImages?: (images: any[]) => void;
 }
 
 export function ProductInfoSection({ 
   formData, 
   updateFormData, 
   imageFiles, 
-  updateImageFiles 
+  updateImageFiles,
+  existingImages = [],
+  productId,
+  setExistingImages
 }: ProductInfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [openCategories, setOpenCategories] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        setCategoriesError(null);
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        setCategoriesError('Failed to fetch categories');
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Handle form field changes
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,8 +157,8 @@ export function ProductInfoSection({
   // Get selected category name
   const getSelectedCategoryName = () => {
     if (formData.categoryId === 0) return "Select category";
-    const category = categories.find(c => c.id === formData.categoryId.toString());
-    return category ? category.title : "Select category";
+    const category = categories.find(c => c.id === formData.categoryId);
+    return category ? category.name || category.title : "Select category";
   };
 
   return (
@@ -137,6 +167,39 @@ export function ProductInfoSection({
         <CardTitle className="font-bold">Product Info</CardTitle>
         <p className="text-gray-500">Enter the details of your new product</p>
       </div>
+
+      {/* Existing Images (from backend) */}
+      {existingImages.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {existingImages.map((img, idx) => (
+            <div key={img.id || idx} className="relative w-24 h-24 border rounded overflow-hidden bg-gray-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={img.imageUrl?.startsWith('http') ? img.imageUrl : `http://localhost:8080${img.imageUrl}`}
+                alt={img.alt || `Product image ${idx + 1}`}
+                className="object-cover w-full h-full"
+              />
+              {productId && setExistingImages && (
+                <button
+                  type="button"
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  title="Delete image"
+                  onClick={async () => {
+                    try {
+                      await deleteProductImage(productId, img.id);
+                      setExistingImages(existingImages.filter((image) => image.id !== img.id));
+                    } catch (err) {
+                      alert('Failed to delete image');
+                    }
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Product Name and Category */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -189,7 +252,7 @@ export function ProductInfoSection({
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => handleCategoryChange(parseInt(category.id))}
                 >
-                  {category.title}
+                  {category.name || category.title}
                 </div>
               ))}
             </div>

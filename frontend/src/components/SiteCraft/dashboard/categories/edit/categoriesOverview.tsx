@@ -1,23 +1,60 @@
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Upload } from "lucide-react";
 // import { Category } from "@/lib/categories";
 
-export default function CategorysOverview() {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+const BACKEND_BASE_URL = "http://localhost:8080"; // Change if your backend runs elsewhere
+
+function getFullImageUrl(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  // Always prefix backend for /uploads
+  if (url.startsWith("/uploads")) {
+    return BACKEND_BASE_URL.replace(/\/$/, "") + url;
+  }
+  // Otherwise, treat as relative to backend
+  return BACKEND_BASE_URL.replace(/\/$/, "") + "/" + url;
+}
+
+interface CategorysOverviewProps {
+  categoryName?: string;
+  setCategoryName?: (name: string) => void;
+  categoryDescription?: string;
+  setCategoryDescription?: (description: string) => void;
+  imageFile?: File | null;
+  setImageFile?: (file: File | null) => void;
+  imagePreview?: string | null;
+  setImagePreview?: (preview: string | null) => void;
+  existingImageUrl?: string | null;
+}
+
+export default function CategorysOverview({
+  categoryName,
+  setCategoryName,
+  categoryDescription,
+  setCategoryDescription,
+  imageFile,
+  setImageFile,
+  imagePreview,
+  setImagePreview,
+  existingImageUrl
+}: CategorysOverviewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setImageFile(file);
+      setImageFile?.(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImagePreview?.(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -35,14 +72,32 @@ export default function CategorysOverview() {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setImageFile(file);
+      setImageFile?.(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImagePreview?.(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const handleClearImage = () => {
+    setImageFile?.(null);
+    setImagePreview?.(null);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCategoryName?.(e.target.value);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCategoryDescription?.(e.target.value);
+  };
+
+  // Determine which image to show
+  const displayImage = imagePreview || getFullImageUrl(existingImageUrl);
+  const displayImageName = imageFile?.name || 'Current image';
+
   return (
     <>
       {/* Category Name */}
@@ -59,6 +114,8 @@ export default function CategorysOverview() {
           placeholder="e.g. Home & Kitchen"
           className="w-full"
           required
+          value={categoryName}
+          onChange={handleNameChange}
         />
       </div>
 
@@ -75,25 +132,22 @@ export default function CategorysOverview() {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          {imagePreview ? (
+          {isClient && displayImage ? (
             <div className="flex flex-col items-center gap-4">
               <div className="relative w-32 h-32">
                 <Image
-                  src={imagePreview}
+                  src={displayImage}
                   alt="Category preview"
                   fill
                   className="object-contain rounded-md"
                 />
               </div>
-              <p className="text-sm text-gray-500">{imageFile?.name}</p>
+              <p className="text-sm text-gray-500">{displayImageName}</p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  setImageFile(null);
-                  setImagePreview(null);
-                }}
+                onClick={handleClearImage}
               >
                 Change Image
               </Button>
@@ -141,6 +195,8 @@ export default function CategorysOverview() {
           placeholder="Describe this category..."
           rows={4}
           className="w-full"
+          value={categoryDescription}
+          onChange={handleDescriptionChange}
         />
         <p className="text-xs text-gray-400">
           A brief description of this category to help customers understand what

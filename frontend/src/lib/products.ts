@@ -1,4 +1,102 @@
+// Backend-compatible interfaces
 export interface Product {
+    id: number
+    name: string
+    description: string
+    discountType?: string
+    discountValue?: number
+    minCap?: number
+    percentageMax?: number
+    maxCap?: number
+    images?: ProductImage[]
+    variants?: ProductVariant[]
+    attributes?: ProductAttribute[]
+    reviews?: ProductReview[]
+    categoryProducts?: CategoryProduct[]
+}
+
+export interface ProductImage {
+    id: number
+    alt: string
+    imageUrl: string
+}
+
+export interface ProductVariant {
+    id: number
+    sku: string
+    stock: number
+    price: number | null
+    productionCost: number
+}
+
+export interface ProductAttribute {
+    id: number
+    attributeName: string
+    attributeValues: AttributeValue[]
+}
+
+export interface AttributeValue {
+    id: number
+    attributeValue: string
+    variantAttributeValues: VariantAttributeValue[]
+}
+
+export interface VariantAttributeValue {
+    id: number
+}
+
+export interface ProductReview {
+    id: number
+    comment: string
+    rate: number
+}
+
+export interface CategoryProduct {
+    id: number
+}
+
+export interface Category {
+    id: number
+    title: string
+    status: string
+}
+
+// DTOs for creating/updating products
+export interface ProductCreateDTO {
+    name: string
+    description: string
+    discountType?: string
+    discountValue?: number
+    minCap?: number
+    percentageMax?: number
+    maxCap?: number
+    categoryId: number
+    attributes?: ProductAttributeDTO[]
+    variants?: ProductVariantDTO[]
+    imageUrls?: string[]
+}
+
+export interface ProductAttributeDTO {
+    name: string
+    values: string[]
+}
+
+export interface ProductVariantDTO {
+    id?: number
+    sku?: string
+    stock: number
+    price: number
+    productionCost: number
+    attributes?: VariantAttributeDTO[]
+}
+
+export interface VariantAttributeDTO {
+    name: string
+    value: string
+}
+
+// Simplified frontend interfaces for display
+export interface SimplifiedProduct {
     id: number
     name: string
     description: string
@@ -12,45 +110,24 @@ export interface Product {
     maxCap?: number
     categoryId: number
     storeId: number
-    images?: ProductImage[]
+    images?: SimplifiedProductImage[]
     category?: Category
 }
 
-export interface ProductImage {
+export interface SimplifiedProductImage {
     id: number
     url: string
     alt?: string
 }
 
-export interface Category {
-    id: number
-    title: string
-    status: string
-}
-
-export interface ProductCreateDTO {
-    name: string
-    description: string
-    price: number
-    stock: number
-    categoryId: number
-    discountType?: string
-    discountValue?: number
-    minCap?: number
-    percentageMax?: number
-    maxCap?: number
-}
-
 export interface ProductStatistics {
     totalProducts: number
-    inStock: number
-    outOfStock: number
-    lowStock: number
-    totalValue: number
+    lowStockCount: number
+    outOfStockCount: number
 }
 
 // API Functions
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (): Promise<SimplifiedProduct[]> => {
     try {
         console.log('📞 Fetching products from backend...');
         const response = await fetch('http://localhost:8080/products', {
@@ -69,7 +146,7 @@ export const getProducts = async (): Promise<Product[]> => {
         console.log('✅ Products fetched successfully:', data);
         
         if (data.success && data.data) {
-            // Transform the data to ensure proper structure
+            // Transform the complex backend data to simplified frontend format
             return data.data.map((product: any) => transformProduct(product));
         } else {
             throw new Error(data.message || 'Failed to fetch products');
@@ -99,7 +176,7 @@ export const getProduct = async (productId: number): Promise<Product> => {
         console.log('✅ Product fetched successfully:', data);
         
         if (data.success && data.data) {
-            return transformProduct(data.data);
+            return data.data; // Return the full product structure
         } else {
             throw new Error(data.message || 'Failed to fetch product');
         }
@@ -112,6 +189,8 @@ export const getProduct = async (productId: number): Promise<Product> => {
 export const createProduct = async (productData: ProductCreateDTO, images?: File[]): Promise<Product> => {
     try {
         console.log('📞 Creating product...');
+        console.log('📤 Product data:', JSON.stringify(productData, null, 2));
+        console.log('📤 Images count:', images?.length || 0);
         
         const formData = new FormData();
         formData.append('product', JSON.stringify(productData));
@@ -119,7 +198,13 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
         if (images && images.length > 0) {
             images.forEach((image, index) => {
                 formData.append('images', image);
+                console.log(`📤 Adding image ${index}:`, image.name, image.size, image.type);
             });
+        }
+
+        console.log('📤 FormData entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}:`, typeof value === 'string' ? value : `${value.name} (${value.size} bytes)`);
         }
 
         const response = await fetch('http://localhost:8080/products/create', {
@@ -128,8 +213,13 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
             body: formData,
         });
 
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('📥 Error response body:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
         }
 
         const data = await response.json();
@@ -239,7 +329,7 @@ export const getProductStatistics = async (): Promise<ProductStatistics> => {
     }
 };
 
-export const getLowStockProducts = async (): Promise<Product[]> => {
+export const getLowStockProducts = async (): Promise<SimplifiedProduct[]> => {
     try {
         console.log('📞 Fetching low stock products...');
         const response = await fetch('http://localhost:8080/products/low-stock', {
@@ -268,7 +358,7 @@ export const getLowStockProducts = async (): Promise<Product[]> => {
     }
 };
 
-export const getOutOfStockProducts = async (): Promise<Product[]> => {
+export const getOutOfStockProducts = async (): Promise<SimplifiedProduct[]> => {
     try {
         console.log('📞 Fetching out of stock products...');
         const response = await fetch('http://localhost:8080/products/out-of-stock', {
@@ -326,23 +416,80 @@ export const getProductImages = async (productId: number): Promise<ProductImage[
     }
 };
 
-// Helper function to transform backend product to frontend format
-export const transformProduct = (product: any): Product => {
+export const deleteProductImage = async (productId: number, imageId: number): Promise<void> => {
+    const response = await fetch(`http://localhost:8080/products/${productId}/images/${imageId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete product image');
+    }
+};
+
+// Helper function to transform backend product to simplified frontend format
+export const transformProduct = (product: any): SimplifiedProduct => {
+    // Calculate total stock from variants
+    const totalStock = product.variants?.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0) || 0;
+    
+    // Get the first variant with a price as the main price
+    const mainVariant = product.variants?.find((v: any) => v.price !== null);
+    const mainPrice = mainVariant?.price || 0;
+    
+    // Transform images
+    const transformedImages: SimplifiedProductImage[] = product.images?.map((img: any) => ({
+        id: img.id,
+        url: img.imageUrl,
+        alt: img.alt
+    })) || [];
+
     return {
         id: product.id,
         name: product.name,
         description: product.description,
-        price: product.price || 0,
-        stock: product.stock || 0,
-        status: product.stock > 0 ? 'In Stock' : 'Out Of Stock',
+        price: mainPrice,
+        stock: totalStock,
+        status: totalStock > 0 ? 'In Stock' : 'Out Of Stock',
         discountType: product.discountType,
         discountValue: product.discountValue,
         minCap: product.minCap,
         percentageMax: product.percentageMax,
         maxCap: product.maxCap,
-        categoryId: product.categoryId || 0,
-        storeId: product.storeId || 0,
-        images: product.images || [],
+        categoryId: product.categoryProducts?.[0]?.id || 0,
+        storeId: 0, // This will be set by the backend
+        images: transformedImages,
         category: product.category
     };
+};
+
+// Helper function to fetch categories from backend
+export const getCategories = async (): Promise<any[]> => {
+    try {
+        console.log('📞 Fetching categories from backend...');
+        const response = await fetch('http://localhost:8080/categories', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('✅ Categories fetched successfully:', data);
+        
+        if (data.success && data.data) {
+            return data.data;
+        } else {
+            throw new Error(data.message || 'Failed to fetch categories');
+        }
+    } catch (error) {
+        console.error('💥 Error fetching categories:', error);
+        throw error;
+    }
 };
