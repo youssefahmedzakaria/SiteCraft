@@ -83,19 +83,30 @@ export default function CustomizeTemplatePage() {
         imageAlt: "New arrivals collection",
       },
     ],
-    backgroundColor: "bg-white",
+    backgroundColor: "bg-[#FFFFFF]", // bg-white
     titleFont: "font-sans",
-    titleColor: "text-white",
+    titleColor: "text-[#FFFFFF]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-white",
+    descriptionColor: "text-[#FFFFFF]", // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-white",
-    buttonTextColor: "text-black",
+    buttonColor: "bg-[#FFFFFF]", // bg-white
+    buttonTextColor: "text-[#000000]", // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
+  };
+
+  // State for promo customization
+  const [promoAttributes, setPromoAttributes] =
+    useState<PromoCustomizationAttributes>(initialPromo);
+
+  // Function to update promo attributes
+  const updatePromoAttributes = (
+    updates: Partial<PromoCustomizationAttributes>
+  ) => {
+    setPromoAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialAbout: AboutCustomizationAttributes = {
@@ -234,6 +245,8 @@ export default function CustomizeTemplatePage() {
       <Sidebar
         headerAttributes={headerAttributes}
         updateHeaderAttributes={updateHeaderAttributes}
+        promoAttributes={promoAttributes}
+        updatePromoAttributes={updatePromoAttributes}
       />
 
       {/* Main content area */}

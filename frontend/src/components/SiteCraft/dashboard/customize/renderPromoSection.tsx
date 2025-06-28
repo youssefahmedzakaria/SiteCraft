@@ -28,44 +28,22 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
+import { PromoCustomizationAttributes } from "@/lib/customization";
 
 type SectionName = "image" | "title" | "description" | "button" | "arrows";
 
-interface PromoImage {
-  id: string;
-  title?: string;
-  description?: string;
-  image?: File | null;
-  imagePreview?: string | null;
-  imageAlt?: string;
-  buttonText?: string;
-  buttonLink?: string;
-}
-
-interface PromoSettings {
-  showArrows: boolean;
-  titleFont: string;
-  titleColor: string;
-  titleSize: string;
-  descriptionFont: string;
-  descriptionColor: string;
-  descriptionSize: string;
-  buttonFont: string;
-  buttonColor: string;
-  buttonTextColor: string;
-  buttonSize: string;
-  buttonRadius: string;
-  backgroundColor: string;
-  imageObjectFit: "Cover" | "Fill" | "Contain";
-  autoplay: boolean;
-}
-
 interface RenderPromoSectionProps {
   detailedSectionTab: string;
+  promoAttributes: PromoCustomizationAttributes;
+  updatePromoAttributes: (
+    updates: Partial<PromoCustomizationAttributes>
+  ) => void;
 }
 
 export function RenderPromoSection({
   detailedSectionTab,
+  promoAttributes,
+  updatePromoAttributes,
 }: RenderPromoSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
@@ -75,24 +53,6 @@ export function RenderPromoSection({
     description: false,
     button: false,
     arrows: false,
-  });
-
-  const [promoSettings, setPromoSettings] = useState<PromoSettings>({
-    showArrows: true,
-    titleFont: "inter",
-    titleColor: "#000000",
-    titleSize: "16px",
-    descriptionFont: "inter",
-    descriptionColor: "#666666",
-    descriptionSize: "14px",
-    buttonFont: "inter",
-    buttonColor: "#000000",
-    buttonTextColor: "#ffffff",
-    buttonSize: "14px",
-    buttonRadius: "4px",
-    backgroundColor: "#ffffff",
-    imageObjectFit: "Contain",
-    autoplay: false,
   });
 
   const toggleSection = (section: SectionName) => {
@@ -120,16 +80,31 @@ export function RenderPromoSection({
     });
   };
 
+  // Handle layout selection and update template
+  const handleLayoutSelection = (layoutId: number) => {
+    const templateNames = [
+      "CenteredPromo",
+      "LeftAlignedPromo",
+      "RightAlignedPromo",
+      "MinimalLeftPromo",
+      "MinimalRightPromo",
+      "OverlayPromo",
+      "SplitPromo",
+    ];
+    const templateName = templateNames[layoutId - 1] || "CenteredPromo";
+    updatePromoAttributes({ template: templateName });
+  };
+
   {
     /* for promos expand */
   }
-  const [expandedPromos, setExpandedPromos] = useState<Record<string, boolean>>(
+  const [expandedPromos, setExpandedPromos] = useState<Record<number, boolean>>(
     {}
   );
 
-  const togglePromoSection = (id: string) => {
+  const togglePromoSection = (index: number) => {
     setExpandedPromos((prev) => {
-      const isCurrentlyOpen = !!prev[id];
+      const isCurrentlyOpen = !!prev[index];
 
       // Close all if already open
       if (isCurrentlyOpen) {
@@ -137,7 +112,7 @@ export function RenderPromoSection({
       }
 
       // Open the clicked promo, close others
-      return { [id]: true };
+      return { [index]: true };
     });
   };
 
@@ -147,155 +122,122 @@ export function RenderPromoSection({
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleImageChange = (
-    promoId: string,
+    indexStr: string,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    const index = parseInt(indexStr);
     const file = e.target.files?.[0] || null;
-    setPromos((prevPromos) =>
-      prevPromos.map((promo) =>
-        promo.id === promoId
-          ? {
-              ...promo,
-              image: file,
-              imagePreview: file ? URL.createObjectURL(file) : null,
-            }
-          : promo
-      )
-    );
+    if (file) {
+      const updatedSlides = [...promoAttributes.slides];
+      updatedSlides[index] = {
+        ...updatedSlides[index],
+        image: URL.createObjectURL(file),
+      };
+      updatePromoAttributes({ slides: updatedSlides });
+    }
   };
 
-  const handleBrowseClick = (promoId: string) => {
-    fileInputRefs.current[promoId]?.click();
+  const handleBrowseClick = (indexStr: string) => {
+    fileInputRefs.current[indexStr]?.click();
   };
 
   const handleDragOverImage = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDropImage = (promoId: string, e: React.DragEvent) => {
+  const handleDropImage = (indexStr: string, e: React.DragEvent) => {
     e.preventDefault();
+    const index = parseInt(indexStr);
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setPromos((prevPromos) =>
-        prevPromos.map((promo) =>
-          promo.id === promoId
-            ? {
-                ...promo,
-                image: file,
-                imagePreview: URL.createObjectURL(file),
-              }
-            : promo
-        )
-      );
+      const updatedSlides = [...promoAttributes.slides];
+      updatedSlides[index] = {
+        ...updatedSlides[index],
+        image: URL.createObjectURL(file),
+      };
+      updatePromoAttributes({ slides: updatedSlides });
     }
   };
 
   {
     /* for promos reorder and management */
   }
-  const [promos, setPromos] = useState<PromoImage[]>([
-    {
-      id: "1",
-      title: "First Promo",
-      description: undefined,
-      image: null,
-      imagePreview: null,
-      imageAlt: "First promo image",
-      buttonText: "Shop Now",
-      buttonLink: "new-collection",
-    },
-    {
-      id: "2",
-      title: "Second Promo",
-      description: undefined,
-      image: null,
-      imagePreview: null,
-      imageAlt: "Second promo image",
-      buttonText: "Shop Now",
-      buttonLink: "best-seller",
-    },
-  ]);
-
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
-    const items = Array.from(promos);
+    const items = Array.from(promoAttributes.slides);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    setPromos(items);
+    updatePromoAttributes({ slides: items });
   };
 
   {
     /* add and delete promo */
   }
   const handleAddPromo = () => {
-    const newPromoId = Date.now().toString();
-    const newPromo: PromoImage = {
-      id: newPromoId,
+    const newPromo = {
       title: "New Promo",
-      description: undefined,
-      image: null,
-      imagePreview: null,
-      imageAlt: "New promo image",
+      description: "Add your description here",
       buttonText: "Shop Now",
-      buttonLink: "new-collection",
+      buttonLink: "#new-collection",
+      image: "/sample.png",
+      imageAlt: "New promo image",
     };
-    setPromos((prevPromos) => [...prevPromos, newPromo]);
-    // Optionally expand the new promo
-    setExpandedPromos((prevExpanded) => ({
-      ...prevExpanded,
-      [newPromoId]: false,
-    }));
+    updatePromoAttributes({
+      slides: [...promoAttributes.slides, newPromo],
+    });
   };
 
-  const handleDeletePromo = (promoId: string) => {
-    setPromos((prevPromos) =>
-      prevPromos.filter((promo) => promo.id !== promoId)
-    );
-    // Optionally close the deleted promo's section
-    setExpandedPromos((prevExpanded) => {
-      const { [promoId]: _, ...rest } = prevExpanded;
-      return rest;
-    });
+  const handleDeletePromo = (index: number) => {
+    const updatedSlides = promoAttributes.slides.filter((_, i) => i !== index);
+    updatePromoAttributes({ slides: updatedSlides });
   };
 
   {
     /* change promo title */
   }
-  const handleTitleChange = (promoId: string, newTitle: string) => {
-    setPromos((prevPromos) =>
-      prevPromos.map((promo) =>
-        promo.id === promoId ? { ...promo, title: newTitle } : promo
-      )
-    );
+  const handleTitleChange = (index: number, newTitle: string) => {
+    const updatedSlides = [...promoAttributes.slides];
+    updatedSlides[index] = { ...updatedSlides[index], title: newTitle };
+    updatePromoAttributes({ slides: updatedSlides });
   };
 
   // change promo image alt
-  const handleImageAltChange = (promoId: string, newImageAlt: string) => {
-    setPromos((prevPromos) =>
-      prevPromos.map((promo) =>
-        promo.id === promoId ? { ...promo, imageAlt: newImageAlt } : promo
-      )
-    );
+  const handleImageAltChange = (index: number, newImageAlt: string) => {
+    const updatedSlides = [...promoAttributes.slides];
+    updatedSlides[index] = { ...updatedSlides[index], imageAlt: newImageAlt };
+    updatePromoAttributes({ slides: updatedSlides });
   };
 
   // change promo button text
-  const handleButtonTextChange = (promoId: string, newButtonText: string) => {
-    setPromos((prevPromos) =>
-      prevPromos.map((promo) =>
-        promo.id === promoId ? { ...promo, buttonText: newButtonText } : promo
-      )
-    );
+  const handleButtonTextChange = (index: number, newButtonText: string) => {
+    const updatedSlides = [...promoAttributes.slides];
+    updatedSlides[index] = {
+      ...updatedSlides[index],
+      buttonText: newButtonText,
+    };
+    updatePromoAttributes({ slides: updatedSlides });
   };
 
   // change promo button link
-  const handleButtonLinkChange = (promoId: string, newButtonLink: string) => {
-    setPromos((prevPromos) =>
-      prevPromos.map((promo) =>
-        promo.id === promoId ? { ...promo, buttonLink: newButtonLink } : promo
-      )
-    );
+  const handleButtonLinkChange = (index: number, newButtonLink: string) => {
+    const updatedSlides = [...promoAttributes.slides];
+    updatedSlides[index] = {
+      ...updatedSlides[index],
+      buttonLink: newButtonLink,
+    };
+    updatePromoAttributes({ slides: updatedSlides });
+  };
+
+  // change promo description
+  const handleDescriptionChange = (index: number, newDescription: string) => {
+    const updatedSlides = [...promoAttributes.slides];
+    updatedSlides[index] = {
+      ...updatedSlides[index],
+      description: newDescription,
+    };
+    updatePromoAttributes({ slides: updatedSlides });
   };
 
   return (
@@ -313,241 +255,294 @@ export function RenderPromoSection({
                       ref={provided.innerRef}
                       className="space-y-2"
                     >
-                      {promos.map((promo, index) => (
+                      {promoAttributes.slides.map((promo, index) => (
                         <Draggable
-                          key={promo.id}
-                          draggableId={promo.id}
+                          key={index}
+                          draggableId={index.toString()}
                           index={index}
                         >
                           {(provided, snapshot) => (
                             <div>
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className={`bg-gray-100 rounded space-y-2 ${
-                                expandedPromos[promo.id] ? "px-2 pt-2 pb-4" : "p-2"
-                              } ${snapshot.isDragging ? "shadow-lg" : ""}`}
-                            >
-                              {/* Promo Card header */}
                               <div
-                                className="flex items-center justify-between"
-                                onClick={() => togglePromoSection(promo.id)}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`bg-gray-100 rounded space-y-2 ${
+                                  expandedPromos[index]
+                                    ? "px-2 pt-2 pb-4"
+                                    : "p-2"
+                                } ${snapshot.isDragging ? "shadow-lg" : ""}`}
                               >
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="cursor-grab text-gray-400 hover:text-gray-600"
-                                    title="Drag to reorder"
-                                  >
-                                    <GripVertical size={18} />
-                                  </div>
-                                  <span>{promo.title}</span>
-                                </div>
-                                {expandedPromos[promo.id] ? (
-                                  <ChevronDown size={18} />
-                                ) : (
-                                  <ChevronRight size={18} />
-                                )}
-                              </div>
-                              {/* Promo Card content */}
-                              {expandedPromos[promo.id] && (
-                                <div className="flex-col px-2 bg-gray-100 rounded space-y-2">
-                                  {/* Promo Card image */}
-                                  <div className="flex-1 space-y-2">
-                                    <label
-                                      htmlFor="image"
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Image
-                                    </label>
+                                {/* Promo Card header */}
+                                <div
+                                  className="flex items-center justify-between"
+                                  onClick={() => togglePromoSection(index)}
+                                >
+                                  <div className="flex items-center gap-2">
                                     <div
-                                      className="flex flex-col items-center gap-2 bg-background border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
-                                      onDragOver={handleDragOverImage}
-                                      onDrop={(e) => handleDropImage(promo.id, e)}
+                                      {...provided.dragHandleProps}
+                                      className="cursor-grab text-gray-400 hover:text-gray-600"
+                                      title="Drag to reorder"
                                     >
-                                      <div
-                                        className={`relative w-24 h-24 rounded ${
-                                          promo.imagePreview ? "" : "bg-gray-100"
-                                        } overflow-hidden`}
+                                      <GripVertical size={18} />
+                                    </div>
+                                    <span>{promo.title}</span>
+                                  </div>
+                                  {expandedPromos[index] ? (
+                                    <ChevronDown size={18} />
+                                  ) : (
+                                    <ChevronRight size={18} />
+                                  )}
+                                </div>
+                                {/* Promo Card content */}
+                                {expandedPromos[index] && (
+                                  <div className="flex-col px-2 bg-gray-100 rounded space-y-2">
+                                    {/* Promo Card image */}
+                                    <div className="flex-1 space-y-2">
+                                      <label
+                                        htmlFor="image"
+                                        className="block text-sm font-medium text-gray-700"
                                       >
-                                        {promo.imagePreview ? (
-                                          <Image
-                                            src={promo.imagePreview}
-                                            alt="Promo preview"
-                                            fill
-                                            className="object-contain rounded-md"
-                                          />
-                                        ) : (
-                                          <div className="flex items-center justify-center w-full h-full">
-                                            <ImageIcon />
-                                          </div>
-                                        )}
+                                        Image
+                                      </label>
+                                      <div
+                                        className="flex flex-col items-center gap-2 bg-background border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+                                        onDragOver={handleDragOverImage}
+                                        onDrop={(e) =>
+                                          handleDropImage(index.toString(), e)
+                                        }
+                                      >
+                                        <div
+                                          className={`relative w-24 h-24 rounded ${
+                                            promo.image ? "" : "bg-gray-100"
+                                          } overflow-hidden`}
+                                        >
+                                          {promo.image ? (
+                                            <Image
+                                              src={promo.image}
+                                              alt="Promo preview"
+                                              fill
+                                              className="object-contain rounded-md"
+                                            />
+                                          ) : (
+                                            <div className="flex items-center justify-center w-full h-full">
+                                              <ImageIcon />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-2 rounded">
+                                          {promo.image ? (
+                                            <p className="text-xs">
+                                              Drag and drop image here to
+                                              change, or{" "}
+                                              <span
+                                                className="cursor-pointer underline"
+                                                onClick={() =>
+                                                  handleBrowseClick(
+                                                    index.toString()
+                                                  )
+                                                }
+                                              >
+                                                browse
+                                              </span>
+                                            </p>
+                                          ) : (
+                                            <p className="text-xs">
+                                              Drag and drop image here, or{" "}
+                                              <span
+                                                className="cursor-pointer underline"
+                                                onClick={() =>
+                                                  handleBrowseClick(
+                                                    index.toString()
+                                                  )
+                                                }
+                                              >
+                                                browse
+                                              </span>
+                                            </p>
+                                          )}
+                                        </div>
+                                        <input
+                                          ref={(el) => {
+                                            fileInputRefs.current[
+                                              index.toString()
+                                            ] = el;
+                                          }}
+                                          id={`image-${index}`}
+                                          name="image"
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) =>
+                                            handleImageChange(
+                                              index.toString(),
+                                              e
+                                            )
+                                          }
+                                        />
                                       </div>
-                                      <div className="flex items-center gap-2 rounded">
-                                        {promo.imagePreview ? (
-                                          <p className="text-xs">
-                                            Drag and drop image here to change, or{" "}
-                                            <span
-                                              className="cursor-pointer underline"
-                                              onClick={() => handleBrowseClick(promo.id)}
-                                            >
-                                              browse
-                                            </span>
-                                          </p>
-                                        ) : (
-                                          <p className="text-xs">
-                                            Drag and drop image here, or{" "}
-                                            <span
-                                              className="cursor-pointer underline"
-                                              onClick={() => handleBrowseClick(promo.id)}
-                                            >
-                                              browse
-                                            </span>
-                                          </p>
-                                        )}
-                                      </div>
-                                      <input
-                                        ref={(el) => {
-                                          fileInputRefs.current[promo.id] = el;
-                                        }}
-                                        id={`image-${promo.id}`}
-                                        name="image"
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={(e) => handleImageChange(promo.id, e)}
+                                    </div>
+
+                                    {/* Image Alt */}
+                                    <div className="space-y-2">
+                                      <label
+                                        htmlFor={`imageAlt-${index}`}
+                                        className="block text-sm font-medium text-gray-700"
+                                      >
+                                        Image Alt Text
+                                      </label>
+                                      <Input
+                                        id={`imageAlt-${index}`}
+                                        name="imageAlt"
+                                        placeholder="Describe the image for accessibility"
+                                        value={promo.imageAlt || ""}
+                                        className="w-full bg-background"
+                                        onChange={(e) =>
+                                          handleImageAltChange(
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
                                       />
                                     </div>
+
+                                    {/* Title */}
+                                    <div className="flex-1 space-y-2">
+                                      <label
+                                        htmlFor={`title-${index}`}
+                                        className="block text-sm font-medium text-gray-700"
+                                      >
+                                        Title
+                                      </label>
+                                      <Input
+                                        id={`title-${index}`}
+                                        name="title"
+                                        placeholder="Promo title"
+                                        value={promo.title || ""}
+                                        className="w-full bg-background"
+                                        onChange={(e) =>
+                                          handleTitleChange(
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                    {/* Description */}
+                                    <div className="space-y-2">
+                                      <label
+                                        htmlFor={`description-${index}`}
+                                        className="block text-sm font-medium text-gray-700"
+                                      >
+                                        Description
+                                      </label>
+                                      <Textarea
+                                        id={`description-${index}`}
+                                        name="description"
+                                        placeholder="Attractive description that matches the title"
+                                        rows={4}
+                                        className="w-full"
+                                        value={promo.description || ""}
+                                        onChange={(e) =>
+                                          handleDescriptionChange(
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+
+                                    {/* Button Text */}
+                                    <div className="space-y-2">
+                                      <label
+                                        htmlFor={`buttonText-${index}`}
+                                        className="block text-sm font-medium text-gray-700"
+                                      >
+                                        Button Text
+                                      </label>
+                                      <Input
+                                        id={`buttonText-${index}`}
+                                        name="buttonText"
+                                        placeholder="Shop Now"
+                                        value={promo.buttonText || ""}
+                                        className="w-full bg-background"
+                                        onChange={(e) =>
+                                          handleButtonTextChange(
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+
+                                    {/* Button Link */}
+                                    <div className="space-y-2">
+                                      <label className="block text-sm font-medium text-gray-700">
+                                        Button Link
+                                      </label>
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            className="w-full justify-between"
+                                          >
+                                            {promo.buttonLink ===
+                                              "#new-collection" &&
+                                              "New Collection"}
+                                            {promo.buttonLink ===
+                                              "#best-seller" && "Best Seller"}
+                                            {promo.buttonLink === "#discount" &&
+                                              "Discount"}
+                                            <ChevronDown className="ml-2 h-4 w-4" />
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                          <DropdownMenuItem
+                                            onSelect={() =>
+                                              handleButtonLinkChange(
+                                                index,
+                                                "#new-collection"
+                                              )
+                                            }
+                                          >
+                                            New Collection
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onSelect={() =>
+                                              handleButtonLinkChange(
+                                                index,
+                                                "#best-seller"
+                                              )
+                                            }
+                                          >
+                                            Best Seller
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onSelect={() =>
+                                              handleButtonLinkChange(
+                                                index,
+                                                "#discount"
+                                              )
+                                            }
+                                          >
+                                            Discount
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </div>
                                   </div>
-                                  
-                                  {/* Image Alt */}
-                                  <div className="space-y-2">
-                                    <label
-                                      htmlFor={`imageAlt-${promo.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Image Alt Text
-                                    </label>
-                                    <Input
-                                      id={`imageAlt-${promo.id}`}
-                                      name="imageAlt"
-                                      placeholder="Describe the image for accessibility"
-                                      defaultValue={promo.imageAlt}
-                                      className="w-full bg-background"
-                                      onChange={(e) =>
-                                        handleImageAltChange(promo.id, e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                  
-                                  {/* Title */}
-                                  <div className="flex-1 space-y-2">
-                                    <label
-                                      htmlFor={`title-${promo.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Title
-                                    </label>
-                                    <Input
-                                      id={`title-${promo.id}`}
-                                      name="title"
-                                      placeholder="Promo title"
-                                      defaultValue={promo.title}
-                                      className="w-full bg-background"
-                                      onChange={(e) =>
-                                        handleTitleChange(promo.id, e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                  {/* Description */}
-                                  <div className="space-y-2">
-                                    <label
-                                      htmlFor={`description-${promo.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Description
-                                    </label>
-                                    <Textarea
-                                      id={`description-${promo.id}`}
-                                      name="description"
-                                      placeholder="Attractive description that matches the title"
-                                      rows={4}
-                                      className="w-full"
-                                    />
-                                  </div>
-                                  
-                                  {/* Button Text */}
-                                  <div className="space-y-2">
-                                    <label
-                                      htmlFor={`buttonText-${promo.id}`}
-                                      className="block text-sm font-medium text-gray-700"
-                                    >
-                                      Button Text
-                                    </label>
-                                    <Input
-                                      id={`buttonText-${promo.id}`}
-                                      name="buttonText"
-                                      placeholder="Shop Now"
-                                      defaultValue={promo.buttonText}
-                                      className="w-full bg-background"
-                                      onChange={(e) =>
-                                        handleButtonTextChange(promo.id, e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                  
-                                  {/* Button Link */}
-                                  <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Button Link
-                                    </label>
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          variant="outline"
-                                          className="w-full justify-between"
-                                        >
-                                          {promo.buttonLink === "new-collection" && "New Collection"}
-                                          {promo.buttonLink === "best-seller" && "Best Seller"}
-                                          {promo.buttonLink === "discount" && "Discount"}
-                                          <ChevronDown className="ml-2 h-4 w-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                          onSelect={() => handleButtonLinkChange(promo.id, "new-collection")}
-                                        >
-                                          New Collection
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onSelect={() => handleButtonLinkChange(promo.id, "best-seller")}
-                                        >
-                                          Best Seller
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onSelect={() => handleButtonLinkChange(promo.id, "discount")}
-                                        >
-                                          Discount
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </div>
-                                </div>
-                              )}
-                              
-                              
+                                )}
+                              </div>
+                              {/* Delete button */}
+                              <div className="flex justify-end mt-1">
+                                <button
+                                  onClick={() => handleDeletePromo(index)}
+                                  className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
+                                  title="Delete Promo"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
-                            {/* Delete button */}
-                            <div className="flex justify-end mt-1">
-                            <button
-                              onClick={() => handleDeletePromo(promo.id)}
-                              className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
-                              title="Delete Promo"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                          </div>
                           )}
                         </Draggable>
                       ))}
@@ -569,7 +564,20 @@ export function RenderPromoSection({
         </div>
       ) : (
         <div className="p-4 space-y-6">
-          <PromoLayoutItems />
+          <PromoLayoutItems
+            selectedLayout={
+              [
+                "CenteredPromo",
+                "LeftAlignedPromo",
+                "RightAlignedPromo",
+                "MinimalLeftPromo",
+                "MinimalRightPromo",
+                "OverlayPromo",
+                "SplitPromo",
+              ].indexOf(promoAttributes.template) + 1
+            }
+            onLayoutSelect={handleLayoutSelection}
+          />
 
           {/* Title Section */}
           <div className="flex items-center">
@@ -587,80 +595,185 @@ export function RenderPromoSection({
           </div>
           {expandedSections.title && (
             <div className="space-y-4">
+              {/* font family */}
               <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {promoSettings.titleFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          promoAttributes.titleFont === "font-inter"
+                            ? "Inter"
+                            : promoAttributes.titleFont === "font-roboto"
+                            ? "Roboto"
+                            : promoAttributes.titleFont === "font-open-sans"
+                            ? "Open Sans"
+                            : promoAttributes.titleFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setPromoSettings((s) => ({ ...s, titleFont: font }))
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleFont: "font-roboto" })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          titleFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleFont: "font-poppins" })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+              {/* color */}
               <div className="space-y-2">
                 <label className="block text-sm mb-2">Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={promoSettings.titleColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleColor: e.target.value,
-                      }))
-                    }
+                    value={promoAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={promoSettings.titleColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={promoAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(promoSettings.titleSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {promoAttributes.titleSize === "text-sm"
+                          ? "Small"
+                          : promoAttributes.titleSize === "text-base"
+                          ? "Meduim"
+                          : promoAttributes.titleSize === "text-lg"
+                          ? "Large"
+                          : promoAttributes.titleSize === "text-xl"
+                          ? "XL"
+                          : promoAttributes.titleSize === "text-2xl"
+                          ? "2XL"
+                          : promoAttributes.titleSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ titleSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           )}
@@ -681,85 +794,192 @@ export function RenderPromoSection({
           </div>
           {expandedSections.description && (
             <div className="space-y-4">
+              {/* font family */}
               <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {promoSettings.descriptionFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          promoAttributes.descriptionFont === "font-inter"
+                            ? "Inter"
+                            : promoAttributes.descriptionFont === "font-roboto"
+                            ? "Roboto"
+                            : promoAttributes.descriptionFont ===
+                              "font-open-sans"
+                            ? "Open Sans"
+                            : promoAttributes.descriptionFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setPromoSettings((s) => ({
-                              ...s,
-                              descriptionFont: font,
-                            }))
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          descriptionFont: "font-roboto",
+                        })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          descriptionFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          descriptionFont: "font-poppins",
+                        })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
 
+              {/* color */}
               <div className="space-y-2">
                 <label className="block text-sm mb-2">Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={promoSettings.descriptionColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionColor: e.target.value,
-                      }))
-                    }
+                    value={promoAttributes.descriptionColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        descriptionColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={promoSettings.descriptionColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={promoAttributes.descriptionColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        descriptionColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(promoSettings.descriptionSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="14"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {promoAttributes.descriptionSize === "text-sm"
+                          ? "Small"
+                          : promoAttributes.descriptionSize === "text-base"
+                          ? "Meduim"
+                          : promoAttributes.descriptionSize === "text-lg"
+                          ? "Large"
+                          : promoAttributes.descriptionSize === "text-xl"
+                          ? "XL"
+                          : promoAttributes.descriptionSize === "text-2xl"
+                          ? "2XL"
+                          : promoAttributes.descriptionSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ descriptionSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           )}
@@ -780,64 +1000,107 @@ export function RenderPromoSection({
           </div>
           {expandedSections.button && (
             <div className="space-y-4">
-              {/* Font Family Dropdown */}
+              {/* font family */}
               <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {promoSettings.buttonFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          promoAttributes.buttonFont === "font-inter"
+                            ? "Inter"
+                            : promoAttributes.buttonFont === "font-roboto"
+                            ? "Roboto"
+                            : promoAttributes.buttonFont === "font-open-sans"
+                            ? "Open Sans"
+                            : promoAttributes.buttonFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setPromoSettings((s) => ({
-                              ...s,
-                              buttonFont: font,
-                            }))
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          buttonFont: "font-roboto",
+                        })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          buttonFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({
+                          buttonFont: "font-poppins",
+                        })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
 
-              {/* Text Color Picker */}
+              {/* text color */}
               <div className="space-y-2">
                 <label className="block text-sm mb-2">Text Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={promoSettings.buttonTextColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonTextColor: e.target.value,
-                      }))
-                    }
+                    value={promoAttributes.buttonTextColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        buttonTextColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={promoSettings.buttonTextColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonTextColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={promoAttributes.buttonTextColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        buttonTextColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -848,71 +1111,195 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={promoSettings.buttonColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonColor: e.target.value,
-                      }))
-                    }
+                    value={promoAttributes.buttonColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        buttonColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={promoSettings.buttonColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={promoAttributes.buttonColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        buttonColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
 
               {/* Font Size Input */}
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(promoSettings.buttonSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="14"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {promoAttributes.buttonSize === "text-sm"
+                          ? "Small"
+                          : promoAttributes.buttonSize === "text-base"
+                          ? "Meduim"
+                          : promoAttributes.buttonSize === "text-lg"
+                          ? "Large"
+                          : promoAttributes.buttonSize === "text-xl"
+                          ? "XL"
+                          : promoAttributes.buttonSize === "text-2xl"
+                          ? "2XL"
+                          : promoAttributes.buttonSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               {/* Border Radius Input */}
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Border Radius (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(promoSettings.buttonRadius) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        buttonRadius: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="4"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+              <div>
+                <label className="block text-sm mb-2">Button Radius</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {promoAttributes.buttonRadius === "rounded-none"
+                          ? "None"
+                          : promoAttributes.buttonRadius === "rounded-sm"
+                          ? "Small"
+                          : promoAttributes.buttonRadius === "rounded-md"
+                          ? "Medium"
+                          : promoAttributes.buttonRadius === "rounded-lg"
+                          ? "Large"
+                          : promoAttributes.buttonRadius === "rounded-xl"
+                          ? "XL"
+                          : promoAttributes.buttonRadius === "text-2xl"
+                          ? "2XL"
+                          : "3XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-none" })
+                      }
+                    >
+                      None
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-md" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ buttonRadius: "rounded-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           )}
@@ -939,26 +1326,41 @@ export function RenderPromoSection({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {promoSettings.imageObjectFit}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {promoAttributes.imageObjectFit === "Cover"
+                          ? "Cover"
+                          : promoAttributes.imageObjectFit === "Fill"
+                          ? "Fill"
+                          : "Contain"}
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["Cover", "Fill", "Contain"].map((fit) => (
-                      <DropdownMenuItem
-                        key={fit}
-                        onSelect={() =>
-                          setPromoSettings((s) => ({
-                            ...s,
-                            imageObjectFit: fit as any,
-                          }))
-                        }
-                      >
-                        {fit}
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ imageObjectFit: "Cover" })
+                      }
+                    >
+                      Cover
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ imageObjectFit: "Fill" })
+                      }
+                    >
+                      Fill
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePromoAttributes({ imageObjectFit: "Contain" })
+                      }
+                    >
+                      Contain
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -967,25 +1369,29 @@ export function RenderPromoSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={promoSettings.backgroundColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        backgroundColor: e.target.value,
-                      }))
-                    }
+                    value={promoAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={promoSettings.backgroundColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        backgroundColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={promoAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      // Update header attributes
+                      updatePromoAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -1011,28 +1417,29 @@ export function RenderPromoSection({
               <div className="flex items-center justify-between">
                 <span>Show Arrows</span>
                 <Button
-                  variant={promoSettings.showArrows ? "default" : "outline"}
+                  variant={promoAttributes.showArrows ? "default" : "outline"}
                   size="sm"
                   onClick={() =>
-                    setPromoSettings((s) => ({
-                      ...s,
-                      showArrows: !s.showArrows,
-                    }))
+                    updatePromoAttributes({
+                      showArrows: !promoAttributes.showArrows,
+                    })
                   }
                 >
-                  {promoSettings.showArrows ? "Enabled" : "Disabled"}
+                  {promoAttributes.showArrows ? "Enabled" : "Disabled"}
                 </Button>
               </div>
               <div className="flex items-center justify-between">
                 <span>Autoplay</span>
                 <Button
-                  variant={promoSettings.autoplay ? "default" : "outline"}
+                  variant={promoAttributes.autoPlay ? "default" : "outline"}
                   size="sm"
                   onClick={() =>
-                    setPromoSettings((s) => ({ ...s, autoplay: !s.autoplay }))
+                    updatePromoAttributes({
+                      autoPlay: !promoAttributes.autoPlay,
+                    })
                   }
                 >
-                  {promoSettings.autoplay ? "Enabled" : "Disabled"}
+                  {promoAttributes.autoPlay ? "Enabled" : "Disabled"}
                 </Button>
               </div>
             </div>
