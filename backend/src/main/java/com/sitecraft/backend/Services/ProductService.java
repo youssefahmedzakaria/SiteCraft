@@ -128,12 +128,21 @@ public class ProductService {
 
                 if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
                     for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
-                        AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
-                        VariantAttributeValue vav = new VariantAttributeValue();
-                        vav.setVariant(savedVariant);
-                        vav.setAttributeValue(av);
-                        variantAttributeValueRepo.save(vav);
-                        attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                        Map<String, AttributeValue> valueMap = createdAttributes.get(variantAttrDTO.getName());
+                        if (valueMap != null) {
+                            AttributeValue av = valueMap.get(variantAttrDTO.getValue());
+                            if (av != null) {
+                                VariantAttributeValue vav = new VariantAttributeValue();
+                                vav.setVariant(savedVariant);
+                                vav.setAttributeValue(av);
+                                variantAttributeValueRepo.save(vav);
+                                attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                            } else {
+                                System.err.println("Warning: Attribute value not found for variant: " + variantAttrDTO.getValue());
+                            }
+                        } else {
+                            System.err.println("Warning: Attribute name not found for variant: " + variantAttrDTO.getName());
+                        }
                     }
                 }
 
@@ -252,12 +261,21 @@ public class ProductService {
 
                     if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
                         for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
-                            AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
-                            VariantAttributeValue vav = new VariantAttributeValue();
-                            vav.setVariant(savedVariant);
-                            vav.setAttributeValue(av);
-                            variantAttributeValueRepo.save(vav);
-                            attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                            Map<String, AttributeValue> valueMap = createdAttributes.get(variantAttrDTO.getName());
+                            if (valueMap != null) {
+                                AttributeValue av = valueMap.get(variantAttrDTO.getValue());
+                                if (av != null) {
+                                    VariantAttributeValue vav = new VariantAttributeValue();
+                                    vav.setVariant(savedVariant);
+                                    vav.setAttributeValue(av);
+                                    variantAttributeValueRepo.save(vav);
+                                    attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                                } else {
+                                    System.err.println("Warning: Attribute value not found for variant: " + variantAttrDTO.getValue());
+                                }
+                            } else {
+                                System.err.println("Warning: Attribute name not found for variant: " + variantAttrDTO.getName());
+                            }
                         }
                     }
 
@@ -470,20 +488,31 @@ public class ProductService {
     @Transactional
     public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
         Product product = updateProduct(id, productDTO, storeId);
+        
+        // Only handle images if images parameter is not null (meaning the frontend sent image data)
         if (images != null) {
-            // Remove old images
-            List<ProductImage> oldImages = productImageRepo.findByProductId(id);
-            for (ProductImage img : oldImages) {
-                String path = System.getProperty("user.dir") + img.getImageUrl();
-                File file = new File(path);
-                if (file.exists()) file.delete();
-            }
-            productImageRepo.deleteAll(oldImages);
-            // Save new images
+            // Remove old images only if new images are provided
             if (!images.isEmpty()) {
+                List<ProductImage> oldImages = productImageRepo.findByProductId(id);
+                for (ProductImage img : oldImages) {
+                    try {
+                        String path = System.getProperty("user.dir") + img.getImageUrl();
+                        File file = new File(path);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    } catch (Exception e) {
+                        // Log the error but don't fail the update
+                        System.err.println("Warning: Could not delete old image file: " + e.getMessage());
+                    }
+                }
+                productImageRepo.deleteAll(oldImages);
+                
+                // Save new images
                 saveProductImages(product.getStore().getId(), product.getId(), images, product);
             }
         }
+        
         return getProductById(product.getId(), storeId);
     }
 
