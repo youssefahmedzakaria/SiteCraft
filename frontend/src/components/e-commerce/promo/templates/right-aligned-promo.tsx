@@ -2,6 +2,7 @@ import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
 export interface RightAlignedPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -29,7 +30,8 @@ export interface RightAlignedPromoProps {
   id?: string
 }
 
-export function RightAlignedPromo({ 
+export function RightAlignedPromo({
+  isClickable = true,
   slides = [
     {
       title: "Your Site Title",
@@ -65,8 +67,8 @@ export function RightAlignedPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-  
-  id, 
+
+  id,
 }: RightAlignedPromoProps) {
   return (
     <section id={id} className={cn("w-full", backgroundColor)}>
@@ -88,8 +90,9 @@ export function RightAlignedPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

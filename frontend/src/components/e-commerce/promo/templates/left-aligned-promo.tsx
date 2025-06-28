@@ -1,6 +1,7 @@
 import { PromoSlider } from "../promo-slider"
 
 export interface LeftAlignedPromoProps {
+  isClickable?: boolean
   id?: string
   slides?: {
     title: string
@@ -27,7 +28,8 @@ export interface LeftAlignedPromoProps {
   imageObjectFit?: "cover" | "fill" | "contain"  
 }
 
-export function LeftAlignedPromo({ 
+export function LeftAlignedPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -86,8 +88,9 @@ export function LeftAlignedPromo({
           buttonRadius={buttonRadius}
           backgroundColor={backgroundColor}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

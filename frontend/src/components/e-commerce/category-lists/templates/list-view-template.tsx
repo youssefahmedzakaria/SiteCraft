@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 interface ListViewCategoryTemplateProps {
+  isClickable?: boolean;
   categories: any[];
   bgColor?: string;
   textColor?: string;
@@ -47,6 +48,7 @@ interface ListViewCategoryTemplateProps {
 }
 
 export function ListViewCategoryTemplate({
+  isClickable = true,
   categories,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -81,7 +83,7 @@ export function ListViewCategoryTemplate({
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
-  
+
   // Generate accent color for icon
   const iconColorClass = accentColor.startsWith("text-")
     ? accentColor
@@ -116,6 +118,7 @@ export function ListViewCategoryTemplate({
         <div className={gap}>
           {categories.map((category) => (
             <FlexibleCard
+              isClickable={isClickable}
               key={category._id}
               item={category}
               type="category"
@@ -160,7 +163,7 @@ export function ListViewCategoryTemplate({
       <div className={gap}>
         {categories.map((category) => (
           <Link
-            href={`/e-commerce/${subdomain}/products`}
+            href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
             className={cn(
               "flex items-center gap-4 p-4 border",
               borderColor,
@@ -197,7 +200,7 @@ export function ListViewCategoryTemplate({
       {showMoreButton && categories.length > 0 && (
         <div className="flex justify-end mt-6">
           <Link
-            href={`/e-commerce/${subdomain}/categories`}
+            href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
             className={cn(
               "inline-flex items-center px-6 py-2",
               "hover:bg-opacity-80 transition-colors duration-300",

@@ -21,6 +21,7 @@ type CornerRadius = "none" | "small" | "medium" | "large"
 
 // Define the props for the FlexibleCard component
 interface FlexibleCardProps {
+  isClickable?: boolean
   // Core data
   item: any
   type: CardItemType
@@ -68,6 +69,7 @@ interface FlexibleCardProps {
 }
 
 export default function FlexibleCard({
+  isClickable,
   // Core data
   item,
   type = "product",
@@ -149,7 +151,7 @@ export default function FlexibleCard({
       : "text-blue-600"
 
   // Determine the link path based on the item type
-  const href = linkPath || (type === "product" ? `/${item.id}` : `/e-commerce/${subdomain}/products`)
+  const href = linkPath || (isClickable ? (type === "product" ? `/${item.id}` : `/e-commerce/${subdomain}/products`) : "#")
 
   // Get item description
   const description =
@@ -229,7 +231,7 @@ export default function FlexibleCard({
     e.preventDefault()
     e.stopPropagation()
     if (type === "product") {
-      router.push(`/e-commerce/${subdomain}/product/${item.id}`)
+      router.push(isClickable ? `/e-commerce/${subdomain}/product/${item.id}` : "#")
     }
   }
 

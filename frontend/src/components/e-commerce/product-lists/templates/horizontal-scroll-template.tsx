@@ -9,6 +9,7 @@ import FlexibleCard from "@/components/e-commerce/card/card-templates";
 import { usePathname } from "next/navigation";
 
 interface HorizontalScrollProductTemplateProps {
+  isClickable?: boolean;
   products: any[];
   bgColor?: string;
   textColor?: string;
@@ -55,6 +56,7 @@ interface HorizontalScrollProductTemplateProps {
 }
 
 export function HorizontalScrollProductTemplate({
+  isClickable,
   products,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -192,6 +194,7 @@ export function HorizontalScrollProductTemplate({
                   className={cn("flex-shrink-0", cardWidth)}
                 >
                   <FlexibleCard
+                    isClickable={isClickable}
                     item={product}
                     type="product"
                     variant={cardVariant}
@@ -250,7 +253,7 @@ export function HorizontalScrollProductTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={`/e-commerce/${subdomain}/products`}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

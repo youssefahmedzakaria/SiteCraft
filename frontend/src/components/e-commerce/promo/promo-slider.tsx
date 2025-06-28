@@ -7,6 +7,7 @@ import { PromoSlide } from "./promo-slide"
 import { Button } from "@/components/e-commerce/ui/button"
 
 export interface PromoSliderProps {
+  isClickable?: boolean
   slides: {
     title: string
     description: string
@@ -36,6 +37,7 @@ export interface PromoSliderProps {
 }
 
 export function PromoSlider({
+  isClickable,
   slides,
   variant = "left",
   autoplay = false,
@@ -109,6 +111,7 @@ export function PromoSlider({
             buttonRadius={buttonRadius}
             imageObjectFit={imageObjectFit}
             backgroundColor={backgroundColor}
+            isClickable={isClickable}
           />
         ))}
       </div>

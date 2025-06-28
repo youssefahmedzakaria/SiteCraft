@@ -1,55 +1,64 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import Image from "next/image"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/e-commerce/card/card-templates"
-import { usePathname } from "next/navigation"
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import FlexibleCard from "@/components/e-commerce/card/card-templates";
+import { usePathname } from "next/navigation";
 
 interface GridProductTemplateProps {
-  products: any[]
+  isClickable?: boolean;
+  products: any[];
   columns?: {
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-  gap?: string
-  bgColor?: string
-  textColor?: string
-  borderRadius?: string
-  showTitle?: boolean
-  titlePosition?: "top" | "bottom" | "overlay"
-  imageHeight?: string
-  fontFamily?: string
-  hoverEffect?: boolean
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: string;
+  bgColor?: string;
+  textColor?: string;
+  borderRadius?: string;
+  showTitle?: boolean;
+  titlePosition?: "top" | "bottom" | "overlay";
+  imageHeight?: string;
+  fontFamily?: string;
+  hoverEffect?: boolean;
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showCardTitle?: boolean
-  showSubtitle?: boolean
-  showCta?: boolean
-  ctaText?: string
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  cardShadow?: string
-  accentColor?: string
-  borderColor?: string
-  overlayColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showCardTitle?: boolean;
+  showSubtitle?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  cardShadow?: string;
+  accentColor?: string;
+  borderColor?: string;
+  overlayColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
   // Show more button props
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
   // Product specific props
-  onAddToCart?: (product: any) => void
-  onAddToFavorite?: (product: any) => void
+  onAddToCart?: (product: any) => void;
+  onAddToFavorite?: (product: any) => void;
 }
 
 export function GridProductTemplate({
+  isClickable,
   products,
   columns = { sm: 2, md: 3, lg: 4, xl: 6 },
   gap = "gap-4",
@@ -87,14 +96,14 @@ export function GridProductTemplate({
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
-  
+
   // Generate dynamic grid classes based on columns prop
   const gridCols = cn(
     `grid-cols-${columns.sm || 2}`,
     columns.md && `md:grid-cols-${columns.md}`,
     columns.lg && `lg:grid-cols-${columns.lg}`,
-    columns.xl && `xl:grid-cols-${columns.xl}`,
-  )
+    columns.xl && `xl:grid-cols-${columns.xl}`
+  );
 
   return (
     <div className={cn("w-full flex-shrink-0", bgColor)}>
@@ -138,7 +147,11 @@ export function GridProductTemplate({
               onAddToFavorite={
                 onAddToFavorite ? () => onAddToFavorite(product) : undefined
               }
-              linkPath={`/e-commerce/${subdomain}/product/${product.id}`}
+              linkPath={
+                isClickable
+                  ? `/e-commerce/${subdomain}/product/${product.id}`
+                  : "#"
+              }
             />
           ))}
         </div>
@@ -146,7 +159,7 @@ export function GridProductTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={`/e-commerce/${subdomain}/products`}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

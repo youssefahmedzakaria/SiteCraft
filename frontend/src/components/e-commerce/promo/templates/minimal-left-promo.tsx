@@ -3,6 +3,7 @@ import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
 export interface MinimalLeftPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -29,7 +30,8 @@ export interface MinimalLeftPromoProps {
   id?: string
 }
 
-export function MinimalLeftPromo({ 
+export function MinimalLeftPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -87,8 +89,9 @@ export function MinimalLeftPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }
