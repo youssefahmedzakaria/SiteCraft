@@ -74,9 +74,9 @@ export const useSignupForm = () => {
       console.log('📥 Signup returned userId:', userId);
 
       if (userId) {
-        console.log('🎯 Redirecting to dashboard...');
-        // Redirect to dashboard - store is already created by backend
-        router.push('/dashboard')
+        console.log('🎯 Redirecting to branding page...');
+        // Redirect to branding page after registration
+        router.push('/branding')
       } else {
         console.log('⚠️ No userId returned from signup');
       }

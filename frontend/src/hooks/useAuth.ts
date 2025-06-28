@@ -16,6 +16,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   signup: (userData: { email: string, password: string, name?: string, phone?: string, gender?: string }) => Promise<number | null>
+  updateSessionAfterStoreCreation: (storeId: number, role: string) => Promise<void>
   checkSession: () => Promise<void>
   clearError: () => void
 }
@@ -85,25 +86,25 @@ export const useAuth = create<AuthState>((set, get) => ({
       const response = await registerAPI(userData)
       console.log('📥 registerAPI response received:', response);
       
-      // Set session with the returned data
-      if (response.userId && response.storeId) {
-        console.log('🔐 Setting session with userId and storeId...');
-        await setSession(response.userId, response.storeId)
+      // Set session with the returned data (only userId, no storeId yet)
+      if (response.userId) {
+        console.log('🔐 Setting session with userId only (no storeId yet)...');
+        await setSession(response.userId, null) // No storeId during registration
         
         console.log('🔄 Updating auth state...');
-        // Update the auth state
+        // Update the auth state (user is authenticated but no store yet)
         set({ 
           isAuthenticated: true, 
           user: {
             userId: response.userId,
-            storeId: response.storeId,
-            role: response.role
+            storeId: null, // No store created yet
+            role: null // No role assigned yet
           },
           signupError: null 
         })
         console.log('✅ Auth state updated successfully!');
       } else {
-        console.log('⚠️ Missing userId or storeId in response:', response);
+        console.log('⚠️ Missing userId in response:', response);
       }
       
       return response.userId
@@ -114,6 +115,34 @@ export const useAuth = create<AuthState>((set, get) => ({
     } finally {
       set({ isLoading: false })
       console.log('🏁 Signup process completed');
+    }
+  },
+
+  updateSessionAfterStoreCreation: async (storeId: number, role: string) => {
+    console.log('🔄 Updating session after store creation...', { storeId, role });
+    const currentUser = get().user;
+    if (!currentUser?.userId) {
+      console.error('❌ No user found to update session');
+      return;
+    }
+
+    try {
+      // Update session with storeId
+      await setSession(currentUser.userId, storeId);
+      
+      // Update auth state
+      set({
+        user: {
+          ...currentUser,
+          storeId: storeId,
+          role: role
+        }
+      });
+      
+      console.log('✅ Session updated successfully after store creation');
+    } catch (error) {
+      console.error('💥 Error updating session after store creation:', error);
+      throw error;
     }
   },
 

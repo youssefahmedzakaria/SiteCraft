@@ -50,7 +50,7 @@ export async function getSession() {
   return res.json();
 }
 
-export async function setSession(userId: number, storeId: number) {
+export async function setSession(userId: number, storeId: number | null) {
   console.log('🔐 Setting session...', { userId, storeId });
   
   const res = await fetch('http://localhost:8080/auth/setSession', {
@@ -75,11 +75,14 @@ export async function setSession(userId: number, storeId: number) {
 export async function register(user: { email: string, password: string, name?: string, phone?: string, gender?: string }) {
   console.log('🚀 Starting registration process...', { email: user.email, name: user.name });
   
+  const requestBody = JSON.stringify(user);
+  console.log('📤 Sending request body:', requestBody);
+  
   const res = await fetch('http://localhost:8080/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify(user),
+    body: requestBody,
   });
   
   console.log('📡 Registration response status:', res.status);
@@ -87,16 +90,21 @@ export async function register(user: { email: string, password: string, name?: s
   
   if (!res.ok) {
     let msg = 'Registration failed';
+    const responseClone = res.clone();
+    
     try { 
       const data = await res.json();
       msg = data.message || data || msg; 
       console.log('❌ Registration error response:', data);
-    } catch {
+    } catch (jsonError) {
       try {
-        msg = await res.text() || msg;
-        console.log('❌ Registration error text:', msg);
-      } catch {
+        const textResponse = await responseClone.text();
+        msg = textResponse || msg;
+        console.log('❌ Registration error text:', textResponse);
+      } catch (textError) {
         console.log('❌ Registration failed with unknown error');
+        console.log('❌ JSON parse error:', jsonError);
+        console.log('❌ Text parse error:', textError);
       }
     }
     throw new Error(msg);

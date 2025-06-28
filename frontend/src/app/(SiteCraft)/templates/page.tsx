@@ -5,8 +5,16 @@ import { TemplateCard } from "@/components/SiteCraft/templates/TemplateCard";
 import { suggestedTemplates } from "@/lib/templates";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function SuggestedTemplatesPage() {
+  const router = useRouter();
+
+  const handleNextClick = () => {
+    router.push("/dashboard");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto p-4 md:p-6">
@@ -61,27 +69,22 @@ export default function SuggestedTemplatesPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-6">
+        {/* Navigation Buttons */}
+        <div className="mt-6 flex justify-between">
           <Button
             variant="outline"
             onClick={() => (window.location.href = "/branding/color-palette")}
-            className="border-gray-300 hover:bg-gray-100"
+            className="border-gray-300 hover:bg-gray-100 flex items-center gap-2"
           >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              ></path>
-            </svg>
+            <ArrowLeft className="w-4 h-4" />
             Back
+          </Button>
+          <Button
+            onClick={handleNextClick}
+            className="bg-black text-white hover:bg-gray-800 flex items-center gap-2 px-6"
+          >
+            Next
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </main>
