@@ -12,57 +12,65 @@
   <style>
     @page { size: auto; margin: 0; }
     html, body { margin: 0; padding: 0; }
-    .bg-logo-left-nav { background-color: #263238; }
-    .border-logo-border { border-color: #cc78604d; }
-    .text-logo-txt { color: #cc7860f2; }
-    .hover\:bg-logo-light-button-hover:hover { background-color: #cc78601a; }
+    .bg-logo-left-nav { background-color: #052a47; }
+    .border-logo-border { border-color: #4CC63D; }
+    .text-logo-txt { color: #4CC63D; }
+    .table-header { background-color: #F3F4F6; }
+    .hover\:bg-logo-light-button-hover:hover { background-color: #E6F9E6; }
+    .min-h-navbar { min-height: 44px; }
+    .table-cell-main { color: #222; }
+    .table-cell-secondary { color: #555; }
+    /* Custom row divider color */
+    .custom-table tr:not(:last-child) td {
+      border-bottom: 0.5px solid #4CC63D !important;
+    }
   </style>
 </head>
 <body class="bg-gray-100">
 
   <!-- Top nav: logo only, flush left -->
-  <nav class="bg-logo-left-nav flex items-center" style="height:44px; padding-left:24px;">
+  <nav class="bg-logo-left-nav flex items-center min-h-navbar" style="padding-left:24px; background-color:#052a47;">
     <img
       src="font.png"
       alt="SiteCraft Logo"
-      style="height:100%;"/>
+      style="height:36px; width:auto; display:block;"/>
   </nav>
 
   <!-- Main wrapper -->
   <div class="container mx-auto mx-6 mt-6">
 
-    <!-- Card: table + insights -->
+    <!-- Card: table + insights (single container) -->
     <div class="bg-white rounded-lg shadow border border-logo-border overflow-hidden">
 
       <!-- Table section -->
-      <div class="overflow-x-auto p-6">
-        <h1 class="text-2xl font-bold text-center mb-2" th:text="${reportName}"></h1>
+      <div class="overflow-x-auto p-6 pb-2">
+        <h1 class="text-2xl font-bold text-center mb-2 text-black" th:text="${reportName}"></h1>
         <h2 class="text-lg text-gray-600 text-center mb-6" th:text="${reportDescription}"></h2>
-        <table class="min-w-full table-fixed divide-y divide-logo-border border border-logo-border">
-          <thead class="bg-gray-200">
+        <table class="custom-table min-w-full table-fixed border border-logo-border rounded-lg" style="border-width: 0.5px;">
+          <thead class="table-header">
             <tr>
               <th
                 th:each="col : ${columns}"
                 th:text="${col}"
-                class="px-4 py-2 text-center text-xs font-semibold uppercase text-logo-txt">
+                class="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider border-b border-logo-border" style="border-bottom-width: 0.5px;">
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-logo-border">
+          <tbody class="bg-white divide-y divide-logo-border" style="border-color: #4CC63D; border-width: 0.5px;">
             <tr th:each="row : ${rows}" class="hover:bg-logo-light-button-hover">
               <td
                 th:each="cell : ${row}"
                 th:text="${cell}"
-                class="px-4 py-2 text-center text-sm text-gray-900">
+                class="px-3 md:px-6 py-4 text-center text-sm table-cell-main">
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Insights & Recommendations section -->
-      <div class="bg-white p-6 border-t border-logo-border">
-        <h3 class="text-xl font-bold mb-4 text-gray-800">Insights &amp; Recommendations</h3>
+      <!-- Insights & Recommendations section (no border-top, same card) -->
+      <div class="bg-white p-6 pt-2">
+        <h3 class="text-xl font-bold mb-4 text-black">Insights &amp; Recommendations</h3>
         <!-- iterate the list built in Java -->
         <div th:each="line : ${reportInsightsList}">
           <p class="text-base text-gray-700 mb-2">
