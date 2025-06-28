@@ -14,8 +14,8 @@ export const useStoreAssignment = () => {
     setError('')
 
     try {
-      // Set the session with userId and storeId
-      await setSession(userId, storeId)
+      // Set the session with userId, storeId, and role (assuming owner role for store assignment)
+      await setSession(userId, storeId, 'owner')
       
       // Refresh the session to get updated data
       await checkSession()

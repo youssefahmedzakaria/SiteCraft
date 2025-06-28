@@ -1,5 +1,6 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Users;
+import com.sitecraft.backend.Models.UserRole;
 import com.sitecraft.backend.Services.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,18 +192,42 @@ public class AuthController {
     @GetMapping("/getSession")
     public ResponseEntity getSession(HttpSession session) {
         Map<String, Object> sessionData = new HashMap<>();
-        sessionData.put("storeId", session.getAttribute("storeId"));
-        sessionData.put("userId", session.getAttribute("userId"));
-        sessionData.put("role", session.getAttribute("role"));
+        Long userId = (Long) session.getAttribute("userId");
+        Long storeId = (Long) session.getAttribute("storeId");
+        String role = (String) session.getAttribute("role");
+        
+        // If we have a userId, try to get the latest role from database
+        if (userId != null) {
+            try {
+                UserRole userRole = userService.getUserRole(userId);
+                if (userRole != null) {
+                    role = userRole.getRole();
+                    storeId = userRole.getStoreId();
+                    // Update session with latest data
+                    session.setAttribute("role", role);
+                    session.setAttribute("storeId", storeId);
+                }
+            } catch (Exception e) {
+                System.out.println("⚠️ Error retrieving user role from database: " + e.getMessage());
+                // Continue with session data if database lookup fails
+            }
+        }
+        
+        sessionData.put("storeId", storeId);
+        sessionData.put("userId", userId);
+        sessionData.put("role", role);
+        
+        System.out.println("🔐 getSession returning: " + sessionData);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
 
     @PostMapping("/setSession")
-    public void setSession(@RequestBody Map<String, Long> in, HttpSession session) {
+    public void setSession(@RequestBody Map<String, Object> in, HttpSession session) {
         System.out.println("🔐 setSession endpoint called with: " + in);
         session.setAttribute("userId", in.get("userId"));
         session.setAttribute("storeId", in.get("storeId"));
-        System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId"));
+        session.setAttribute("role", in.get("role"));
+        System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId") + ", role: " + in.get("role"));
     }
 
     public static class LoginRequest {

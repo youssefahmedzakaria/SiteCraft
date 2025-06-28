@@ -89,7 +89,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       // Set session with the returned data (only userId, no storeId yet)
       if (response.userId) {
         console.log('🔐 Setting session with userId only (no storeId yet)...');
-        await setSession(response.userId, null) // No storeId during registration
+        await setSession(response.userId, null, null) // No storeId or role during registration
         
         console.log('🔄 Updating auth state...');
         // Update the auth state (user is authenticated but no store yet)
@@ -127,10 +127,18 @@ export const useAuth = create<AuthState>((set, get) => ({
     }
 
     try {
-      // Update session with storeId
-      await setSession(currentUser.userId, storeId);
+      // Update session with storeId and role
+      console.log('📞 Calling setSession with:', { userId: currentUser.userId, storeId, role });
+      await setSession(currentUser.userId, storeId, role);
+      console.log('✅ setSession completed successfully');
       
-      // Update auth state
+      // Refresh the session to get updated data from backend
+      console.log('🔄 Refreshing session data...');
+      const { checkSession } = get();
+      await checkSession();
+      console.log('✅ Session refreshed successfully');
+      
+      // Also update auth state locally for immediate effect
       set({
         user: {
           ...currentUser,
@@ -149,20 +157,26 @@ export const useAuth = create<AuthState>((set, get) => ({
   checkSession: async () => {
     set({ isLoading: true })
     try {
+      console.log('🔄 Checking session...');
       const session = await getSession()
+      console.log('📥 Session data received:', session);
+      
       if (session && session.userId) {
+        console.log('✅ Valid session found, updating auth state...');
         set({ 
           isAuthenticated: true, 
           user: session 
         })
+        console.log('✅ Auth state updated with session data');
       } else {
+        console.log('❌ No valid session found');
         set({ 
           isAuthenticated: false, 
           user: null 
         })
       }
     } catch (error) {
-      console.error('Session check error:', error)
+      console.error('💥 Session check error:', error)
       set({ 
         isAuthenticated: false, 
         user: null 

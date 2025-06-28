@@ -38,6 +38,19 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return null
   }
 
+  // If user is authenticated but doesn't have a store yet, redirect to branding
+  if (isAuthenticated && user && !user.storeId && !user.role) {
+    router.push('/branding')
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-blue-600 mb-4">Setting up your store...</h1>
+          <p className="text-gray-600">Redirecting you to create your store.</p>
+        </div>
+      </div>
+    )
+  }
+
   // Check role if required
   if (requiredRole && user?.role !== requiredRole) {
     return (
