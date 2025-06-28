@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getOrder, Order } from "@/lib/orders";
+import { getProduct, Product } from "@/lib/products";
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -14,6 +15,9 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Map of productId to product name
+  const [productNames, setProductNames] = useState<Record<number, string>>({});
+  const [fetchingNames, setFetchingNames] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -30,6 +34,37 @@ export default function OrderDetailsPage() {
     };
     fetchOrder();
   }, [orderId]);
+
+  // Fetch missing product names for order items
+  useEffect(() => {
+    if (!order || !order.orderProducts) return;
+    const missing = order.orderProducts.filter(
+      (item) => item.product && !item.product.name && item.product.id && !productNames[item.product.id]
+    );
+    if (missing.length === 0) return;
+    setFetchingNames(true);
+    Promise.all(
+      missing.map(async (item) => {
+        if (!item.product) return { prodId: undefined, name: item.sku || "N/A" };
+        const prodId = item.product.id;
+        const prod = await getProduct(prodId);
+        console.log('Fetched product for id', prodId, prod);
+        return { prodId, name: prod?.name || item.sku || "N/A" };
+      })
+    ).then((results) => {
+      setProductNames((prev) => {
+        const updated = { ...prev };
+        results.forEach(({ prodId, name }) => {
+          if (prodId !== undefined) {
+            console.log('Resolved name for product', prodId, ':', name);
+            updated[prodId] = name;
+          }
+        });
+        return updated;
+      });
+      setFetchingNames(false);
+    });
+  }, [order, productNames]);
 
   if (loading) {
     return (
@@ -147,14 +182,21 @@ export default function OrderDetailsPage() {
                 </thead>
                 <tbody>
                   {order.orderProducts && order.orderProducts.length > 0 ? (
-                    order.orderProducts.map((item) => (
-                      <tr key={item.id} className="border-b">
-                        <td className="py-2">{item.product?.name || "N/A"}</td>
-                        <td className="text-right py-2">{item.quantity}</td>
-                        <td className="text-right py-2">{item.price.toFixed(2)} EGP</td>
-                        <td className="text-right py-2">{(item.price * item.quantity).toFixed(2)} EGP</td>
-                      </tr>
-                    ))
+                    order.orderProducts.map((item) => {
+                      const prod = item.product;
+                      return (
+                        <tr key={item.id} className="border-b">
+                          <td className="py-2">
+                            {(prod && prod.name) ||
+                              (prod && prod.id && productNames[prod.id]) ||
+                              (fetchingNames && prod && prod.id ? "Loading..." : item.sku || "N/A")}
+                          </td>
+                          <td className="text-right py-2">{item.quantity}</td>
+                          <td className="text-right py-2">{item.price.toFixed(2)} EGP</td>
+                          <td className="text-right py-2">{(item.price * item.quantity).toFixed(2)} EGP</td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr><td colSpan={4} className="text-center py-4">No items found.</td></tr>
                   )}

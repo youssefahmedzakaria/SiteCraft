@@ -5,17 +5,18 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { DeleteConfirmationDialog } from "@/components/SiteCraft/ui/deleteConfirmationDialog";
 import type { SimplifiedProduct } from "@/lib/products";
 import { deleteProduct } from "@/lib/products";
-import { categories } from "@/lib/categories";
 import Link from "next/link";
 import { useState } from "react";
 
 export function ProductRecord({
   product,
+  categories = [],
   isSelected = false,
   onSelect,
   fetchProducts
 }: {
   product: SimplifiedProduct;
+  categories?: any[];
   isSelected?: boolean;
   onSelect?: (id: number) => void;
   fetchProducts?: () => void;
@@ -39,8 +40,8 @@ export function ProductRecord({
   // Get category name from categoryId
   const getCategoryName = (categoryId: number) => {
     if (!categoryId) return 'Unknown Category';
-    const category = categories.find(c => c.id === categoryId.toString());
-    return category ? category.title : 'Unknown Category';
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : 'Unknown Category';
   };
 
   // Format price with EGP currency

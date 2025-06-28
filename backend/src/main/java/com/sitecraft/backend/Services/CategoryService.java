@@ -7,6 +7,7 @@ import com.sitecraft.backend.Repositories.CategoryRepo;
 import com.sitecraft.backend.Repositories.ProductRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.DTOs.CategoryCreateDTO;
+import com.sitecraft.backend.DTOs.CategoryResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -30,10 +32,21 @@ public class CategoryService {
     private StoreRepo storeRepo;
 
     // Basic CRUD Operations
-    public List<Category> getAllCategories(Long storeId) {
+    public List<CategoryResponseDTO> getAllCategories(Long storeId) {
         Store existingStore = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
-        return categoryRepo.findByStoreId(existingStore.getId());
+        List<Category> categories = categoryRepo.findByStoreId(existingStore.getId());
+        
+        // Add product count to each category
+        for (Category category : categories) {
+            Long productCount = categoryRepo.countProductsByCategoryId(category.getId());
+            // We'll add this as a transient field or use a DTO
+            // For now, we'll use a custom query approach
+        }
+        
+        return categories.stream()
+                .map(category -> new CategoryResponseDTO(category, categoryRepo.countProductsByCategoryId(category.getId())))
+                .collect(Collectors.toList());
     }
 
     public Category getCategoryById(Long id, Long storeId) {

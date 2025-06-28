@@ -13,6 +13,8 @@ export interface Product {
     attributes?: ProductAttribute[]
     reviews?: ProductReview[]
     categoryProducts?: CategoryProduct[]
+    categoryId?: number
+    categoryName?: string
 }
 
 export interface ProductImage {
@@ -445,6 +447,9 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         alt: img.alt
     })) || [];
 
+    // Get category ID from the new categoryId field
+    const categoryId = product.categoryId || 0;
+
     return {
         id: product.id,
         name: product.name,
@@ -457,10 +462,10 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         minCap: product.minCap,
         percentageMax: product.percentageMax,
         maxCap: product.maxCap,
-        categoryId: product.categoryProducts?.[0]?.id || 0,
+        categoryId: categoryId,
         storeId: 0, // This will be set by the backend
         images: transformedImages,
-        category: product.category
+        category: product.categoryName ? { id: categoryId, title: product.categoryName, status: 'Active' } : undefined
     };
 };
 

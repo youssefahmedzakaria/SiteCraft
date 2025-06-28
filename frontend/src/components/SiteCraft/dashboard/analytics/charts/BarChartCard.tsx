@@ -47,12 +47,17 @@ export const BarChartCard: FC<BarChartCardProps> = ({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Only abbreviate month names on narrow screens
+  // Only abbreviate month names on narrow screens, or format date as MM-DD
   const tickFormatter = (value: string) => {
-    if (nameKey === 'month' && windowWidth < 640) {
-      return value.substring(0, 3)
+    // If it's a date string (YYYY-MM-DD or ISO), format as MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+      const [, month, day] = value.split('-');
+      return `${month}-${day}`;
     }
-    return value
+    if (nameKey === 'month' && windowWidth < 640) {
+      return value.substring(0, 3);
+    }
+    return value;
   }
 
   // Tilt labels on smaller/tablet sizes

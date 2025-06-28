@@ -103,7 +103,7 @@ export default function EditProductPage() {
       setBasicFormData({
         name: product.name,
         description: product.description,
-        categoryId: product.categoryProducts?.[0]?.id || 0,
+        categoryId: product.categoryId || 0,
       });
 
       // Set discount settings
@@ -119,8 +119,9 @@ export default function EditProductPage() {
       setExistingImages(product.images || []);
 
       // Transform attributes from backend format to frontend format
+      let transformedAttributes: ProductAttributeDTO[] = [];
       if (product.attributes && product.attributes.length > 0) {
-        const transformedAttributes: ProductAttributeDTO[] = product.attributes.map(attr => ({
+        transformedAttributes = product.attributes.map(attr => ({
           name: attr.attributeName,
           values: attr.attributeValues.map(val => val.attributeValue)
         }));
@@ -128,20 +129,36 @@ export default function EditProductPage() {
         console.log('🔄 Transformed attributes:', transformedAttributes);
       }
 
+      // Map variant id to its attribute name/value pairs
+      const variantIdToAttributes: Record<number, { name: string; value: string }[]> = {};
+      if (product.attributes && product.attributes.length > 0) {
+        for (const attr of product.attributes) {
+          for (const attrValue of attr.attributeValues) {
+            if (attrValue.variantAttributeValues && attrValue.variantAttributeValues.length > 0) {
+              for (const vav of attrValue.variantAttributeValues) {
+                if (!variantIdToAttributes[vav.id]) variantIdToAttributes[vav.id] = [];
+                variantIdToAttributes[vav.id].push({ name: attr.attributeName, value: attrValue.attributeValue });
+              }
+            }
+          }
+        }
+      }
+
       // Transform variants from backend format to frontend format
       if (product.variants && product.variants.length > 0) {
         const transformedVariants: ProductVariantDTO[] = product.variants.map(variant => {
-          // Extract variant attributes from the complex backend structure
-          const variantAttributes: VariantAttributeDTO[] = [];
-          if (variant.id) {
-            // This is a simplified approach - in a real scenario, you'd need to map the variant attributes properly
-            // For now, we'll create a basic structure
-            variantAttributes.push({
-              name: "Default",
-              value: "Default"
-            });
+          let variantAttributes = variantIdToAttributes[variant.id];
+          if (!variantAttributes || variantAttributes.length === 0 || (variantAttributes.length === 1 && variantAttributes[0].name === "Default" && variantAttributes[0].value === "Default")) {
+            // Parse the SKU and use the last part after the last '|'
+            let parsedName = variant.sku || "-";
+            const lastPipeIndex = parsedName.lastIndexOf("|");
+            if (lastPipeIndex !== -1) {
+              parsedName = parsedName.substring(lastPipeIndex + 1);
+            }
+            // Remove leading colons, spaces, and any other unwanted characters
+            parsedName = parsedName.replace(/^[:|\s]+/, "").trim();
+            variantAttributes = [{ name: "", value: parsedName }];
           }
-
           return {
             id: variant.id,
             sku: variant.sku,
@@ -607,29 +624,60 @@ export default function EditProductPage() {
 
               {activeTab === "Stock Management" && (
                 <div className="space-y-4">
-                  <div className="mb-2">
-                    <CardTitle className="font-bold text-2xl">
-                      Handle Stock Levels
-                    </CardTitle>
-                    <p className="text-gray-500">
-                      Management of stock levels of different options and
-                      variation.
-                    </p>
-                  </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start space-x-3">
-                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                      <div className="text-sm text-blue-800">
-                        <p className="font-medium mb-1">Stock Management Information</p>
-                        <ul className="list-disc list-inside space-y-1">
-                          <li>Stock levels are managed per variant in the Options and Variations tab</li>
-                          <li>Navigate to the "Product's Options and Variations" tab to set stock levels</li>
-                          <li>Each variant can have different stock quantities</li>
-                          <li>Low stock notifications will be based on individual variant stock levels</li>
-                        </ul>
+                  {variants.length > 0 ? (
+                    <>
+                      <div className="mb-2">
+                        <CardTitle className="font-bold text-2xl">
+                          Handle Stock Levels
+                        </CardTitle>
+                        <p className="text-gray-500">
+                          Management of stock levels of different options and
+                          variation.
+                        </p>
                       </div>
-                    </div>
-                  </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <div className="flex items-start space-x-3">
+                          <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                          <div className="text-sm text-blue-800">
+                            <p className="font-medium mb-1">Stock Management Information</p>
+                            <ul className="list-disc list-inside space-y-1">
+                              <li>Stock levels are managed per variant in the Options and Variations tab</li>
+                              <li>Navigate to the "Product's Options and Variations" tab to set stock levels</li>
+                              <li>Each variant can have different stock quantities</li>
+                              <li>Low stock notifications will be based on individual variant stock levels</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Live Variant Table */}
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                          <thead>
+                            <tr>
+                              <th className="px-4 py-2 border-b">Variant</th>
+                              <th className="px-4 py-2 border-b">SKU</th>
+                              <th className="px-4 py-2 border-b">Stock</th>
+                              <th className="px-4 py-2 border-b">Price</th>
+                              <th className="px-4 py-2 border-b">Production Cost</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {variants.map((variant, index) => (
+                              <tr key={index} className="text-center">
+                                <td className="px-4 py-2 border-b">
+                                  {variant.attributes?.map(attr => `${attr.name}: ${attr.value}`).join(', ')}
+                                </td>
+                                <td className="px-4 py-2 border-b">{variant.sku}</td>
+                                <td className="px-4 py-2 border-b">{variant.stock}</td>
+                                <td className="px-4 py-2 border-b">{variant.price}</td>
+                                <td className="px-4 py-2 border-b">{variant.productionCost}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               )}
 

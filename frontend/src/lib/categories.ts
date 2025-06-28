@@ -7,7 +7,7 @@ export interface BackendCategory {
     store: {
         id: number
     }
-    products: any[]
+    productCount: number
     createdAt?: string
 }
 
@@ -338,7 +338,7 @@ export const removeProductFromCategory = async (categoryId: number, productId: n
 
 // Helper function to transform backend category to frontend format
 export const transformCategory = (category: BackendCategory): Category => {
-    const productCount = category.products?.length || 0;
+    const productCount = category.productCount || 0;
     const status = productCount > 0 ? 'Active' : 'Empty';
     
     // Use a consistent date format to avoid hydration mismatch

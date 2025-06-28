@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,6 +50,7 @@ public class Product {
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<CategoryProduct> categoryProducts;
 
     public Product() {}
@@ -111,4 +113,16 @@ public class Product {
 
     public List<CategoryProduct> getCategoryProducts() { return categoryProducts; }
     public void setCategoryProducts(List<CategoryProduct> categoryProducts) { this.categoryProducts = categoryProducts; }
+
+    // Add a method to get category ID for JSON serialization
+    @JsonProperty("categoryId")
+    public Long getCategoryId() {
+        return category != null ? category.getId() : null;
+    }
+
+    // Add a method to get category name for JSON serialization
+    @JsonProperty("categoryName")
+    public String getCategoryName() {
+        return category != null ? category.getName() : null;
+    }
 }

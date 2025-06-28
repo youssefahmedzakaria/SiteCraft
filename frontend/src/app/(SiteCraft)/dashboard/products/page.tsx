@@ -21,8 +21,8 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
 } from "@/components/SiteCraft/ui/dropdown-menu";
-import { useState } from "react";
-import { categories } from "@/lib/categories";
+import { useState, useEffect } from "react";
+import { getCategories } from "@/lib/products";
 import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/dicountDialog";
 import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { SimplifiedProduct } from "@/lib/products";
@@ -32,6 +32,8 @@ export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
   const [stockFilter, setStockFilter] = useState<string>("All Stock");
   const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
   const [file, setFile] = useState<File | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
@@ -55,6 +57,22 @@ export default function ProductPage() {
 
   const { isAuthenticated, user } = useAuth();
 
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleCategorySelect = (title: string) => {
     setCategoryFilter(title);
   };
@@ -71,8 +89,8 @@ export default function ProductPage() {
     // Filter by category
     if (categoryFilter !== "All Categories") {
       if (!product.categoryId) return false;
-      const category = categories.find(c => c.id === product.categoryId.toString());
-      if (!category || category.title !== categoryFilter) {
+      const category = categories.find(c => c.id === product.categoryId);
+      if (!category || category.name !== categoryFilter) {
         return false;
       }
     }
@@ -128,8 +146,8 @@ export default function ProductPage() {
     const categoryProducts = filteredProducts.filter(
       (product: SimplifiedProduct) => {
         if (!product.categoryId) return false;
-        const categoryObj = categories.find(c => c.id === product.categoryId.toString());
-        return categoryObj && categoryObj.title === category;
+        const categoryObj = categories.find(c => c.id === product.categoryId);
+        return categoryObj && categoryObj.name === category;
       }
     );
     const newSelection = [...selectedProducts];
@@ -345,9 +363,9 @@ export default function ProductPage() {
                 {categories.map((category) => (
                   <DropdownMenuItem
                     key={category.id}
-                    onClick={() => handleCategorySelect(category.title)}
+                    onClick={() => handleCategorySelect(category.name)}
                   >
-                    {category.title}
+                    {category.name}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -395,6 +413,7 @@ export default function ProductPage() {
                   <ProductRecord 
                     key={product.id} 
                     product={product}
+                    categories={categories}
                     isSelected={selectedProducts.includes(product.id)}
                     onSelect={() => handleSelectProduct(product.id)}
                     fetchProducts={fetchProducts}
