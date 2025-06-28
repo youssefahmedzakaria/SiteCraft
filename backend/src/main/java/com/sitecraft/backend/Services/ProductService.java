@@ -54,7 +54,7 @@ public class ProductService {
     private VariantAttributeValueRepo variantAttributeValueRepo;
 
     public List<Product> getAllProducts(Long storeId) {
-        return productRepo.findByStoreId(storeId);
+        return productRepo.findByStoreIdWithCategory(storeId);
     }
 
     public Product getProductById(Long id, Long storeId) {
@@ -84,6 +84,12 @@ public class ProductService {
         product.setStore(store);
 
         Product savedProduct = productRepo.save(product);
+
+        // Create CategoryProduct entry for many-to-many relationship
+        CategoryProduct categoryProduct = new CategoryProduct();
+        categoryProduct.setCategory(category);
+        categoryProduct.setProduct(savedProduct);
+        categoryProductRepo.save(categoryProduct);
 
         Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
 
@@ -173,7 +179,23 @@ public class ProductService {
         if (productDTO.getCategoryId() != null) {
             Category category = categoryRepo.findById(productDTO.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
+            
+            // Update the direct category relationship
             product.setCategory(category);
+            
+            // Update the many-to-many relationship through CategoryProduct table
+            // First, remove existing CategoryProduct entries for this product
+            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findAll()
+                    .stream()
+                    .filter(cp -> cp.getProduct().getId().equals(id))
+                    .toList();
+            categoryProductRepo.deleteAll(existingCategoryProducts);
+            
+            // Create new CategoryProduct entry
+            CategoryProduct categoryProduct = new CategoryProduct();
+            categoryProduct.setCategory(category);
+            categoryProduct.setProduct(product);
+            categoryProductRepo.save(categoryProduct);
         }
 
         // Only update variants and attributes if they are provided in the DTO
