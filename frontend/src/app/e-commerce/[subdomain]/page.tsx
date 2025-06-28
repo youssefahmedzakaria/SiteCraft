@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <CenteredPromo
-        id="home"
+        id="promo"
         slides={[
           {
             title: "Welcome to Our Store",
