@@ -13,6 +13,7 @@ import { GridCategoryTemplate, FeaturedGridCategoryTemplate, HorizontalScrollCat
 import {GridProductTemplate,HorizontalScrollProductTemplate,ListViewProductTemplate,FeaturedGridProductTemplate} from "@/components/e-commerce/product-lists";
 import { ProductList } from "@/components/e-commerce/product-lists";
 import { usePathname } from "next/navigation";
+import { link } from "fs";
 
 export default function Home() {
   const path = usePathname();
@@ -212,6 +213,7 @@ export default function Home() {
               },
             },
             id: "1",
+            link: "/products",
           },
           {
             name: "Earrings",
@@ -223,6 +225,7 @@ export default function Home() {
               },
             },
             id: "2",
+            link: "/products",
           },
           {
             name: "Necklaces",
@@ -234,6 +237,7 @@ export default function Home() {
               },
             },
             id: "3",
+            link: "/products",
           },
           {
             name: "Rings",
@@ -245,6 +249,7 @@ export default function Home() {
               },
             },
             id: "4",
+            link: "/products",
           },
           {
             name: "Earrings",
@@ -256,6 +261,7 @@ export default function Home() {
               },
             },
             id: "5",
+            link: "/products",
           },
           {
             name: "Necklaces",
@@ -267,8 +273,10 @@ export default function Home() {
               },
             },
             id: "6",
+            link: "/products",
           },
         ]}
+        title="Featured Categories"
         bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"

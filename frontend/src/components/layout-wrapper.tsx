@@ -46,7 +46,6 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           dividerColor="border-gray-200"
           searchIconColor="text-white"
           fontFamily="font-sans"
-          isRTL={false}
         />
       )}
       <main className="flex-1">{children}</main>

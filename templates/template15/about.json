@@ -1,0 +1,17 @@
+{
+    "template": "RightAlignAbout",
+    "id": "about",
+    "title": "our story",
+    "titleColor": "black",
+    "description": "story about our brand, our values, and our mission",
+    "secondaryDescription": "we are committed to providing the best service and products to our customers",
+    "descriptionColor": "black",
+    "backgroundColor": "white",
+    "image": null,
+    "imageAlt": null,
+    "imageObjectFit": null,
+    "titleFont": "font-sans",
+    "titleSize": "text-4xl",
+    "descriptionFont": "font-sans",
+    "descriptionSize": "text-lg"
+}

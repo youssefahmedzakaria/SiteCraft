@@ -1,0 +1,29 @@
+{
+  "template": "CenteredPromo",
+  "id": "promo",
+  "slides": [
+    {
+      "title": "welcome to our store",
+      "description": "Discover our amazing products .",
+      "buttonText": "Shop Now",
+      "buttonLink": "/products",
+      "image": null,
+      "imageAlt": null
+    }
+  ],
+  "autoplay": false,
+  "showArrows":false,
+  "titleFont": "font-bold",
+  "titleColor": "text-white",
+  "titleSize": "text-4xl",
+  "descriptionFont": "font-normal",
+  "descriptionColor": "text-white/80",
+  "descriptionSize": "text-lg",
+  "buttonFont": "font-semibold",
+  "buttonColor": "bg-white",
+  "buttonTextColor": "text-black",
+  "buttonSize": "text-base",
+  "buttonRadius": "rounded-lg",
+  "backgroundColor": "bg-black",
+  "imageObjectFit": "cover"
+}

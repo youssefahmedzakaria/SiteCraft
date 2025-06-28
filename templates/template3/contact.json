@@ -1,0 +1,23 @@
+{
+  "template": "RightAlignedContact",
+  "id": "contact",
+  "title": "Contact Us",
+  "address": "123 Street,city,State,Zipcode",
+  "addressUrl": "https://maps.google.com/maps?address",
+  "openHours": "sunday - thursday: 9:00 AM - 10:00 PM\nSaturday: 10:00 AM - 4:00 PM\nfriday: Closed",
+  "phone": "+201234567890",
+  "contactEmail": "info@brand.com",
+  "socialLinks": {
+    "facebook": "https://www.facebook.com",
+    "instagram": "https://www.instagram.com"
+  },
+  "imageUrl": null,
+  "showMap": true,
+  "backgroundColor": "bg-white",
+  "titleFont": "font-semibold",
+  "titleColor": "text-black",
+  "titleSize": "text-2xl",
+  "contentFont": "font-normal",
+  "contentColor": "text-black",
+  "contentSize": "text-sm"
+}

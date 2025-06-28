@@ -1,0 +1,28 @@
+{
+  "template": "DefultPolicies",
+  "id": "policies",
+  "title": "Our Policies",
+  "sections": [
+    {
+      "title": "Shipping Policy",
+      "content": "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days and shipped via reliable carriers."
+    },
+    {
+      "title": "Warranty Policy",
+      "content": "All our products comes with a lifetime warranty against manufacturing defects."
+    }
+  ],
+  "backgroundColor": "bg-white",
+  "titleColor": "text-black",
+  "titleSize": "text-4xl",
+  "titleFont": "font-sans",
+  "titleFontWeight": "font-bold",
+  "sectionTitleColor": "text-black",
+  "sectionTitleSize": "text-2xl",
+  "sectionTitleFont": "font-serif",
+  "sectionTitleFontWeight": "font-medium",
+  "sectionContentColor": "text-gray-600",
+  "sectionContentSize": "text-lg",
+  "sectionContentFont": "font-serif",
+  "sectionContentFontWeight": "font-medium"
+}
