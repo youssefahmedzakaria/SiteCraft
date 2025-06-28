@@ -484,4 +484,30 @@ public class ProductService {
             count++;
         }
     }
+
+    @Transactional
+    public void deleteProductImage(Long productId, Long imageId, Long storeId) {
+        // 1. Fetch the product and check it belongs to the store
+        Product product = productRepo.findByIdAndStoreId(productId, storeId)
+            .orElseThrow(() -> new RuntimeException("Product not found or does not belong to store"));
+
+        // 2. Find the image
+        ProductImage image = productImageRepo.findById(imageId)
+            .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        // 3. Check the image belongs to the product
+        if (!image.getProduct().getId().equals(productId)) {
+            throw new RuntimeException("Image does not belong to this product");
+        }
+
+        // 4. Delete the file from disk
+        String path = System.getProperty("user.dir") + image.getImageUrl();
+        File file = new File(path);
+        if (file.exists()) file.delete();
+
+        // 5. Remove the image from the product and delete from DB
+        product.getImages().remove(image);
+        productImageRepo.delete(image);
+        productRepo.save(product);
+    }
 }

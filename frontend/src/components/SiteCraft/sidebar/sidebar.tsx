@@ -7,15 +7,20 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { sidebarElements } from "@/lib/sidebarElements";
+import { getFilteredSidebarElements } from "@/lib/sidebarElements";
 import { SidebarElementComponent } from "./sidebarElementComponent";
 import { CornerDownRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const isReportsActive = pathname === "/dashboard/analytics/reports";
+  
+  // Filter sidebar elements based on user role
+  const filteredSidebarElements = getFilteredSidebarElements(user?.role || null);
 
   return (
     <div>
@@ -74,10 +79,10 @@ export function Sidebar() {
 
         {/* Navigation Links */}
         <nav className="flex flex-col space-y-1">
-          {sidebarElements.map((element) => (
+          {filteredSidebarElements.map((element, index) => (
             <div key={element.id}>
-              {/* Add a divider before Account Settings */}
-              {element.id === "10" && (
+              {/* Add a divider before Logout button for all users */}
+              {element.title === 'Log Out' && (
                 <div className="border-t border-primary-foreground my-2 mx-4"></div>
               )}
 
@@ -92,6 +97,7 @@ export function Sidebar() {
                 </Link>
               )}
               
+              {/* Only show Reports submenu if Analytics is visible and user is on analytics page */}
               {element.destination === "/dashboard/analytics" &&
                 pathname.startsWith("/dashboard/analytics") && (
                   <Link

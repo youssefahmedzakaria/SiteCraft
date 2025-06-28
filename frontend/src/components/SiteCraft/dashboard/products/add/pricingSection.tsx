@@ -4,21 +4,24 @@ import React, { useState } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import { Switch } from "@/components/SiteCraft/ui/switch";
-import { ProductCreateDTO } from "@/lib/products";
+
+interface DiscountSettings {
+  discountType?: string;
+  discountValue?: number;
+  minCap?: number;
+  percentageMax?: number;
+  maxCap?: number;
+}
 
 interface PricingSectionProps {
-  formData: ProductCreateDTO;
-  updateFormData: (updates: Partial<ProductCreateDTO>) => void;
+  formData: DiscountSettings;
+  updateFormData: (updates: Partial<DiscountSettings>) => void;
 }
 
 export function PricingSection({ formData, updateFormData }: PricingSectionProps) {
   const [discountEnabled, setDiscountEnabled] = useState(false);
 
   // Handle form field changes
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateFormData({ price: parseFloat(e.target.value) || 0 });
-  };
-
   const handleDiscountTypeChange = (type: string) => {
     updateFormData({ discountType: type });
   };
@@ -50,37 +53,17 @@ export function PricingSection({ formData, updateFormData }: PricingSectionProps
         maxCap: undefined
       });
     } else {
-      updateFormData({ discountType: "Percentage" });
+      updateFormData({ discountType: "percentage" });
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="mb-2">
-        <CardTitle className="font-bold">Pricing</CardTitle>
+        <CardTitle className="font-bold">Discount Settings</CardTitle>
         <p className="text-gray-500">
-          Set the price and discount options for your product
+          Set discount options for your product (pricing is handled per variant)
         </p>
-      </div>
-
-      {/* Product Price */}
-      <div className="space-y-2">
-        <label
-          htmlFor="price"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Price (EGP) <span className="text-red-500">*</span>
-        </label>
-        <Input
-          id="price"
-          name="price"
-          type="number"
-          value={formData.price || ''}
-          onChange={handlePriceChange}
-          placeholder="e.g. 250"
-          className="w-full"
-          required
-        />
       </div>
 
       {/* Toggle Discount */}
@@ -111,8 +94,8 @@ export function PricingSection({ formData, updateFormData }: PricingSectionProps
               <label className="flex gap-2">
                 <input
                   type="radio"
-                  value="Percentage"
-                  checked={formData.discountType === "Percentage"}
+                  value="percentage"
+                  checked={formData.discountType === "percentage"}
                   onChange={(e) => handleDiscountTypeChange(e.target.value)}
                 />
                 Percentage
@@ -120,11 +103,11 @@ export function PricingSection({ formData, updateFormData }: PricingSectionProps
               <label className="flex gap-2">
                 <input
                   type="radio"
-                  value="Amount"
-                  checked={formData.discountType === "Amount"}
+                  value="fixed"
+                  checked={formData.discountType === "fixed"}
                   onChange={(e) => handleDiscountTypeChange(e.target.value)}
                 />
-                Amount
+                Fixed Amount
               </label>
             </div>
           </div>
@@ -143,14 +126,14 @@ export function PricingSection({ formData, updateFormData }: PricingSectionProps
               type="number"
               value={formData.discountValue || ''}
               onChange={handleDiscountValueChange}
-              placeholder={formData.discountType === "Percentage" ? "e.g. 10" : "e.g. 100"}
+              placeholder={formData.discountType === "percentage" ? "e.g. 10" : "e.g. 100"}
               className="w-full"
               required
             />
           </div>
 
           {/* Discount Limits */}
-          {formData.discountType === "Percentage" && (
+          {formData.discountType === "percentage" && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label

@@ -1,18 +1,54 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Category } from "@/lib/categories";
-import { use, useState } from "react";
+import { Category, deleteCategory } from "@/lib/categories";
+import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/SiteCraft/ui/deleteConfirmationDialog";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
-export function CategoryRecord({ category }: { category: Category }) {
+interface CategoryRecordProps {
+  category: Category;
+  onDelete?: (categoryId: number) => void;
+}
+
+export function CategoryRecord({ category, onDelete }: CategoryRecordProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleDelete = () => {
-    // Implement actual delete logic here
-    console.log(`Deleting category: ${category.title}`);
-    setShowDeleteDialog(false);
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      setDeleteError(null);
+      
+      await deleteCategory(parseInt(category.id));
+      
+      // Call the parent's onDelete callback if provided
+      if (onDelete) {
+        onDelete(parseInt(category.id));
+      }
+      
+      setShowDeleteDialog(false);
+      
+      // Show success message briefly
+      setTimeout(() => {
+        // You could add a toast notification here
+      }, 1000);
+      
+    } catch (error) {
+      console.error('💥 Error deleting category:', error);
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete category');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEdit = () => {
+    // Navigate to edit page with category ID
+    router.push(`/dashboard/categories/edit/${category.id}`);
   };
 
   return (
@@ -43,20 +79,20 @@ export function CategoryRecord({ category }: { category: Category }) {
           </span>
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-          <Link href="/dashboard/categories/edit" className="w-full sm:w-auto">
-            <Button
-              variant="ghost"
-              className="text-blue-600 hover:text-blue-900"
-            >
-              Edit
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            className="text-blue-600 hover:text-blue-900"
+            onClick={handleEdit}
+          >
+            Edit
+          </Button>
           <Button
             variant="ghost"
             className="text-red-600 hover:text-red-900"
             onClick={() => setShowDeleteDialog(true)}
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? 'Deleting...' : 'Delete'}
           </Button>
         </td>
       </tr>
@@ -66,8 +102,10 @@ export function CategoryRecord({ category }: { category: Category }) {
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleDelete}
         title="Delete Category"
-        description="Are you sure you want to delete this category? All products in this category will be moved to 'Uncategorized'."
+        description="Are you sure you want to delete this category? This action cannot be undone."
         itemName={category.title}
+        isLoading={isDeleting}
+        error={deleteError}
       />
     </>
   );

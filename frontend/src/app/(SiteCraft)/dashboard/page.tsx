@@ -1,7 +1,7 @@
 // frontend/src/app/dashboard/overview/page.tsx
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import type { Order, TopProduct } from "@/lib/overviewData";
 import {
@@ -12,6 +12,15 @@ import {
 import { AnimatedChartWrapper } from "@/components/SiteCraft/dashboard/analytics/charts/AnimatedChartWrapper";
 import { BarChartCard } from "@/components/SiteCraft/dashboard/analytics/charts/BarChartCard";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { getFirstAccessiblePage } from "@/lib/sidebarElements";
+import { useProductStatistics } from "@/hooks/useProductStatistics";
+import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { getProductAnalyticsFromStats, getCategoryAnalyticsFromStats } from "@/lib/generalAnalytics";
+import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/SiteCraft/ui/button";
 
 // ─── Table Headers ─────────────────────────────────────────────────────────────
 
@@ -99,8 +108,43 @@ const ProductRecord: FC<{ product: TopProduct }> = ({ product }) => (
 // ─── Page Component ────────────────────────────────────────────────────────────
 
 export default function OverviewPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const { stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useProductStatistics();
+  const { statistics: categoryStats, isLoading: categoryStatsLoading, error: categoryStatsError, fetchCategories: refetchCategoryStats } = useCategoryManagement();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Handle client-side rendering to avoid hydration mismatch
+    setIsClient(true);
+    
+    // If user is staff, redirect to their first accessible page
+    if (user && user.role === 'staff') {
+      const firstPage = getFirstAccessiblePage(user.role);
+      router.push(firstPage);
+    }
+  }, [user, router]);
+
+  // If user is staff, show loading while redirecting
+  if (user && user.role === 'staff') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  // Show loading until client-side rendering is complete
+  if (!isClient) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole="owner">
       <div className="flex min-h-screen bg-gray-100">
         <Sidebar />
 

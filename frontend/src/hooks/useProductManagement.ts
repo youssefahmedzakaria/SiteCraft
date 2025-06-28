@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { 
   Product, 
+  SimplifiedProduct,
   getProducts, 
   getProduct, 
   createProduct, 
@@ -14,7 +15,7 @@ import {
 } from '@/lib/products'
 
 export const useProductManagement = () => {
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<SimplifiedProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [isCreating, setIsCreating] = useState(false)
@@ -60,7 +61,8 @@ export const useProductManagement = () => {
       setError('')
       
       const newProduct = await createProduct(productData, images)
-      setProducts(prev => [...prev, newProduct])
+      // Refresh the products list to get the updated data
+      await fetchProducts()
       
       console.log('✅ Product created successfully');
       return newProduct
@@ -80,9 +82,8 @@ export const useProductManagement = () => {
       setError('')
       
       const updatedProduct = await updateProduct(productId, productData, images)
-      setProducts(prev => prev.map(product => 
-        product.id === productId ? updatedProduct : product
-      ))
+      // Refresh the products list to get the updated data
+      await fetchProducts()
       
       console.log('✅ Product updated successfully');
       return updatedProduct

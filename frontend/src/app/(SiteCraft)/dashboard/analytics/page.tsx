@@ -28,6 +28,8 @@ import {
 import { DateRangeFilter } from "@/components/SiteCraft/dashboard/analytics/DateRangeFilter";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { ChevronDown } from "lucide-react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
 export default function AnalyticsPage() {
   const [selectedSpan, setSelectedSpan] = useState<Timespan>("30");
   const currentCharts = chartDataByTimespan[selectedSpan];
@@ -46,136 +48,126 @@ export default function AnalyticsPage() {
   // track the chosen date range
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
 
-  // for now, fall back to “30” if no range (you can wire real lookup later)
+  // for now, fall back to "30" if no range (you can wire real lookup later)
   const fallbackSpan = dateRange ? undefined : "30";
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
+    <ProtectedRoute requiredRole="owner">
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        {/* Page header */}
-        <div className="mb-6 space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Analytics</h1>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <h2 className="text-lg md:text-xl font-semibold text-gray-600">
-              Track your store's performance and customer insights
-            </h2>
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 space-y-6">
+          {/* Page header */}
+          <div className="mb-6 space-y-2">
+            <h1 className="text-2xl md:text-3xl font-bold">Analytics</h1>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-600">
+                Track your store's performance and customer insights
+              </h2>
 
-            {/* <DateRangeFilter
-              initialDateRange={dateRange}
-              onApply={setDateRange}
-            /> */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="bg-white border-logo-border text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover px-3 py-2 text-sm font-medium flex items-center"
-                >
-                  {labels[selectedSpan]}
-                  <ChevronDown className="ml-2 w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSelectedSpan("7")}>
-                  Last week
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan("30")}>
-                  Last month
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan("90")}>
-                  Last quarter
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedSpan("365")}>
-                  Last year
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              {/* <DateRangeFilter
+                initialDateRange={dateRange}
+                onApply={setDateRange}
+              /> */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-white border-logo-border text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover px-3 py-2 text-sm font-medium flex items-center"
+                  >
+                    {labels[selectedSpan]}
+                    <ChevronDown className="ml-2 w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setSelectedSpan("7")}>
+                    Last week
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedSpan("30")}>
+                    Last month
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedSpan("90")}>
+                    Last quarter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedSpan("365")}>
+                    Last year
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </div>
 
-        {/* Metric cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          {currentMetrics.map((item) => (
-            <GeneralAnalyticsCard key={item.id} analytic={item} />
-          ))}
-        </div>
+          {/* Metric cards */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            {currentMetrics.map((item) => (
+              <GeneralAnalyticsCard key={item.id} analytic={item} />
+            ))}
+          </div>
 
-        {/* Charts grid */}
-        <div className="grid gap-6 sm:grid-cols-2 mb-8">
-          <AnimatedChartWrapper delay={0}>
-            <LineChartCard
-              data={currentCharts.salesData}
-              dataKey="sales"
-              nameKey={axisKey}
-              title="Revenue Overview"
-              subtitle="Total by EGP x100"
-            />
-          </AnimatedChartWrapper>
-
-          <AnimatedChartWrapper delay={40}>
-            <BarChartCard
-              data={currentCharts.NetProfitData}
-              dataKey="sales"
-              nameKey={axisKey}
-              title="Net Profit"
-              subtitle="Total by EGP x100"
-            />
-          </AnimatedChartWrapper>
-
-          <AnimatedChartWrapper delay={80}>
-            <PieChartCard
-              data={currentCharts.salesByCategoryData}
-              dataKey="value"
-              nameKey="status"
-              title="Sales by Category"
-              subtitle="Distribution by percentage"
-            />
-          </AnimatedChartWrapper>
-
-          <AnimatedChartWrapper delay={120}>
-            <RadarChartCard
-              data={currentCharts.customerAcquisitionData}
-              dataKey="value"
-              nameKey="source"
-              title="Customer Acquisition"
-              subtitle="Individuals x100"
-            />
-          </AnimatedChartWrapper>
-
-          <AnimatedChartWrapper delay={160}>
-            <HorizontalBarChartCard
-              data={currentCharts.topSellingProductsData}
-              dataKey="units"
-              nameKey="product"
-              title="Top Selling Products"
-              subtitle="Units Sold x10"
-            />
-          </AnimatedChartWrapper>
-
-          <AnimatedChartWrapper delay={200}>
-            <HorizontalBarChartCard
-              data={currentCharts.wishlistTrendsData}
-              dataKey="units"
-              nameKey="item"
-              title="Wish-list Trends"
-              subtitle="Saves count x10"
-            />
-          </AnimatedChartWrapper>
-
-          <div className="sm:col-span-2">
-            <AnimatedChartWrapper delay={240}>
-              <MultiLineChartCard
-                data={currentCharts.salesByProductData}
-                dataKeys={["Baggy Pants", "Fit Pants", "Shorts"]}
+          {/* Charts grid */}
+          <div className="grid gap-6 sm:grid-cols-2 mb-8">
+            <AnimatedChartWrapper delay={0}>
+              <LineChartCard
+                data={currentCharts.salesData}
+                dataKey="sales"
                 nameKey={axisKey}
-                title="Sales by Product"
+                title="Revenue Overview"
+                subtitle="Total by EGP x100"
+              />
+            </AnimatedChartWrapper>
+
+            <AnimatedChartWrapper delay={40}>
+              <BarChartCard
+                data={currentCharts.NetProfitData}
+                dataKey="sales"
+                nameKey={axisKey}
+                title="Net Profit"
+                subtitle="Total by EGP x100"
+              />
+            </AnimatedChartWrapper>
+
+            <AnimatedChartWrapper delay={80}>
+              <PieChartCard
+                data={currentCharts.salesByCategoryData}
+                dataKey="value"
+                nameKey="status"
+                title="Sales by Category"
+                subtitle="Distribution by percentage"
+              />
+            </AnimatedChartWrapper>
+
+            <AnimatedChartWrapper delay={120}>
+              <RadarChartCard
+                data={currentCharts.customerAcquisitionData}
+                dataKey="value"
+                nameKey="source"
+                title="Customer Acquisition"
+                subtitle="Individuals x100"
+              />
+            </AnimatedChartWrapper>
+
+            <AnimatedChartWrapper delay={160}>
+              <HorizontalBarChartCard
+                data={currentCharts.topSellingProductsData}
+                dataKey="units"
+                nameKey="product"
+                title="Top Selling Products"
                 subtitle="Units Sold x10"
               />
             </AnimatedChartWrapper>
+
+            <AnimatedChartWrapper delay={200}>
+              <MultiLineChartCard
+                data={currentCharts.customerRetentionData}
+                dataKeys={["value"]}
+                nameKey={axisKey}
+                title="Customer Retention"
+                subtitle="Percentage over time"
+              />
+            </AnimatedChartWrapper>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

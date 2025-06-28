@@ -1,17 +1,23 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { Card, CardContent, CardTitle } from "@/components/SiteCraft/ui/card";
 import { ProductInfoSection } from "@/components/SiteCraft/dashboard/products/add/productInfoSection";
 import { PricingSection } from "@/components/SiteCraft/dashboard/products/add/pricingSection";
 import { LowStockSection } from "@/components/SiteCraft/dashboard/products/add/lowStockSection";
-import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
 import { CustomVariationSection } from "@/components/SiteCraft/dashboard/products/add/customVariationSection";
 import { useProductManagement } from "@/hooks/useProductManagement";
-import { ProductCreateDTO, ProductAttributeDTO, ProductVariantDTO, VariantAttributeDTO, getCategories } from "@/lib/products";
+import { 
+  Product, 
+  ProductCreateDTO, 
+  ProductAttributeDTO, 
+  ProductVariantDTO, 
+  VariantAttributeDTO,
+  getProduct 
+} from "@/lib/products";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +26,14 @@ import {
 } from "@/components/SiteCraft/ui/dialog";
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 
-export default function AddProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
-  const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
+  const params = useParams();
+  const productId = params?.id ? parseInt(params.id as string) : null;
+  
+  const { handleUpdateProduct, isUpdating, error, clearError } = useProductManagement();
   
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
@@ -37,11 +46,15 @@ export default function AddProductPage() {
     "Stock Management",
   ];
 
+  // Loading states
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+
   // Form state for basic product info
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: 2,
+    categoryId: 0,
   });
 
   // Discount settings
@@ -54,6 +67,7 @@ export default function AddProductPage() {
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<any[]>([]);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Attributes and variants state
@@ -68,6 +82,86 @@ export default function AddProductPage() {
   // Add drag states for variations
   const [draggedVariationIndex, setDraggedVariationIndex] = useState<number | null>(null);
   const [dragOverVariationIndex, setDragOverVariationIndex] = useState<number | null>(null);
+
+  // Load existing product data
+  useEffect(() => {
+    if (productId) {
+      loadProductData(productId);
+    }
+  }, [productId]);
+
+  const loadProductData = async (id: number) => {
+    try {
+      setIsLoading(true);
+      setLoadError('');
+      
+      console.log('📝 Loading product data for ID:', id);
+      const product: Product = await getProduct(id);
+      console.log('✅ Product loaded:', product);
+
+      // Set basic form data
+      setBasicFormData({
+        name: product.name,
+        description: product.description,
+        categoryId: product.categoryProducts?.[0]?.id || 0,
+      });
+
+      // Set discount settings
+      setDiscountSettings({
+        discountType: product.discountType,
+        discountValue: product.discountValue,
+        minCap: product.minCap,
+        percentageMax: product.percentageMax,
+        maxCap: product.maxCap,
+      });
+
+      // Set existing images
+      setExistingImages(product.images || []);
+
+      // Transform attributes from backend format to frontend format
+      if (product.attributes && product.attributes.length > 0) {
+        const transformedAttributes: ProductAttributeDTO[] = product.attributes.map(attr => ({
+          name: attr.attributeName,
+          values: attr.attributeValues.map(val => val.attributeValue)
+        }));
+        setAttributes(transformedAttributes);
+        console.log('🔄 Transformed attributes:', transformedAttributes);
+      }
+
+      // Transform variants from backend format to frontend format
+      if (product.variants && product.variants.length > 0) {
+        const transformedVariants: ProductVariantDTO[] = product.variants.map(variant => {
+          // Extract variant attributes from the complex backend structure
+          const variantAttributes: VariantAttributeDTO[] = [];
+          if (variant.id) {
+            // This is a simplified approach - in a real scenario, you'd need to map the variant attributes properly
+            // For now, we'll create a basic structure
+            variantAttributes.push({
+              name: "Default",
+              value: "Default"
+            });
+          }
+
+          return {
+            id: variant.id,
+            sku: variant.sku,
+            stock: variant.stock,
+            price: variant.price || 0,
+            productionCost: variant.productionCost,
+            attributes: variantAttributes
+          };
+        });
+        setVariants(transformedVariants);
+        console.log('🔄 Transformed variants:', transformedVariants);
+      }
+
+    } catch (err: any) {
+      console.error('💥 Error loading product:', err);
+      setLoadError(err.message || 'Failed to load product');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Function to add a new attribute
   const handleAddAttribute = (e: React.MouseEvent) => {
@@ -234,6 +328,11 @@ export default function AddProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!productId) {
+      alert('Product ID not found');
+      return;
+    }
+    
     try {
       // Validate required fields
       if (!basicFormData.name || !basicFormData.description || basicFormData.categoryId === 0) {
@@ -265,10 +364,10 @@ export default function AddProductPage() {
       };
 
       // Log the data being sent
-      console.log('📤 Sending product data to backend:', JSON.stringify(productData, null, 2));
+      console.log('📤 Sending updated product data to backend:', JSON.stringify(productData, null, 2));
 
-      // Create product
-      const newProduct = await handleCreateProduct(productData, imageFiles);
+      // Update product
+      const updatedProduct = await handleUpdateProduct(productId, productData, imageFiles);
       
       // Show success dialog
       setShowSuccessDialog(true);
@@ -279,8 +378,8 @@ export default function AddProductPage() {
       }, 2000);
       
     } catch (err: any) {
-      console.error('Error creating product:', err);
-      alert(`Failed to create product: ${err.message}`);
+      console.error('Error updating product:', err);
+      alert(`Failed to update product: ${err.message}`);
     }
   };
 
@@ -299,6 +398,44 @@ export default function AddProductPage() {
     setImageFiles(files);
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading product...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error state
+  if (loadError) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Product</h2>
+              <p className="text-gray-600 mb-4">{loadError}</p>
+              <Link href="/dashboard/products">
+                <Button variant="outline">Back to Products</Button>
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
@@ -307,9 +444,9 @@ export default function AddProductPage() {
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         {/* Header section with title and subtitle */}
         <div className="mb-6 space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Add New Product</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Edit Product</h1>
           <h2 className="text-lg md:text-xl text-gray-600">
-            Create a new product for your store
+            Edit the details of {basicFormData.name}
           </h2>
         </div>
 
@@ -358,6 +495,9 @@ export default function AddProductPage() {
                     updateFormData={updateBasicFormData}
                     imageFiles={imageFiles}
                     updateImageFiles={updateImageFiles}
+                    existingImages={existingImages}
+                    productId={productId ?? undefined}
+                    setExistingImages={setExistingImages}
                   />
 
                   {/* Pricing Section */}
@@ -381,8 +521,8 @@ export default function AddProductPage() {
                       Options and Variations
                     </CardTitle>
                     <p className="text-gray-500">
-                      Add product options that your customers can choose from on
-                      the product page.
+                      Edit product options that your customers can choose from
+                      on the product page.
                     </p>
                   </div>
 
@@ -466,7 +606,31 @@ export default function AddProductPage() {
               )}
 
               {activeTab === "Stock Management" && (
-                <StockManagementSection />
+                <div className="space-y-4">
+                  <div className="mb-2">
+                    <CardTitle className="font-bold text-2xl">
+                      Handle Stock Levels
+                    </CardTitle>
+                    <p className="text-gray-500">
+                      Management of stock levels of different options and
+                      variation.
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start space-x-3">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div className="text-sm text-blue-800">
+                        <p className="font-medium mb-1">Stock Management Information</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Stock levels are managed per variant in the Options and Variations tab</li>
+                          <li>Navigate to the "Product's Options and Variations" tab to set stock levels</li>
+                          <li>Each variant can have different stock quantities</li>
+                          <li>Low stock notifications will be based on individual variant stock levels</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* Submit Button */}
@@ -478,10 +642,10 @@ export default function AddProductPage() {
                 </Link>
                 <Button 
                   type="submit" 
-                  disabled={isCreating}
+                  disabled={!!isUpdating}
                   className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
                 >
-                  {isCreating ? 'Creating Product...' : 'Create Product'}
+                  {isUpdating ? 'Updating Product...' : 'Update Product'}
                 </Button>
               </div>
             </form>
@@ -525,12 +689,12 @@ export default function AddProductPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center space-x-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <span>Product Created Successfully!</span>
+                <span>Product Updated Successfully!</span>
               </DialogTitle>
             </DialogHeader>
             <div className="text-center py-4">
               <p className="text-gray-600">
-                Your product has been created and is now available in your store.
+                Your product has been updated and is now available in your store.
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 Redirecting to products page...

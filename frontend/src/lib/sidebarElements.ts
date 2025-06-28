@@ -86,3 +86,26 @@ export const sidebarElements: SidebarElement[] = [
     destination: '/',
   },
 ]
+
+export function getFilteredSidebarElements(role: string | null): SidebarElement[] {
+  if (role === 'staff') {
+    // Staff users can access specific pages
+    return sidebarElements.filter(element => 
+      ['Categories', 'Products', 'Orders', 'Customers', 'Store Info', 'Shipping Info', 'Log Out'].includes(element.title)
+    );
+  }
+  
+  // Owner/admin users can access all pages
+  return sidebarElements;
+}
+
+export function getFirstAccessiblePage(role: string): string {
+  // For staff users, return the first accessible page
+  // You can customize this logic based on your role-based access requirements
+  if (role === 'staff') {
+    // Return the first page that staff can access
+    return '/dashboard/products'; // or any other appropriate first page
+  }
+  // For other roles, return dashboard overview
+  return '/dashboard';
+}

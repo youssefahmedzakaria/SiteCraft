@@ -5,7 +5,8 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Image from "next/image";
 import { useProductManagement } from "@/hooks/useProductManagement";
-import { productAnalytics } from "@/lib/generalAnalytics";
+import { useProductStatistics } from "@/hooks/useProductStatistics";
+import { getProductAnalyticsFromStats } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
 import { ProductRecord } from "@/components/SiteCraft/dashboard/products/productRecord";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
@@ -24,6 +25,8 @@ import { useState } from "react";
 import { categories } from "@/lib/categories";
 import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/dicountDialog";
 import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
+import { SimplifiedProduct } from "@/lib/products";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
@@ -43,6 +46,15 @@ export default function ProductPage() {
     fetchProducts
   } = useProductManagement();
 
+  const {
+    stats,
+    isLoading: statsLoading,
+    error: statsError,
+    refetch: refetchStats
+  } = useProductStatistics();
+
+  const { isAuthenticated, user } = useAuth();
+
   const handleCategorySelect = (title: string) => {
     setCategoryFilter(title);
   };
@@ -55,7 +67,7 @@ export default function ProductPage() {
     setSearchQuery(value);
   };
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = products.filter((product: SimplifiedProduct) => {
     // Filter by category
     if (categoryFilter !== "All Categories") {
       if (!product.categoryId) return false;
@@ -114,7 +126,7 @@ export default function ProductPage() {
 
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(
-      (product) => {
+      (product: SimplifiedProduct) => {
         if (!product.categoryId) return false;
         const categoryObj = categories.find(c => c.id === product.categoryId.toString());
         return categoryObj && categoryObj.title === category;
@@ -157,6 +169,24 @@ export default function ProductPage() {
             <div className="flex items-center space-x-2">
               <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
               <span className="text-lg text-gray-600">Loading products...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+              <p className="text-gray-600">Please log in to view product statistics and manage products.</p>
             </div>
           </div>
         </main>
@@ -235,11 +265,53 @@ export default function ProductPage() {
           </div>
         )}
 
+        {/* Statistics Error Alert */}
+        {statsError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{statsError}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={refetchStats}
+                className="text-red-600 hover:text-red-800"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Stats cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-          {productAnalytics.map((product) => (
-            <GeneralAnalyticsCard key={product.id} analytic={product} />
-          ))}
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-700">Product Statistics</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refetchStats}
+              disabled={statsLoading}
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${statsLoading ? 'animate-spin' : ''}`} />
+              Refresh Stats
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {stats ? getProductAnalyticsFromStats(stats).map((product) => (
+              <GeneralAnalyticsCard key={product.id} analytic={product} />
+            )) : (
+              // Show loading state for stats
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg border border-logo-border p-6 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Search and filters */}
@@ -319,12 +391,13 @@ export default function ProductPage() {
             />
             <tbody className="bg-white divide-y divide-logo-border">
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
+                filteredProducts.map((product: SimplifiedProduct) => (
                   <ProductRecord 
                     key={product.id} 
                     product={product}
                     isSelected={selectedProducts.includes(product.id)}
                     onSelect={() => handleSelectProduct(product.id)}
+                    fetchProducts={fetchProducts}
                   />
                 ))
               ) : (

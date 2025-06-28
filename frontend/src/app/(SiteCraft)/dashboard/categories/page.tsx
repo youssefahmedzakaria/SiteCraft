@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import type React from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Image from "next/image";
-import { categories } from "@/lib/categories";
-import { categoryAnalytics } from "@/lib/generalAnalytics";
+import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { getCategoryAnalyticsFromStats } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
 import { CategoryRecord } from "@/components/SiteCraft/dashboard/categories/categoryRecord";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
@@ -17,8 +18,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/SiteCraft/ui/dropdown-menu";
-import { useState } from "react";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CategoriesPage() {
   const [sortType, setSortType] = useState<
@@ -30,6 +31,24 @@ export default function CategoriesPage() {
     | "productsDesc"
   >("newest");
   const [file, setFile] = useState<File | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  const {
+    categories,
+    statistics,
+    isLoading,
+    error,
+    clearError,
+    fetchCategories
+  } = useCategoryManagement();
+
+  const { isAuthenticated } = useAuth();
+
+  // Handle client-side rendering to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSortChange = (
     type:
@@ -47,20 +66,30 @@ export default function CategoriesPage() {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      // You can add additional logic here to process the file
       console.log("File selected:", selectedFile.name);
-
-      // Optional: You could add file reading logic here
-      // const reader = new FileReader();
-      // reader.onload = (e) => {
-      //   const content = e.target?.result;
-      //   // Process the file content
-      // };
-      // reader.readAsText(selectedFile);
     }
   };
 
-  const sortedCategories = categories.sort((a, b) => {
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  // Filter categories based on search query
+  const filteredCategories = categories.filter((category) => {
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const categoryName = category.title.toLowerCase();
+      return categoryName.includes(searchLower);
+    }
+    return true;
+  });
+
+  const sortedCategories = filteredCategories.sort((a, b) => {
+    // Only sort on client-side to avoid hydration mismatch
+    if (!isClient) {
+      return 0;
+    }
+    
     switch (sortType) {
       case "newest":
         return (
@@ -71,17 +100,51 @@ export default function CategoriesPage() {
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
       case "nameAsc":
-        return a.title.localeCompare(b.title); // Sort by name A to Z
+        return a.title.localeCompare(b.title);
       case "nameDesc":
-        return b.title.localeCompare(a.title); // Sort by name Z to A
+        return b.title.localeCompare(a.title);
       case "productsAsc":
-        return a.numOfProducts - b.numOfProducts; // Sort by number of products ascending
+        return a.numOfProducts - b.numOfProducts;
       case "productsDesc":
-        return b.numOfProducts - a.numOfProducts; // Sort by number of products descending
+        return b.numOfProducts - a.numOfProducts;
       default:
         return 0;
     }
   });
+
+  if (isLoading || !isClient) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading categories...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+              <p className="text-gray-600">Please log in to view and manage categories.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -139,18 +202,60 @@ export default function CategoriesPage() {
           </div>
         </div>
 
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Stats cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-          {categoryAnalytics.map((category) => (
-            <GeneralAnalyticsCard key={category.id} analytic={category} />
-          ))}
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-700">Category Statistics</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchCategories}
+              disabled={isLoading}
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh Stats
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {statistics ? getCategoryAnalyticsFromStats(statistics).map((category) => (
+              <GeneralAnalyticsCard key={category.id} analytic={category} />
+            )) : (
+              // Show loading state for stats
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg border border-logo-border p-6 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Search and filters */}
         <div className="border-t border-logo-border mt-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
-            <SearchBar placeholder="Search: e.g. Home & Kitchen"></SearchBar>
+            <SearchBar placeholder="Search: e.g. Home & Kitchen" onChange={handleSearchChange} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -208,13 +313,47 @@ export default function CategoriesPage() {
             <table className="min-w-full divide-y divide-logo-border">
               <CategoryTableHeader />
               <tbody className="bg-white divide-y divide-logo-border">
-                {/* Sample category rows */}
-                {sortedCategories.map((category) => (
-                  <CategoryRecord key={category.id} category={category} />
-                ))}
+                {sortedCategories.length > 0 ? (
+                  sortedCategories.map((category) => (
+                    <CategoryRecord 
+                      key={category.id} 
+                      category={category} 
+                      onDelete={(categoryId) => {
+                        // The category will be automatically removed from the list
+                        // by the useCategoryManagement hook
+                        console.log('Category deleted:', categoryId);
+                      }}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="py-8 text-center text-muted-foreground"
+                    >
+                      {categories.length === 0
+                        ? "No categories found. Try adding your first category."
+                        : "No categories match your search."}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+
+          {/* Refresh button for fallback */}
+          {categories.length === 0 && !isLoading && (
+            <div className="mt-6 text-center">
+              <Button
+                variant="outline"
+                onClick={fetchCategories}
+                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                <span>Refresh Categories</span>
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>
