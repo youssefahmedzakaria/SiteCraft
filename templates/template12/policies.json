@@ -1,0 +1,24 @@
+{
+  "template": "DefaultPolicies",
+  "id": "policies",
+  "title": "Policies",
+  "sections": [
+     {
+      "title": "Return Policy",
+      "content": "If you are not satisfied, you may return the item within 30 days of receipt for a full refund."
+    }
+  ],
+  "backgroundColor": "bg-white",
+  "titleColor": "text-black",
+  "titleSize": "text-4xl",
+  "titleFont": "font-sans",
+  "titleFontWeight": "font-bold",
+  "sectionTitleColor": "text-black",
+  "sectionTitleSize": "text-2xl",
+  "sectionTitleFont": "font-serif",
+  "sectionTitleFontWeight": "font-medium",
+  "sectionContentColor": "text-gray-600",
+  "sectionContentSize": "text-lg",
+  "sectionContentFont": "font-serif",
+  "sectionContentFontWeight": "font-medium"
+}

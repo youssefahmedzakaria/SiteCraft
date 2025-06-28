@@ -12,11 +12,6 @@
     "imageObjectFit": null,
     "titleFont": "font-serif",
     "titleSize": "text-4xl",
-    "titleFontWeight": "font-bold",
     "descriptionFont": "font-sans",
-    "descriptionSize": "text-lg",
-    "descriptionFontWeight": "font-normal",
-    "showImage": true,
-    "imagePosition": "top",
-    "textAlignment": "center"
+    "descriptionSize": "text-lg"
 }

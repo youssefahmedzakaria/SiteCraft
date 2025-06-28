@@ -1,0 +1,17 @@
+{
+    "template": "CenteredAbout",
+    "id": "about",
+    "title": "Our Story",
+    "titleColor": "black",
+    "description": "keep it simple and short, this is a simple description about your brand",
+    "secondaryDescription": "just another simple description about your brand",
+    "descriptionColor": "black",
+    "backgroundColor": "white",
+    "image": null,
+    "imageAlt": null,
+    "imageObjectFit": null,
+    "titleFont": "font-serif",
+    "titleSize": "text-4xl",
+    "descriptionFont": "font-sans",
+    "descriptionSize": "text-lg"
+}

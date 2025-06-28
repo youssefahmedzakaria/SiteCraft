@@ -1,50 +1,75 @@
 {
-    "template": "FeaturedGridCategoryTemplate",
+  
     "backgroundColor": "bg-white",
     "textColor": "text-black",
     "categories": [
         {
-            "id": "category1",
-            "title": "Category 1",
-            "image": "/category1.jpg",
-            "imageAlt": "Category 1 Image",
-            "link": "/products"
+            "name": "category1",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "1"
         },
         {
-            "id": "category2",
-            "title": "Category 2",
-            "image": "/category2.jpg",
-            "imageAlt": "Category 2 Image",
-            "link": "/products"
+            "name": "category2",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "2"
         },
         {
-            "id": "category3",
-            "title": "Category 3",
-            "image": "/category3.jpg",
-            "imageAlt": "Category 3 Image",
-            "link": "/products"
+            "name": "category3",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "3"
         },
         {
-            "id": "category4",
-            "title": "Category 4",
-            "image": "/category4.jpg",
-            "imageAlt": "Category 4 Image",
-            "link": "/products"
+            "name": "category4",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "4"
         },
         {
-            "id": "category5",
-            "title": "Category 5",
-            "image": "/category5.jpg",
-            "imageAlt": "Category 5 Image",
-            "link": "/products"
+            "name": "category5",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "5"
         },
         {
-            "id": "category6",
-            "title": "Category 6",
-            "image": "/category6.jpg",
-            "imageAlt": "Category 6 Image",
-            "link": "/products"
+            "name": "Brooches",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": "/brooch1.jpg"
+                    }
+                }
+            },
+            "id": "6"
         }
+       
     ],
     "columns": {
         "sm": 1,
@@ -73,7 +98,15 @@
     "overlayColor": "bg-black/30",
     "showScrollbar": false,
     "scrollBarSliderColor": "bg-gray-400",
-    "scrollBarBgColor": "bg-gray-200"
+    "scrollBarBgColor": "bg-gray-200",
+    "showDescription": true,
+    "showControls": true,
+    "showIcon": true,
+    "imageHeight": "aspect-square",
+    "cardWidth": "w-full",
+    "showMoreButton": true,
+    "showMoreText": "Show More",
+    "showMorebuttonBgColor": "bg-blue-500",
+    "showMorebuttonTextColor": "text-white"
    
 }
-  
