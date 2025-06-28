@@ -3,12 +3,7 @@
 
 import React, { FC, useEffect, useState } from "react";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
-import type { Order, TopProduct } from "@/lib/overviewData";
-import {
-  todaysOrders,
-  dailySales,
-  topSellingProducts,
-} from "@/lib/overviewData";
+import type { Order, TopProduct, DailySale } from "@/lib/overview";
 import { AnimatedChartWrapper } from "@/components/SiteCraft/dashboard/analytics/charts/AnimatedChartWrapper";
 import { BarChartCard } from "@/components/SiteCraft/dashboard/analytics/charts/BarChartCard";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -17,9 +12,10 @@ import { useRouter } from "next/navigation";
 import { getFirstAccessiblePage } from "@/lib/sidebarElements";
 import { useProductStatistics } from "@/hooks/useProductStatistics";
 import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { useOverview } from "@/hooks/useOverview";
 import { getProductAnalyticsFromStats, getCategoryAnalyticsFromStats } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/SiteCraft/ui/button";
 
 // ─── Table Headers ─────────────────────────────────────────────────────────────
@@ -112,6 +108,17 @@ export default function OverviewPage() {
   const router = useRouter();
   const { stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useProductStatistics();
   const { statistics: categoryStats, isLoading: categoryStatsLoading, error: categoryStatsError, fetchCategories: refetchCategoryStats } = useCategoryManagement();
+  const { 
+    orderCount, 
+    salesTotal, 
+    topProducts, 
+    todayOrders, 
+    dailySales, 
+    isLoading: overviewLoading, 
+    error: overviewError, 
+    clearError: clearOverviewError, 
+    refetch: refetchOverview 
+  } = useOverview();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -143,6 +150,25 @@ export default function OverviewPage() {
     );
   }
 
+  // Show loading state
+  if (overviewLoading) {
+    return (
+      <ProtectedRoute requiredRole="owner">
+        <div className="flex min-h-screen bg-gray-100">
+          <Sidebar />
+          <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center space-x-2">
+                <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+                <span className="text-lg text-gray-600">Loading overview data...</span>
+              </div>
+            </div>
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute requiredRole="owner">
       <div className="flex min-h-screen bg-gray-100">
@@ -157,16 +183,74 @@ export default function OverviewPage() {
             </h2>
           </div>
 
+          {/* Error Alert */}
+          {overviewError && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <span className="text-red-800">{overviewError}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearOverviewError}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Overview Stats Cards */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <GeneralAnalyticsCard
+              analytic={{
+                id: 'orders',
+                title: "Today's Orders",
+                value: orderCount?.toString() ?? '-',
+                subtitle: 'Placed today',
+              }}
+            />
+            <GeneralAnalyticsCard
+              analytic={{
+                id: 'sales',
+                title: "Today's Sales",
+                value: `e£${salesTotal?.toFixed(2) ?? '-'}`,
+                subtitle: 'Revenue today',
+              }}
+            />
+          </div>
+
           {/* 1) Today's Orders */}
           <section>
-            <h2 className="text-lg font-semibold mb-2">Today's Orders</h2>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-semibold">Today's Orders</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refetchOverview}
+                disabled={overviewLoading}
+                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${overviewLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
             <div className="border rounded-lg border-logo-border overflow-x-auto">
               <table className="min-w-full divide-y divide-logo-border">
                 <OrdersTableHeader />
                 <tbody className="bg-white divide-y divide-logo-border">
-                  {todaysOrders.map((order) => (
-                    <OrderRecord key={order.id} order={order} />
-                  ))}
+                  {todayOrders.length > 0 ? (
+                    todayOrders.map((order) => (
+                      <OrderRecord key={order.id} order={order} />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                        No orders today
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -202,9 +286,17 @@ export default function OverviewPage() {
                 <table className="min-w-full divide-y divide-logo-border">
                   <ProductsTableHeader />
                   <tbody className="bg-white divide-y divide-logo-border">
-                    {topSellingProducts.map((prod) => (
-                      <ProductRecord key={prod.product} product={prod} />
-                    ))}
+                    {topProducts.length > 0 ? (
+                      topProducts.map((prod) => (
+                        <ProductRecord key={prod.product} product={prod} />
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={2} className="px-4 py-8 text-center text-gray-500">
+                          No products sold yet
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

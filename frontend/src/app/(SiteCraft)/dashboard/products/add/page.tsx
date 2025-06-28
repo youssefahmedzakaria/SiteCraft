@@ -466,7 +466,7 @@ export default function AddProductPage() {
               )}
 
               {activeTab === "Stock Management" && (
-                <StockManagementSection />
+                <StockManagementSection variants={variants} />
               )}
 
               {/* Submit Button */}

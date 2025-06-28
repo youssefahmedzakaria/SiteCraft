@@ -156,7 +156,16 @@ export const transformOrder = (order: any): Order => {
       gender: order.customer.gender,
       status: order.customer.status
     } : undefined,
-    orderProducts: order.orderProducts || [],
+    orderProducts: order.orderProducts
+      ? order.orderProducts.map((op: any) => ({
+          ...op,
+          product: op.product
+            ? op.product
+            : (op.productId
+                ? { id: op.productId, name: op.sku, description: '', variants: [], images: [] }
+                : undefined)
+        }))
+      : [],
     paymentLog: order.paymentLog,
     shipping: order.shipping
   };
