@@ -30,10 +30,17 @@ export function StockManagementSection({ variants }: { variants: ProductVariantD
         (attrs[0].name === "Default" || !attrs[0].name) &&
         (attrs[0].value === "Default" || !attrs[0].value));
     if (isDefault) {
-      // Parse the SKU and use the last part after the last '|'
+      // Parse the SKU and use everything after the second '|', then format nicely
       if (variant.sku && variant.sku.includes("|")) {
         const parts = variant.sku.split("|");
-        return parts[parts.length - 1];
+        const attributes = parts.length > 2 ? parts.slice(2) : [parts[parts.length - 1]];
+        return attributes
+          .map(attr => {
+            const [name, value] = attr.split("-");
+            if (!name || !value) return attr;
+            return `${name.charAt(0).toUpperCase() + name.slice(1)}: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
+          })
+          .join(", ");
       }
       return variant.sku || "-";
     } else {

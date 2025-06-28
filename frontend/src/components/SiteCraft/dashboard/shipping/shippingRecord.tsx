@@ -1,17 +1,36 @@
 "use client";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Shipping } from "@/lib/shipping";
+import { ShippingInfo } from "@/lib/shipping";
 import { DeleteConfirmationDialog } from "@/components/SiteCraft/ui/deleteConfirmationDialog";
 import Link from "next/link";
 import { useState } from "react";
 
-export function ShippingRecord({ shipping }: { shipping: Shipping }) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+interface ShippingRecordProps {
+  shipping: ShippingInfo;
+  onDelete: (shippingId: number) => Promise<void>;
+}
 
-  const handleDelete = () => {
-    console.log(`Deleting shipping area: ${shipping.governorate}`);
-    setShowDeleteDialog(false);
+export function ShippingRecord({ shipping, onDelete }: ShippingRecordProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      console.log('🗑️ Deleting shipping info:', shipping);
+      
+      await onDelete(shipping.id!);
+      console.log('✅ Shipping info deleted successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to delete shipping info:', error);
+      alert(`Failed to delete shipping info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
   };
+
   return (
     <tr>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-1/12">
@@ -19,16 +38,16 @@ export function ShippingRecord({ shipping }: { shipping: Shipping }) {
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-3/12">
-        <div className="text-sm text-gray-900">{shipping.governorate}</div>
+        <div className="text-sm text-gray-900">{shipping.governmentName}</div>
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-2/12">
-        <div className="text-sm text-gray-500">EGP {shipping.price}</div>
+        <div className="text-sm text-gray-500">EGP {shipping.shippingPrice}</div>
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-3/12">
         <div className="text-sm text-gray-500">
-          {shipping.estimatedDeliveryDays}
+          {shipping.estimatedDeliveryTime}
         </div>
       </td>
 
@@ -48,17 +67,18 @@ export function ShippingRecord({ shipping }: { shipping: Shipping }) {
             size="sm"
             className="text-red-600 hover:text-red-900"
             onClick={() => setShowDeleteDialog(true)}
+            disabled={deleting}
           >
-            Delete
+            {deleting ? 'Deleting...' : 'Delete'}
           </Button>
 
           <DeleteConfirmationDialog
             isOpen={showDeleteDialog}
             onClose={() => setShowDeleteDialog(false)}
             onConfirm={handleDelete}
-            title="Delete Product"
-            description="Are you sure you want to delete this shipping area?"
-            itemName={shipping.governorate}
+            title="Delete Shipping Location"
+            description="Are you sure you want to delete this shipping location? This action cannot be undone."
+            itemName={shipping.governmentName}
           />
         </div>
       </td>

@@ -433,7 +433,7 @@ export default function AddProductPage() {
                           <div key={index} className="flex items-center space-x-4 p-3 border rounded">
                             <div className="flex-1">
                               <span className="font-medium">
-                                {variant.attributes?.map(attr => `${attr.name}: ${attr.value}`).join(', ')}
+                                {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
                               </span>
                             </div>
                             <Input

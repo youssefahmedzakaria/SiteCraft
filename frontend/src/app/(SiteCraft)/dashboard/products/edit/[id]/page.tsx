@@ -149,11 +149,18 @@ export default function EditProductPage() {
         const transformedVariants: ProductVariantDTO[] = product.variants.map(variant => {
           let variantAttributes = variantIdToAttributes[variant.id];
           if (!variantAttributes || variantAttributes.length === 0 || (variantAttributes.length === 1 && variantAttributes[0].name === "Default" && variantAttributes[0].value === "Default")) {
-            // Parse the SKU and use the last part after the last '|'
+            // Parse the SKU and use everything after the second '|', then format nicely
             let parsedName = variant.sku || "-";
-            const lastPipeIndex = parsedName.lastIndexOf("|");
-            if (lastPipeIndex !== -1) {
-              parsedName = parsedName.substring(lastPipeIndex + 1);
+            if (parsedName.includes("|")) {
+              const parts = parsedName.split("|");
+              const attributes = parts.length > 2 ? parts.slice(2) : [parts[parts.length - 1]];
+              parsedName = attributes
+                .map(attr => {
+                  const [name, value] = attr.split("-");
+                  if (!name || !value) return attr;
+                  return `${name.charAt(0).toUpperCase() + name.slice(1)}: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
+                })
+                .join(", ");
             }
             // Remove leading colons, spaces, and any other unwanted characters
             parsedName = parsedName.replace(/^[:|\s]+/, "").trim();
@@ -228,19 +235,31 @@ export default function EditProductPage() {
 
     // Generate all combinations of attribute values
     const combinations = generateCombinations(attrs);
-    
-    // Create variants from combinations
+
+    // Build a map of old variants by key
+    const oldVariantMap: Record<string, ProductVariantDTO> = {};
+    variants.forEach(variant => {
+      const key = (variant.attributes || [])
+        .map(attr => `${attr.name}:${attr.value}`)
+        .join('|');
+      oldVariantMap[key] = variant;
+    });
+
+    // Create new variants, preserving data if possible
     const newVariants: ProductVariantDTO[] = combinations.map((combination, index) => {
       const variantAttributes: VariantAttributeDTO[] = combination.map((value, attrIndex) => ({
         name: attrs[attrIndex].name,
         value: value
       }));
-
+      const key = variantAttributes.map(attr => `${attr.name}:${attr.value}`).join('|');
+      const old = oldVariantMap[key];
       return {
-        stock: 0,
-        price: 0,
-        productionCost: 0,
-        attributes: variantAttributes
+        stock: old?.stock || 0,
+        price: old?.price || 0,
+        productionCost: old?.productionCost || 0,
+        attributes: variantAttributes,
+        id: old?.id,
+        sku: old?.sku,
       };
     });
 
@@ -377,7 +396,23 @@ export default function EditProductPage() {
         percentageMax: discountSettings.percentageMax,
         maxCap: discountSettings.maxCap,
         attributes: attributes.length > 0 ? attributes : [],
-        variants: variants.length > 0 ? variants : [],
+        variants: variants.length > 0
+          ? variants.map(variant => ({
+              ...variant,
+              // If attributes is a single item with name '', value 'Color: Black, Size: L',
+              // replace it with the correct array of { name, value } pairs parsed from the string
+              attributes:
+                variant.attributes &&
+                variant.attributes.length === 1 &&
+                variant.attributes[0].name === "" &&
+                variant.attributes[0].value.includes(":")
+                  ? variant.attributes[0].value.split(", ").map(pair => {
+                      const [name, value] = pair.split(": ");
+                      return { name: name?.trim() || "", value: value?.trim() || "" };
+                    })
+                  : variant.attributes || []
+            }))
+          : [],
       };
 
       // Log the data being sent
@@ -590,7 +625,7 @@ export default function EditProductPage() {
                           <div key={index} className="flex items-center space-x-4 p-3 border rounded">
                             <div className="flex-1">
                               <span className="font-medium">
-                                {variant.attributes?.map(attr => `${attr.name}: ${attr.value}`).join(', ')}
+                                {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
                               </span>
                             </div>
                             <Input
@@ -665,7 +700,7 @@ export default function EditProductPage() {
                             {variants.map((variant, index) => (
                               <tr key={index} className="text-center">
                                 <td className="px-4 py-2 border-b">
-                                  {variant.attributes?.map(attr => `${attr.name}: ${attr.value}`).join(', ')}
+                                  {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
                                 </td>
                                 <td className="px-4 py-2 border-b">{variant.sku}</td>
                                 <td className="px-4 py-2 border-b">{variant.stock}</td>
