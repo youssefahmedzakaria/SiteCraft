@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
+import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 
 // Color theory utility functions
 const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
@@ -176,36 +178,80 @@ interface ColorPalette {
 export default function ColorPalettePage() {
   const [primaryColor, setPrimaryColor] = useState("#000000");
   const [secondaryColor, setSecondaryColor] = useState("#ffffff");
-  const [accentColor, setAccentColor] = useState("#3498db");
+  const [accentColor, setAccentColor] = useState("#ff6b6b");
   const [presetPalettes, setPresetPalettes] = useState<ColorPalette[]>([]);
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Load colors from previous page
   useEffect(() => {
-    // In a real app, you would use a state management solution like Redux or Context API
-    // For this example, we'll simulate getting the colors from localStorage or URL params
-    const storedPrimaryColor =
-      localStorage.getItem("primaryColor") || "#000000";
-    const storedSecondaryColor =
-      localStorage.getItem("secondaryColor") || "#ffffff";
+    if (!isClient) return;
+    
+    // Load colors from localStorage (set by branding page)
+    const storedPrimaryColor = localStorage.getItem("primaryColor") || "#000000";
+    const storedSecondaryColor = localStorage.getItem("secondaryColor") || "#ffffff";
+    const storedAccentColor = localStorage.getItem("accentColor") || "#ff6b6b";
 
-    setPrimaryColor(storedPrimaryColor);
-    setSecondaryColor(storedSecondaryColor);
+    // Validate and clean the colors
+    const primaryColor = validateHexColor(storedPrimaryColor) ? storedPrimaryColor : "#000000";
+    const secondaryColor = validateHexColor(storedSecondaryColor) ? storedSecondaryColor : "#ffffff";
+    const accentColor = validateHexColor(storedAccentColor) ? storedAccentColor : "#ff6b6b";
 
-    // Generate accent color as a complementary color to primary
-    const rgb = hexToRgb(storedPrimaryColor);
-    if (rgb) {
-      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-      const complementaryHue = (hsl.h + 0.5) % 1;
-      const complementaryRgb = hslToRgb(complementaryHue, hsl.s, hsl.l);
-      setAccentColor(
-        rgbToHex(complementaryRgb.r, complementaryRgb.g, complementaryRgb.b)
-      );
+    setPrimaryColor(primaryColor);
+    setSecondaryColor(secondaryColor);
+    setAccentColor(accentColor);
+
+    // Only generate accent color if it wasn't already set from branding page
+    if (!localStorage.getItem("accentColor")) {
+      const rgb = hexToRgb(primaryColor);
+      if (rgb) {
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        const complementaryHue = (hsl.h + 0.5) % 1;
+        const complementaryRgb = hslToRgb(complementaryHue, hsl.s, hsl.l);
+        setAccentColor(
+          rgbToHex(complementaryRgb.r, complementaryRgb.g, complementaryRgb.b)
+        );
+      }
     }
-  }, []);
+
+    console.log('🎨 Colors loaded from branding page:', { primaryColor, secondaryColor, accentColor });
+  }, [isClient]);
+
+  // Validate hex color format
+  const validateHexColor = (color: string): boolean => {
+    return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+  };
+
+  // Ensure color contrast for accessibility
+  const ensureContrast = (backgroundColor: string, textColor: string): string => {
+    const bgRgb = hexToRgb(backgroundColor);
+    const textRgb = hexToRgb(textColor);
+    
+    if (!bgRgb || !textRgb) return textColor;
+    
+    const bgBrightness = (bgRgb.r * 299 + bgRgb.g * 587 + bgRgb.b * 114) / 1000;
+    const textBrightness = (textRgb.r * 299 + textRgb.g * 587 + textRgb.b * 114) / 1000;
+    
+    const contrast = Math.abs(bgBrightness - textBrightness);
+    
+    // If contrast is too low, return a contrasting color
+    if (contrast < 128) {
+      return bgBrightness > 128 ? "#000000" : "#ffffff";
+    }
+    
+    return textColor;
+  };
 
   // Generate palette suggestions based on primary color
   useEffect(() => {
+    if (!isClient) return;
+    
     const palettes: ColorPalette[] = [
       {
         name: "Modern Minimalist",
@@ -282,31 +328,87 @@ export default function ColorPalettePage() {
     ];
 
     setPresetPalettes(palettes);
-  }, [primaryColor, accentColor]);
+  }, [primaryColor, accentColor, isClient]);
 
   const handleSaveChanges = () => {
-    // Save the selected colors
-    localStorage.setItem("primaryColor", primaryColor);
-    localStorage.setItem("secondaryColor", secondaryColor);
-    localStorage.setItem("accentColor", accentColor);
+    if (!isClient) return;
+    
+    // Validate colors before saving
+    const validPrimaryColor = validateHexColor(primaryColor) ? primaryColor : "#000000";
+    const validSecondaryColor = validateHexColor(secondaryColor) ? secondaryColor : "#ffffff";
+    const validAccentColor = validateHexColor(accentColor) ? accentColor : "#ff6b6b";
 
-    // Navigate back to the dashboard or next step
-    window.location.href = "/templates";
+    // Save the validated colors
+    localStorage.setItem("primaryColor", validPrimaryColor);
+    localStorage.setItem("secondaryColor", validSecondaryColor);
+    localStorage.setItem("accentColor", validAccentColor);
+
+    console.log('💾 Colors saved:', { validPrimaryColor, validSecondaryColor, validAccentColor });
+
+    // Navigate to templates page
+    router.push("/templates");
   };
 
   const handleSelectPalette = (palette: ColorPalette) => {
-    setPrimaryColor(palette.colors[0]);
-    setSecondaryColor(palette.colors[1]);
-    if (palette.colors[2]) {
-      setAccentColor(palette.colors[2]);
+    if (!isClient) return;
+    
+    // Validate palette colors before setting
+    const validColors = palette.colors.map(color => 
+      validateHexColor(color) ? color : "#000000"
+    );
+    
+    setPrimaryColor(validColors[0] || "#000000");
+    setSecondaryColor(validColors[1] || "#ffffff");
+    if (validColors[2]) {
+      setAccentColor(validColors[2]);
     }
     setSelectedPaletteName(palette.name);
+    
+    console.log('🎨 Palette selected:', palette.name, validColors);
+  };
+
+  // Handle color input changes with validation
+  const handleColorChange = (colorType: 'primary' | 'secondary' | 'accent', value: string) => {
+    if (!isClient) return;
+    
+    const cleanValue = value.startsWith('#') ? value : `#${value}`;
+    
+    if (validateHexColor(cleanValue)) {
+      switch (colorType) {
+        case 'primary':
+          setPrimaryColor(cleanValue);
+          break;
+        case 'secondary':
+          setSecondaryColor(cleanValue);
+          break;
+        case 'accent':
+          setAccentColor(cleanValue);
+          break;
+      }
+    }
   };
 
   const handleBackClick = () => {
+    if (!isClient) return;
     // Navigate back to the branding page
-    window.location.href = "/branding";
+    router.push("/branding");
   };
+
+  // Don't render until client-side
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <main className="container mx-auto p-4 md:p-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -420,13 +522,13 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          onChange={(e) => handleColorChange('primary', e.target.value)}
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          onChange={(e) => handleColorChange('primary', e.target.value)}
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -449,13 +551,13 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={secondaryColor}
-                          onChange={(e) => setSecondaryColor(e.target.value)}
+                          onChange={(e) => handleColorChange('secondary', e.target.value)}
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={secondaryColor}
-                          onChange={(e) => setSecondaryColor(e.target.value)}
+                          onChange={(e) => handleColorChange('secondary', e.target.value)}
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -478,13 +580,13 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
+                          onChange={(e) => handleColorChange('accent', e.target.value)}
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
+                          onChange={(e) => handleColorChange('accent', e.target.value)}
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -501,18 +603,18 @@ export default function ColorPalettePage() {
                     >
                       <h3
                         className="text-lg font-semibold"
-                        style={{ color: secondaryColor }}
+                        style={{ color: ensureContrast(primaryColor, secondaryColor) }}
                       >
                         Primary Color
                       </h3>
-                      <p style={{ color: secondaryColor }}>
+                      <p style={{ color: ensureContrast(primaryColor, secondaryColor) }}>
                         This shows how your primary color will look with text.
                       </p>
                       <Button
                         className="mt-3"
                         style={{
                           backgroundColor: accentColor,
-                          color: "white",
+                          color: ensureContrast(accentColor, "#ffffff"),
                         }}
                       >
                         Sample Button
@@ -526,11 +628,11 @@ export default function ColorPalettePage() {
                       >
                         <h3
                           className="text-lg font-semibold"
-                          style={{ color: primaryColor }}
+                          style={{ color: ensureContrast(secondaryColor, primaryColor) }}
                         >
                           Secondary Color
                         </h3>
-                        <p style={{ color: primaryColor }}>
+                        <p style={{ color: ensureContrast(secondaryColor, primaryColor) }}>
                           Secondary color text preview.
                         </p>
                       </div>
@@ -539,10 +641,15 @@ export default function ColorPalettePage() {
                         className="p-5"
                         style={{ backgroundColor: accentColor }}
                       >
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 
+                          className="text-lg font-semibold"
+                          style={{ color: ensureContrast(accentColor, "#ffffff") }}
+                        >
                           Accent Color
                         </h3>
-                        <p className="text-white">Accent color text preview.</p>
+                        <p style={{ color: ensureContrast(accentColor, "#ffffff") }}>
+                          Accent color text preview.
+                        </p>
                       </div>
                     </div>
                   </div>

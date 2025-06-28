@@ -23,6 +23,7 @@
     "@types/recharts": "^1.8.29",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "color-thief-browser": "^2.0.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.9.2",
     "lucide-react": "^0.501.0",

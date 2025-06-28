@@ -3,6 +3,7 @@
     "@radix-ui/react-switch": "^1.2.2",
     "@radix-ui/react-toast": "^1.2.11",
     "class-variance-authority": "^0.7.1",
+    "color-thief-browser": "^2.0.2",
     "framer-motion": "^12.9.1"
   }
 }

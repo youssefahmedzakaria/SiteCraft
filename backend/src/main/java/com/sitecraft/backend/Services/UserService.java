@@ -58,20 +58,8 @@ public class UserService {
         Users savedUser = userRepo.save(users);
         System.out.println("✅ User saved with ID: " + savedUser.getId());
         
-        // Create a default store for the user
-        Store defaultStore = new Store();
-        defaultStore.setStoreName(users.getName() + "'s Store");
-        defaultStore.setStoreType("General");
-        defaultStore.setDescription("Store created for " + users.getName());
-        defaultStore.setEmailAddress(users.getEmail());
-        defaultStore.setPhoneNumber(users.getPhone());
-        defaultStore.setCreationDate(LocalDateTime.now());
-        
-        System.out.println("🏪 Creating store: " + defaultStore.getStoreName());
-        
-        // Create the store and assign user as owner
-        Store createdStore = storeService.createStore(defaultStore, savedUser.getId());
-        System.out.println("✅ Store created with ID: " + createdStore.getId());
+        // Note: Store will be created later in the branding flow
+        // No automatic store creation during registration
         
         return savedUser;
     }
