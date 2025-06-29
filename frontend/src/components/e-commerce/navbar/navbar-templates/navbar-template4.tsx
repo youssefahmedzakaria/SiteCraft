@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
-import { Logo } from '../navbar-components/logo';
-import { Navigation } from '../navbar-components/navigation';
-import { SearchBar } from '../navbar-components/search-bar';
-import { IconsGroup } from '../navbar-components/icons-group';
-import MobileMenu from '../navbar-components/mobile-menu';
+import React, { useState } from "react";
+import { Menu } from "lucide-react";
+import { Logo } from "../navbar-components/logo";
+import { Navigation } from "../navbar-components/navigation";
+import { SearchBar } from "../navbar-components/search-bar";
+import { IconsGroup } from "../navbar-components/icons-group";
+import MobileMenu from "../navbar-components/mobile-menu";
 
 export interface NavbarTemplate4Props {
+  isCustomize?: boolean;
   brandName?: string | React.ReactNode;
   backgroundColor?: string;
   textColor?: string;
@@ -31,16 +32,17 @@ export interface NavbarTemplate4Props {
 }
 
 export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
+  isCustomize,
   brandName,
-  backgroundColor = 'bg-white',
-  textColor = 'text-black',
-  fontFamily = 'font-sans',
+  backgroundColor = "bg-white",
+  textColor = "text-black",
+  fontFamily = "font-sans",
   logo,
   menuItems = [],
   MobileMenuItems = [],
-  iconColor = 'text-black',
-  dividerColor = 'border-gray-200',
-  searchIconColor = 'text-gray-400',
+  iconColor = "text-black",
+  dividerColor = "border-gray-200",
+  searchIconColor = "text-gray-400",
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -59,7 +61,11 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav
+        className={`${
+          isCustomize ? "relative" : "fixed"
+        } top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16">

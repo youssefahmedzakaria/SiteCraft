@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
-import { Logo } from '../navbar-components/logo';
-import { Navigation } from '../navbar-components/navigation';
-import { SearchBar } from '../navbar-components/search-bar';
-import { IconsGroup } from '../navbar-components/icons-group';
-import MobileMenu from '../navbar-components/mobile-menu';
+import React, { useState } from "react";
+import { Menu } from "lucide-react";
+import { Logo } from "../navbar-components/logo";
+import { Navigation } from "../navbar-components/navigation";
+import { SearchBar } from "../navbar-components/search-bar";
+import { IconsGroup } from "../navbar-components/icons-group";
+import MobileMenu from "../navbar-components/mobile-menu";
 
 export interface NavbarTemplate7Props {
+  isCustomize?: boolean;
   brandName?: string | React.ReactNode;
   backgroundColor?: string;
   textColor?: string;
@@ -32,21 +33,22 @@ export interface NavbarTemplate7Props {
 }
 
 export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
+  isCustomize,
   brandName,
-  backgroundColor = 'bg-white',
-  textColor = 'text-black',
-  fontFamily = 'font-sans',
+  backgroundColor = "bg-white",
+  textColor = "text-black",
+  fontFamily = "font-sans",
   logo,
   menuItems = [],
   MobileMenuItems = [],
-  iconColor = 'text-black',
-  dividerColor = 'border-gray-200',
-  searchIconColor = 'text-gray-400',
+  iconColor = "text-black",
+  dividerColor = "border-gray-200",
+  searchIconColor = "text-gray-400",
   isRTL = false,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const rtlClass = isRTL ? 'rtl' : '';
+  const rtlClass = isRTL ? "rtl" : "";
 
   return (
     <>
@@ -62,22 +64,40 @@ export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily} ${rtlClass}`}>
+      <nav
+        className={`${
+          isCustomize ? "relative" : "fixed"
+        } top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily} ${rtlClass}`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16 relative">
             {/* Left - Navigation - Fixed width */}
-            <div className={`w-1/3 flex ${isRTL ? 'justify-end order-3' : 'justify-start order-1'}`}>
+            <div
+              className={`w-1/3 flex ${
+                isRTL ? "justify-end order-3" : "justify-start order-1"
+              }`}
+            >
               <Navigation menuItems={menuItems} textColor={textColor} />
             </div>
 
             {/* Center - Logo - Absolute centered */}
-            <div className={`absolute left-1/2 transform -translate-x-1/2 ${isRTL ? 'order-1' : 'order-2'}`}>
+            <div
+              className={`absolute left-1/2 transform -translate-x-1/2 ${
+                isRTL ? "order-1" : "order-2"
+              }`}
+            >
               <Logo brandName={brandName} logo={logo} textColor={textColor} />
             </div>
 
             {/* Right - Search and Icons - Fixed width */}
-            <div className={`w-1/3 flex ${isRTL ? 'justify-start order-1 flex-row-reverse' : 'justify-end order-3'}`}>
+            <div
+              className={`w-1/3 flex ${
+                isRTL
+                  ? "justify-start order-1 flex-row-reverse"
+                  : "justify-end order-3"
+              }`}
+            >
               <div className="flex items-center space-x-6">
                 <SearchBar
                   expanded={isSearchOpen}

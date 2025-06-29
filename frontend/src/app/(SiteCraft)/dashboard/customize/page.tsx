@@ -229,7 +229,7 @@ export default function CustomizeTemplatePage() {
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "BRAND",
     backgroundColor: "bg-[#FFFFFF]",
-    textColor: "text-black",
+    textColor: "text-[#000000]",
     logo: {
       src: "/logo.png",
       alt: "Company Logo",
@@ -357,34 +357,36 @@ export default function CustomizeTemplatePage() {
 
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          {/* <Navbar
+          <Navbar
+            isCustomize={true}
             template={headerAttributes.template}
             brandName={headerAttributes.brandName}
             backgroundColor={headerAttributes.backgroundColor}
             textColor={headerAttributes.textColor}
             logo={headerAttributes.logo}
-            menuItems={[
-              { label: `${headerAttributes.menuItems[0].label}`, href: "#" },
-              { label: `${headerAttributes.menuItems[1].label}`, href: "#" },
-              { label: `${headerAttributes.menuItems[3].label}`, href: "#" },
-              {
-                label: `${headerAttributes.menuItems[4].label}`,
-                href: "#",
-              },
-            ]}
+            menuItems={headerAttributes.menuItems.map((item) => ({
+              label: item.label,
+              href: "#",
+              isShown: item.isShown,
+            }))}
             iconColor={headerAttributes.iconColor}
             dividerColor={headerAttributes.dividerColor}
             searchIconColor={headerAttributes.searchIconColor}
             fontFamily={headerAttributes.fontFamily}
-          /> */}
+          />
           <CenteredPromo
             isClickable={false}
             id={promoAttributes.id}
             slides={promoAttributes.slides}
+            autoplay={promoAttributes.autoPlay}
+            showArrows={promoAttributes.showArrows}
             backgroundColor={promoAttributes.backgroundColor}
             titleFont={promoAttributes.titleFont}
             titleColor={promoAttributes.titleColor}
             titleSize={promoAttributes.titleSize}
+            descriptionFont={promoAttributes.descriptionFont}
+            descriptionColor={promoAttributes.descriptionColor}
+            descriptionSize={promoAttributes.descriptionSize}
             buttonFont={promoAttributes.buttonFont}
             buttonColor={promoAttributes.buttonColor}
             buttonTextColor={promoAttributes.buttonTextColor}
@@ -630,8 +632,12 @@ export default function CustomizeTemplatePage() {
             backgroundColor={aboutAttributes.backgroundColor}
             title={aboutAttributes.title}
             titleColor={aboutAttributes.titleColor}
+            titleFont={aboutAttributes.titleFont}
+            titleSize={aboutAttributes.titleSize}
             descriptionColor={aboutAttributes.descriptionColor}
             description={aboutAttributes.description}
+            descriptionFont={aboutAttributes.descriptionFont}
+            descriptionSize={aboutAttributes.descriptionSize}
             secondaryDescription={aboutAttributes.secondaryDescription}
             image={aboutAttributes.image}
             imageAlt={aboutAttributes.imageAlt}
@@ -677,47 +683,19 @@ export default function CustomizeTemplatePage() {
             sections={policiesAttributes.sections}
           />
           <Footer
-            companyName="Jewelry"
-            textColor="text-black"
+            companyName={footerAttributes.brandName}
+            textColor={footerAttributes.textColor}
             companyLogo={{
-              src: "/logo.png",
-              alt: "Custom Logo",
-              width: 50,
-              height: 50,
+              src: footerAttributes.logo.src || "/logo.png",
+              alt: footerAttributes.logo.alt,
+              width: parseInt(footerAttributes.logo.size) || 50,
+              height: parseInt(footerAttributes.logo.size) || 50,
             }}
-            aboutLinks={[
-              {
-                label: "Policies",
-                href: "#",
-                font: "font-serif",
-                fontSize: "text-lg",
-                fontColor: "text-black",
-              },
-              {
-                label: "About Us",
-                href: "#",
-                font: "font-serif",
-                fontSize: "text-lg",
-                fontColor: "text-black",
-              },
-            ]}
-            socialMedia={{
-              facebook: "https://facebook.com/amnayahia26",
-              instagram: "https://instagram.com/amnayahia26",
-              email: "amnayahia26@gmail.com",
-            }}
-            socialMediaStyles={{
-              iconSize: 24,
-              iconColor: "text-black",
-              hoverColor: "text-black",
-            }}
-            copyrightStyles={{
-              font: "font-sans",
-              fontSize: "text-s",
-              fontWeight: "font-light",
-              fontColor: "text-black",
-            }}
-            backgroundColor="bg-white"
+            aboutLinks={footerAttributes.aboutLinks}
+            socialMedia={footerAttributes.socialMedia}
+            socialMediaStyles={footerAttributes.socialMediaStyles}
+            copyrightStyles={footerAttributes.copyrightStyles}
+            backgroundColor={footerAttributes.backgroundColor}
           />
         </div>
       </div>

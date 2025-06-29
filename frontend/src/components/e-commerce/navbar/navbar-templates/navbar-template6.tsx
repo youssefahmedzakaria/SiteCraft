@@ -9,6 +9,7 @@ import MobileMenu from "../navbar-components/mobile-menu";
 import { usePathname } from "next/navigation";
 
 export interface NavbarTemplate6Props {
+  isCustomize?: boolean;
   brandName?: string | React.ReactNode;
   backgroundColor?: string;
   textColor?: string;
@@ -33,6 +34,7 @@ export interface NavbarTemplate6Props {
 }
 
 export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
+  isCustomize,
   brandName,
   backgroundColor = "bg-white",
   textColor = "text-black",
@@ -66,7 +68,9 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
       />
 
       <nav
-        className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
+        className={`${
+          isCustomize ? "relative" : "fixed"
+        } top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
       >
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
