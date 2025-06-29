@@ -84,12 +84,12 @@ export function RenderPromoSection({
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = [
       "CenteredPromo",
-      "LeftAlignedPromo",
-      "RightAlignedPromo",
-      "MinimalLeftPromo",
-      "MinimalRightPromo",
       "OverlayPromo",
+      "MinimalRightPromo",
+      "MinimalLeftPromo",
       "SplitPromo",
+      "RightAlignedPromo",
+      "LeftAlignedPromo",
     ];
     const templateName = templateNames[layoutId - 1] || "CenteredPromo";
     updatePromoAttributes({ template: templateName });
@@ -568,12 +568,12 @@ export function RenderPromoSection({
             selectedLayout={
               [
                 "CenteredPromo",
-                "LeftAlignedPromo",
-                "RightAlignedPromo",
-                "MinimalLeftPromo",
-                "MinimalRightPromo",
                 "OverlayPromo",
+                "MinimalRightPromo",
+                "MinimalLeftPromo",
                 "SplitPromo",
+                "RightAlignedPromo",
+                "LeftAlignedPromo",
               ].indexOf(promoAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}

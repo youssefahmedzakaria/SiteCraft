@@ -96,7 +96,8 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
 
           {/* Bottom Section - Navigation */}
           <div className={`border-t ${dividerColor} py-3 hidden md:block`}>
-            <Navigation menuItems={menuItems} textColor={textColor} />
+            <Navigation menuItems={menuItems} textColor={textColor}
+              fontFamily={fontFamily} />
           </div>
         </div>
       </nav>

@@ -74,8 +74,8 @@ export function RenderAboutSection({
     const templateNames = [
       "TopImageAbout",
       "CenteredAbout",
-      "LeftAlignedAbout",
       "RightAlignedAbout",
+      "LeftAlignedAbout",
     ];
     const templateName = templateNames[layoutId - 1] || "TopImageAbout";
     updateAboutAttributes({ template: templateName });
@@ -208,8 +208,8 @@ export function RenderAboutSection({
               [
                 "TopImageAbout",
                 "CenteredAbout",
-                "LeftAlignedAbout",
                 "RightAlignedAbout",
+                "LeftAlignedAbout",
               ].indexOf(aboutAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}

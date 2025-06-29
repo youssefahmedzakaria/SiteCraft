@@ -71,13 +71,14 @@ export function RenderContactSection({
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = [
-      "MinimalRightContact",
-      "MinimalLeftContact",
-      "CenteredContact",
-      "LeftAlignedContact",
       "RightAlignedContact",
+      "LeftAlignedContact",
+      "MinimalLeftContact",
+      "MinimalRightContact",
+      "CenteredContact",
+      
     ];
-    const templateName = templateNames[layoutId - 1] || "MinimalRightContact";
+    const templateName = templateNames[layoutId - 1] || "RightAlignedContact";
     updateContactAttributes({ template: templateName });
   };
 
@@ -241,11 +242,12 @@ export function RenderContactSection({
           <ContactLayoutItems
             selectedLayout={
               [
-                "MinimalRightContact",
-                "MinimalLeftContact",
-                "CenteredContact",
-                "LeftAlignedContact",
+                
                 "RightAlignedContact",
+                "LeftAlignedContact",
+                "MinimalLeftContact",
+                "MinimalRightContact",
+                "CenteredContact",
               ].indexOf(contactAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}

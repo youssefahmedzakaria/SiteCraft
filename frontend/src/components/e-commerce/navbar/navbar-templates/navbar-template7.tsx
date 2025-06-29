@@ -78,7 +78,8 @@ export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
                 isRTL ? "justify-end order-3" : "justify-start order-1"
               }`}
             >
-              <Navigation menuItems={menuItems} textColor={textColor} />
+              <Navigation menuItems={menuItems} textColor={textColor}
+                fontFamily={fontFamily} />
             </div>
 
             {/* Center - Logo - Absolute centered */}

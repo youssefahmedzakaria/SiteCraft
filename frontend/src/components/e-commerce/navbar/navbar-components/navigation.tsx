@@ -4,6 +4,7 @@ import Link from 'next/link';
 export interface NavigationProps {
   menuItems: Array<{ label: string; href: string }>;
   textColor?: string;
+  fontFamily?: string;
   orientation?: 'horizontal' | 'vertical';
   className?: string;
   onClick?: () => void;
@@ -12,6 +13,7 @@ export interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ 
   menuItems, 
   textColor, 
+  fontFamily = 'font-sans',
   orientation = 'horizontal',
   className = '',
   onClick
@@ -25,7 +27,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         <Link
           key={item.label}
           href={item.href}
-          className={`text-sm hover:underline transition-all ${textColor}`}
+          className={`text-sm hover:underline transition-all ${fontFamily} ${textColor}`}
           onClick={onClick}
         >
           {item.label}

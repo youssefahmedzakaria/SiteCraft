@@ -72,7 +72,8 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
             {/* Left side - Brand and Navigation */}
             <div className="flex items-center space-x-8">
               <Logo brandName={brandName} logo={logo} textColor={textColor} />
-              <Navigation menuItems={menuItems} textColor={textColor} />
+              <Navigation menuItems={menuItems} textColor={textColor} 
+              fontFamily={fontFamily} />
             </div>
 
             {/* Right side - Search and Icons */}

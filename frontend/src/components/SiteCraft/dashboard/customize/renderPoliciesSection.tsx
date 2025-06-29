@@ -90,10 +90,10 @@ export function RenderPoliciesSection({
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = [
+      "CenteredPolicies",
+      "LeftPolicies",
       "TitleLeftContentCenterPolicies",
       "DefaultPolicies",
-      "LeftPolicies",
-      "CenteredPolicies",
     ];
     const templateName =
       templateNames[layoutId - 1] || "TitleLeftContentCenterPolicies";
@@ -124,10 +124,12 @@ export function RenderPoliciesSection({
           <PoliciesLayoutItems
             selectedLayout={
               [
+                "CenteredPolicies",
+                "LeftPolicies",
                 "TitleLeftContentCenterPolicies",
                 "DefaultPolicies",
-                "LeftPolicies",
-                "CenteredPolicies",
+                
+                
               ].indexOf(policiesAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}

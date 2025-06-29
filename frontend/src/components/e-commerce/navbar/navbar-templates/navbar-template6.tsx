@@ -78,7 +78,8 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
             {/* Left side - Brand and Navigation */}
             <div className="flex items-center space-x-8">
               <Logo brandName={brandName} logo={logo} textColor={textColor} />
-              <Navigation menuItems={menuItems} textColor={textColor} />
+              <Navigation menuItems={menuItems} textColor={textColor} 
+              fontFamily={fontFamily}/>
             </div>
 
             {/* Right side - Search and Text Links */}

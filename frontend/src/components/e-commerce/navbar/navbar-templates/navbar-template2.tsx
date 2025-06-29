@@ -88,7 +88,8 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
             </div>
             {/* Menu items centered below logo */}
             <div className="flex justify-center h-10 mt-4">
-              <Navigation menuItems={menuItems} textColor={textColor} />
+              <Navigation menuItems={menuItems} textColor={textColor} 
+              fontFamily={fontFamily} />
             </div>
           </div>
 

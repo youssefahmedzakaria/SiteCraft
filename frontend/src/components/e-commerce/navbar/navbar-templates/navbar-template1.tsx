@@ -115,9 +115,10 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
 
           {/* Bottom Navigation - Desktop only */}
           <div
-            className={`hidden md:flex justify-start py-2 border-t ${dividerColor}`}
+            className={`hidden md:flex justify-start py-2 border-t  ${dividerColor}`}
           >
-            <Navigation menuItems={menuItems || []} textColor={textColor} />
+            <Navigation menuItems={menuItems || []} textColor={textColor}
+              fontFamily={fontFamily} />
           </div>
         </div>
       </nav>
