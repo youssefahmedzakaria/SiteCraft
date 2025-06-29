@@ -4,8 +4,18 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
 import { Eye } from "lucide-react";
 import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter";
+import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default";
+import { LeftPolicies } from "@/components/e-commerce/policies/templates/left";
+import { CenteredPolicies } from "@/components/e-commerce/policies/templates/centerd";
 import { MinimalRightContact } from "@/components/e-commerce/contact/templates/minimal-right";
+import { CenteredContact } from "@/components/e-commerce/contact/templates/centered-contact";
+import { LeftAlignedContact } from "@/components/e-commerce/contact/templates/left-aligned";
+import { RightAlignedContact } from "@/components/e-commerce/contact/templates/right-aligned";
+import { MinimalLeftContact } from "@/components/e-commerce/contact/templates/minimal-left";
 import { TopImageAbout } from "@/components/e-commerce/about-us/templates/top-image-about";
+import { CenteredAbout } from "@/components/e-commerce/about-us/templates/centered-about";
+import { LeftAlignedAbout } from "@/components/e-commerce/about-us/templates/left-aligned-about";
+import { RightAlignedAbout } from "@/components/e-commerce/about-us/templates/right-aligned-about";
 import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template";
 import ProductList from "@/components/e-commerce/product-lists/product-list";
 import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo";
@@ -19,7 +29,14 @@ import {
 } from "@/lib/customization";
 import Navbar from "@/components/e-commerce/navbar/Navbar";
 import { Footer } from "@/components/e-commerce/footer/Footer";
-import { LeftAlignedPromo, MinimalLeftPromo, MinimalRightPromo, OverlayPromo, RightAlignedPromo, SplitPromo } from "@/components/e-commerce/promo";
+import {
+  LeftAlignedPromo,
+  MinimalLeftPromo,
+  MinimalRightPromo,
+  OverlayPromo,
+  RightAlignedPromo,
+  SplitPromo,
+} from "@/components/e-commerce/promo";
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
@@ -467,81 +484,75 @@ export default function CustomizeTemplatePage() {
             />
           )}
 
-          {
-            promoAttributes.template === "MinimalRightPromo" && (
-              <MinimalRightPromo
-                isClickable={false}
-                id={promoAttributes.id}
-                slides={promoAttributes.slides}
-                autoplay={promoAttributes.autoPlay}
-                showArrows={promoAttributes.showArrows}
-                titleFont={promoAttributes.titleFont}
-                titleColor={promoAttributes.titleColor}
-                titleSize={promoAttributes.titleSize}
-                descriptionFont={promoAttributes.descriptionFont}
-                descriptionColor={promoAttributes.descriptionColor}
-                descriptionSize={promoAttributes.descriptionSize}
-                buttonFont={promoAttributes.buttonFont}
-                buttonColor={promoAttributes.buttonColor}
-                buttonTextColor={promoAttributes.buttonTextColor}
-                buttonSize={promoAttributes.buttonSize}
-                buttonRadius={promoAttributes.buttonRadius}
-                backgroundColor={promoAttributes.backgroundColor}
-                imageObjectFit={promoAttributes.imageObjectFit}
-              />
-            )
-          }
+          {promoAttributes.template === "MinimalRightPromo" && (
+            <MinimalRightPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
 
-          {
-            promoAttributes.template === "OverlayPromo" && (
-              <OverlayPromo
-                isClickable={false}
-                id={promoAttributes.id}
-                slides={promoAttributes.slides}
-                autoplay={promoAttributes.autoPlay}
-                showArrows={promoAttributes.showArrows}
-                titleFont={promoAttributes.titleFont}
-                titleColor={promoAttributes.titleColor}
-                titleSize={promoAttributes.titleSize}
-                descriptionFont={promoAttributes.descriptionFont}
-                descriptionColor={promoAttributes.descriptionColor}
-                descriptionSize={promoAttributes.descriptionSize}
-                buttonFont={promoAttributes.buttonFont}
-                buttonColor={promoAttributes.buttonColor}
-                buttonTextColor={promoAttributes.buttonTextColor}
-                buttonSize={promoAttributes.buttonSize}
-                buttonRadius={promoAttributes.buttonRadius}
-                backgroundColor={promoAttributes.backgroundColor}
-                imageObjectFit={promoAttributes.imageObjectFit}
-              />
-            )
-          }
+          {promoAttributes.template === "OverlayPromo" && (
+            <OverlayPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
 
-          {
-            promoAttributes.template === "SplitPromo" && (
-              <SplitPromo
-                isClickable={false}
-                id={promoAttributes.id}
-                slides={promoAttributes.slides}
-                autoplay={promoAttributes.autoPlay}
-                showArrows={promoAttributes.showArrows}
-                titleFont={promoAttributes.titleFont}
-                titleColor={promoAttributes.titleColor}
-                titleSize={promoAttributes.titleSize}
-                // descriptionFont={promoAttributes.descriptionFont}
-                // descriptionColor={promoAttributes.descriptionColor}
-                // descriptionSize={promoAttributes.descriptionSize}
-                buttonFont={promoAttributes.buttonFont}
-                buttonColor={promoAttributes.buttonColor}
-                buttonTextColor={promoAttributes.buttonTextColor}
-                buttonSize={promoAttributes.buttonSize}
-                buttonRadius={promoAttributes.buttonRadius}
-                backgroundColor={promoAttributes.backgroundColor}
-                imageObjectFit={promoAttributes.imageObjectFit}
-                // className={promoAttributes.className}
-              />
-            )
-          }
+          {promoAttributes.template === "SplitPromo" && (
+            <SplitPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              // descriptionFont={promoAttributes.descriptionFont}
+              // descriptionColor={promoAttributes.descriptionColor}
+              // descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+              // className={promoAttributes.className}
+            />
+          )}
 
           <ProductList
             isClickable={false}
@@ -776,61 +787,283 @@ export default function CustomizeTemplatePage() {
             showMorebuttonBgColor="bg-black"
             showMorebuttonTextColor="text-white"
           />
-          <TopImageAbout
-            id={aboutAttributes.id}
-            backgroundColor={aboutAttributes.backgroundColor}
-            title={aboutAttributes.title}
-            titleColor={aboutAttributes.titleColor}
-            titleFont={aboutAttributes.titleFont}
-            titleSize={aboutAttributes.titleSize}
-            descriptionColor={aboutAttributes.descriptionColor}
-            description={aboutAttributes.description}
-            descriptionFont={aboutAttributes.descriptionFont}
-            descriptionSize={aboutAttributes.descriptionSize}
-            secondaryDescription={aboutAttributes.secondaryDescription}
-            image={aboutAttributes.image}
-            imageAlt={aboutAttributes.imageAlt}
-            imageObjectFit={aboutAttributes.imageObjectFit}
-          />
-          <MinimalRightContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-          <TitleLeftContentCenterPolicies
-            id={policiesAttributes.id}
-            backgroundColor={policiesAttributes.backgroundColor}
-            title={policiesAttributes.title}
-            titleFont={policiesAttributes.titleFont}
-            titleFontWeight={policiesAttributes.titleFontWeight}
-            titleSize={policiesAttributes.titleSize}
-            titleColor={policiesAttributes.titleColor}
-            sectionTitleColor={policiesAttributes.sectionTitleColor}
-            sectionTitleSize={policiesAttributes.sectionTitleSize}
-            sectionTitleFont={policiesAttributes.sectionTitleFont}
-            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-            sectionContentColor={policiesAttributes.sectionContentColor}
-            sectionContentSize={policiesAttributes.sectionContentSize}
-            sectionContentFont={policiesAttributes.sectionContentFont}
-            sectionContentFontWeight={
-              policiesAttributes.sectionContentFontWeight
-            }
-            sections={policiesAttributes.sections}
-          />
+          {aboutAttributes.template === "TopImageAbout" && (
+            <TopImageAbout
+              id={aboutAttributes.id}
+              backgroundColor={aboutAttributes.backgroundColor}
+              title={aboutAttributes.title}
+              titleColor={aboutAttributes.titleColor}
+              titleFont={aboutAttributes.titleFont}
+              titleSize={aboutAttributes.titleSize}
+              descriptionColor={aboutAttributes.descriptionColor}
+              description={aboutAttributes.description}
+              descriptionFont={aboutAttributes.descriptionFont}
+              descriptionSize={aboutAttributes.descriptionSize}
+              secondaryDescription={aboutAttributes.secondaryDescription}
+              image={aboutAttributes.image}
+              imageAlt={aboutAttributes.imageAlt}
+              imageObjectFit={aboutAttributes.imageObjectFit}
+              // variant={aboutAttributes.variant}
+              // className={aboutAttributes.className}
+            />
+          )}
+          {aboutAttributes.template === "CenteredAbout" && (
+            <CenteredAbout
+              id={aboutAttributes.id}
+              backgroundColor={aboutAttributes.backgroundColor}
+              title={aboutAttributes.title}
+              titleColor={aboutAttributes.titleColor}
+              titleFont={aboutAttributes.titleFont}
+              titleSize={aboutAttributes.titleSize}
+              descriptionColor={aboutAttributes.descriptionColor}
+              description={aboutAttributes.description}
+              descriptionFont={aboutAttributes.descriptionFont}
+              descriptionSize={aboutAttributes.descriptionSize}
+              secondaryDescription={aboutAttributes.secondaryDescription}
+              image={aboutAttributes.image}
+              imageAlt={aboutAttributes.imageAlt}
+              imageObjectFit={aboutAttributes.imageObjectFit}
+              // variant={aboutAttributes.variant}
+              // className={aboutAttributes.className}
+            />
+          )}
+          {aboutAttributes.template === "LeftAlignedAbout" && (
+            <LeftAlignedAbout
+              id={aboutAttributes.id}
+              backgroundColor={aboutAttributes.backgroundColor}
+              title={aboutAttributes.title}
+              titleColor={aboutAttributes.titleColor}
+              titleFont={aboutAttributes.titleFont}
+              titleSize={aboutAttributes.titleSize}
+              descriptionColor={aboutAttributes.descriptionColor}
+              description={aboutAttributes.description}
+              descriptionFont={aboutAttributes.descriptionFont}
+              descriptionSize={aboutAttributes.descriptionSize}
+              secondaryDescription={aboutAttributes.secondaryDescription}
+              image={aboutAttributes.image}
+              imageAlt={aboutAttributes.imageAlt}
+              imageObjectFit={aboutAttributes.imageObjectFit}
+              // variant={aboutAttributes.variant}
+              // className={aboutAttributes.className}
+            />
+          )}
+          {aboutAttributes.template === "RightAlignedAbout" && (
+            <RightAlignedAbout
+              id={aboutAttributes.id}
+              backgroundColor={aboutAttributes.backgroundColor}
+              title={aboutAttributes.title}
+              titleColor={aboutAttributes.titleColor}
+              titleFont={aboutAttributes.titleFont}
+              titleSize={aboutAttributes.titleSize}
+              descriptionColor={aboutAttributes.descriptionColor}
+              description={aboutAttributes.description}
+              descriptionFont={aboutAttributes.descriptionFont}
+              descriptionSize={aboutAttributes.descriptionSize}
+              secondaryDescription={aboutAttributes.secondaryDescription}
+              image={aboutAttributes.image}
+              imageAlt={aboutAttributes.imageAlt}
+              imageObjectFit={aboutAttributes.imageObjectFit}
+              // variant={aboutAttributes.variant}
+              // className={aboutAttributes.className}
+            />
+          )}
+          {contactAttributes.template === "MinimalRightContact" && (
+            <MinimalRightContact
+              id={contactAttributes.id}
+              imageUrl={contactAttributes.imageUrl}
+              backgroundColor={contactAttributes.backgroundColor}
+              titleColor={contactAttributes.titleColor}
+              contentFont={contactAttributes.contentFont}
+              contentSize={contactAttributes.contentSize}
+              titleFont={contactAttributes.titleFont}
+              titleSize={contactAttributes.titleSize}
+              contentColor={contactAttributes.contentColor}
+              showMap={contactAttributes.showMap}
+              title={contactAttributes.title}
+              address={contactAttributes.address}
+              addressUrl={contactAttributes.addressUrl}
+              openHours={contactAttributes.openHours}
+              phone={contactAttributes.phone}
+              contactEmail={contactAttributes.contactEmail}
+              socialLinks={contactAttributes.socialLinks}
+            />
+          )}
+          {contactAttributes.template === "CenteredContact" && (
+            <CenteredContact
+              id={contactAttributes.id}
+              imageUrl={contactAttributes.imageUrl}
+              backgroundColor={contactAttributes.backgroundColor}
+              titleColor={contactAttributes.titleColor}
+              contentFont={contactAttributes.contentFont}
+              contentSize={contactAttributes.contentSize}
+              titleFont={contactAttributes.titleFont}
+              titleSize={contactAttributes.titleSize}
+              contentColor={contactAttributes.contentColor}
+              showMap={contactAttributes.showMap}
+              title={contactAttributes.title}
+              address={contactAttributes.address}
+              addressUrl={contactAttributes.addressUrl}
+              openHours={contactAttributes.openHours}
+              phone={contactAttributes.phone}
+              contactEmail={contactAttributes.contactEmail}
+              socialLinks={contactAttributes.socialLinks}
+            />
+          )}
+          {contactAttributes.template === "LeftAlignedContact" && (
+            <LeftAlignedContact
+              id={contactAttributes.id}
+              imageUrl={contactAttributes.imageUrl}
+              backgroundColor={contactAttributes.backgroundColor}
+              titleColor={contactAttributes.titleColor}
+              contentFont={contactAttributes.contentFont}
+              contentSize={contactAttributes.contentSize}
+              titleFont={contactAttributes.titleFont}
+              titleSize={contactAttributes.titleSize}
+              contentColor={contactAttributes.contentColor}
+              showMap={contactAttributes.showMap}
+              title={contactAttributes.title}
+              address={contactAttributes.address}
+              addressUrl={contactAttributes.addressUrl}
+              openHours={contactAttributes.openHours}
+              phone={contactAttributes.phone}
+              contactEmail={contactAttributes.contactEmail}
+              socialLinks={contactAttributes.socialLinks}
+            />
+          )}
+          {contactAttributes.template === "RightAlignedContact" && (
+            <RightAlignedContact
+              id={contactAttributes.id}
+              imageUrl={contactAttributes.imageUrl}
+              backgroundColor={contactAttributes.backgroundColor}
+              titleColor={contactAttributes.titleColor}
+              contentFont={contactAttributes.contentFont}
+              contentSize={contactAttributes.contentSize}
+              titleFont={contactAttributes.titleFont}
+              titleSize={contactAttributes.titleSize}
+              contentColor={contactAttributes.contentColor}
+              showMap={contactAttributes.showMap}
+              title={contactAttributes.title}
+              address={contactAttributes.address}
+              addressUrl={contactAttributes.addressUrl}
+              openHours={contactAttributes.openHours}
+              phone={contactAttributes.phone}
+              contactEmail={contactAttributes.contactEmail}
+              socialLinks={contactAttributes.socialLinks}
+            />
+          )}
+          {contactAttributes.template === "MinimalLeftContact" && (
+            <MinimalLeftContact
+              id={contactAttributes.id}
+              imageUrl={contactAttributes.imageUrl}
+              backgroundColor={contactAttributes.backgroundColor}
+              titleColor={contactAttributes.titleColor}
+              contentFont={contactAttributes.contentFont}
+              contentSize={contactAttributes.contentSize}
+              titleFont={contactAttributes.titleFont}
+              titleSize={contactAttributes.titleSize}
+              contentColor={contactAttributes.contentColor}
+              showMap={contactAttributes.showMap}
+              title={contactAttributes.title}
+              address={contactAttributes.address}
+              addressUrl={contactAttributes.addressUrl}
+              openHours={contactAttributes.openHours}
+              phone={contactAttributes.phone}
+              contactEmail={contactAttributes.contactEmail}
+              socialLinks={contactAttributes.socialLinks}
+            />
+          )}
+          {policiesAttributes.template === "TitleLeftContentCenterPolicies" && (
+            <TitleLeftContentCenterPolicies
+              id={policiesAttributes.id}
+              backgroundColor={policiesAttributes.backgroundColor}
+              title={policiesAttributes.title}
+              titleFont={policiesAttributes.titleFont}
+              titleFontWeight={policiesAttributes.titleFontWeight}
+              titleSize={policiesAttributes.titleSize}
+              titleColor={policiesAttributes.titleColor}
+              sectionTitleColor={policiesAttributes.sectionTitleColor}
+              sectionTitleSize={policiesAttributes.sectionTitleSize}
+              sectionTitleFont={policiesAttributes.sectionTitleFont}
+              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
+              sectionContentColor={policiesAttributes.sectionContentColor}
+              sectionContentSize={policiesAttributes.sectionContentSize}
+              sectionContentFont={policiesAttributes.sectionContentFont}
+              sectionContentFontWeight={
+                policiesAttributes.sectionContentFontWeight
+              }
+              sections={policiesAttributes.sections}
+              // variant={policiesAttributes.variant}
+            />
+          )}
+          {policiesAttributes.template === "DefaultPolicies" && (
+            <DefaultPolicies
+              id={policiesAttributes.id}
+              backgroundColor={policiesAttributes.backgroundColor}
+              title={policiesAttributes.title}
+              titleFont={policiesAttributes.titleFont}
+              titleFontWeight={policiesAttributes.titleFontWeight}
+              titleSize={policiesAttributes.titleSize}
+              titleColor={policiesAttributes.titleColor}
+              sectionTitleColor={policiesAttributes.sectionTitleColor}
+              sectionTitleSize={policiesAttributes.sectionTitleSize}
+              sectionTitleFont={policiesAttributes.sectionTitleFont}
+              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
+              sectionContentColor={policiesAttributes.sectionContentColor}
+              sectionContentSize={policiesAttributes.sectionContentSize}
+              sectionContentFont={policiesAttributes.sectionContentFont}
+              sectionContentFontWeight={
+                policiesAttributes.sectionContentFontWeight
+              }
+              sections={policiesAttributes.sections}
+              // variant={policiesAttributes.variant}
+            />
+          )}
+          {policiesAttributes.template === "LeftPolicies" && (
+            <LeftPolicies
+              id={policiesAttributes.id}
+              backgroundColor={policiesAttributes.backgroundColor}
+              title={policiesAttributes.title}
+              titleFont={policiesAttributes.titleFont}
+              titleFontWeight={policiesAttributes.titleFontWeight}
+              titleSize={policiesAttributes.titleSize}
+              titleColor={policiesAttributes.titleColor}
+              sectionTitleColor={policiesAttributes.sectionTitleColor}
+              sectionTitleSize={policiesAttributes.sectionTitleSize}
+              sectionTitleFont={policiesAttributes.sectionTitleFont}
+              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
+              sectionContentColor={policiesAttributes.sectionContentColor}
+              sectionContentSize={policiesAttributes.sectionContentSize}
+              sectionContentFont={policiesAttributes.sectionContentFont}
+              sectionContentFontWeight={
+                policiesAttributes.sectionContentFontWeight
+              }
+              sections={policiesAttributes.sections}
+              // variant={policiesAttributes.variant}
+            />
+          )}
+          {policiesAttributes.template === "CenteredPolicies" && (
+            <CenteredPolicies
+              id={policiesAttributes.id}
+              backgroundColor={policiesAttributes.backgroundColor}
+              title={policiesAttributes.title}
+              titleFont={policiesAttributes.titleFont}
+              titleFontWeight={policiesAttributes.titleFontWeight}
+              titleSize={policiesAttributes.titleSize}
+              titleColor={policiesAttributes.titleColor}
+              sectionTitleColor={policiesAttributes.sectionTitleColor}
+              sectionTitleSize={policiesAttributes.sectionTitleSize}
+              sectionTitleFont={policiesAttributes.sectionTitleFont}
+              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
+              sectionContentColor={policiesAttributes.sectionContentColor}
+              sectionContentSize={policiesAttributes.sectionContentSize}
+              sectionContentFont={policiesAttributes.sectionContentFont}
+              sectionContentFontWeight={
+                policiesAttributes.sectionContentFontWeight
+              }
+              sections={policiesAttributes.sections}
+              // variant={policiesAttributes.variant}
+            />
+          )}
           <Footer
             companyName={footerAttributes.brandName}
             textColor={footerAttributes.textColor}
