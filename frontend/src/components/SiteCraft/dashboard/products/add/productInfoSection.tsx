@@ -279,70 +279,113 @@ export function ProductInfoSection({
         />
       </div>
 
-      {/* Product Images */}
+      {/* Product Gallery */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Product Images
+          Product Gallery
         </label>
-        <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleBrowseClick}
-              className="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Browse files
-            </button>
-            <span className="text-gray-500"> or drag and drop</span>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            PNG, JPG, GIF up to 10MB
-          </p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="hidden"
-          />
-        </div>
 
-        {/* Image Previews */}
-        {imageFiles.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        {/* Gallery Container */}
+        <div className="p-4 border border-gray-200 rounded-lg">
+          {/* Gallery Preview */}
+          <div className="flex flex-wrap gap-4">
             {imageFiles.map((file, index) => (
               <div
                 key={index}
-                className="relative group"
+                className={`relative w-24 h-24 group cursor-move ${
+                  dragOverIndex === index ? "border-2 border-blue-500" : ""
+                }`}
                 draggable
                 onDragStart={() => handleImageDragStart(index)}
+                onDragOver={(e) => e.preventDefault()}
                 onDragEnter={() => handleImageDragEnter(index)}
                 onDragEnd={handleImageDragEnd}
               >
                 <Image
                   src={imagePreviews[index] || URL.createObjectURL(file)}
-                  alt={`Preview ${index + 1}`}
-                  width={200}
-                  height={200}
-                  className="w-full h-32 object-cover rounded-lg"
+                  alt={`Product image ${index + 1}`}
+                  fill
+                  className="object-cover rounded-md"
                 />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 rounded-md">
+                  <span className="text-white text-xs font-medium">
+                    Drag to move
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  ×
+                  ✕
                 </button>
+                {index === 0 && (
+                  <div className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
+                    Main
+                  </div>
+                )}
               </div>
             ))}
+
+            {/* Add Image Button */}
+            {imageFiles.length !== 0 && (
+              <div
+                className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
+                onClick={handleBrowseClick}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl text-gray-400">+</span>
+                  <span className="text-xs text-gray-500">Add</span>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Drop Area (only shown when no images) */}
+          {imageFiles.length === 0 && (
+            <div
+              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Upload size={40} />
+                <p className="text-sm text-gray-500">
+                  Drag and drop your images here, or{" "}
+                  <span
+                    className="text-blue-600 cursor-pointer hover:text-blue-800"
+                    onClick={handleBrowseClick}
+                  >
+                    browse
+                  </span>
+                </p>
+                <p className="text-xs text-gray-400">
+                  Recommended: 512x512px, PNG or JPG
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Hidden File Input */}
+          <input
+            ref={fileInputRef}
+            id="image"
+            name="image"
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageChange}
+          />
+        </div>
+
+        {/* Help Text */}
+        <p className="text-xs text-gray-400">
+          You can upload multiple images. The first image will be used as the
+          main product image.
+        </p>
       </div>
     </div>
   );

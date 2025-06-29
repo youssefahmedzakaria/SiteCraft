@@ -94,7 +94,7 @@ function extractColorsFromImage(img: HTMLImageElement): { primary: string; secon
   const selectedColors: typeof colorClusters = [];
   for (const cluster of colorClusters) {
     const isTooSimilar = selectedColors.some(selected => 
-      colorDistance(cluster.color, selected.color) < 50
+      colorDistance(cluster.color, selected.color) < 80 // Increased threshold for better separation
     );
     
     if (!isTooSimilar) {
@@ -103,28 +103,105 @@ function extractColorsFromImage(img: HTMLImageElement): { primary: string; secon
     }
   }
 
-  // Ensure we have at least 3 colors
+  // Ensure we have at least 3 colors by adding fallbacks
   while (selectedColors.length < 3) {
-    selectedColors.push({
-      color: [0, 0, 0],
-      count: 0,
-      brightness: 0,
-      saturation: 0
-    });
+    if (selectedColors.length === 0) {
+      selectedColors.push({
+        color: [0, 0, 0],
+        count: 0,
+        brightness: 0,
+        saturation: 0
+      });
+    } else if (selectedColors.length === 1) {
+      // Add a contrasting color
+      const firstColor = selectedColors[0].color;
+      const contrastingColor = [
+        Math.min(255, firstColor[0] + 100),
+        Math.min(255, firstColor[1] + 100),
+        Math.min(255, firstColor[2] + 100)
+      ];
+      selectedColors.push({
+        color: contrastingColor,
+        count: 0,
+        brightness: (contrastingColor[0] * 299 + contrastingColor[1] * 587 + contrastingColor[2] * 114) / 1000,
+        saturation: getSaturation(contrastingColor[0], contrastingColor[1], contrastingColor[2])
+      });
+    } else {
+      // Add a third distinct color
+      const color1 = selectedColors[0].color;
+      const color2 = selectedColors[1].color;
+      const thirdColor = [
+        Math.abs(255 - (color1[0] + color2[0]) / 2),
+        Math.abs(255 - (color1[1] + color2[1]) / 2),
+        Math.abs(255 - (color1[2] + color2[2]) / 2)
+      ];
+      selectedColors.push({
+        color: thirdColor,
+        count: 0,
+        brightness: (thirdColor[0] * 299 + thirdColor[1] * 587 + thirdColor[2] * 114) / 1000,
+        saturation: getSaturation(thirdColor[0], thirdColor[1], thirdColor[2])
+      });
+    }
   }
 
-  // Assign colors based on brightness and saturation
-  const sortedByBrightness = [...selectedColors].sort((a, b) => b.brightness - a.brightness);
+  // Ensure the three colors are different by creating variations if needed
+  let primary, secondary, accent;
+  
+  // Sort by saturation for primary selection
   const sortedBySaturation = [...selectedColors].sort((a, b) => b.saturation - a.saturation);
-
-  // Primary: Most saturated color
-  const primary = rgbToHex(sortedBySaturation[0].color);
+  primary = rgbToHex(sortedBySaturation[0].color);
   
-  // Secondary: Lightest color (good for backgrounds)
-  const secondary = rgbToHex(sortedByBrightness[0].color);
+  // Sort by brightness for secondary selection
+  const sortedByBrightness = [...selectedColors].sort((a, b) => b.brightness - a.brightness);
+  secondary = rgbToHex(sortedByBrightness[0].color);
   
-  // Accent: Most contrasting color to primary
-  const accent = rgbToHex(sortedBySaturation[1]?.color || sortedByBrightness[1]?.color || [255, 107, 107]);
+  // For accent, choose the most different color from primary and secondary
+  const primaryRgb = sortedBySaturation[0].color;
+  const secondaryRgb = sortedByBrightness[0].color;
+  
+  let accentRgb = sortedBySaturation[1]?.color || sortedByBrightness[1]?.color;
+  
+  // If accent is too similar to primary or secondary, create a variation
+  if (accentRgb) {
+    const distanceToPrimary = colorDistance(accentRgb, primaryRgb);
+    const distanceToSecondary = colorDistance(accentRgb, secondaryRgb);
+    
+    if (distanceToPrimary < 100 || distanceToSecondary < 100) {
+      // Create a complementary color variation
+      accentRgb = [
+        Math.min(255, Math.max(0, 255 - primaryRgb[0])),
+        Math.min(255, Math.max(0, 255 - primaryRgb[1])),
+        Math.min(255, Math.max(0, 255 - primaryRgb[2]))
+      ];
+    }
+  } else {
+    // Fallback accent color
+    accentRgb = [255, 107, 107];
+  }
+  
+  accent = rgbToHex(accentRgb);
+  
+  // Final check: ensure all three colors are different
+  if (primary === secondary) {
+    // Make secondary lighter
+    const secondaryRgb = sortedByBrightness[0].color;
+    const lighterSecondary = [
+      Math.min(255, secondaryRgb[0] + 50),
+      Math.min(255, secondaryRgb[1] + 50),
+      Math.min(255, secondaryRgb[2] + 50)
+    ];
+    secondary = rgbToHex(lighterSecondary);
+  }
+  
+  if (primary === accent || secondary === accent) {
+    // Create a new accent color
+    const primaryRgb = sortedBySaturation[0].color;
+    accent = rgbToHex([
+      Math.min(255, Math.max(0, 255 - primaryRgb[0])),
+      Math.min(255, Math.max(0, 255 - primaryRgb[1])),
+      Math.min(255, Math.max(0, 255 - primaryRgb[2]))
+    ]);
+  }
 
   return { primary, secondary, accent };
 }
@@ -143,6 +220,357 @@ function getSaturation(r: number, g: number, b: number): number {
   const delta = max - min;
   return max === 0 ? 0 : delta / max;
 }
+
+// Color palette generation functions
+const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+};
+
+const rgbToHexPalette = (r: number, g: number, b: number): string => {
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+};
+
+const hslToRgb = (
+  h: number,
+  s: number,
+  l: number
+): { r: number; g: number; b: number } => {
+  let r, g, b;
+
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+};
+
+const rgbToHsl = (
+  r: number,
+  g: number,
+  b: number
+): { h: number; s: number; l: number } => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+
+    h /= 6;
+  }
+
+  return { h, s, l };
+};
+
+const generateAnalogousPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [];
+
+  // Generate colors at -30°, -15°, original, +15°, and +30°
+  for (let i = -2; i <= 2; i++) {
+    if (i === 0) {
+      result.push(color); // Original color
+    } else {
+      let newHue = hsl.h + (i * 15) / 360;
+      if (newHue < 0) newHue += 1;
+      if (newHue > 1) newHue -= 1;
+
+      const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+      result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+    }
+  }
+
+  return result;
+};
+
+const generateComplementaryPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+  // Complementary color (opposite on the color wheel)
+  let complementaryHue = (hsl.h + 0.5) % 1;
+  const complementaryRgb = hslToRgb(complementaryHue, hsl.s, hsl.l);
+  const complementaryColor = rgbToHexPalette(
+    complementaryRgb.r,
+    complementaryRgb.g,
+    complementaryRgb.b
+  );
+
+  return [color, complementaryColor];
+};
+
+const generateTriadicPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate colors at +120° and +240°
+  for (let i = 1; i <= 2; i++) {
+    let newHue = (hsl.h + (i * 120) / 360) % 1;
+    const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateMonochromaticPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [];
+
+  // Generate 5 shades with varying lightness
+  for (let i = 0; i < 5; i++) {
+    const newLightness = 0.1 + i * 0.2; // From 0.1 to 0.9
+    const newRgb = hslToRgb(hsl.h, hsl.s, newLightness);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateSplitComplementaryPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate colors at +150° and +210° (split complementary)
+  for (let i = 1; i <= 2; i++) {
+    let newHue = (hsl.h + (150 + (i - 1) * 60) / 360) % 1;
+    const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateTetradicPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate colors at +90°, +180°, and +270°
+  for (let i = 1; i <= 3; i++) {
+    let newHue = (hsl.h + (i * 90) / 360) % 1;
+    const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateWarmPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate warm variations (reds, oranges, yellows)
+  const warmHues = [0, 0.08, 0.17]; // Red, orange, yellow
+  for (let i = 1; i < warmHues.length; i++) {
+    const newRgb = hslToRgb(warmHues[i], hsl.s, hsl.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateCoolPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate cool variations (greens, blues, purples)
+  const coolHues = [0.33, 0.67, 0.83]; // Green, blue, purple
+  for (let i = 1; i < coolHues.length; i++) {
+    const newRgb = hslToRgb(coolHues[i], hsl.s, hsl.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateHighContrastPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // High contrast variations
+  const highContrastColors = [
+    { h: (hsl.h + 0.5) % 1, s: hsl.s, l: 0.1 }, // Dark complementary
+    { h: hsl.h, s: hsl.s, l: 0.9 }, // Light version
+  ];
+
+  for (const colorConfig of highContrastColors) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateSoftPastelPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Soft pastel variations
+  const pastelVariations = [
+    { h: hsl.h, s: Math.max(0.1, hsl.s * 0.5), l: 0.8 }, // Light pastel
+    { h: (hsl.h + 0.1) % 1, s: Math.max(0.1, hsl.s * 0.6), l: 0.75 }, // Slightly different hue
+  ];
+
+  for (const colorConfig of pastelVariations) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateDeepRichPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Deep and rich variations
+  const deepVariations = [
+    { h: hsl.h, s: Math.min(1, hsl.s * 1.2), l: 0.3 }, // Darker, more saturated
+    { h: (hsl.h + 0.05) % 1, s: Math.min(1, hsl.s * 1.1), l: 0.25 }, // Very dark
+  ];
+
+  for (const colorConfig of deepVariations) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHexPalette(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+// Function to generate and save all color palettes
+const generateAndSaveColorPalettes = (primaryColor: string, secondaryColor: string, accentColor: string) => {
+  const palettes = [
+    {
+      name: "Logo Inspired",
+      colors: [primaryColor, secondaryColor, accentColor],
+    },
+    {
+      name: "Analogous Harmony",
+      colors: generateAnalogousPalette(primaryColor).slice(0, 3),
+    },
+    {
+      name: "Complementary Contrast",
+      colors: generateComplementaryPalette(primaryColor).concat([secondaryColor]),
+    },
+    {
+      name: "Triadic Balance",
+      colors: generateTriadicPalette(primaryColor),
+    },
+    {
+      name: "Monochromatic Shades",
+      colors: generateMonochromaticPalette(primaryColor).slice(0, 3),
+    },
+    {
+      name: "Split Complementary",
+      colors: generateSplitComplementaryPalette(primaryColor),
+    },
+    {
+      name: "Tetradic Harmony",
+      colors: generateTetradicPalette(primaryColor),
+    },
+    {
+      name: "Warm Variations",
+      colors: generateWarmPalette(primaryColor),
+    },
+    {
+      name: "Cool Variations",
+      colors: generateCoolPalette(primaryColor),
+    },
+    {
+      name: "High Contrast",
+      colors: generateHighContrastPalette(primaryColor),
+    },
+    {
+      name: "Soft Pastels",
+      colors: generateSoftPastelPalette(primaryColor),
+    },
+    {
+      name: "Deep & Rich",
+      colors: generateDeepRichPalette(primaryColor),
+    },
+  ];
+
+  // Save palettes to localStorage
+  localStorage.setItem("colorPalettes", JSON.stringify(palettes));
+  console.log('🎨 Color palettes generated and saved:', palettes);
+};
 
 export default function BrandingPage() {
   const [storeName, setStoreName] = useState("My Store");
@@ -212,6 +640,10 @@ export default function BrandingPage() {
           setPrimaryColor(colors.primary);
           setSecondaryColor(colors.secondary);
           setAccentColor(colors.accent);
+          
+          // Generate and save color palettes immediately after color extraction
+          generateAndSaveColorPalettes(colors.primary, colors.secondary, colors.accent);
+          
           console.log('✅ Colors extracted successfully:', colors);
         } catch (err) {
           console.error('Color extraction failed:', err);
@@ -245,6 +677,10 @@ export default function BrandingPage() {
         setPrimaryColor(colors.primary);
         setSecondaryColor(colors.secondary);
         setAccentColor(colors.accent);
+        
+        // Generate and save color palettes for existing logo
+        generateAndSaveColorPalettes(colors.primary, colors.secondary, colors.accent);
+        
         console.log('✅ Colors extracted from existing logo:', colors);
       })
       .catch((err) => {
