@@ -333,7 +333,32 @@ export function Sidebar({
           </div>
 
           <div className="sections-container">
+            <div key="header" className= "border-b border-gray-200">
+              <div className="flex items-center">
+                <div
+                    className="px-2 py-4 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <GripVertical size={18} className="text-white" />
+                  </div>
+
+                <button
+                  className="flex-1 flex items-center justify-between text-left pr-4"
+                  onClick={() => toggleSection(sections[0].id)}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* {section.icon} */}
+                    <span className="font-medium">Header & Menu</span>
+                  </div>
+                  {sections[0].expanded ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
             {sections.map((section, index) => (
+            (section.id !== "Header&Menu" && section.id !== "Footer") &&
               <div
                 key={section.id}
                 ref={(el) => {
@@ -373,6 +398,29 @@ export function Sidebar({
                 </div>
               </div>
             ))}
+            <div key="footer" className= "border-b border-gray-200">
+              <div className="flex items-center">
+                <div
+                    className="px-2 py-4 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <GripVertical size={18} className="text-white" />
+                  </div>
+                <button
+                  className="flex-1 flex items-center justify-between text-left pr-4"
+                  onClick={() => toggleSection(sections[sections.length - 1].id)}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* {section.icon} */}
+                    <span className="font-medium">Footer</span>
+                  </div>
+                  {sections[sections.length - 1].expanded ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
