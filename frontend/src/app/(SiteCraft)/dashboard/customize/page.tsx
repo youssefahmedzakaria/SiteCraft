@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
@@ -37,6 +38,56 @@ import {
   RightAlignedPromo,
   SplitPromo,
 } from "@/components/e-commerce/promo";
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+
+interface Section {
+  id: string;
+  title: string;
+  expanded: boolean;
+}
+
+const initialSections: Section[] = [
+  {
+    id: "Header&Menu",
+    title: "Header & Menu",
+    expanded: false,
+  },
+  {
+    id: "PromoSlider",
+    title: "Promo Slider",
+    expanded: false,
+  },
+  {
+    id: "Categories",
+    title: "Categories",
+    expanded: false,
+  },
+  {
+    id: "Products",
+    title: "Products",
+    expanded: false,
+  },
+  {
+    id: "AboutUs",
+    title: "About Us",
+    expanded: false,
+  },
+  {
+    id: "Policies",
+    title: "Policies",
+    expanded: false,
+  },
+  {
+    id: "ContactUs",
+    title: "Contact Us",
+    expanded: false,
+  },
+  {
+    id: "Footer",
+    title: "Footer",
+    expanded: false,
+  },
+];
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
@@ -304,6 +355,359 @@ export default function CustomizeTemplatePage() {
     setFooterAttributes((prev) => ({ ...prev, ...updates }));
   };
 
+  const sectionComponents = {
+    PromoSlider: {
+      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
+      LeftAlignedPromo: (
+        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      RightAlignedPromo: (
+        <RightAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalLeftPromo: (
+        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalRightPromo: (
+        <MinimalRightPromo {...promoAttributes} isClickable={false} />
+      ),
+      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
+      SplitPromo: (
+        <SplitPromo
+          {...promoAttributes}
+          isClickable={false}
+
+          // className={promoAttributes.className}
+          // descriptionFont={promoAttributes.descriptionFont}
+          // descriptionColor={promoAttributes.descriptionColor}
+          // descriptionSize={promoAttributes.descriptionSize}
+        />
+      ),
+    },
+    Products: {
+      ProductList: (
+        <ProductList
+          isClickable={false}
+          products={[
+            {
+              name: "Product 1",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-1",
+            },
+            {
+              name: "Product 2",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-2",
+            },
+            {
+              name: "Product 3",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-3",
+            },
+            {
+              name: "Product 4",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-4",
+            },
+            {
+              name: "Product 5",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-5",
+            },
+            {
+              name: "Product 6",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-6",
+            },
+            {
+              name: "Product 7",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-7",
+            },
+            {
+              name: "Product 8",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              price: {
+                price: 100,
+              },
+              description: "This is a description of the product",
+              id: "product-8",
+            },
+          ]}
+          template="featured"
+          title="Featured Products"
+          titleColor="text-black"
+          titlePosition="top"
+          titleFontSize="text-2xl"
+          titleFont="font-bold"
+          columns={{ sm: 2, md: 3, lg: 4 }}
+          bgColor="bg-white"
+          textColor="text-black"
+          borderRadius="rounded-lg"
+          showTitle={true}
+          fontFamily="font-sans"
+          hoverEffect={true}
+          cardVariant="hover"
+          showSubtitle={true}
+          showCta={true}
+          showMoreButton={true}
+          ctaText="Shop Now"
+          cornerRadius="medium"
+          cardShadow="shadow-lg"
+          showMoreText="All Products"
+          showMorebuttonBgColor="bg-black"
+          showMorebuttonTextColor="text-white"
+        />
+      ),
+    },
+    Categories: {
+      FeaturedGrid: (
+        <HorizontalScrollCategoryTemplate
+          isClickable={false}
+          showControls={false}
+          categories={[
+            {
+              name: "Rings",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              id: "1",
+            },
+            {
+              name: "Earrings",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/earing.jpg",
+                  },
+                },
+              },
+              id: "2",
+            },
+            {
+              name: "Necklaces",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/neckless.jpg",
+                  },
+                },
+              },
+              id: "3",
+            },
+            {
+              name: "Rings",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/ring2.jpg",
+                  },
+                },
+              },
+              id: "4",
+            },
+            {
+              name: "Earrings",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/earing.jpg",
+                  },
+                },
+              },
+              id: "5",
+            },
+            {
+              name: "Necklaces",
+              media: {
+                mainMedia: {
+                  image: {
+                    url: "/neckless.jpg",
+                  },
+                },
+              },
+              id: "6",
+            },
+          ]}
+          bgColor="bg-white"
+          textColor="text-black"
+          borderRadius="rounded-lg"
+          showTitle={true}
+          fontFamily="font-sans"
+          hoverEffect={true}
+          cardVariant="featured"
+          showCta={true}
+          ctaText="Shop Now"
+          overlayColor="bg-black/30"
+          showMoreButton={true}
+          showMoreText="Show More"
+          showMorebuttonBgColor="bg-black"
+          showMorebuttonTextColor="text-white"
+        />
+      ),
+    },
+    AboutUs: {
+      TopImageAbout: (
+        <TopImageAbout
+          {
+            ...aboutAttributes
+            // variant={aboutAttributes.variant}
+            // className={aboutAttributes.className}
+          }
+        />
+      ),
+      CenteredAbout: (
+        <CenteredAbout
+          {
+            ...aboutAttributes
+            // variant={aboutAttributes.variant}
+            // className={aboutAttributes.className}
+          }
+        />
+      ),
+      LeftAlignedAbout: (
+        <LeftAlignedAbout
+          {
+            ...aboutAttributes
+            // variant={aboutAttributes.variant}
+            // className={aboutAttributes.className}
+          }
+        />
+      ),
+      RightAlignedAbout: (
+        <RightAlignedAbout
+          {
+            ...aboutAttributes
+            // variant={aboutAttributes.variant}
+            // className={aboutAttributes.className}
+          }
+        />
+      ),
+    },
+    ContactUs: {
+      MinimalRightContact: <MinimalRightContact {...contactAttributes} />,
+      CenteredContact: <CenteredContact {...contactAttributes} />,
+      LeftAlignedContact: <LeftAlignedContact {...contactAttributes} />,
+      RightAlignedContact: <RightAlignedContact {...contactAttributes} />,
+      MinimalLeftContact: <MinimalLeftContact {...contactAttributes} />,
+    },
+    Policies: {
+      TitleLeftContentCenterPolicies: (
+        <TitleLeftContentCenterPolicies
+          {
+            ...policiesAttributes
+            // variant={policiesAttributes.variant}
+          }
+        />
+      ),
+      DefaultPolicies: (
+        <DefaultPolicies
+          {
+            ...policiesAttributes
+            // variant={policiesAttributes.variant}
+          }
+        />
+      ),
+      LeftPolicies: (
+        <LeftPolicies
+          {
+            ...policiesAttributes
+            // variant={policiesAttributes.variant}
+          }
+        />
+      ),
+      CenteredPolicies: (
+        <CenteredPolicies
+          {
+            ...policiesAttributes
+            // variant={policiesAttributes.variant}
+          }
+        />
+      ),
+    },
+  };
+
+  const [sections, setSections] = useState<Section[]>(initialSections);
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
@@ -320,6 +724,8 @@ export default function CustomizeTemplatePage() {
         updateContactAttributes={updateContactAttributes}
         footerAttributes={footerAttributes}
         updateFooterAttributes={updateFooterAttributes}
+        sections={sections}
+        setSections={setSections}
       />
 
       {/* Main content area */}
@@ -375,710 +781,90 @@ export default function CustomizeTemplatePage() {
 
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <Navbar
-            isCustomize={true}
-            template={headerAttributes.template}
-            brandName={headerAttributes.brandName}
-            backgroundColor={headerAttributes.backgroundColor}
-            textColor={headerAttributes.textColor}
-            logo={headerAttributes.logo}
-            menuItems={headerAttributes.menuItems.map((item) => ({
-              label: item.label,
-              href: "#",
-              isShown: item.isShown,
-            }))}
-            iconColor={headerAttributes.iconColor}
-            dividerColor={headerAttributes.dividerColor}
-            searchIconColor={headerAttributes.searchIconColor}
-            fontFamily={headerAttributes.fontFamily}
-          />
-          {promoAttributes.template === "CenteredPromo" && (
-            <CenteredPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              backgroundColor={promoAttributes.backgroundColor}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              imageObjectFit={promoAttributes.imageObjectFit}
+          <div className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
+            selectedTab === "desktop" ? "w-full max-w-6xl" : 
+            selectedTab === "tablet" ? "w-full max-w-2xl" : 
+            "w-full max-w-sm"
+          }`}>
+            <Navbar
+              isCustomize={true}
+              template={headerAttributes.template}
+              brandName={headerAttributes.brandName}
+              backgroundColor={headerAttributes.backgroundColor}
+              textColor={headerAttributes.textColor}
+              logo={headerAttributes.logo}
+              menuItems={headerAttributes.menuItems.map((item) => ({
+                label: item.label,
+                href: "#",
+                isShown: item.isShown,
+              }))}
+              iconColor={headerAttributes.iconColor}
+              dividerColor={headerAttributes.dividerColor}
+              searchIconColor={headerAttributes.searchIconColor}
+              fontFamily={headerAttributes.fontFamily}
             />
-          )}
 
-          {promoAttributes.template === "LeftAlignedPromo" && (
-            <LeftAlignedPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-            />
-          )}
+            {/* Render middle sections dynamically */}
+            {sections.slice(1, sections.length - 1).map((section, index) => {
+              const sectionId = section.id as keyof typeof sectionComponents;
+              const sectionComponent = sectionComponents[sectionId];
 
-          {promoAttributes.template === "RightAlignedPromo" && (
-            <RightAlignedPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-            />
-          )}
-
-          {promoAttributes.template === "MinimalLeftPromo" && (
-            <MinimalLeftPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-            />
-          )}
-
-          {promoAttributes.template === "MinimalRightPromo" && (
-            <MinimalRightPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-            />
-          )}
-
-          {promoAttributes.template === "OverlayPromo" && (
-            <OverlayPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              descriptionFont={promoAttributes.descriptionFont}
-              descriptionColor={promoAttributes.descriptionColor}
-              descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-            />
-          )}
-
-          {promoAttributes.template === "SplitPromo" && (
-            <SplitPromo
-              isClickable={false}
-              id={promoAttributes.id}
-              slides={promoAttributes.slides}
-              autoplay={promoAttributes.autoPlay}
-              showArrows={promoAttributes.showArrows}
-              titleFont={promoAttributes.titleFont}
-              titleColor={promoAttributes.titleColor}
-              titleSize={promoAttributes.titleSize}
-              // descriptionFont={promoAttributes.descriptionFont}
-              // descriptionColor={promoAttributes.descriptionColor}
-              // descriptionSize={promoAttributes.descriptionSize}
-              buttonFont={promoAttributes.buttonFont}
-              buttonColor={promoAttributes.buttonColor}
-              buttonTextColor={promoAttributes.buttonTextColor}
-              buttonSize={promoAttributes.buttonSize}
-              buttonRadius={promoAttributes.buttonRadius}
-              backgroundColor={promoAttributes.backgroundColor}
-              imageObjectFit={promoAttributes.imageObjectFit}
-              // className={promoAttributes.className}
-            />
-          )}
-
-          <ProductList
-            isClickable={false}
-            products={[
-              {
-                name: "Product 1",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-1",
-              },
-              {
-                name: "Product 2",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-2",
-              },
-              {
-                name: "Product 3",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-3",
-              },
-              {
-                name: "Product 4",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-4",
-              },
-              {
-                name: "Product 5",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-5",
-              },
-              {
-                name: "Product 6",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-6",
-              },
-              {
-                name: "Product 7",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-7",
-              },
-              {
-                name: "Product 8",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                price: {
-                  price: 100,
-                },
-                description: "This is a description of the product",
-                id: "product-8",
-              },
-            ]}
-            template="featured"
-            title="Featured Products"
-            titleColor="text-black"
-            titlePosition="top"
-            titleFontSize="text-2xl"
-            titleFont="font-bold"
-            columns={{ sm: 2, md: 3, lg: 4 }}
-            bgColor="bg-white"
-            textColor="text-black"
-            borderRadius="rounded-lg"
-            showTitle={true}
-            fontFamily="font-sans"
-            hoverEffect={true}
-            cardVariant="hover"
-            showSubtitle={true}
-            showCta={true}
-            showMoreButton={true}
-            ctaText="Shop Now"
-            cornerRadius="medium"
-            cardShadow="shadow-lg"
-            showMoreText="All Products"
-            showMorebuttonBgColor="bg-black"
-            showMorebuttonTextColor="text-white"
-          />
-          <FeaturedGridCategoryTemplate
-            isClickable={false}
-            categories={[
-              {
-                name: "Rings",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                id: "1",
-              },
-              {
-                name: "Earrings",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/earing.jpg",
-                    },
-                  },
-                },
-                id: "2",
-              },
-              {
-                name: "Necklaces",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/neckless.jpg",
-                    },
-                  },
-                },
-                id: "3",
-              },
-              {
-                name: "Rings",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/ring2.jpg",
-                    },
-                  },
-                },
-                id: "4",
-              },
-              {
-                name: "Earrings",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/earing.jpg",
-                    },
-                  },
-                },
-                id: "5",
-              },
-              {
-                name: "Necklaces",
-                media: {
-                  mainMedia: {
-                    image: {
-                      url: "/neckless.jpg",
-                    },
-                  },
-                },
-                id: "6",
-              },
-            ]}
-            bgColor="bg-white"
-            textColor="text-black"
-            borderRadius="rounded-lg"
-            showTitle={true}
-            fontFamily="font-sans"
-            hoverEffect={true}
-            cardVariant="featured"
-            showCta={true}
-            ctaText="Shop Now"
-            overlayColor="bg-black/30"
-            showMoreButton={true}
-            showMoreText="Show More"
-            showMorebuttonBgColor="bg-black"
-            showMorebuttonTextColor="text-white"
-          />
-          {aboutAttributes.template === "TopImageAbout" && (
-            <TopImageAbout
-              id={aboutAttributes.id}
-              backgroundColor={aboutAttributes.backgroundColor}
-              title={aboutAttributes.title}
-              titleColor={aboutAttributes.titleColor}
-              titleFont={aboutAttributes.titleFont}
-              titleSize={aboutAttributes.titleSize}
-              descriptionColor={aboutAttributes.descriptionColor}
-              description={aboutAttributes.description}
-              descriptionFont={aboutAttributes.descriptionFont}
-              descriptionSize={aboutAttributes.descriptionSize}
-              secondaryDescription={aboutAttributes.secondaryDescription}
-              image={aboutAttributes.image}
-              imageAlt={aboutAttributes.imageAlt}
-              imageObjectFit={aboutAttributes.imageObjectFit}
-              // variant={aboutAttributes.variant}
-              // className={aboutAttributes.className}
-            />
-          )}
-          {aboutAttributes.template === "CenteredAbout" && (
-            <CenteredAbout
-              id={aboutAttributes.id}
-              backgroundColor={aboutAttributes.backgroundColor}
-              title={aboutAttributes.title}
-              titleColor={aboutAttributes.titleColor}
-              titleFont={aboutAttributes.titleFont}
-              titleSize={aboutAttributes.titleSize}
-              descriptionColor={aboutAttributes.descriptionColor}
-              description={aboutAttributes.description}
-              descriptionFont={aboutAttributes.descriptionFont}
-              descriptionSize={aboutAttributes.descriptionSize}
-              secondaryDescription={aboutAttributes.secondaryDescription}
-              image={aboutAttributes.image}
-              imageAlt={aboutAttributes.imageAlt}
-              imageObjectFit={aboutAttributes.imageObjectFit}
-              // variant={aboutAttributes.variant}
-              // className={aboutAttributes.className}
-            />
-          )}
-          {aboutAttributes.template === "LeftAlignedAbout" && (
-            <LeftAlignedAbout
-              id={aboutAttributes.id}
-              backgroundColor={aboutAttributes.backgroundColor}
-              title={aboutAttributes.title}
-              titleColor={aboutAttributes.titleColor}
-              titleFont={aboutAttributes.titleFont}
-              titleSize={aboutAttributes.titleSize}
-              descriptionColor={aboutAttributes.descriptionColor}
-              description={aboutAttributes.description}
-              descriptionFont={aboutAttributes.descriptionFont}
-              descriptionSize={aboutAttributes.descriptionSize}
-              secondaryDescription={aboutAttributes.secondaryDescription}
-              image={aboutAttributes.image}
-              imageAlt={aboutAttributes.imageAlt}
-              imageObjectFit={aboutAttributes.imageObjectFit}
-              // variant={aboutAttributes.variant}
-              // className={aboutAttributes.className}
-            />
-          )}
-          {aboutAttributes.template === "RightAlignedAbout" && (
-            <RightAlignedAbout
-              id={aboutAttributes.id}
-              backgroundColor={aboutAttributes.backgroundColor}
-              title={aboutAttributes.title}
-              titleColor={aboutAttributes.titleColor}
-              titleFont={aboutAttributes.titleFont}
-              titleSize={aboutAttributes.titleSize}
-              descriptionColor={aboutAttributes.descriptionColor}
-              description={aboutAttributes.description}
-              descriptionFont={aboutAttributes.descriptionFont}
-              descriptionSize={aboutAttributes.descriptionSize}
-              secondaryDescription={aboutAttributes.secondaryDescription}
-              image={aboutAttributes.image}
-              imageAlt={aboutAttributes.imageAlt}
-              imageObjectFit={aboutAttributes.imageObjectFit}
-              // variant={aboutAttributes.variant}
-              // className={aboutAttributes.className}
-            />
-          )}
-          {contactAttributes.template === "MinimalRightContact" && (
-            <MinimalRightContact
-              id={contactAttributes.id}
-              imageUrl={contactAttributes.imageUrl}
-              backgroundColor={contactAttributes.backgroundColor}
-              titleColor={contactAttributes.titleColor}
-              contentFont={contactAttributes.contentFont}
-              contentSize={contactAttributes.contentSize}
-              titleFont={contactAttributes.titleFont}
-              titleSize={contactAttributes.titleSize}
-              contentColor={contactAttributes.contentColor}
-              showMap={contactAttributes.showMap}
-              title={contactAttributes.title}
-              address={contactAttributes.address}
-              addressUrl={contactAttributes.addressUrl}
-              openHours={contactAttributes.openHours}
-              phone={contactAttributes.phone}
-              contactEmail={contactAttributes.contactEmail}
-              socialLinks={contactAttributes.socialLinks}
-            />
-          )}
-          {contactAttributes.template === "CenteredContact" && (
-            <CenteredContact
-              id={contactAttributes.id}
-              imageUrl={contactAttributes.imageUrl}
-              backgroundColor={contactAttributes.backgroundColor}
-              titleColor={contactAttributes.titleColor}
-              contentFont={contactAttributes.contentFont}
-              contentSize={contactAttributes.contentSize}
-              titleFont={contactAttributes.titleFont}
-              titleSize={contactAttributes.titleSize}
-              contentColor={contactAttributes.contentColor}
-              showMap={contactAttributes.showMap}
-              title={contactAttributes.title}
-              address={contactAttributes.address}
-              addressUrl={contactAttributes.addressUrl}
-              openHours={contactAttributes.openHours}
-              phone={contactAttributes.phone}
-              contactEmail={contactAttributes.contactEmail}
-              socialLinks={contactAttributes.socialLinks}
-            />
-          )}
-          {contactAttributes.template === "LeftAlignedContact" && (
-            <LeftAlignedContact
-              id={contactAttributes.id}
-              imageUrl={contactAttributes.imageUrl}
-              backgroundColor={contactAttributes.backgroundColor}
-              titleColor={contactAttributes.titleColor}
-              contentFont={contactAttributes.contentFont}
-              contentSize={contactAttributes.contentSize}
-              titleFont={contactAttributes.titleFont}
-              titleSize={contactAttributes.titleSize}
-              contentColor={contactAttributes.contentColor}
-              showMap={contactAttributes.showMap}
-              title={contactAttributes.title}
-              address={contactAttributes.address}
-              addressUrl={contactAttributes.addressUrl}
-              openHours={contactAttributes.openHours}
-              phone={contactAttributes.phone}
-              contactEmail={contactAttributes.contactEmail}
-              socialLinks={contactAttributes.socialLinks}
-            />
-          )}
-          {contactAttributes.template === "RightAlignedContact" && (
-            <RightAlignedContact
-              id={contactAttributes.id}
-              imageUrl={contactAttributes.imageUrl}
-              backgroundColor={contactAttributes.backgroundColor}
-              titleColor={contactAttributes.titleColor}
-              contentFont={contactAttributes.contentFont}
-              contentSize={contactAttributes.contentSize}
-              titleFont={contactAttributes.titleFont}
-              titleSize={contactAttributes.titleSize}
-              contentColor={contactAttributes.contentColor}
-              showMap={contactAttributes.showMap}
-              title={contactAttributes.title}
-              address={contactAttributes.address}
-              addressUrl={contactAttributes.addressUrl}
-              openHours={contactAttributes.openHours}
-              phone={contactAttributes.phone}
-              contactEmail={contactAttributes.contactEmail}
-              socialLinks={contactAttributes.socialLinks}
-            />
-          )}
-          {contactAttributes.template === "MinimalLeftContact" && (
-            <MinimalLeftContact
-              id={contactAttributes.id}
-              imageUrl={contactAttributes.imageUrl}
-              backgroundColor={contactAttributes.backgroundColor}
-              titleColor={contactAttributes.titleColor}
-              contentFont={contactAttributes.contentFont}
-              contentSize={contactAttributes.contentSize}
-              titleFont={contactAttributes.titleFont}
-              titleSize={contactAttributes.titleSize}
-              contentColor={contactAttributes.contentColor}
-              showMap={contactAttributes.showMap}
-              title={contactAttributes.title}
-              address={contactAttributes.address}
-              addressUrl={contactAttributes.addressUrl}
-              openHours={contactAttributes.openHours}
-              phone={contactAttributes.phone}
-              contactEmail={contactAttributes.contactEmail}
-              socialLinks={contactAttributes.socialLinks}
-            />
-          )}
-          {policiesAttributes.template === "TitleLeftContentCenterPolicies" && (
-            <TitleLeftContentCenterPolicies
-              id={policiesAttributes.id}
-              backgroundColor={policiesAttributes.backgroundColor}
-              title={policiesAttributes.title}
-              titleFont={policiesAttributes.titleFont}
-              titleFontWeight={policiesAttributes.titleFontWeight}
-              titleSize={policiesAttributes.titleSize}
-              titleColor={policiesAttributes.titleColor}
-              sectionTitleColor={policiesAttributes.sectionTitleColor}
-              sectionTitleSize={policiesAttributes.sectionTitleSize}
-              sectionTitleFont={policiesAttributes.sectionTitleFont}
-              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-              sectionContentColor={policiesAttributes.sectionContentColor}
-              sectionContentSize={policiesAttributes.sectionContentSize}
-              sectionContentFont={policiesAttributes.sectionContentFont}
-              sectionContentFontWeight={
-                policiesAttributes.sectionContentFontWeight
+              if (!sectionComponent) {
+                return null;
               }
-              sections={policiesAttributes.sections}
-              // variant={policiesAttributes.variant}
-            />
-          )}
-          {policiesAttributes.template === "DefaultPolicies" && (
-            <DefaultPolicies
-              id={policiesAttributes.id}
-              backgroundColor={policiesAttributes.backgroundColor}
-              title={policiesAttributes.title}
-              titleFont={policiesAttributes.titleFont}
-              titleFontWeight={policiesAttributes.titleFontWeight}
-              titleSize={policiesAttributes.titleSize}
-              titleColor={policiesAttributes.titleColor}
-              sectionTitleColor={policiesAttributes.sectionTitleColor}
-              sectionTitleSize={policiesAttributes.sectionTitleSize}
-              sectionTitleFont={policiesAttributes.sectionTitleFont}
-              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-              sectionContentColor={policiesAttributes.sectionContentColor}
-              sectionContentSize={policiesAttributes.sectionContentSize}
-              sectionContentFont={policiesAttributes.sectionContentFont}
-              sectionContentFontWeight={
-                policiesAttributes.sectionContentFontWeight
+
+              // Get the template for this section
+              let template: string;
+              switch (sectionId) {
+                case "PromoSlider":
+                  template = promoAttributes.template;
+                  break;
+                case "Products":
+                  template = "ProductList";
+                  break;
+                case "Categories":
+                  template = "FeaturedGrid";
+                  break;
+                case "AboutUs":
+                  template = aboutAttributes.template;
+                  break;
+                case "Policies":
+                  template = policiesAttributes.template;
+                  break;
+                case "ContactUs":
+                  template = contactAttributes.template;
+                  break;
+                default:
+                  return null;
               }
-              sections={policiesAttributes.sections}
-              // variant={policiesAttributes.variant}
-            />
-          )}
-          {policiesAttributes.template === "LeftPolicies" && (
-            <LeftPolicies
-              id={policiesAttributes.id}
-              backgroundColor={policiesAttributes.backgroundColor}
-              title={policiesAttributes.title}
-              titleFont={policiesAttributes.titleFont}
-              titleFontWeight={policiesAttributes.titleFontWeight}
-              titleSize={policiesAttributes.titleSize}
-              titleColor={policiesAttributes.titleColor}
-              sectionTitleColor={policiesAttributes.sectionTitleColor}
-              sectionTitleSize={policiesAttributes.sectionTitleSize}
-              sectionTitleFont={policiesAttributes.sectionTitleFont}
-              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-              sectionContentColor={policiesAttributes.sectionContentColor}
-              sectionContentSize={policiesAttributes.sectionContentSize}
-              sectionContentFont={policiesAttributes.sectionContentFont}
-              sectionContentFontWeight={
-                policiesAttributes.sectionContentFontWeight
+
+              // Get the component for this template
+              const Component =
+                sectionComponent[template as keyof typeof sectionComponent];
+
+              if (!Component) {
+                return null;
               }
-              sections={policiesAttributes.sections}
-              // variant={policiesAttributes.variant}
+
+              return <div key={section.id}>{Component}</div>;
+            })}
+
+            <Footer
+              companyName={footerAttributes.brandName}
+              textColor={footerAttributes.textColor}
+              companyLogo={{
+                src: footerAttributes.logo.src || "/logo.png",
+                alt: footerAttributes.logo.alt,
+                width: parseInt(footerAttributes.logo.size) || 50,
+                height: parseInt(footerAttributes.logo.size) || 50,
+              }}
+              aboutLinks={footerAttributes.aboutLinks}
+              socialMedia={footerAttributes.socialMedia}
+              socialMediaStyles={footerAttributes.socialMediaStyles}
+              copyrightStyles={footerAttributes.copyrightStyles}
+              backgroundColor={footerAttributes.backgroundColor}
             />
-          )}
-          {policiesAttributes.template === "CenteredPolicies" && (
-            <CenteredPolicies
-              id={policiesAttributes.id}
-              backgroundColor={policiesAttributes.backgroundColor}
-              title={policiesAttributes.title}
-              titleFont={policiesAttributes.titleFont}
-              titleFontWeight={policiesAttributes.titleFontWeight}
-              titleSize={policiesAttributes.titleSize}
-              titleColor={policiesAttributes.titleColor}
-              sectionTitleColor={policiesAttributes.sectionTitleColor}
-              sectionTitleSize={policiesAttributes.sectionTitleSize}
-              sectionTitleFont={policiesAttributes.sectionTitleFont}
-              sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-              sectionContentColor={policiesAttributes.sectionContentColor}
-              sectionContentSize={policiesAttributes.sectionContentSize}
-              sectionContentFont={policiesAttributes.sectionContentFont}
-              sectionContentFontWeight={
-                policiesAttributes.sectionContentFontWeight
-              }
-              sections={policiesAttributes.sections}
-              // variant={policiesAttributes.variant}
-            />
-          )}
-          <Footer
-            companyName={footerAttributes.brandName}
-            textColor={footerAttributes.textColor}
-            companyLogo={{
-              src: footerAttributes.logo.src || "/logo.png",
-              alt: footerAttributes.logo.alt,
-              width: parseInt(footerAttributes.logo.size) || 50,
-              height: parseInt(footerAttributes.logo.size) || 50,
-            }}
-            aboutLinks={footerAttributes.aboutLinks}
-            socialMedia={footerAttributes.socialMedia}
-            socialMediaStyles={footerAttributes.socialMediaStyles}
-            copyrightStyles={footerAttributes.copyrightStyles}
-            backgroundColor={footerAttributes.backgroundColor}
-          />
+          </div>
         </div>
       </div>
     </div>

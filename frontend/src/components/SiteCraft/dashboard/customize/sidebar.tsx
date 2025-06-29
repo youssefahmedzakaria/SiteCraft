@@ -25,6 +25,12 @@ import {
   PoliciesCustomizationAttributes,
 } from "@/lib/customization";
 import { PromoCustomizationAttributes } from "@/lib/customization";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 interface Section {
   id: string;
@@ -58,6 +64,8 @@ interface SidebarProps {
   updateFooterAttributes: (
     updates: Partial<FooterCustomizationAttributes>
   ) => void;
+  sections: Section[];
+  setSections: React.Dispatch<React.SetStateAction<Section[]>>;
 }
 
 export function Sidebar({
@@ -73,46 +81,11 @@ export function Sidebar({
   updateContactAttributes,
   footerAttributes,
   updateFooterAttributes,
+  sections,
+  setSections,
 }: SidebarProps) {
-  // Define sections in an array to make them orderable
-  const [sections, setSections] = useState<Section[]>([
-    {
-      id: "Header&Menu",
-      title: "Header & Menu",
-      // icon: <AppWindow size={18} />,
-      expanded: false,
-    },
-    {
-      id: "PromoSlider",
-      title: "Promo Slider",
-      // icon: <Images size={18} />,
-      expanded: false,
-    },
-    {
-      id: "AboutUs",
-      title: "About Us",
-      // icon: <Images size={18} />,
-      expanded: false,
-    },
-    {
-      id: "Policies",
-      title: "Policies",
-      // icon: <Images size={18} />,
-      expanded: false,
-    },
-    {
-      id: "ContactUs",
-      title: "Contact Us",
-      // icon: <Images size={18} />,
-      expanded: false,
-    },
-    {
-      id: "Footer",
-      title: "Footer",
-      // icon: <Images size={18} />,
-      expanded: false,
-    },
-  ]);
+  // Remove local useState for sections
+  // const [sections, setSections] = useState<Section[]>([ ... ]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(
@@ -169,47 +142,19 @@ export function Sidebar({
     setDetailedSection(null);
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
-    setDraggedSectionIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
-    if (
-      draggedSectionIndex !== null &&
-      sectionRefs.current[sections[draggedSectionIndex].id]
-    ) {
-      const el = sectionRefs.current[sections[draggedSectionIndex].id];
-      if (el) {
-        el.classList.remove("opacity-50");
-      }
-    }
-    setDraggedSectionIndex(null);
-  };
-
-  const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
-    e.preventDefault();
-
-    if (draggedSectionIndex === null) return;
-    if (draggedSectionIndex === dropIndex) return;
-
-    const newSections = [...sections];
-    const draggedSection = newSections[draggedSectionIndex];
-
-    // Remove the dragged item
-    newSections.splice(draggedSectionIndex, 1);
-
-    // Add it at the new position
-    newSections.splice(dropIndex, 0, draggedSection);
-
-    setSections(newSections);
-    setDraggedSectionIndex(null);
+  // Replace old drag-and-drop handlers with handleDragEnd for @hello-pangea/dnd
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    const start = result.source.index;
+    const end = result.destination.index;
+    // Only reorder the middle sections (excluding Header&Menu and Footer)
+    const fixedTop = sections[0];
+    const fixedBottom = sections[sections.length - 1];
+    const middle = sections.slice(1, sections.length - 1);
+    const items = Array.from(middle);
+    const [reorderedItem] = items.splice(start, 1);
+    items.splice(end, 0, reorderedItem);
+    setSections([fixedTop, ...items, fixedBottom]);
   };
 
   return (
@@ -333,46 +278,92 @@ export function Sidebar({
           </div>
 
           <div className="sections-container">
-            {sections.map((section, index) => (
-              <div
-                key={section.id}
-                ref={(el) => {
-                  sectionRefs.current[section.id] = el;
-                }}
-                className={`border-b border-gray-200 ${
-                  draggedSectionIndex === index ? "opacity-50" : ""
-                }`}
-                draggable={true}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDrop={(e) => handleDrop(e, index)}
-              >
-                <div className="flex items-center">
-                  <div
-                    className="px-2 py-4 cursor-grab flex items-center text-gray-400 hover:text-gray-600"
-                    title="Drag to reorder"
-                  >
-                    <GripVertical size={18} />
-                  </div>
-
-                  <button
-                    className="flex-1 flex items-center justify-between text-left pr-4"
-                    onClick={() => toggleSection(section.id)}
-                  >
-                    <div className="flex items-center gap-2">
-                      {/* {section.icon} */}
-                      <span className="font-medium">{section.title}</span>
-                    </div>
-                    {section.expanded ? (
-                      <ChevronDown size={18} />
-                    ) : (
-                      <ChevronRight size={18} />
-                    )}
-                  </button>
+            {/* Header (fixed, not draggable) */}
+            <div key="header" className="border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="px-2 py-4 flex items-center text-gray-400 hover:text-gray-600">
+                  <GripVertical size={18} className="text-white" />
                 </div>
+                <button
+                  className="flex-1 flex items-center justify-between text-left pr-4"
+                  onClick={() => toggleSection(sections[0].id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Header & Menu</span>
+                  </div>
+                  {sections[0].expanded ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
               </div>
-            ))}
+            </div>
+            {/* Draggable middle sections */}
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="sidebar-sections">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {sections.slice(1, sections.length - 1).map((section, index) => (
+                      <Draggable key={section.id} draggableId={section.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`border-b border-gray-200 ${snapshot.isDragging ? "opacity-50" : ""}`}
+                          >
+                            <div className="flex items-center">
+                              <div
+                                {...provided.dragHandleProps}
+                                className="px-2 py-4 cursor-grab flex items-center text-gray-400 hover:text-gray-600"
+                                title="Drag to reorder"
+                              >
+                                <GripVertical size={18} />
+                              </div>
+                              <button
+                                className="flex-1 flex items-center justify-between text-left pr-4"
+                                onClick={() => toggleSection(section.id)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{section.title}</span>
+                                </div>
+                                {section.expanded ? (
+                                  <ChevronDown size={18} />
+                                ) : (
+                                  <ChevronRight size={18} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+            {/* Footer (fixed, not draggable) */}
+            <div key="footer" className="border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="px-2 py-4 flex items-center text-gray-400 hover:text-gray-600">
+                  <GripVertical size={18} className="text-white" />
+                </div>
+                <button
+                  className="flex-1 flex items-center justify-between text-left pr-4"
+                  onClick={() => toggleSection(sections[sections.length - 1].id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Footer</span>
+                  </div>
+                  {sections[sections.length - 1].expanded ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
