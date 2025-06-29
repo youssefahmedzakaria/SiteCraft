@@ -38,6 +38,7 @@ import {
   RightAlignedPromo,
   SplitPromo,
 } from "@/components/e-commerce/promo";
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
 
 interface Section {
   id: string;
@@ -54,6 +55,16 @@ const initialSections: Section[] = [
   {
     id: "PromoSlider",
     title: "Promo Slider",
+    expanded: false,
+  },
+  {
+    id: "Categories",
+    title: "Categories",
+    expanded: false,
+  },
+  {
+    id: "Products",
+    title: "Products",
     expanded: false,
   },
   {
@@ -372,7 +383,7 @@ export default function CustomizeTemplatePage() {
         />
       ),
     },
-    products: {
+    Products: {
       ProductList: (
         <ProductList
           isClickable={false}
@@ -524,10 +535,11 @@ export default function CustomizeTemplatePage() {
         />
       ),
     },
-    categories: {
+    Categories: {
       FeaturedGrid: (
-        <FeaturedGridCategoryTemplate
+        <HorizontalScrollCategoryTemplate
           isClickable={false}
+          showControls={false}
           categories={[
             {
               name: "Rings",
@@ -769,81 +781,90 @@ export default function CustomizeTemplatePage() {
 
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <Navbar
-            isCustomize={true}
-            template={headerAttributes.template}
-            brandName={headerAttributes.brandName}
-            backgroundColor={headerAttributes.backgroundColor}
-            textColor={headerAttributes.textColor}
-            logo={headerAttributes.logo}
-            menuItems={headerAttributes.menuItems.map((item) => ({
-              label: item.label,
-              href: "#",
-              isShown: item.isShown,
-            }))}
-            iconColor={headerAttributes.iconColor}
-            dividerColor={headerAttributes.dividerColor}
-            searchIconColor={headerAttributes.searchIconColor}
-            fontFamily={headerAttributes.fontFamily}
-          />
-          
-          {/* Render middle sections dynamically */}
-          {sections.slice(1, sections.length - 1).map((section, index) => {
-            const sectionId = section.id as keyof typeof sectionComponents;
-            const sectionComponent = sectionComponents[sectionId];
-            
-            if (!sectionComponent) {
-              return null;
-            }
+          <div className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
+            selectedTab === "desktop" ? "w-full max-w-6xl" : 
+            selectedTab === "tablet" ? "w-full max-w-2xl" : 
+            "w-full max-w-sm"
+          }`}>
+            <Navbar
+              isCustomize={true}
+              template={headerAttributes.template}
+              brandName={headerAttributes.brandName}
+              backgroundColor={headerAttributes.backgroundColor}
+              textColor={headerAttributes.textColor}
+              logo={headerAttributes.logo}
+              menuItems={headerAttributes.menuItems.map((item) => ({
+                label: item.label,
+                href: "#",
+                isShown: item.isShown,
+              }))}
+              iconColor={headerAttributes.iconColor}
+              dividerColor={headerAttributes.dividerColor}
+              searchIconColor={headerAttributes.searchIconColor}
+              fontFamily={headerAttributes.fontFamily}
+            />
 
-            // Get the template for this section
-            let template: string;
-            switch (sectionId) {
-              case "PromoSlider":
-                template = promoAttributes.template;
-                break;
-              case "AboutUs":
-                template = aboutAttributes.template;
-                break;
-              case "Policies":
-                template = policiesAttributes.template;
-                break;
-              case "ContactUs":
-                template = contactAttributes.template;
-                break;
-              default:
+            {/* Render middle sections dynamically */}
+            {sections.slice(1, sections.length - 1).map((section, index) => {
+              const sectionId = section.id as keyof typeof sectionComponents;
+              const sectionComponent = sectionComponents[sectionId];
+
+              if (!sectionComponent) {
                 return null;
-            }
+              }
 
-            // Get the component for this template
-            const Component = sectionComponent[template as keyof typeof sectionComponent];
-            
-            if (!Component) {
-              return null;
-            }
+              // Get the template for this section
+              let template: string;
+              switch (sectionId) {
+                case "PromoSlider":
+                  template = promoAttributes.template;
+                  break;
+                case "Products":
+                  template = "ProductList";
+                  break;
+                case "Categories":
+                  template = "FeaturedGrid";
+                  break;
+                case "AboutUs":
+                  template = aboutAttributes.template;
+                  break;
+                case "Policies":
+                  template = policiesAttributes.template;
+                  break;
+                case "ContactUs":
+                  template = contactAttributes.template;
+                  break;
+                default:
+                  return null;
+              }
 
-            return (
-              <div key={section.id}>
-                {Component}
-              </div>
-            );
-          })}
-          
-          <Footer
-            companyName={footerAttributes.brandName}
-            textColor={footerAttributes.textColor}
-            companyLogo={{
-              src: footerAttributes.logo.src || "/logo.png",
-              alt: footerAttributes.logo.alt,
-              width: parseInt(footerAttributes.logo.size) || 50,
-              height: parseInt(footerAttributes.logo.size) || 50,
-            }}
-            aboutLinks={footerAttributes.aboutLinks}
-            socialMedia={footerAttributes.socialMedia}
-            socialMediaStyles={footerAttributes.socialMediaStyles}
-            copyrightStyles={footerAttributes.copyrightStyles}
-            backgroundColor={footerAttributes.backgroundColor}
-          />
+              // Get the component for this template
+              const Component =
+                sectionComponent[template as keyof typeof sectionComponent];
+
+              if (!Component) {
+                return null;
+              }
+
+              return <div key={section.id}>{Component}</div>;
+            })}
+
+            <Footer
+              companyName={footerAttributes.brandName}
+              textColor={footerAttributes.textColor}
+              companyLogo={{
+                src: footerAttributes.logo.src || "/logo.png",
+                alt: footerAttributes.logo.alt,
+                width: parseInt(footerAttributes.logo.size) || 50,
+                height: parseInt(footerAttributes.logo.size) || 50,
+              }}
+              aboutLinks={footerAttributes.aboutLinks}
+              socialMedia={footerAttributes.socialMedia}
+              socialMediaStyles={footerAttributes.socialMediaStyles}
+              copyrightStyles={footerAttributes.copyrightStyles}
+              backgroundColor={footerAttributes.backgroundColor}
+            />
+          </div>
         </div>
       </div>
     </div>
