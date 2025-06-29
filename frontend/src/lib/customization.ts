@@ -1,5 +1,13 @@
 export interface HeaderCustomizationAttributes {
-  template: string;
+  template:
+    | "template1"
+    | "template2"
+    | "template3"
+    | "template4"
+    | "template5"
+    | "template6"
+    | "template7"
+    | "template8";
   brandName: string;
   backgroundColor: string;
   textColor: string;
@@ -44,7 +52,7 @@ export interface PromoCustomizationAttributes {
   buttonSize: string;
   buttonRadius: string;
   backgroundColor: string;
-  imageObjectFit: string;
+  imageObjectFit: "cover" | "fill" | "contain";
 }
 
 export interface AboutCustomizationAttributes {
@@ -56,9 +64,9 @@ export interface AboutCustomizationAttributes {
   secondaryDescription: string;
   descriptionColor: string;
   backgroundColor: string;
-  image: string | null;
-  imageAlt: string | null;
-  imageObjectFit: string | null;
+  image: string;
+  imageAlt: string;
+  imageObjectFit: "cover" | "fill" | "contain";
   titleFont: string;
   titleSize: string;
   titleFontWeight: string;
@@ -103,7 +111,7 @@ export interface ContactCustomizationAttributes {
     instagram?: string;
     twitter?: string;
   };
-  imageUrl: string | null;
+  imageUrl: string;
   showMap: boolean;
   backgroundColor: string;
   titleFont: string;

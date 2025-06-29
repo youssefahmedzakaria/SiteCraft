@@ -17,6 +17,8 @@ import {
   PoliciesCustomizationAttributes,
   PromoCustomizationAttributes,
 } from "@/lib/customization";
+import Navbar from "@/components/e-commerce/navbar/Navbar";
+import { Footer } from "@/components/e-commerce/footer/Footer";
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
@@ -355,39 +357,40 @@ export default function CustomizeTemplatePage() {
 
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <CenteredPromo
-            isClickable={false}
-            id="promo"
-            slides={[
+          {/* <Navbar
+            template={headerAttributes.template}
+            brandName={headerAttributes.brandName}
+            backgroundColor={headerAttributes.backgroundColor}
+            textColor={headerAttributes.textColor}
+            logo={headerAttributes.logo}
+            menuItems={[
+              { label: `${headerAttributes.menuItems[0].label}`, href: "#" },
+              { label: `${headerAttributes.menuItems[1].label}`, href: "#" },
+              { label: `${headerAttributes.menuItems[3].label}`, href: "#" },
               {
-                title: "Welcome to Our Store",
-                description:
-                  "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
-                buttonText: "Shop Now",
-                buttonLink: "#new-collection",
-                image: "/girl.jpg",
-                imageAlt: "Welcome to our store",
-              },
-              {
-                title: "New Collection",
-                description:
-                  "Check out our newest products. Limited time offers with free shipping on all orders.",
-                buttonText: "View Collection",
-                buttonLink: "#new-collection",
-                image: "/hand.jpg",
-                imageAlt: "New arrivals collection",
+                label: `${headerAttributes.menuItems[4].label}`,
+                href: "#",
               },
             ]}
-            backgroundColor="bg-white"
-            titleFont="font-sans"
-            titleColor="text-white"
-            titleSize="text-4xl"
-            buttonFont="font-sans"
-            buttonColor="bg-white"
-            buttonTextColor="text-black"
-            buttonSize="text-lg"
-            buttonRadius="rounded-md"
-            imageObjectFit="cover"
+            iconColor={headerAttributes.iconColor}
+            dividerColor={headerAttributes.dividerColor}
+            searchIconColor={headerAttributes.searchIconColor}
+            fontFamily={headerAttributes.fontFamily}
+          /> */}
+          <CenteredPromo
+            isClickable={false}
+            id={promoAttributes.id}
+            slides={promoAttributes.slides}
+            backgroundColor={promoAttributes.backgroundColor}
+            titleFont={promoAttributes.titleFont}
+            titleColor={promoAttributes.titleColor}
+            titleSize={promoAttributes.titleSize}
+            buttonFont={promoAttributes.buttonFont}
+            buttonColor={promoAttributes.buttonColor}
+            buttonTextColor={promoAttributes.buttonTextColor}
+            buttonSize={promoAttributes.buttonSize}
+            buttonRadius={promoAttributes.buttonRadius}
+            imageObjectFit={promoAttributes.imageObjectFit}
           />
           <ProductList
             isClickable={false}
@@ -623,73 +626,98 @@ export default function CustomizeTemplatePage() {
             showMorebuttonTextColor="text-white"
           />
           <TopImageAbout
-            id="about"
-            backgroundColor="bg-white"
-            title="About Us"
-            titleColor="text-black"
-            descriptionColor="text-gray-600"
-            description="We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional."
-            secondaryDescription="With years of experience in the industry, we understand what our customers need and strive to exceed their expectations."
-            image="/about.jpg"
-            imageAlt="About our company"
-            imageObjectFit="cover"
+            id={aboutAttributes.id}
+            backgroundColor={aboutAttributes.backgroundColor}
+            title={aboutAttributes.title}
+            titleColor={aboutAttributes.titleColor}
+            descriptionColor={aboutAttributes.descriptionColor}
+            description={aboutAttributes.description}
+            secondaryDescription={aboutAttributes.secondaryDescription}
+            image={aboutAttributes.image}
+            imageAlt={aboutAttributes.imageAlt}
+            imageObjectFit={aboutAttributes.imageObjectFit}
           />
           <MinimalRightContact
-            id="contact"
-            imageUrl="/ring.jpg"
-            backgroundColor="bg-white"
-            titleColor="text-black"
-            contentFont="font-semibold"
-            contentSize="text-lg"
-            titleFont="font-bold"
-            titleSize="text-3xl"
-            contentColor="text-black"
-            showMap={true}
-            title="Contact Us"
-            address="masr el gedida, cairo, egypt"
-            addressUrl="https://www.google.com/maps?q=30.0890922546387,31.2838287353516"
-            openHours="Monday - Friday: 9:00 AM - 6:00 PM"
-            phone="+1 234 567 890"
-            contactEmail="contact@example.com"
-            socialLinks={{
-              facebook: "https://www.facebook.com",
-              instagram: "https://www.instagram.com",
-              twitter: "https://www.x.com",
-            }}
+            id={contactAttributes.id}
+            imageUrl={contactAttributes.imageUrl}
+            backgroundColor={contactAttributes.backgroundColor}
+            titleColor={contactAttributes.titleColor}
+            contentFont={contactAttributes.contentFont}
+            contentSize={contactAttributes.contentSize}
+            titleFont={contactAttributes.titleFont}
+            titleSize={contactAttributes.titleSize}
+            contentColor={contactAttributes.contentColor}
+            showMap={contactAttributes.showMap}
+            title={contactAttributes.title}
+            address={contactAttributes.address}
+            addressUrl={contactAttributes.addressUrl}
+            openHours={contactAttributes.openHours}
+            phone={contactAttributes.phone}
+            contactEmail={contactAttributes.contactEmail}
+            socialLinks={contactAttributes.socialLinks}
           />
           <TitleLeftContentCenterPolicies
-            id="policies"
-            backgroundColor="bg-white"
-            title="Our Policies"
-            titleFont="font-sans"
-            titleFontWeight="font-normal"
-            titleSize="text-xl"
-            titleColor="text-black"
-            sectionTitleColor="text-black"
-            sectionTitleSize="text-lg"
-            sectionTitleFont="font-sans"
-            sectionTitleFontWeight="font-normal"
-            sectionContentColor="text-black"
-            sectionContentSize="text-xl"
-            sectionContentFont="font-sans"
-            sectionContentFontWeight="font-normal"
-            sections={[
+            id={policiesAttributes.id}
+            backgroundColor={policiesAttributes.backgroundColor}
+            title={policiesAttributes.title}
+            titleFont={policiesAttributes.titleFont}
+            titleFontWeight={policiesAttributes.titleFontWeight}
+            titleSize={policiesAttributes.titleSize}
+            titleColor={policiesAttributes.titleColor}
+            sectionTitleColor={policiesAttributes.sectionTitleColor}
+            sectionTitleSize={policiesAttributes.sectionTitleSize}
+            sectionTitleFont={policiesAttributes.sectionTitleFont}
+            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
+            sectionContentColor={policiesAttributes.sectionContentColor}
+            sectionContentSize={policiesAttributes.sectionContentSize}
+            sectionContentFont={policiesAttributes.sectionContentFont}
+            sectionContentFontWeight={
+              policiesAttributes.sectionContentFontWeight
+            }
+            sections={policiesAttributes.sections}
+          />
+          <Footer
+            companyName="Jewelry"
+            textColor="text-black"
+            companyLogo={{
+              src: "/logo.png",
+              alt: "Custom Logo",
+              width: 50,
+              height: 50,
+            }}
+            aboutLinks={[
               {
-                title: "Shipping Policy",
-                content:
-                  "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
+                label: "Policies",
+                href: "#",
+                font: "font-serif",
+                fontSize: "text-lg",
+                fontColor: "text-black",
               },
               {
-                title: "Return Policy",
-                content:
-                  "30-day return policy for unused items in original packaging.",
-              },
-              {
-                title: "Privacy Policy",
-                content:
-                  "We respect your privacy and protect your personal information.",
+                label: "About Us",
+                href: "#",
+                font: "font-serif",
+                fontSize: "text-lg",
+                fontColor: "text-black",
               },
             ]}
+            socialMedia={{
+              facebook: "https://facebook.com/amnayahia26",
+              instagram: "https://instagram.com/amnayahia26",
+              email: "amnayahia26@gmail.com",
+            }}
+            socialMediaStyles={{
+              iconSize: 24,
+              iconColor: "text-black",
+              hoverColor: "text-black",
+            }}
+            copyrightStyles={{
+              font: "font-sans",
+              fontSize: "text-s",
+              fontWeight: "font-light",
+              fontColor: "text-black",
+            }}
+            backgroundColor="bg-white"
           />
         </div>
       </div>
