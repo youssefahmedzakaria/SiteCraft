@@ -12,11 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "@/components/SiteCraft/ui/button";
+import { FooterCustomizationAttributes } from "@/lib/customization";
+import { form } from "@heroui/theme";
 
 // content sections
 type ContentSectionName = "logo" | "copyright" | "socialMedia" | "aboutLinks";
 
-// content sections
+// design sections
 type DesignSectionName =
   | "general"
   | "branding"
@@ -33,12 +35,19 @@ interface AboutLink {
 
 interface RenderFooterSectionProps {
   detailedSectionTab: string;
+  footerAttributes: FooterCustomizationAttributes;
+  updateFooterAttributes: (
+    updates: Partial<FooterCustomizationAttributes>
+  ) => void;
 }
 
 export function RenderFooterSection({
   detailedSectionTab,
+  footerAttributes,
+  updateFooterAttributes,
 }: RenderFooterSectionProps) {
-  const [copyrightFontWeight, setCopyrightFontWeight] = useState<string>("normal");
+  const [copyrightFontWeight, setCopyrightFontWeight] =
+    useState<string>("normal");
   {
     /* content sections */
   }
@@ -88,6 +97,12 @@ export function RenderFooterSection({
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        updateFooterAttributes({
+          logo: {
+            ...footerAttributes.logo,
+            src: reader.result as string,
+          },
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -109,6 +124,12 @@ export function RenderFooterSection({
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        updateFooterAttributes({
+          logo: {
+            ...footerAttributes.logo,
+            src: reader.result as string,
+          },
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -117,13 +138,19 @@ export function RenderFooterSection({
   {
     /* For About Links in content */
   }
-  const [contentLinks, setContentLink] = useState<AboutLink[]>([
-    {
-      id: "1",
-      title: undefined,
-      link: undefined,
-    },
-  ]);
+  const [contentLinks, setContentLink] = useState<AboutLink[]>(
+    footerAttributes.aboutLinks?.map((link, index) => ({
+      id: (index + 1).toString(),
+      title: link.label,
+      link: link.href,
+    })) || [
+      {
+        id: "1",
+        title: undefined,
+        link: undefined,
+      },
+    ]
+  );
 
   const handleTitleChange = (linkId: string, newTitle: string) => {
     setContentLink((prevLinks) =>
@@ -131,6 +158,20 @@ export function RenderFooterSection({
         link.id === linkId ? { ...link, title: newTitle } : link
       )
     );
+
+    // Update footer attributes
+    const updatedLinks = contentLinks.map((link) =>
+      link.id === linkId ? { ...link, title: newTitle } : link
+    );
+    updateFooterAttributes({
+      aboutLinks: updatedLinks.map((link) => ({
+        label: link.title || "",
+        href: link.link || "",
+        font: "font-serif",
+        fontSize: "text-lg",
+        fontColor: "text-black",
+      })),
+    });
   };
 
   const handleLinkChange = (linkId: string, newLink: string) => {
@@ -139,6 +180,20 @@ export function RenderFooterSection({
         link.id === linkId ? { ...link, link: newLink } : link
       )
     );
+
+    // Update footer attributes
+    const updatedLinks = contentLinks.map((link) =>
+      link.id === linkId ? { ...link, link: newLink } : link
+    );
+    updateFooterAttributes({
+      aboutLinks: updatedLinks.map((link) => ({
+        label: link.title || "",
+        href: link.link || "",
+        font: "font-serif",
+        fontSize: "text-lg",
+        fontColor: "text-black",
+      })),
+    });
   };
 
   {
@@ -152,14 +207,36 @@ export function RenderFooterSection({
       link: undefined,
     };
     setContentLink((prevLinks) => [...prevLinks, newLink]);
-    console.log(contentLinks);
+
+    // Update footer attributes
+    const updatedLinks = [...contentLinks, newLink];
+    updateFooterAttributes({
+      aboutLinks: updatedLinks.map((link) => ({
+        label: link.title || "",
+        href: link.link || "",
+        font: "font-serif",
+        fontSize: "text-lg",
+        fontColor: "text-black",
+      })),
+    });
   };
 
   const handleDeleteContentLink = (linkId: string) => {
     setContentLink((prevLinks) =>
       prevLinks.filter((link) => link.id !== linkId)
     );
-    console.log(contentLinks);
+
+    // Update footer attributes
+    const updatedLinks = contentLinks.filter((link) => link.id !== linkId);
+    updateFooterAttributes({
+      aboutLinks: updatedLinks.map((link) => ({
+        label: link.title || "",
+        href: link.link || "",
+        font: "font-serif",
+        fontSize: "text-lg",
+        fontColor: "text-black",
+      })),
+    });
   };
 
   // -----------------------------------------------------------------------------------------------------------------------------
@@ -376,56 +453,60 @@ export function RenderFooterSection({
           </div>
           {expandedDesignSections.general && (
             <div className="space-y-4">
-              <div className="color-picker-container">
+              <div className="space-y-2">
                 <label className="block text-sm mb-2">Background Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={footerSettings.background}
+                    value={footerAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        background: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
                     }}
                   />
                   <input
                     type="text"
-                    value={footerSettings.background}
+                    value={footerAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        background: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
                     }}
                   />
                 </div>
               </div>
-              <div className="color-picker-container">
+              <div className="space-y-2">
                 <label className="block text-sm mb-2">Text Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={footerSettings.generalText}
+                    value={footerAttributes.textColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        generalText: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        textColor: `text-[${e.target.value}]`,
+                      });
                     }}
                   />
                   <input
                     type="text"
-                    value={footerSettings.generalText}
+                    value={footerAttributes.textColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        generalText: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        textColor: `text-[${e.target.value}]`,
+                      });
                     }}
                   />
                 </div>
@@ -454,16 +535,15 @@ export function RenderFooterSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(footerSettings.logoHeight) || ""}
+                    value={footerAttributes.logo.size || 50}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setFooterSettings((s) => ({
-                        ...s,
-                        logoHeight: value ? `${value}px` : "0px",
-                      }));
+                      updateFooterAttributes({
+                        logo: { ...footerAttributes.logo, size: value || "50" },
+                      });
                     }}
                     className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
+                    placeholder="50"
                     min="0"
                   />
                   <span className="text-sm text-gray-500">px</span>
@@ -499,13 +579,16 @@ export function RenderFooterSection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {copyrightFontFamily === "inter"
+                        {footerAttributes.copyrightStyles?.font === "font-inter"
                           ? "Inter"
-                          : copyrightFontFamily === "roboto"
+                          : footerAttributes.copyrightStyles?.font ===
+                            "font-roboto"
                           ? "Roboto"
-                          : copyrightFontFamily === "open-sans"
+                          : footerAttributes.copyrightStyles?.font ===
+                            "font-open-sans"
                           ? "Open Sans"
-                          : copyrightFontFamily === "poppins"
+                          : footerAttributes.copyrightStyles?.font ===
+                            "font-poppins"
                           ? "Poppins"
                           : "Lato"}
                       </span>
@@ -514,29 +597,62 @@ export function RenderFooterSection({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      onClick={() => handleCopyrightFontFamilyChange("inter")}
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            font: "font-inter",
+                          },
+                        })
+                      }
                     >
                       Inter
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleCopyrightFontFamilyChange("roboto")}
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            font: "font-roboto",
+                          },
+                        })
+                      }
                     >
                       Roboto
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        handleCopyrightFontFamilyChange("open-sans")
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            font: "font-open-sans",
+                          },
+                        })
                       }
                     >
                       Open Sans
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleCopyrightFontFamilyChange("poppins")}
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            font: "font-poppins",
+                          },
+                        })
+                      }
                     >
                       Poppins
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleCopyrightFontFamilyChange("lato")}
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            font: "font-lato",
+                          },
+                        })
+                      }
                     >
                       Lato
                     </DropdownMenuItem>
@@ -545,88 +661,238 @@ export function RenderFooterSection({
               </div>
 
               {/* font size */}
-              <div className="space-y-2">
+              <div>
                 <label className="block text-sm mb-2">Font Size</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(footerSettings.copyrightFontSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFooterSettings((s) => ({
-                        ...s,
-                        copyrightFontSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {footerAttributes.copyrightStyles?.fontSize ===
+                        "text-sm"
+                          ? "Small"
+                          : footerAttributes.copyrightStyles?.fontSize ===
+                            "text-base"
+                          ? "Medium"
+                          : footerAttributes.copyrightStyles?.fontSize ===
+                            "text-lg"
+                          ? "Large"
+                          : footerAttributes.copyrightStyles?.fontSize ===
+                            "text-xl"
+                          ? "XL"
+                          : footerAttributes.copyrightStyles?.fontSize ===
+                            "text-2xl"
+                          ? "2XL"
+                          : footerAttributes.copyrightStyles?.fontSize ===
+                            "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-sm",
+                          },
+                        })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-base",
+                          },
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-lg",
+                          },
+                        })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-xl",
+                          },
+                        })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-2xl",
+                          },
+                        })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-3xl",
+                          },
+                        })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontSize: "text-4xl",
+                          },
+                        })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               {/* font weight */}
-              <div className="space-y-2">
-                              <label className="block text-sm mb-2">Font Weight</label>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className="w-full justify-between"
-                                  >
-                                    {/* {policiesSettings.sectionTitleFontWeight} */} {copyrightFontWeight}
-                                    <ChevronDown className="ml-2 h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  {["normal", "medium", "semibold", "bold"].map((weight) => (
-                                    <DropdownMenuItem
-                                      key={weight}
-                                      onSelect={(e) => {
-                                        const value = weight;
-                                        if (
-                                          value === "normal" ||
-                                          value === "medium" ||
-                                          value === "semibold" ||
-                                          value === "bold"
-                                        ) {
-                                          // updateSettings("sectionTitleFontWeight", value); 
-                                          setCopyrightFontWeight(value);
-                                        }
-                                      }}
-                                    >
-                                      {weight}
-                                    </DropdownMenuItem>
-                                  ))}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
+              <div>
+                <label className="block text-sm mb-2">Font Weight</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {footerAttributes.copyrightStyles?.fontWeight ===
+                        "font-normal"
+                          ? "Normal"
+                          : footerAttributes.copyrightStyles?.fontWeight ===
+                            "font-medium"
+                          ? "Medium"
+                          : footerAttributes.copyrightStyles?.fontWeight ===
+                            "font-semibold"
+                          ? "Semibold"
+                          : "Bold"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontWeight: "font-normal",
+                          },
+                        })
+                      }
+                    >
+                      Normal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontWeight: "font-medium",
+                          },
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontWeight: "font-semibold",
+                          },
+                        })
+                      }
+                    >
+                      Semibold
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateFooterAttributes({
+                          copyrightStyles: {
+                            ...footerAttributes.copyrightStyles,
+                            fontWeight: "font-bold",
+                          },
+                        })
+                      }
+                    >
+                      Bold
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
               {/* font color */}
-              <div className="color-picker-container">
+              <div className="space-y-2">
                 <label className="block text-sm mb-2">Text Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={footerSettings.copyrightColor}
+                    value={footerAttributes.copyrightStyles?.fontColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        copyrightColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        copyrightStyles: {
+                          ...footerAttributes.copyrightStyles,
+                          fontColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                   <input
                     type="text"
-                    value={footerSettings.copyrightColor}
+                    value={footerAttributes.copyrightStyles?.fontColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        copyrightColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        copyrightStyles: {
+                          ...footerAttributes.copyrightStyles,
+                          fontColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                 </div>
@@ -656,16 +922,18 @@ export function RenderFooterSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="number"
-                    value={parseInt(footerSettings.socialMediaIconSize) || ""}
+                    value={footerAttributes.socialMediaStyles?.iconSize || 20}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setFooterSettings((s) => ({
-                        ...s,
-                        socialMediaIconSize: value ? `${value}px` : "0px",
-                      }));
+                      updateFooterAttributes({
+                        socialMediaStyles: {
+                          ...footerAttributes.socialMediaStyles,
+                          iconSize: parseInt(value) || 20,
+                        },
+                      });
                     }}
                     className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
+                    placeholder="20"
                     min="0"
                   />
                   <span className="text-sm text-gray-500">px</span>
@@ -673,58 +941,74 @@ export function RenderFooterSection({
               </div>
 
               {/* icon color */}
-              <div className="color-picker-container">
+              <div className="space-y-2">
                 <label className="block text-sm mb-2">Icons Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={footerSettings.socialMediaIconColor}
+                    value={footerAttributes.socialMediaStyles?.iconColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        socialMediaIconColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        socialMediaStyles: {
+                          ...footerAttributes.socialMediaStyles,
+                          iconColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                   <input
                     type="text"
-                    value={footerSettings.socialMediaIconColor}
+                    value={footerAttributes.socialMediaStyles?.iconColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        socialMediaIconColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        socialMediaStyles: {
+                          ...footerAttributes.socialMediaStyles,
+                          iconColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                 </div>
               </div>
 
               {/* icon hover color */}
-              <div className="color-picker-container">
+              <div className="space-y-2">
                 <label className="block text-sm mb-2">Icons Hover Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={footerSettings.socialMediaIconHoverColor}
+                    value={footerAttributes.socialMediaStyles?.hoverColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        socialMediaIconHoverColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        socialMediaStyles: {
+                          ...footerAttributes.socialMediaStyles,
+                          hoverColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                   <input
                     type="text"
-                    value={footerSettings.socialMediaIconHoverColor}
+                    value={footerAttributes.socialMediaStyles?.hoverColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        socialMediaIconHoverColor: e.target.value,
-                      }));
+                      updateFooterAttributes({
+                        socialMediaStyles: {
+                          ...footerAttributes.socialMediaStyles,
+                          hoverColor: `text-[${e.target.value}]`,
+                        },
+                      });
                     }}
                   />
                 </div>
@@ -733,131 +1017,319 @@ export function RenderFooterSection({
           )}
 
           {/* About Link */}
-          <div className="flex items-center">
-            <button
-              className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleDesignSection("aboutLinks")}
-            >
-              <span className="font-medium">About Links</span>
-              {expandedDesignSections.aboutLinks ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
+          {footerAttributes.aboutLinks.length > 0 && (
+            <div className="space-y-6">
+              <div className="flex items-center">
+                <button
+                  className="flex-1 flex items-center justify-between text-left"
+                  onClick={() => toggleDesignSection("aboutLinks")}
+                >
+                  <span className="font-medium">About Links</span>
+                  {expandedDesignSections.aboutLinks ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
+              </div>
+              {expandedDesignSections.aboutLinks && (
+                <div className="space-y-4">
+                  {/* font family */}
+                  <div>
+                    <label className="block text-sm mb-2">Font Family</label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                        >
+                          <span className="ml-2">
+                            {footerAttributes.aboutLinks[0].font ===
+                            "font-inter"
+                              ? "Inter"
+                              : footerAttributes.aboutLinks[0].font ===
+                                "font-roboto"
+                              ? "Roboto"
+                              : footerAttributes.aboutLinks[0].font ===
+                                "font-open-sans"
+                              ? "Open Sans"
+                              : footerAttributes.aboutLinks[0].font ===
+                                "font-poppins"
+                              ? "Poppins"
+                              : "Lato"}
+                          </span>
+                          <ChevronDown />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                font: "font-inter",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Inter
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                font: "font-roboto",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Roboto
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                font: "font-open-sans",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Open Sans
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                font: "font-poppins",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Poppins
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                font: "font-lato",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Lato
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* font size */}
+                  <div>
+                    <label className="block text-sm mb-2">Font Size</label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                        >
+                          <span className="ml-2">
+                            {footerAttributes.aboutLinks[0].fontSize ===
+                            "text-sm"
+                              ? "Small"
+                              : footerAttributes.aboutLinks[0].fontSize ===
+                                "text-base"
+                              ? "Medium"
+                              : footerAttributes.aboutLinks[0].fontSize ===
+                                "text-lg"
+                              ? "Large"
+                              : footerAttributes.aboutLinks[0].fontSize ===
+                                "text-xl"
+                              ? "XL"
+                              : footerAttributes.aboutLinks[0].fontSize ===
+                                "text-2xl"
+                              ? "2XL"
+                              : footerAttributes.aboutLinks[0].fontSize ===
+                                "text-3xl"
+                              ? "3XL"
+                              : "4XL"}
+                          </span>
+                          <ChevronDown />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-sm",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Small
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-base",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Medium
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-lg",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          Large
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-xl",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          XL
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-2xl",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          2XL
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-3xl",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          3XL
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const updatedLinks =
+                              footerAttributes.aboutLinks.map((link) => ({
+                                ...link,
+                                fontSize: "text-4xl",
+                              }));
+
+                            updateFooterAttributes({
+                              aboutLinks: updatedLinks,
+                            });
+                          }}
+                        >
+                          4XL
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* font color */}
+                  <div className="space-y-2">
+                    <label className="block text-sm mb-2">Text Color</label>
+                    <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                      <input
+                        type="color"
+                        value={footerAttributes.aboutLinks[0].fontColor
+                          .split("-[")[1]
+                          .slice(0, -1)}
+                        className="w-8 h-8 cursor-pointer bg-transparent"
+                        onChange={(e) => {
+                          const updatedLinks = footerAttributes.aboutLinks.map(
+                            (link) => ({
+                              ...link,
+                              fontColor: `text-[${e.target.value}]`,
+                            })
+                          );
+                          updateFooterAttributes({
+                            aboutLinks: updatedLinks,
+                          });
+                        }}
+                      />
+                      <input
+                        type="text"
+                        value={footerAttributes.aboutLinks[0].fontColor
+                          .split("-[")[1]
+                          .slice(0, -1)}
+                        className="flex-1 border-none bg-transparent focus:outline-none"
+                        onChange={(e) => {
+                          const updatedLinks = footerAttributes.aboutLinks.map(
+                            (link) => ({
+                              ...link,
+                              fontColor: `text-[${e.target.value}]`,
+                            })
+                          );
+                          updateFooterAttributes({
+                            aboutLinks: updatedLinks,
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
-          </div>
-          {expandedDesignSections.aboutLinks && (
-            <div className="space-y-4">
-              {/* font family */}
-              <div>
-                <label className="block text-sm mb-2">Font Family</label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
-                    >
-                      <span className="ml-2">
-                        {aboutLinksFontFamily === "inter"
-                          ? "Inter"
-                          : aboutLinksFontFamily === "roboto"
-                          ? "Roboto"
-                          : aboutLinksFontFamily === "open-sans"
-                          ? "Open Sans"
-                          : aboutLinksFontFamily === "poppins"
-                          ? "Poppins"
-                          : "Lato"}
-                      </span>
-                      <ChevronDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => handleAboutLinksFontFamilyChange("inter")}
-                    >
-                      Inter
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAboutLinksFontFamilyChange("roboto")}
-                    >
-                      Roboto
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleAboutLinksFontFamilyChange("open-sans")
-                      }
-                    >
-                      Open Sans
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleAboutLinksFontFamilyChange("poppins")
-                      }
-                    >
-                      Poppins
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAboutLinksFontFamilyChange("lato")}
-                    >
-                      Lato
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              {/* font size */}
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(footerSettings.aboutLinkFontSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFooterSettings((s) => ({
-                        ...s,
-                        aboutLinkFontSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 h-7 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
-              </div>
-
-              {/* font weight */}
-
-              {/* font color */}
-              <div className="color-picker-container">
-                <label className="block text-sm mb-2">Text Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    value={footerSettings.aboutLinkColor}
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                    onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        aboutLinkColor: e.target.value,
-                      }));
-                    }}
-                  />
-                  <input
-                    type="text"
-                    value={footerSettings.aboutLinkColor}
-                    className="flex-1 border-none bg-transparent focus:outline-none"
-                    onChange={(e) => {
-                      setFooterSettings((prev) => ({
-                        ...prev,
-                        aboutLinkColor: e.target.value,
-                      }));
-                    }}
-                  />
-                </div>
-              </div>
             </div>
           )}
         </div>

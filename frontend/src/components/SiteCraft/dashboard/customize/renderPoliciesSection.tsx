@@ -35,6 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/SiteCraft/ui/dropdown-menu";
+import { PoliciesCustomizationAttributes } from "@/lib/customization";
 
 type DesignSectionName = "background" | "title" | "policySection";
 
@@ -46,27 +47,16 @@ interface Policy {
 
 interface RenderPoliciesSectionProps {
   detailedSectionTab: string;
-}
-
-interface PoliciesSettings {
-  layout?: string;
-  backgroundColor?: string;
-  titleColor?: string;
-  titleSize?: string;
-  titleFont?: "inter" | "roboto" | "open-sans" | "poppins" | "lato";
-  titleFontWeight?: string;
-  sectionTitleColor?: string;
-  sectionTitleSize?: string;
-  sectionTitleFont?: "inter" | "roboto" | "open-sans" | "poppins" | "lato";
-  sectionTitleFontWeight?: string;
-  sectionContentColor?: string;
-  sectionContentFont?: "inter" | "roboto" | "open-sans" | "poppins" | "lato";
-  sectionContentFontSize?: string;
-  sectionContentFontWeight?: string;
+  policiesAttributes: PoliciesCustomizationAttributes;
+  updatePoliciesAttributes: (
+    updates: Partial<PoliciesCustomizationAttributes>
+  ) => void;
 }
 
 export function RenderPoliciesSection({
   detailedSectionTab,
+  policiesAttributes,
+  updatePoliciesAttributes,
 }: RenderPoliciesSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -97,32 +87,21 @@ export function RenderPoliciesSection({
     });
   };
 
-  // Content State
-  const [title, setTitle] = useState("Policies");
+  // Handle layout selection and update template
+  const handleLayoutSelection = (layoutId: number) => {
+    const templateNames = [
+      "TitleLeftContentCenterPolicies",
+      "DefaultPolicies",
+      "LeftPolicies",
+      "CenteredPolicies",
+    ];
+    const templateName =
+      templateNames[layoutId - 1] || "TitleLeftContentCenterPolicies";
+    updatePoliciesAttributes({ template: templateName });
+  };
 
-  // Design State
-  const [policiesSettings, setPoliciesSettings] = useState<PoliciesSettings>({
-    layout: "1",
-    backgroundColor: "#ffffff",
-    titleColor: "#ffffff",
-    titleSize: "18",
-    titleFont: "inter",
-    titleFontWeight: "normal",
-    sectionTitleColor: "#ffffff",
-    sectionTitleSize: "18",
-    sectionTitleFont: "inter",
-    sectionTitleFontWeight: "normal",
-    sectionContentColor: "#ffffff",
-    sectionContentFont: "inter",
-    sectionContentFontSize: "18",
-    sectionContentFontWeight: "normal",
-  });
-
-  const updateSettings = (field: keyof PoliciesSettings, value: string) => {
-    setPoliciesSettings((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleTitleChange = (newTitle: string) => {
+    updatePoliciesAttributes({ title: newTitle });
   };
 
   return (
@@ -133,8 +112,8 @@ export function RenderPoliciesSection({
           <div className="space-y-3">
             <h1 className="text-lg font-semibold tracking-tight">Title</h1>
             <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={policiesAttributes.title}
+              onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Enter section title"
             />
           </div>
@@ -142,7 +121,17 @@ export function RenderPoliciesSection({
       ) : (
         <div className="p-4 space-y-6">
           {/* Layout Selection */}
-          <PoliciesLayoutItems />
+          <PoliciesLayoutItems
+            selectedLayout={
+              [
+                "TitleLeftContentCenterPolicies",
+                "DefaultPolicies",
+                "LeftPolicies",
+                "CenteredPolicies",
+              ].indexOf(policiesAttributes.template) + 1
+            }
+            onLayoutSelect={handleLayoutSelection}
+          />
 
           {/* Background */}
           <div className="flex items-center">
@@ -165,19 +154,27 @@ export function RenderPoliciesSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={policiesSettings.backgroundColor}
-                    onChange={(e) =>
-                      updateSettings("backgroundColor", e.target.value)
-                    }
+                    value={policiesAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={policiesSettings.backgroundColor}
-                    onChange={(e) =>
-                      updateSettings("backgroundColor", e.target.value)
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={policiesAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -200,114 +197,247 @@ export function RenderPoliciesSection({
           </div>
           {expandedSections.title && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    value={policiesSettings.titleColor}
-                    onChange={(e) =>
-                      updateSettings("titleColor", e.target.value)
-                    }
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={policiesSettings.titleColor}
-                    onChange={(e) =>
-                      updateSettings("titleColor", e.target.value)
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(policiesSettings.titleSize!) || ""}
-                    onChange={(e) =>
-                      updateSettings(
-                        "titleSize",
-                        e.target.value ? `${e.target.value}px` : "0px"
-                      )
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
-              </div>
-              <div className="space-y-2">
+              {/* font family */}
+              <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.titleFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          policiesAttributes.titleFont === "font-inter"
+                            ? "Inter"
+                            : policiesAttributes.titleFont === "font-roboto"
+                            ? "Roboto"
+                            : policiesAttributes.titleFont === "font-open-sans"
+                            ? "Open Sans"
+                            : policiesAttributes.titleFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={(e) => {
-                            const value = font;
-                            if (
-                              value === "inter" ||
-                              value === "roboto" ||
-                              value === "open-sans" ||
-                              value === "poppins" ||
-                              value === "lato"
-                            ) {
-                              updateSettings("titleFont", value);
-                            }
-                          }}
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleFont: "font-roboto" })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          titleFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleFont: "font-poppins" })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+
+              {/* color */}
               <div className="space-y-2">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={policiesAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={policiesAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {policiesAttributes.titleSize === "text-sm"
+                          ? "Small"
+                          : policiesAttributes.titleSize === "text-base"
+                          ? "Medium"
+                          : policiesAttributes.titleSize === "text-lg"
+                          ? "Large"
+                          : policiesAttributes.titleSize === "text-xl"
+                          ? "XL"
+                          : policiesAttributes.titleSize === "text-2xl"
+                          ? "2XL"
+                          : policiesAttributes.titleSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({ titleSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* font weight */}
+              <div>
                 <label className="block text-sm mb-2">Font Weight</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.titleFontWeight}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {policiesAttributes.titleFontWeight === "font-normal"
+                          ? "Normal"
+                          : policiesAttributes.titleFontWeight === "font-medium"
+                          ? "Medium"
+                          : policiesAttributes.titleFontWeight ===
+                            "font-semibold"
+                          ? "Semibold"
+                          : "Bold"}
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["normal", "medium", "semibold", "bold"].map((weight) => (
-                      <DropdownMenuItem
-                        key={weight}
-                        onSelect={(e) => {
-                          const value = weight;
-                          if (
-                            value === "normal" ||
-                            value === "medium" ||
-                            value === "semibold" ||
-                            value === "bold"
-                          ) {
-                            updateSettings("titleFontWeight", value);
-                          }
-                        }}
-                      >
-                        {weight}
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          titleFontWeight: "font-normal",
+                        })
+                      }
+                    >
+                      Normal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          titleFontWeight: "font-medium",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          titleFontWeight: "font-semibold",
+                        })
+                      }
+                    >
+                      Semibold
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          titleFontWeight: "font-bold",
+                        })
+                      }
+                    >
+                      Bold
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -336,111 +466,268 @@ export function RenderPoliciesSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={policiesSettings.sectionTitleColor}
-                    onChange={(e) =>
-                      updateSettings("sectionTitleColor", e.target.value)
-                    }
+                    value={policiesAttributes.sectionTitleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        sectionTitleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={policiesSettings.sectionTitleColor}
-                    onChange={(e) =>
-                      updateSettings("sectionTitleColor", e.target.value)
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={policiesAttributes.sectionTitleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        sectionTitleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">
-                  Title Font Size (px)
-                </label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(policiesSettings.sectionTitleSize!) || ""}
-                    onChange={(e) =>
-                      updateSettings(
-                        "sectionTitleSize",
-                        e.target.value ? `${e.target.value}px` : "0px"
-                      )
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+
+              {/* Section Title Font Size */}
+              <div>
+                <label className="block text-sm mb-2">Title Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {policiesAttributes.sectionTitleSize === "text-sm"
+                          ? "Small"
+                          : policiesAttributes.sectionTitleSize === "text-base"
+                          ? "Medium"
+                          : policiesAttributes.sectionTitleSize === "text-lg"
+                          ? "Large"
+                          : policiesAttributes.sectionTitleSize === "text-xl"
+                          ? "XL"
+                          : policiesAttributes.sectionTitleSize === "text-2xl"
+                          ? "2XL"
+                          : policiesAttributes.sectionTitleSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-sm",
+                        })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-base",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-lg",
+                        })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-xl",
+                        })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-2xl",
+                        })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-3xl",
+                        })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleSize: "text-4xl",
+                        })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <div className="space-y-2">
+
+              {/* Section Title Font Family */}
+              <div>
                 <label className="block text-sm mb-2">Title Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.sectionTitleFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          policiesAttributes.sectionTitleFont === "font-inter"
+                            ? "Inter"
+                            : policiesAttributes.sectionTitleFont ===
+                              "font-roboto"
+                            ? "Roboto"
+                            : policiesAttributes.sectionTitleFont ===
+                              "font-open-sans"
+                            ? "Open Sans"
+                            : policiesAttributes.sectionTitleFont ===
+                              "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={(e) => {
-                            const value = font;
-                            if (
-                              value === "inter" ||
-                              value === "roboto" ||
-                              value === "open-sans" ||
-                              value === "poppins" ||
-                              value === "lato"
-                            ) {
-                              updateSettings("sectionTitleFont", value);
-                            }
-                          }}
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFont: "font-inter",
+                        })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFont: "font-roboto",
+                        })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFont: "font-poppins",
+                        })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFont: "font-lato",
+                        })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="space-y-2">
+
+              {/* Section Title Font Weight */}
+              <div>
                 <label className="block text-sm mb-2">Title Font Weight</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.sectionTitleFontWeight}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {policiesAttributes.sectionTitleFontWeight ===
+                        "font-normal"
+                          ? "Normal"
+                          : policiesAttributes.sectionTitleFontWeight ===
+                            "font-medium"
+                          ? "Medium"
+                          : policiesAttributes.sectionTitleFontWeight ===
+                            "font-semibold"
+                          ? "Semibold"
+                          : "Bold"}
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["normal", "medium", "semibold", "bold"].map((weight) => (
-                      <DropdownMenuItem
-                        key={weight}
-                        onSelect={(e) => {
-                          const value = weight;
-                          if (
-                            value === "normal" ||
-                            value === "medium" ||
-                            value === "semibold" ||
-                            value === "bold"
-                          ) {
-                            updateSettings("sectionTitleFontWeight", value);
-                          }
-                        }}
-                      >
-                        {weight}
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFontWeight: "font-normal",
+                        })
+                      }
+                    >
+                      Normal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFontWeight: "font-medium",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFontWeight: "font-semibold",
+                        })
+                      }
+                    >
+                      Semibold
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionTitleFontWeight: "font-bold",
+                        })
+                      }
+                    >
+                      Bold
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -451,48 +738,130 @@ export function RenderPoliciesSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={policiesSettings.sectionContentColor}
-                    onChange={(e) =>
-                      updateSettings("sectionContentColor", e.target.value)
-                    }
+                    value={policiesAttributes.sectionContentColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        sectionContentColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={policiesSettings.sectionContentColor}
-                    onChange={(e) =>
-                      updateSettings("sectionContentColor", e.target.value)
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={policiesAttributes.sectionContentColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updatePoliciesAttributes({
+                        sectionContentColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">
-                  Content Font Size (px)
-                </label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={
-                      parseInt(policiesSettings.sectionContentFontSize!) || ""
-                    }
-                    onChange={(e) =>
-                      updateSettings(
-                        "sectionContentFontSize",
-                        e.target.value ? `${e.target.value}px` : "0px"
-                      )
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
                 </div>
               </div>
 
-              {/* Font Settings */}
-              <div className="space-y-2">
+              {/* Section Content Font Size */}
+              <div>
+                <label className="block text-sm mb-2">Content Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {policiesAttributes.sectionContentSize === "text-sm"
+                          ? "Small"
+                          : policiesAttributes.sectionContentSize ===
+                            "text-base"
+                          ? "Medium"
+                          : policiesAttributes.sectionContentSize === "text-lg"
+                          ? "Large"
+                          : policiesAttributes.sectionContentSize === "text-xl"
+                          ? "XL"
+                          : policiesAttributes.sectionContentSize === "text-2xl"
+                          ? "2XL"
+                          : policiesAttributes.sectionContentSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-sm",
+                        })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-base",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-lg",
+                        })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-xl",
+                        })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-2xl",
+                        })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-3xl",
+                        })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentSize: "text-4xl",
+                        })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Section Content Font Family */}
+              <div>
                 <label className="block text-sm mb-2">
                   Content Font Family
                 </label>
@@ -500,38 +869,80 @@ export function RenderPoliciesSection({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.sectionContentFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          policiesAttributes.sectionContentFont === "font-inter"
+                            ? "Inter"
+                            : policiesAttributes.sectionContentFont ===
+                              "font-roboto"
+                            ? "Roboto"
+                            : policiesAttributes.sectionContentFont ===
+                              "font-open-sans"
+                            ? "Open Sans"
+                            : policiesAttributes.sectionContentFont ===
+                              "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={(e) => {
-                            const value = font;
-                            if (
-                              value === "inter" ||
-                              value === "roboto" ||
-                              value === "open-sans" ||
-                              value === "poppins" ||
-                              value === "lato"
-                            ) {
-                              updateSettings("sectionContentFont", value);
-                            }
-                          }}
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFont: "font-inter",
+                        })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFont: "font-roboto",
+                        })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFont: "font-poppins",
+                        })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFont: "font-lato",
+                        })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="space-y-2">
+
+              {/* Section Content Font Weight */}
+              <div>
                 <label className="block text-sm mb-2">
                   Content Font Weight
                 </label>
@@ -539,31 +950,61 @@ export function RenderPoliciesSection({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {policiesSettings.sectionContentFontWeight}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {policiesAttributes.sectionContentFontWeight ===
+                        "font-normal"
+                          ? "Normal"
+                          : policiesAttributes.sectionContentFontWeight ===
+                            "font-medium"
+                          ? "Medium"
+                          : policiesAttributes.sectionContentFontWeight ===
+                            "font-semibold"
+                          ? "Semibold"
+                          : "Bold"}
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["normal", "medium", "semibold", "bold"].map((font) => (
-                      <DropdownMenuItem
-                        key={font}
-                        onSelect={(e) => {
-                          const value = font;
-                          if (
-                            value === "normal" ||
-                            value === "medium" ||
-                            value === "semibold" ||
-                            value === "bold"
-                          ) {
-                            updateSettings("sectionContentFontWeight", value);
-                          }
-                        }}
-                      >
-                        {font}
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFontWeight: "font-normal",
+                        })
+                      }
+                    >
+                      Normal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFontWeight: "font-medium",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFontWeight: "font-semibold",
+                        })
+                      }
+                    >
+                      Semibold
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updatePoliciesAttributes({
+                          sectionContentFontWeight: "font-bold",
+                        })
+                      }
+                    >
+                      Bold
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

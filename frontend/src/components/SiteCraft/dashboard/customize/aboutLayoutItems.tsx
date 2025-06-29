@@ -1,11 +1,18 @@
 "use client";
 import React, { useState } from "react";
 
-export function AboutLayoutItems() {
+interface AboutLayoutItemsProps {
+  selectedLayout: number;
+  onLayoutSelect: (layoutId: number) => void;
+}
+
+export function AboutLayoutItems({
+  selectedLayout,
+  onLayoutSelect,
+}: AboutLayoutItemsProps) {
   {
     /* For layout selection in design */
   }
-  const [layoutSelected, setLayoutSelected] = useState<number | null>(1);
   return (
     <div>
       <h3 className="font-medium mb-2">Layout</h3>
@@ -14,11 +21,11 @@ export function AboutLayoutItems() {
           <button
             key={layoutId}
             className={`flex flex-col items-center justify-center aspect-square p-2 rounded border border-gray-200 hover:border-gray-900 transition-colors shadow ${
-              layoutId === layoutSelected
+              layoutId === selectedLayout
                 ? "bg-gray-800 border-gray-500"
                 : "bg-white"
             }`}
-            onClick={() => setLayoutSelected(layoutId)}
+            onClick={() => onLayoutSelect(layoutId)}
           >
             {layoutId === 1 && (
               <div className="flex flex-col space-y-0.5 items-center justify-center w-8 h-5">

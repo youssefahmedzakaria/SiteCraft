@@ -118,9 +118,10 @@ export interface FooterCustomizationAttributes {
   brandName: string;
   backgroundColor: string;
   textColor: string;
-  Logo: {
+  logo: {
     src: string | null;
     alt: string;
+    size: string;
   };
   aboutLinks: {
     label: string;

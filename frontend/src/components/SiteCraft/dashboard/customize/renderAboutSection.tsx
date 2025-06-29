@@ -20,26 +20,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "@/components/SiteCraft/ui/button";
+import { AboutCustomizationAttributes } from "@/lib/customization";
 
 type DesignSectionName = "image" | "title" | "description" | "background";
 
-interface AboutUsSettings {
-  titleFont: string;
-  titleColor: string;
-  titleSize: string;
-  descriptionFont: string;
-  descriptionColor: string;
-  descriptionSize: string;
-  backgroundColor: string;
-  imageObjectFit: "Cover" | "Fill" | "Contain";
-}
-
 interface RenderAboutSectionProps {
   detailedSectionTab: string;
+  aboutAttributes: AboutCustomizationAttributes;
+  updateAboutAttributes: (
+    updates: Partial<AboutCustomizationAttributes>
+  ) => void;
 }
 
 export function RenderAboutSection({
   detailedSectionTab,
+  aboutAttributes,
+  updateAboutAttributes,
 }: RenderAboutSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -48,17 +44,6 @@ export function RenderAboutSection({
     title: false,
     description: false,
     background: false,
-  });
-
-  const [aboutUsSettings, setPromoSettings] = useState<AboutUsSettings>({
-    titleFont: "inter",
-    titleColor: "#000000",
-    titleSize: "16px",
-    descriptionFont: "inter",
-    descriptionColor: "#666666",
-    descriptionSize: "14px",
-    backgroundColor: "#ffffff",
-    imageObjectFit: "Cover",
   });
 
   const toggleSection = (section: DesignSectionName) => {
@@ -84,20 +69,29 @@ export function RenderAboutSection({
     });
   };
 
+  // Handle layout selection and update template
+  const handleLayoutSelection = (layoutId: number) => {
+    const templateNames = [
+      "TopImageAbout",
+      "CenteredAbout",
+      "LeftAlignedAbout",
+      "RightAlignedAbout",
+    ];
+    const templateName = templateNames[layoutId - 1] || "TopImageAbout";
+    updateAboutAttributes({ template: templateName });
+  };
+
   {
     /* For image selection in content */
   }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        updateAboutAttributes({ image: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -115,10 +109,9 @@ export function RenderAboutSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        updateAboutAttributes({ image: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -138,12 +131,12 @@ export function RenderAboutSection({
             >
               <div
                 className={`relative w-16 h-16 rounded ${
-                  imagePreview ? "" : "bg-gray-100"
+                  aboutAttributes.image ? "" : "bg-gray-100"
                 }  overflow-hidden`}
               >
-                {imagePreview ? (
+                {aboutAttributes.image ? (
                   <Image
-                    src={imagePreview}
+                    src={aboutAttributes.image}
                     alt="Image preview"
                     fill
                     className="object-contain rounded-md"
@@ -155,7 +148,7 @@ export function RenderAboutSection({
                 )}
               </div>
               <div className="flex items-center gap-2 rounded">
-                {imagePreview ? (
+                {aboutAttributes.image ? (
                   <p className="text-xs">
                     Drag and drop your image here to change image, or{" "}
                     <span
@@ -200,13 +193,27 @@ export function RenderAboutSection({
               id="imageAlt"
               name="imageAlt"
               placeholder="About us image alt text"
+              value={aboutAttributes.imageAlt || ""}
               className="w-full bg-background"
+              onChange={(e) =>
+                updateAboutAttributes({ imageAlt: e.target.value })
+              }
             />
           </div>
         </div>
       ) : (
         <div className="p-4 space-y-6">
-          <AboutLayoutItems />
+          <AboutLayoutItems
+            selectedLayout={
+              [
+                "TopImageAbout",
+                "CenteredAbout",
+                "LeftAlignedAbout",
+                "RightAlignedAbout",
+              ].indexOf(aboutAttributes.template) + 1
+            }
+            onLayoutSelect={handleLayoutSelection}
+          />
 
           {/* Image Section */}
           <div className="flex items-center">
@@ -230,55 +237,43 @@ export function RenderAboutSection({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {aboutUsSettings.imageObjectFit}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {aboutAttributes.imageObjectFit === "Cover"
+                          ? "Cover"
+                          : aboutAttributes.imageObjectFit === "Fill"
+                          ? "Fill"
+                          : "Contain"}
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["Cover", "Fill", "Contain"].map((fit) => (
-                      <DropdownMenuItem
-                        key={fit}
-                        onSelect={() =>
-                          setPromoSettings((s) => ({
-                            ...s,
-                            imageObjectFit: fit as any,
-                          }))
-                        }
-                      >
-                        {fit}
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ imageObjectFit: "Cover" })
+                      }
+                    >
+                      Cover
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ imageObjectFit: "Fill" })
+                      }
+                    >
+                      Fill
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ imageObjectFit: "Contain" })
+                      }
+                    >
+                      Contain
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Background Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    value={aboutUsSettings.backgroundColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        backgroundColor: e.target.value,
-                      }))
-                    }
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={aboutUsSettings.backgroundColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        backgroundColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -299,80 +294,243 @@ export function RenderAboutSection({
           </div>
           {expandedSections.title && (
             <div className="space-y-4">
+              {/* font family */}
               <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {aboutUsSettings.titleFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          aboutAttributes.titleFont === "font-inter"
+                            ? "Inter"
+                            : aboutAttributes.titleFont === "font-roboto"
+                            ? "Roboto"
+                            : aboutAttributes.titleFont === "font-open-sans"
+                            ? "Open Sans"
+                            : aboutAttributes.titleFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setPromoSettings((s) => ({ ...s, titleFont: font }))
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleFont: "font-roboto" })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          titleFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleFont: "font-poppins" })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+              {/* color */}
               <div className="space-y-2">
                 <label className="block text-sm mb-2">Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={aboutUsSettings.titleColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleColor: e.target.value,
-                      }))
-                    }
+                    value={aboutAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updateAboutAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={aboutUsSettings.titleColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={aboutAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateAboutAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(aboutUsSettings.titleSize) || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        titleSize: value ? `${value}px` : "0px",
-                      }));
-                    }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {aboutAttributes.titleSize === "text-sm"
+                          ? "Small"
+                          : aboutAttributes.titleSize === "text-base"
+                          ? "Medium"
+                          : aboutAttributes.titleSize === "text-lg"
+                          ? "Large"
+                          : aboutAttributes.titleSize === "text-xl"
+                          ? "XL"
+                          : aboutAttributes.titleSize === "text-2xl"
+                          ? "2XL"
+                          : aboutAttributes.titleSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              {/* font weight */}
+              <div>
+                <label className="block text-sm mb-2">Font Weight</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {aboutAttributes.titleFontWeight === "font-normal"
+                          ? "Normal"
+                          : aboutAttributes.titleFontWeight === "font-medium"
+                          ? "Medium"
+                          : aboutAttributes.titleFontWeight === "font-semibold"
+                          ? "Semibold"
+                          : "Bold"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          titleFontWeight: "font-normal",
+                        })
+                      }
+                    >
+                      Normal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          titleFontWeight: "font-medium",
+                        })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          titleFontWeight: "font-semibold",
+                        })
+                      }
+                    >
+                      Semibold
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ titleFontWeight: "font-bold" })
+                      }
+                    >
+                      Bold
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           )}
@@ -393,84 +551,237 @@ export function RenderAboutSection({
           </div>
           {expandedSections.description && (
             <div className="space-y-4">
+              {/* font family */}
               <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {aboutUsSettings.descriptionFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          aboutAttributes.descriptionFont === "font-inter"
+                            ? "Inter"
+                            : aboutAttributes.descriptionFont === "font-roboto"
+                            ? "Roboto"
+                            : aboutAttributes.descriptionFont ===
+                              "font-open-sans"
+                            ? "Open Sans"
+                            : aboutAttributes.descriptionFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setPromoSettings((s) => ({
-                              ...s,
-                              descriptionFont: font,
-                            }))
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          descriptionFont: "font-roboto",
+                        })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          descriptionFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({
+                          descriptionFont: "font-poppins",
+                        })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
 
+              {/* color */}
               <div className="space-y-2">
                 <label className="block text-sm mb-2">Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={aboutUsSettings.descriptionColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionColor: e.target.value,
-                      }))
-                    }
+                    value={aboutAttributes.descriptionColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updateAboutAttributes({
+                        descriptionColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={aboutUsSettings.descriptionColor}
-                    onChange={(e) =>
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionColor: e.target.value,
-                      }))
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={aboutAttributes.descriptionColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateAboutAttributes({
+                        descriptionColor: `text-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
 
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {aboutAttributes.descriptionSize === "text-sm"
+                          ? "Small"
+                          : aboutAttributes.descriptionSize === "text-base"
+                          ? "Medium"
+                          : aboutAttributes.descriptionSize === "text-lg"
+                          ? "Large"
+                          : aboutAttributes.descriptionSize === "text-xl"
+                          ? "XL"
+                          : aboutAttributes.descriptionSize === "text-2xl"
+                          ? "2XL"
+                          : aboutAttributes.descriptionSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateAboutAttributes({ descriptionSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          )}
+
+          {/* Background Section */}
+          <div className="flex items-center">
+            <button
+              className="flex-1 flex items-center justify-between text-left"
+              onClick={() => toggleSection("background")}
+            >
+              <span className="font-medium">Background</span>
+              {expandedSections.background ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronRight size={18} />
+              )}
+            </button>
+          </div>
+          {expandedSections.background && (
+            <div className="space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
+                <label className="block text-sm mb-2">Background Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
-                    type="number"
-                    value={parseInt(aboutUsSettings.descriptionSize) || ""}
+                    type="color"
+                    value={aboutAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setPromoSettings((s) => ({
-                        ...s,
-                        descriptionSize: value ? `${value}px` : "0px",
-                      }));
+                      updateAboutAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
                     }}
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="14"
-                    min="0"
                   />
-                  <span className="text-sm text-gray-500">px</span>
+                  <input
+                    type="text"
+                    value={aboutAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateAboutAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </div>

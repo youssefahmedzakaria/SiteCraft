@@ -14,56 +14,35 @@ import {
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { ContactLayoutItems } from "./contactLayoutItems";
+import { ContactCustomizationAttributes } from "@/lib/customization";
 
 // design sections
 type DesignSectionName = "background" | "title" | "content";
 
-interface ContactSettings {
-  title?: string;
-  address?: string;
-  addressLink?: string;
-  openHours?: string;
-  phone?: string;
-  email?: string;
-  layout?: string;
-  backgroundColor?: string;
-  titleFont?: "inter" | "roboto" | "open-sans" | "poppins" | "lato";
-  titleColor?: string;
-  titleSize?: string;
-  contentFont?: "inter" | "roboto" | "open-sans" | "poppins" | "lato";
-  contentColor?: string;
-  contentFontSize?: string;
-  showMap?: boolean;
-}
-
-// social media link data
-interface SocialMediaLinks {
-  id: string;
-  title?: string;
-  link?: string;
-}
-
 interface RenderContactSectionProps {
   detailedSectionTab: string;
+  contactAttributes: ContactCustomizationAttributes;
+  updateContactAttributes: (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => void;
 }
 
 export function RenderContactSection({
   detailedSectionTab,
+  contactAttributes,
+  updateContactAttributes,
 }: RenderContactSectionProps) {
   {
     /* For image selection in content */
   }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        updateContactAttributes({ imageUrl: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -81,37 +60,26 @@ export function RenderContactSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        updateContactAttributes({ imageUrl: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  {
-    /* For About Links in content */
-  }
-  const [contentLinks, setContentLink] = useState<SocialMediaLinks[]>([
-    {
-      id: "1",
-      title: "Facebook",
-      link: undefined,
-    },
-    {
-      id: "2",
-      title: "Instagram",
-      link: undefined,
-    },
-    {
-      id: "3",
-      title: "Twitter",
-      link: undefined,
-    },
-  ]);
-
-  // -----------------------------------------------------------------------------------------------------------------------------
+  // Handle layout selection and update template
+  const handleLayoutSelection = (layoutId: number) => {
+    const templateNames = [
+      "MinimalRightContact",
+      "MinimalLeftContact",
+      "CenteredContact",
+      "LeftAlignedContact",
+      "RightAlignedContact",
+    ];
+    const templateName = templateNames[layoutId - 1] || "MinimalRightContact";
+    updateContactAttributes({ template: templateName });
+  };
 
   {
     /* design sections */
@@ -145,27 +113,6 @@ export function RenderContactSection({
     });
   };
 
-  {
-    /* For design settings */
-  }
-  const [contactSettings, setContactSettings] = useState<ContactSettings>({
-    title: "Contact Us",
-    address: undefined,
-    addressLink: undefined,
-    openHours: undefined,
-    phone: undefined,
-    email: undefined,
-    layout: "1",
-    backgroundColor: "#ffffff",
-    titleFont: "inter",
-    titleColor: "#000000",
-    titleSize: "18px",
-    contentFont: "inter",
-    contentColor: "#000000",
-    contentFontSize: "16px",
-    showMap: true,
-  });
-
   return (
     <div>
       {detailedSectionTab === "content" ? (
@@ -178,18 +125,22 @@ export function RenderContactSection({
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <Button
-                  variant={contactSettings.showMap ? "default" : "outline"}
+                  variant={contactAttributes.showMap ? "default" : "outline"}
                   onClick={() =>
-                    setContactSettings({ ...contactSettings, showMap: true })
+                    updateContactAttributes({
+                      showMap: true,
+                    })
                   }
                   className="flex-1"
                 >
                   Map View
                 </Button>
                 <Button
-                  variant={!contactSettings.showMap ? "default" : "outline"}
+                  variant={!contactAttributes.showMap ? "default" : "outline"}
                   onClick={() =>
-                    setContactSettings({ ...contactSettings, showMap: false })
+                    updateContactAttributes({
+                      showMap: false,
+                    })
                   }
                   className="flex-1"
                 >
@@ -197,7 +148,7 @@ export function RenderContactSection({
                 </Button>
               </div>
 
-              {contactSettings.showMap ? (
+              {contactAttributes.showMap ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
@@ -206,10 +157,9 @@ export function RenderContactSection({
                     <Input
                       id="address"
                       name="address"
-                      value={contactSettings.address}
+                      value={contactAttributes.address}
                       onChange={(e) =>
-                        setContactSettings({
-                          ...contactSettings,
+                        updateContactAttributes({
                           address: e.target.value,
                         })
                       }
@@ -223,11 +173,10 @@ export function RenderContactSection({
                     <Input
                       id="addressLink"
                       name="addressLink"
-                      value={contactSettings.addressLink}
+                      value={contactAttributes.addressUrl}
                       onChange={(e) =>
-                        setContactSettings({
-                          ...contactSettings,
-                          addressLink: e.target.value,
+                        updateContactAttributes({
+                          addressUrl: e.target.value,
                         })
                       }
                       placeholder="Enter Google Maps link"
@@ -240,10 +189,9 @@ export function RenderContactSection({
                     <Input
                       id="openHours"
                       name="openHours"
-                      value={contactSettings.openHours}
+                      value={contactAttributes.openHours}
                       onChange={(e) =>
-                        setContactSettings({
-                          ...contactSettings,
+                        updateContactAttributes({
                           openHours: e.target.value,
                         })
                       }
@@ -258,10 +206,10 @@ export function RenderContactSection({
                   onDrop={handleDropImage}
                   onClick={handleBrowseClick}
                 >
-                  {imagePreview ? (
+                  {contactAttributes.imageUrl ? (
                     <div className="relative w-full h-48">
                       <Image
-                        src={imagePreview}
+                        src={contactAttributes.imageUrl}
                         alt="Preview"
                         fill
                         className="object-contain"
@@ -290,7 +238,18 @@ export function RenderContactSection({
       ) : (
         <div className="p-4 space-y-6">
           {/* Layout */}
-          <ContactLayoutItems />
+          <ContactLayoutItems
+            selectedLayout={
+              [
+                "MinimalRightContact",
+                "MinimalLeftContact",
+                "CenteredContact",
+                "LeftAlignedContact",
+                "RightAlignedContact",
+              ].indexOf(contactAttributes.template) + 1
+            }
+            onLayoutSelect={handleLayoutSelection}
+          />
 
           {/* Background */}
           <div className="flex items-center">
@@ -309,29 +268,31 @@ export function RenderContactSection({
           {expandedDesignSections.background && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm mb-2">Color</label>
+                <label className="block text-sm mb-2">Background Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={contactSettings.backgroundColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        backgroundColor: e.target.value,
-                      })
-                    }
+                    value={contactAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                   <input
                     type="text"
-                    value={contactSettings.backgroundColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        backgroundColor: e.target.value,
-                      })
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
+                    value={contactAttributes.backgroundColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        backgroundColor: `bg-[${e.target.value}]`,
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -354,82 +315,183 @@ export function RenderContactSection({
           </div>
           {expandedDesignSections.title && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    value={contactSettings.titleColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        titleColor: e.target.value,
-                      })
-                    }
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={contactSettings.titleColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        titleColor: e.target.value,
-                      })
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(contactSettings.titleSize!) || ""}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        titleSize: e.target.value
-                          ? `${e.target.value}px`
-                          : "0px",
-                      })
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
-              </div>
-              <div className="space-y-2">
+              {/* font family */}
+              <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {contactSettings.titleFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          contactAttributes.titleFont === "font-inter"
+                            ? "Inter"
+                            : contactAttributes.titleFont === "font-roboto"
+                            ? "Roboto"
+                            : contactAttributes.titleFont === "font-open-sans"
+                            ? "Open Sans"
+                            : contactAttributes.titleFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setContactSettings({
-                              ...contactSettings,
-                              titleFont: font as ContactSettings["titleFont"],
-                            })
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleFont: "font-roboto" })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({
+                          titleFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleFont: "font-poppins" })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* color */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={contactAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={contactAttributes.titleColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        titleColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {contactAttributes.titleSize === "text-sm"
+                          ? "Small"
+                          : contactAttributes.titleSize === "text-base"
+                          ? "Medium"
+                          : contactAttributes.titleSize === "text-lg"
+                          ? "Large"
+                          : contactAttributes.titleSize === "text-xl"
+                          ? "XL"
+                          : contactAttributes.titleSize === "text-2xl"
+                          ? "2XL"
+                          : contactAttributes.titleSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ titleSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -452,83 +514,183 @@ export function RenderContactSection({
           </div>
           {expandedDesignSections.content && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Color</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="color"
-                    value={contactSettings.contentColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        contentColor: e.target.value,
-                      })
-                    }
-                    className="w-8 h-8 cursor-pointer bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={contactSettings.contentColor}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        contentColor: e.target.value,
-                      })
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm mb-2">Font Size (px)</label>
-                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                  <input
-                    type="number"
-                    value={parseInt(contactSettings.contentFontSize!) || ""}
-                    onChange={(e) =>
-                      setContactSettings({
-                        ...contactSettings,
-                        contentFontSize: e.target.value
-                          ? `${e.target.value}px`
-                          : "0px",
-                      })
-                    }
-                    className="flex-1 border-none bg-transparent focus:outline-none text-sm"
-                    placeholder="16"
-                    min="0"
-                  />
-                  <span className="text-sm text-gray-500">px</span>
-                </div>
-              </div>
-              <div className="space-y-2">
+              {/* font family */}
+              <div>
                 <label className="block text-sm mb-2">Font Family</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
-                      {contactSettings.contentFont}
-                      <ChevronDown className="ml-2 h-4 w-4" />
+                      <span className="ml-2">
+                        {
+                          contactAttributes.contentFont === "font-inter"
+                            ? "Inter"
+                            : contactAttributes.contentFont === "font-roboto"
+                            ? "Roboto"
+                            : contactAttributes.contentFont === "font-open-sans"
+                            ? "Open Sans"
+                            : contactAttributes.contentFont === "font-poppins"
+                            ? "Poppins"
+                            : "Lato" // default
+                        }
+                      </span>
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {["inter", "roboto", "open-sans", "poppins", "lato"].map(
-                      (font) => (
-                        <DropdownMenuItem
-                          key={font}
-                          onSelect={() =>
-                            setContactSettings({
-                              ...contactSettings,
-                              contentFont:
-                                font as ContactSettings["contentFont"],
-                            })
-                          }
-                        >
-                          {font}
-                        </DropdownMenuItem>
-                      )
-                    )}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentFont: "font-inter" })
+                      }
+                    >
+                      Inter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentFont: "font-roboto" })
+                      }
+                    >
+                      Roboto
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({
+                          contentFont: "font-open-sans",
+                        })
+                      }
+                    >
+                      Open Sans
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentFont: "font-poppins" })
+                      }
+                    >
+                      Poppins
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentFont: "font-lato" })
+                      }
+                    >
+                      Lato
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* color */}
+              <div className="space-y-2">
+                <label className="block text-sm mb-2">Color</label>
+                <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
+                  <input
+                    type="color"
+                    value={contactAttributes.contentColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="w-8 h-8 cursor-pointer bg-transparent"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        contentColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={contactAttributes.contentColor
+                      .split("-[")[1]
+                      .slice(0, -1)}
+                    className="flex-1 border-none bg-transparent focus:outline-none"
+                    onChange={(e) => {
+                      updateContactAttributes({
+                        contentColor: `text-[${e.target.value}]`,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* font size */}
+              <div>
+                <label className="block text-sm mb-2">Font Size</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                    >
+                      <span className="ml-2">
+                        {contactAttributes.contentSize === "text-sm"
+                          ? "Small"
+                          : contactAttributes.contentSize === "text-base"
+                          ? "Medium"
+                          : contactAttributes.contentSize === "text-lg"
+                          ? "Large"
+                          : contactAttributes.contentSize === "text-xl"
+                          ? "XL"
+                          : contactAttributes.contentSize === "text-2xl"
+                          ? "2XL"
+                          : contactAttributes.contentSize === "text-3xl"
+                          ? "3XL"
+                          : "4XL"}
+                      </span>
+                      <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-sm" })
+                      }
+                    >
+                      Small
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-base" })
+                      }
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-lg" })
+                      }
+                    >
+                      Large
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-xl" })
+                      }
+                    >
+                      XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-2xl" })
+                      }
+                    >
+                      2XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-3xl" })
+                      }
+                    >
+                      3XL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        updateContactAttributes({ contentSize: "text-4xl" })
+                      }
+                    >
+                      4XL
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

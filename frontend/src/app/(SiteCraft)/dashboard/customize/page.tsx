@@ -113,13 +113,13 @@ export default function CustomizeTemplatePage() {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-black",
+    titleColor: "text-[#000000]", // text-black
     description:
       "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
     secondaryDescription:
       "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
-    descriptionColor: "text-gray-600",
-    backgroundColor: "bg-white",
+    descriptionColor: "text-[#4B5563]", // text-gray-600
+    backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/about.jpg",
     imageAlt: "About our company",
     imageObjectFit: "cover",
@@ -127,7 +127,18 @@ export default function CustomizeTemplatePage() {
     titleSize: "text-4xl",
     titleFontWeight: "font-bold",
     descriptionFont: "font-sans",
-    descriptionSize: "text-base md:text-lg",
+    descriptionSize: "text-lg",
+  };
+
+  // State for about customization
+  const [aboutAttributes, setAboutAttributes] =
+    useState<AboutCustomizationAttributes>(initialAbout);
+
+  // Function to update about attributes
+  const updateAboutAttributes = (
+    updates: Partial<AboutCustomizationAttributes>
+  ) => {
+    setAboutAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialPolicies: PoliciesCustomizationAttributes = {
@@ -150,19 +161,30 @@ export default function CustomizeTemplatePage() {
           "We respect your privacy and protect your personal information.",
       },
     ],
-    backgroundColor: "bg-white",
-    titleColor: "text-black",
+    backgroundColor: "bg-[#FFFFFF]", // bg-white
+    titleColor: "text-[#000000]", // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-black",
+    sectionTitleColor: "text-[#000000]", // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-black",
+    sectionContentColor: "text-[#000000]", // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
+  };
+
+  // State for policies customization
+  const [policiesAttributes, setPoliciesAttributes] =
+    useState<PoliciesCustomizationAttributes>(initialPolicies);
+
+  // Function to update policies attributes
+  const updatePoliciesAttributes = (
+    updates: Partial<PoliciesCustomizationAttributes>
+  ) => {
+    setPoliciesAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialContact: ContactCustomizationAttributes = {
@@ -182,44 +204,56 @@ export default function CustomizeTemplatePage() {
     },
     imageUrl: "/ring.jpg",
     showMap: true,
-    backgroundColor: "bg-white",
+    backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-black",
+    titleColor: "text-[#000000]",
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-black",
+    contentColor: "text-[#000000]",
     contentSize: "text-lg",
+  };
+
+  // State for contact customization
+  const [contactAttributes, setContactAttributes] =
+    useState<ContactCustomizationAttributes>(initialContact);
+
+  // Function to update contact attributes
+  const updateContactAttributes = (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => {
+    setContactAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "BRAND",
-    backgroundColor: "bg-white",
+    backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-black",
-    Logo: {
+    logo: {
       src: "/logo.png",
       alt: "Company Logo",
+      size: "24",
     },
     aboutLinks: [
       {
         label: "Contact Us",
         href: "/contact",
         font: "font-serif",
-        fontSize: "text-lg black",
-        fontColor: "text-black",
+        fontSize: "text-lg",
+        fontColor: "text-[#000000]",
       },
       {
         label: "About Us",
         href: "/about",
         font: "font-serif",
-        fontSize: "text-lg black",
-        fontColor: "text-black",
+        fontSize: "text-lg",
+        fontColor: "text-[#000000]",
       },
       {
         label: "Policies",
         href: "/policies",
         font: "font-serif",
-        fontSize: "text-lg black",
-        fontColor: "text-black",
+        fontSize: "text-lg",
+        fontColor: "text-[#000000]",
       },
     ],
     socialMedia: {
@@ -228,15 +262,26 @@ export default function CustomizeTemplatePage() {
     },
     socialMediaStyles: {
       iconSize: 20,
-      iconColor: "text-black",
-      hoverColor: "text-black",
+      iconColor: "text-[#000000]",
+      hoverColor: "text-[#000000]",
     },
     copyrightStyles: {
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-light",
-      fontColor: "text-black",
+      fontColor: "text-[#000000]",
     },
+  };
+
+  // State for footer customization
+  const [footerAttributes, setFooterAttributes] =
+    useState<FooterCustomizationAttributes>(initialFooter);
+
+  // Function to update footer attributes
+  const updateFooterAttributes = (
+    updates: Partial<FooterCustomizationAttributes>
+  ) => {
+    setFooterAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   return (
@@ -247,6 +292,14 @@ export default function CustomizeTemplatePage() {
         updateHeaderAttributes={updateHeaderAttributes}
         promoAttributes={promoAttributes}
         updatePromoAttributes={updatePromoAttributes}
+        aboutAttributes={aboutAttributes}
+        updateAboutAttributes={updateAboutAttributes}
+        policiesAttributes={policiesAttributes}
+        updatePoliciesAttributes={updatePoliciesAttributes}
+        contactAttributes={contactAttributes}
+        updateContactAttributes={updateContactAttributes}
+        footerAttributes={footerAttributes}
+        updateFooterAttributes={updateFooterAttributes}
       />
 
       {/* Main content area */}
