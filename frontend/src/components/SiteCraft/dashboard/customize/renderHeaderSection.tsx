@@ -144,7 +144,15 @@ export function RenderHeaderSection({
 
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
-    const templateName = `template${layoutId}`;
+    const templateName = `template${layoutId}` as
+      | "template1"
+      | "template2"
+      | "template3"
+      | "template4"
+      | "template5"
+      | "template6"
+      | "template7"
+      | "template8";
     updateHeaderAttributes({ template: templateName });
   };
 

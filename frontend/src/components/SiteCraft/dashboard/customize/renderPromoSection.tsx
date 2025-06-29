@@ -1330,9 +1330,9 @@ export function RenderPromoSection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {promoAttributes.imageObjectFit === "Cover"
+                        {promoAttributes.imageObjectFit === "cover"
                           ? "Cover"
-                          : promoAttributes.imageObjectFit === "Fill"
+                          : promoAttributes.imageObjectFit === "fill"
                           ? "Fill"
                           : "Contain"}
                       </span>
@@ -1342,21 +1342,21 @@ export function RenderPromoSection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updatePromoAttributes({ imageObjectFit: "Cover" })
+                        updatePromoAttributes({ imageObjectFit: "cover" })
                       }
                     >
                       Cover
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updatePromoAttributes({ imageObjectFit: "Fill" })
+                        updatePromoAttributes({ imageObjectFit: "fill" })
                       }
                     >
                       Fill
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updatePromoAttributes({ imageObjectFit: "Contain" })
+                        updatePromoAttributes({ imageObjectFit: "contain" })
                       }
                     >
                       Contain

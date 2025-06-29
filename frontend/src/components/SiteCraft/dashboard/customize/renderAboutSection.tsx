@@ -241,9 +241,9 @@ export function RenderAboutSection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {aboutAttributes.imageObjectFit === "Cover"
+                        {aboutAttributes.imageObjectFit === "cover"
                           ? "Cover"
-                          : aboutAttributes.imageObjectFit === "Fill"
+                          : aboutAttributes.imageObjectFit === "fill"
                           ? "Fill"
                           : "Contain"}
                       </span>
@@ -253,21 +253,21 @@ export function RenderAboutSection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ imageObjectFit: "Cover" })
+                        updateAboutAttributes({ imageObjectFit: "cover" })
                       }
                     >
                       Cover
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ imageObjectFit: "Fill" })
+                        updateAboutAttributes({ imageObjectFit: "fill" })
                       }
                     >
                       Fill
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ imageObjectFit: "Contain" })
+                        updateAboutAttributes({ imageObjectFit: "contain" })
                       }
                     >
                       Contain
