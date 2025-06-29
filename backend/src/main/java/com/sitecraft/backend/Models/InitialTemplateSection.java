@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InitialTemplate {
+public class InitialTemplateSection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

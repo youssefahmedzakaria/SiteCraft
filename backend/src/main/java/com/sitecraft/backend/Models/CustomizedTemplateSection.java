@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomizedTemplate {
+public class CustomizedTemplateSection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
