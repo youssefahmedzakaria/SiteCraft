@@ -6,6 +6,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePathname } from "next/navigation"
+import { useCart } from "@/contexts/cart-context"
+import { useFavorites } from "@/contexts/favorites-context"
+import { useRouter } from "next/navigation"
 
 type CardItemType = "product" | "category"
 
@@ -17,6 +21,7 @@ type CornerRadius = "none" | "small" | "medium" | "large"
 
 // Define the props for the FlexibleCard component
 interface FlexibleCardProps {
+  isClickable?: boolean
   // Core data
   item: any
   type: CardItemType
@@ -64,6 +69,7 @@ interface FlexibleCardProps {
 }
 
 export default function FlexibleCard({
+  isClickable,
   // Core data
   item,
   type = "product",
@@ -109,6 +115,13 @@ export default function FlexibleCard({
   imageClassName = "",
   contentClassName = "",
 }: FlexibleCardProps) {
+  const path = usePathname()
+  const pathSegments = path.split("/")
+  const subdomain = pathSegments[2]
+  const router = useRouter()
+  const { addToCart, removeFromCart, state: cartState } = useCart()
+  const { addToFavorites, removeFromFavorites, state: favoritesState } = useFavorites()
+
   // Define aspect ratio classes
   const aspectRatioClass = {
     square: "aspect-square",
@@ -138,7 +151,7 @@ export default function FlexibleCard({
       : "text-blue-600"
 
   // Determine the link path based on the item type
-  const href = linkPath || (type === "product" ? `/${item.slug}` : `/list?cat=${item.slug}`)
+  const href = linkPath || (isClickable ? (type === "product" ? `/${item.id}` : `/e-commerce/${subdomain}/products`) : "#")
 
   // Get item description
   const description =
@@ -163,6 +176,63 @@ export default function FlexibleCard({
 
   const formatPrice = (price: number) => {
     return price.toFixed(2)
+  }
+
+  // Check if item is in favorites
+  const isInFavorites = favoritesState.items.some((fav) => fav.id === item.id)
+
+  // Check if item is in cart
+  const isInCart = cartState.items.some((cartItem) => cartItem.id === item.id)
+
+  // Handle add to cart action (toggle)
+  const handleAddToCartAction = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (type === "product") {
+      if (isInCart) {
+        // Remove from cart if already in cart
+        removeFromCart(item.id)
+      } else {
+        // Add to cart if not in cart
+        addToCart({
+          id: item.id,
+          name: item.name,
+          price: getPrice(),
+          image: imageUrl,
+        })
+      }
+    }
+    onAddToCart?.()
+  }
+
+  // Handle favorites action
+  const handleFavoritesAction = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (type === "product") {
+      const favoriteItem = {
+        id: item.id,
+        name: item.name,
+        price: getPrice(),
+        image: imageUrl,
+      }
+
+      if (isInFavorites) {
+        removeFromFavorites(item.id)
+      } else {
+        addToFavorites(favoriteItem)
+      }
+    }
+    onAddToFavorite?.()
+  }
+
+  // Handle view/eye action
+  const handleViewAction = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (type === "product") {
+      router.push(isClickable ? `/e-commerce/${subdomain}/product/${item.id}` : "#")
+    }
   }
 
   // Wrap content in Link if needed
@@ -414,24 +484,24 @@ export default function FlexibleCard({
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex gap-2">
                     <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        onAddToCart?.()
-                      }}
+                      onClick={handleAddToCartAction}
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                      title={isInCart ? "Remove from Cart" : "Add to Cart"}
                     >
-                      <ShoppingCart className="w-5 h-5" />
+                      <ShoppingCart className={`w-5 h-5 ${isInCart ? "fill-blue-500 text-blue-500" : ""}`} />
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        onAddToFavorite?.()
-                      }}
+                      onClick={handleFavoritesAction}
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                      title={isInFavorites ? "Remove from Favorites" : "Add to Favorites"}
                     >
-                      <Heart className="w-5 h-5" />
+                      <Heart className={`w-5 h-5 ${isInFavorites ? "fill-red-500 text-red-500" : ""}`} />
                     </button>
-                    <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+                    <button
+                      onClick={handleViewAction}
+                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                      title="View Product"
+                    >
                       <Eye className="w-5 h-5" />
                     </button>
                   </div>
@@ -522,22 +592,18 @@ export default function FlexibleCard({
               {type === "product" && (
                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onAddToCart?.()
-                    }}
+                    onClick={handleAddToCartAction}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    title={isInCart ? "Remove from Cart" : "Add to Cart"}
                   >
-                    <ShoppingCart className="w-5 h-5" />
+                    <ShoppingCart className={`w-5 h-5 ${isInCart ? "fill-blue-500 text-blue-500" : ""}`} />
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onAddToFavorite?.()
-                    }}
+                    onClick={handleFavoritesAction}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    title={isInFavorites ? "Remove from Favorites" : "Add to Favorites"}
                   >
-                    <Heart className="w-5 h-5" />
+                    <Heart className={`w-5 h-5 ${isInFavorites ? "fill-red-500 text-red-500" : ""}`} />
                   </button>
                 </div>
               )}
@@ -553,7 +619,7 @@ export default function FlexibleCard({
                   onClick={(e) => {
                     e.preventDefault()
                     if (type === "product") {
-                      onAddToCart?.()
+                      handleAddToCartAction(e)
                     } else {
                       ctaAction?.()
                     }

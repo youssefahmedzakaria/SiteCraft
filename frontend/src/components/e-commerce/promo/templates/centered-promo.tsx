@@ -2,6 +2,7 @@ import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
 export interface CenteredPromoProps {
+  isClickable?: boolean
   id?: string
   slides?: {
     title: string
@@ -29,6 +30,7 @@ export interface CenteredPromoProps {
 }
 
 export function CenteredPromo({ 
+  isClickable = true,
   id,
   slides = [
     {
@@ -87,6 +89,7 @@ export function CenteredPromo({
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
           backgroundColor={backgroundColor}
+          isClickable={isClickable}
         />
       </div>
     </section>

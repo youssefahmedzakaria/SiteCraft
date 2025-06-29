@@ -2,6 +2,7 @@ import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
 export interface MinimalRightPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -26,11 +27,10 @@ export interface MinimalRightPromoProps {
   backgroundColor?: string
   imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
-  scrollEffect?: "zoom-out" | "sticky" | "parallax" | "none"
-  scrollSpeed?: number
 }
 
-export function MinimalRightPromo({ 
+export function MinimalRightPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -67,8 +67,6 @@ export function MinimalRightPromo({
   descriptionSize,
   backgroundColor,
   imageObjectFit,
-  scrollEffect,
-  scrollSpeed,
 }: MinimalRightPromoProps) {
   return (
     <section id={id} className={cn("w-full", backgroundColor)}>
@@ -90,10 +88,9 @@ export function MinimalRightPromo({
           descriptionColor={descriptionColor}
           descriptionSize={descriptionSize}
           imageObjectFit={imageObjectFit}
-          scrollEffect={scrollEffect}
-          scrollSpeed={scrollSpeed}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

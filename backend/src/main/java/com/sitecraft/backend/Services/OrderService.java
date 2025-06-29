@@ -144,6 +144,9 @@ public class OrderService {
 
             // 4. Get Cart
             ShoppingCart cart = cartService.getCartByCustomerId(customerId);
+            if (cart.getCartProducts().isEmpty()) {
+                throw new RuntimeException("Cart is empty.");
+            }
 
             // 5. Create Order Products
             List<OrderProduct> orderProducts = new ArrayList<>();

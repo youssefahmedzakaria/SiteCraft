@@ -2,6 +2,7 @@ import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
 export interface OverlayPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -28,7 +29,8 @@ export interface OverlayPromoProps {
   id?: string
 }
 
-export function OverlayPromo({ 
+export function OverlayPromo({
+  isClickable = true,
   slides = [
     {
       title: "Your Site Title",
@@ -85,8 +87,10 @@ export function OverlayPromo({
           buttonTextColor={buttonTextColor}
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
+          imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

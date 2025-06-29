@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
-import { Logo } from '../navbar-components/logo';
-import { IconsGroup } from '../navbar-components/icons-group';
-import MobileMenu from '../navbar-components/mobile-menu';
-import { SideMenu } from '../navbar-components/side-menu';
+import React, { useState } from "react";
+import { Menu } from "lucide-react";
+import { Logo } from "../navbar-components/logo";
+import { IconsGroup } from "../navbar-components/icons-group";
+import MobileMenu from "../navbar-components/mobile-menu";
+import { SideMenu } from "../navbar-components/side-menu";
 
 export interface NavbarTemplate8Props {
+  isCustomize?: boolean;
   brandName?: string | React.ReactNode;
   backgroundColor?: string;
   textColor?: string;
@@ -30,16 +31,17 @@ export interface NavbarTemplate8Props {
 }
 
 export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
+  isCustomize,
   brandName,
   logo,
-  backgroundColor = 'bg-[#8B4513]',
-  textColor = 'text-white',
+  backgroundColor = "bg-[#8B4513]",
+  textColor = "text-white",
   menuItems = [],
   MobileMenuItems = [],
-  iconColor = 'text-white',
-  dividerColor = 'border-[#6B3410]',
-  searchIconColor = 'text-gray-300',
-  fontFamily = 'font-sans',
+  iconColor = "text-white",
+  dividerColor = "border-[#6B3410]",
+  searchIconColor = "text-gray-300",
+  fontFamily = "font-sans",
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
@@ -60,7 +62,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
 
       <SideMenu
         isOpen={isSideMenuOpen}
-        position='right'
+        position="right"
         fullSearchBar={true}
         onClose={() => setIsSideMenuOpen(false)}
         menuItems={menuItems}
@@ -71,7 +73,11 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
         searchIconColor={searchIconColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav
+        className={`${
+          isCustomize ? "relative" : "fixed"
+        } top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           {/* Desktop Layout */}
           <div className="hidden md:flex items-center justify-between h-16 w-full">
@@ -79,7 +85,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
             <div className="flex items-center space-x-2 min-w-0">
               <Logo brandName={brandName} logo={logo} textColor={textColor} />
             </div>
-            
+
             {/* Right - Icons and side menu button */}
             <div className="flex items-center space-x-6 justify-end min-w-0">
               <IconsGroup iconColor={iconColor} />

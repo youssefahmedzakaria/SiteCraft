@@ -1,0 +1,90 @@
+{
+  "template": "grid",
+  "products": [
+    {
+      "id": "product1",
+      "title": "product1",
+      "image": null,
+      "imageAlt": null,
+      "price": "$49.99",
+      "link": "/products/product1"
+    },
+    {
+      "id": "product2",
+      "title": "product2",
+      "image": null,
+      "imageAlt": null,
+      "price": "$59.99",
+      "link": "/products/product2"
+    },
+    {
+      "id": "product3",
+      "title": "product3",
+      "image": null,
+      "imageAlt": null,
+      "price": "$39.99",
+      "link": "/products/product3"
+    },
+    {
+      "id": "product4",
+      "title": "product4",
+      "image": null,
+      "imageAlt": null,
+      "price": "$29.99",
+      "link": "/products/product4"
+    },
+    {
+      "id": "product5",
+      "title": "product5",
+      "image": null,
+      "imageAlt": null,
+      "price": "$19.99",
+      "link": "/products/product5"
+    },
+    {
+      "id": "product6",
+      "title": "product6",
+      "image": null,
+      "imageAlt": null,
+      "price": "$24.99",
+      "link": "/products/product6"
+    }
+
+  ],
+  "columns": {
+    "sm": 1,
+    "md": 4,
+    "lg": 4,
+    "xl": 4
+  },
+  "gap": "gap-6",
+  "bgColor": "bg-white",
+  "textColor": "text-gray-800",
+  "accentColor": "bg-blue-600",
+  "borderColor": "border-gray-200",
+  "borderRadius": "rounded-lg",
+  "overlayColor": "bg-black/30",
+  "showTitle": true,
+  "showProductTitle": true,
+  "showDescription": false,
+  "showCta": true,
+  "showControls": true,
+  "showIcon": false,
+  "ctaText": "View Product",
+  "imageHeight": "aspect-square",
+  "cardWidth": "w-full",
+  "fontFamily": "font-sans",
+  "cardShadow": "shadow-lg",
+  "hoverEffect": true,
+  "cardVariant": "default",
+  "showSubtitle": false,
+  "cornerRadius": "medium",
+  "scrollBarSliderColor": "bg-gray-300",
+  "scrollBarBgColor": "bg-gray-200",
+  "titleColor": "text-gray-800",
+  "titleFontSize": "text-3xl",
+  "title": "Featured Products",
+  "titleFont": "font-bold",
+  "onAddToCart": null,
+  "onAddToFavorite": null
+}

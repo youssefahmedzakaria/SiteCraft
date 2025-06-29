@@ -17,6 +17,14 @@ import { RenderAboutSection } from "./renderAboutSection";
 import { RenderFooterSection } from "./renderFooterSection";
 import { RenderPoliciesSection } from "./renderPoliciesSection";
 import { RenderContactSection } from "./renderContactSection";
+import {
+  AboutCustomizationAttributes,
+  ContactCustomizationAttributes,
+  FooterCustomizationAttributes,
+  HeaderCustomizationAttributes,
+  PoliciesCustomizationAttributes,
+} from "@/lib/customization";
+import { PromoCustomizationAttributes } from "@/lib/customization";
 
 interface Section {
   id: string;
@@ -25,7 +33,47 @@ interface Section {
   expanded: boolean;
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  headerAttributes: HeaderCustomizationAttributes;
+  updateHeaderAttributes: (
+    updates: Partial<HeaderCustomizationAttributes>
+  ) => void;
+  promoAttributes: PromoCustomizationAttributes;
+  updatePromoAttributes: (
+    updates: Partial<PromoCustomizationAttributes>
+  ) => void;
+  aboutAttributes: AboutCustomizationAttributes;
+  updateAboutAttributes: (
+    updates: Partial<AboutCustomizationAttributes>
+  ) => void;
+  policiesAttributes: PoliciesCustomizationAttributes;
+  updatePoliciesAttributes: (
+    updates: Partial<PoliciesCustomizationAttributes>
+  ) => void;
+  contactAttributes: ContactCustomizationAttributes;
+  updateContactAttributes: (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => void;
+  footerAttributes: FooterCustomizationAttributes;
+  updateFooterAttributes: (
+    updates: Partial<FooterCustomizationAttributes>
+  ) => void;
+}
+
+export function Sidebar({
+  headerAttributes,
+  updateHeaderAttributes,
+  promoAttributes,
+  updatePromoAttributes,
+  aboutAttributes,
+  updateAboutAttributes,
+  policiesAttributes,
+  updatePoliciesAttributes,
+  contactAttributes,
+  updateContactAttributes,
+  footerAttributes,
+  updateFooterAttributes,
+}: SidebarProps) {
   // Define sections in an array to make them orderable
   const [sections, setSections] = useState<Section[]>([
     {
@@ -233,17 +281,41 @@ export function Sidebar() {
 
           {/* Detailed Section Content */}
           {detailedSection.id === "Header&Menu" ? (
-            <RenderHeaderSection detailedSectionTab={detailedSectionTab} />
+            <RenderHeaderSection
+              detailedSectionTab={detailedSectionTab}
+              headerAttributes={headerAttributes}
+              updateHeaderAttributes={updateHeaderAttributes}
+            />
           ) : detailedSection.id === "PromoSlider" ? (
-            <RenderPromoSection detailedSectionTab={detailedSectionTab} />
-          ) : detailedSection.id === "Policies" ? (
-            <RenderPoliciesSection detailedSectionTab={detailedSectionTab} />
+            <RenderPromoSection
+              detailedSectionTab={detailedSectionTab}
+              promoAttributes={promoAttributes}
+              updatePromoAttributes={updatePromoAttributes}
+            />
           ) : detailedSection.id === "AboutUs" ? (
-            <RenderAboutSection detailedSectionTab={detailedSectionTab} />
+            <RenderAboutSection
+              detailedSectionTab={detailedSectionTab}
+              aboutAttributes={aboutAttributes}
+              updateAboutAttributes={updateAboutAttributes}
+            />
+          ) : detailedSection.id === "Policies" ? (
+            <RenderPoliciesSection
+              detailedSectionTab={detailedSectionTab}
+              policiesAttributes={policiesAttributes}
+              updatePoliciesAttributes={updatePoliciesAttributes}
+            />
           ) : detailedSection.id === "ContactUs" ? (
-            <RenderContactSection detailedSectionTab={detailedSectionTab} />
+            <RenderContactSection
+              detailedSectionTab={detailedSectionTab}
+              contactAttributes={contactAttributes}
+              updateContactAttributes={updateContactAttributes}
+            />
           ) : detailedSection.id === "Footer" ? (
-            <RenderFooterSection detailedSectionTab={detailedSectionTab} />
+            <RenderFooterSection
+              detailedSectionTab={detailedSectionTab}
+              footerAttributes={footerAttributes}
+              updateFooterAttributes={updateFooterAttributes}
+            />
           ) : null}
         </div>
       ) : (

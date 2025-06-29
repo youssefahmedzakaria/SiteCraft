@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
-import { Logo } from '../navbar-components/logo';
-import { Navigation } from '../navbar-components/navigation';
-import { FullSearchBar } from '../navbar-components/full-search-bar';
-import { IconsGroup } from '../navbar-components/icons-group';
-import  MobileMenu  from '../navbar-components/mobile-menu';
+import React, { useState } from "react";
+import { Menu } from "lucide-react";
+import { Logo } from "../navbar-components/logo";
+import { Navigation } from "../navbar-components/navigation";
+import { FullSearchBar } from "../navbar-components/full-search-bar";
+import { IconsGroup } from "../navbar-components/icons-group";
+import MobileMenu from "../navbar-components/mobile-menu";
 
 export interface NavbarTemplate5Props {
+  isCustomize?: boolean;
   brandName?: string | React.ReactNode;
   backgroundColor?: string;
   textColor?: string;
@@ -31,16 +32,17 @@ export interface NavbarTemplate5Props {
 }
 
 export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
+  isCustomize,
   brandName,
-  backgroundColor = 'bg-white',
-  textColor = 'text-black',
-  fontFamily = 'font-sans',
+  backgroundColor = "bg-white",
+  textColor = "text-black",
+  fontFamily = "font-sans",
   logo,
   menuItems = [],
   MobileMenuItems = [],
-  iconColor = 'text-black',
-  dividerColor = 'border-gray-200',
-  searchIconColor = 'text-gray-400',
+  iconColor = "text-black",
+  dividerColor = "border-gray-200",
+  searchIconColor = "text-gray-400",
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -58,7 +60,11 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
         dividerColor={dividerColor}
       />
 
-      <nav className={`fixed top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}>
+      <nav
+        className={`${
+          isCustomize ? "relative" : "fixed"
+        } top-0 left-0 w-full z-30 backdrop-blur ${backgroundColor} ${textColor} ${fontFamily}`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           {/* Top Bar */}
           <div className="flex items-center justify-between h-16">
@@ -74,11 +80,11 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
                   textColor={textColor}
                 />
               </div>
-              
+
               <div className="hidden md:flex">
                 <IconsGroup iconColor={iconColor} />
               </div>
-              
+
               <button
                 className="md:hidden p-1 hover:opacity-80"
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -90,10 +96,7 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
 
           {/* Bottom Section - Navigation */}
           <div className={`border-t ${dividerColor} py-3 hidden md:block`}>
-            <Navigation 
-              menuItems={menuItems} 
-              textColor={textColor} 
-            />
+            <Navigation menuItems={menuItems} textColor={textColor} />
           </div>
         </div>
       </nav>

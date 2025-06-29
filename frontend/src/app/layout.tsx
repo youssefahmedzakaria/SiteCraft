@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { LayoutWrapper } from "@/components/SiteCraft/layout-wrapper";
+import { LayoutWrapper } from "@/components/layout-wrapper";
+import { CartProvider } from "@/contexts/cart-context";
+import { FavoritesProvider } from "@/contexts/favorites-context";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,8 +35,12 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <SessionProvider>
-          <LayoutWrapper> {children}</LayoutWrapper>
+<SessionProvider>        
+<CartProvider>
+          <FavoritesProvider>
+            <LayoutWrapper> {children}</LayoutWrapper>
+          </FavoritesProvider>
+        </CartProvider>
         </SessionProvider>
       </body>
     </html>

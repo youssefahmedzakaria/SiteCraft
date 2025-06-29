@@ -1,0 +1,112 @@
+{
+  
+    "backgroundColor": "bg-white",
+    "textColor": "text-black",
+    "categories": [
+        {
+            "name": "category1",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "1"
+        },
+        {
+            "name": "category2",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "2"
+        },
+        {
+            "name": "category3",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "3"
+        },
+        {
+            "name": "category4",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "4"
+        },
+        {
+            "name": "category5",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "5"
+        },
+        {
+            "name": "Brooches",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": "/brooch1.jpg"
+                    }
+                }
+            },
+            "id": "6"
+        }
+       
+    ],
+    "columns": {
+        "sm": 1,
+        "md": 4,
+        "lg": 4,
+        "xl": 4
+    },
+    "gap": "gap-6",
+    "showCategoryTitle": "true",
+    "borderRadius": "rounded-lg",
+    "fontFamily": "font-sans",
+    "hoverEffect": true,
+    "cardVariant": "featured",
+    "showSubtitle": true,
+    "cornerRadius": "medium",
+    "cardShadow": "shadow-lg",
+    "accentColor": "bg-blue-500",
+    "borderColor": "border-blue-500",
+    "title": "Featured Categories",
+    "showTitle": true,
+    "titleFont": "font-serif",
+    "titleColor": "text-blue-500",
+    "titleFontSize": "text-lg",
+    "showCta": true,
+    "ctaText": "Shop Now",
+    "overlayColor": "bg-black/30",
+    "showScrollbar": false,
+    "scrollBarSliderColor": "bg-gray-400",
+    "scrollBarBgColor": "bg-gray-200",
+    "showDescription": true,
+    "showControls": true,
+    "showIcon": true,
+    "imageHeight": "aspect-square",
+    "cardWidth": "w-full",
+    "showMoreButton": true,
+    "showMoreText": "Show More",
+    "showMorebuttonBgColor": "bg-blue-500",
+    "showMorebuttonTextColor": "text-white"
+   
+}

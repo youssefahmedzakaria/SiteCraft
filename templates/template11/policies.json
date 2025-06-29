@@ -1,0 +1,28 @@
+{
+  "template": "TitleLeftContentCenterPolicies",
+  "id": "policies",
+  "title": "Policies",
+  "sections": [
+      {
+      "title": "Fast Refunds",
+      "content": "Refunds processed within 5 business days."
+    },
+    {
+      "title": "Secure Payments",
+      "content": "All payments are processed via encrypted gateways."
+    }
+  ],
+  "backgroundColor": "bg-white",
+  "titleColor": "text-black",
+  "titleSize": "text-4xl",
+  "titleFont": "font-sans",
+  "titleFontWeight": "font-bold",
+  "sectionTitleColor": "text-black",
+  "sectionTitleSize": "text-2xl",
+  "sectionTitleFont": "font-serif",
+  "sectionTitleFontWeight": "font-medium",
+  "sectionContentColor": "text-gray-600",
+  "sectionContentSize": "text-lg",
+  "sectionContentFont": "font-serif",
+  "sectionContentFontWeight": "font-medium"
+}

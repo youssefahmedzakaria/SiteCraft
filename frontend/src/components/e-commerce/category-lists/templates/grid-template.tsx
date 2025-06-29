@@ -1,45 +1,58 @@
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import FlexibleCard from "@/components/card/card-templates"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import FlexibleCard from "@/components/e-commerce/card/card-templates";
+import { usePathname } from "next/navigation";
 
 interface GridCategoryTemplateProps {
-  categories: any[]
+  isClickable?: boolean;
+  categories: any[];
   columns?: {
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-  gap?: string
-  bgColor?: string
-  textColor?: string
-  borderRadius?: string
-  showTitle?: boolean
-  titlePosition?: "top" | "bottom" | "overlay"
-  imageHeight?: string
-  fontFamily?: string
-  hoverEffect?: boolean
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showCardTitle?: boolean
-  showSubtitle?: boolean
-  showCta?: boolean
-  ctaText?: string
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  cardShadow?: string
-  accentColor?: string
-  borderColor?: string
-  overlayColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: string;
+  bgColor?: string;
+  textColor?: string;
+  borderRadius?: string;
+  showTitle?: boolean;
+  titlePosition?: "top" | "bottom" | "overlay";
+  imageHeight?: string;
+  fontFamily?: string;
+  hoverEffect?: boolean;
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showCardTitle?: boolean;
+  showSubtitle?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  cardShadow?: string;
+  accentColor?: string;
+  borderColor?: string;
+  overlayColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export function GridCategoryTemplate({
+  isClickable = true,
   categories,
   columns = { sm: 2, md: 3, lg: 4, xl: 6 },
   gap = "gap-4",
@@ -70,60 +83,85 @@ export function GridCategoryTemplate({
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
 }: GridCategoryTemplateProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   // Generate dynamic grid classes based on columns prop
   const gridCols = cn(
     `grid-cols-${columns.sm || 2}`,
     columns.md && `md:grid-cols-${columns.md}`,
     columns.lg && `lg:grid-cols-${columns.lg}`,
-    columns.xl && `xl:grid-cols-${columns.xl}`,
-  )
+    columns.xl && `xl:grid-cols-${columns.xl}`
+  );
 
   return (
-    <div className={cn("w-full px-4 py-8", bgColor, textColor, fontFamily)}>
-      {showTitle && titlePosition === "top" && <h2 className={cn("text-2xl font-bold mb-6", titleColor, titleFontSize, titleFont)}>{title}</h2>}
-
-      <div className={cn("grid", gridCols, gap)}>
-        {categories.map((category) => (
-          <FlexibleCard
-            key={category._id}
-            item={category}
-            type="category"
-            variant={cardVariant}
-            imageRatio={imageHeight === "aspect-square" ? "square" : imageHeight === "aspect-[3/4]" ? "portrait" : "landscape"}
-            cornerRadius={cornerRadius}
-            showTitle={showCardTitle}
-            showSubtitle={showSubtitle}
-            showCta={showCta}
-            ctaText={ctaText}
-            bgColor={bgColor}
-            textColor={textColor}
-            accentColor={accentColor}
-            borderColor={borderColor}
-            overlayColor={overlayColor}
-            fontFamily={fontFamily}
-            cardShadow={cardShadow}
-            hoverEffect={hoverEffect}
-            linkPath={`/list?cat=${category.slug}`}
-          />
-        ))}
-      </div>
-            {/* Show More Button */}
-      {showMoreButton && (
-        <div className="flex justify-end mt-6">
-          <Link 
-            href="/categories" 
+    <div className={cn("w-full flex-shrink-0", bgColor)}>
+      <div
+        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+      >
+        {showTitle && titlePosition === "top" && (
+          <h2
             className={cn(
-              "inline-flex items-center px-6 py-2",
-              "hover:bg-opacity-80 transition-colors duration-300",
-              "rounded-lg text-sm font-medium",
-              showMorebuttonBgColor,
-              showMorebuttonTextColor
+              "text-4xl md:text-6xl font-bold text-center mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
             )}
           >
-            {showMoreText}
-          </Link>
+            {title}
+          </h2>
+        )}
+        <div className={cn("grid", gridCols, gap)}>
+          {categories.map((category) => (
+            <FlexibleCard
+              isClickable={isClickable}
+              key={category._id}
+              item={category}
+              type="category"
+              variant={cardVariant}
+              imageRatio={
+                imageHeight === "aspect-square"
+                  ? "square"
+                  : imageHeight === "aspect-[3/4]"
+                  ? "portrait"
+                  : "landscape"
+              }
+              cornerRadius={cornerRadius}
+              showTitle={showCardTitle}
+              showSubtitle={showSubtitle}
+              showCta={showCta}
+              ctaText={ctaText}
+              bgColor={bgColor}
+              textColor={textColor}
+              accentColor={accentColor}
+              borderColor={borderColor}
+              overlayColor={overlayColor}
+              fontFamily={fontFamily}
+              cardShadow={cardShadow}
+              hoverEffect={hoverEffect}
+              linkPath={`/e-commerce/${subdomain}/products`}
+            />
+          ))}
         </div>
-      )}
+        {/* Show More Button */}
+        {showMoreButton && (
+          <div className="flex justify-end mt-6">
+            <Link
+              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+                showMorebuttonBgColor,
+                showMorebuttonTextColor
+              )}
+            >
+              {showMoreText}
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }

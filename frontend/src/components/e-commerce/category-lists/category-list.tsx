@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { cn } from "@/lib/utils"
-import {GridCategoryTemplate} from "@/components/category-lists/templates/grid-template"
-import {HorizontalScrollCategoryTemplate} from "@/components/category-lists/templates/horizontal-scroll-template"
-import FeaturedGridCategoryTemplate from "@/components/category-lists/templates/featured-grid-template"
-import {ListViewCategoryTemplate} from "@/components/category-lists/templates/list-view-template"
+import {GridCategoryTemplate} from "@/components/e-commerce/category-lists/templates/grid-template"
+import {HorizontalScrollCategoryTemplate} from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template"
+import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template"
+import {ListViewCategoryTemplate} from "@/components/e-commerce/category-lists/templates/list-view-template"
 interface CategoryListProps {
   categories: any[]
   template?: "grid" | "horizontal" | "featured" | "list" 
