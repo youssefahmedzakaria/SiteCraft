@@ -39,6 +39,8 @@ export default function ProductPage() {
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
+  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const {
     products,
@@ -176,6 +178,31 @@ export default function ProductPage() {
     }
 
     setSelectedProducts(newSelection);
+  };
+
+  const allSelected = selectedProducts.length === products.length && products.length > 0;
+  const toggleSelectAll = () => {
+    setSelectedProducts(allSelected ? [] : products.map(p => p.id));
+  };
+  const toggleSelect = (id: number) => {
+    setSelectedProducts(sel =>
+      sel.includes(id) ? sel.filter(pid => pid !== id) : [...sel, id]
+    );
+  };
+
+  const handleApplyDiscount = async (discountType: string, discountValue: number) => {
+    await fetch("http://localhost:8080/products/apply-discount", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productIds: selectedProducts,
+        discountType: discountType.toLowerCase(),
+        discountValue: parseFloat(discountValue as any), 
+      }),
+      credentials: 'include',
+    });
+    setShowDiscountDialog(false);
+    // Optionally: refresh products list
   };
 
   if (isLoading) {
@@ -399,13 +426,42 @@ export default function ProductPage() {
           </div>
         </div>
 
+        {/* Left-aligned selection controls */}
+        <div className="flex justify-start items-center gap-4 my-4">
+          <span>{selectedProducts.length} Selected</span>
+          {selectedProducts.length > 0 && (
+            <Button
+              onClick={() => setShowDiscountDialog(true)}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              size="lg"
+            >
+              Apply Discount
+            </Button>
+          )}
+        </div>
+
+        {/* Discount Dialog */}
+        {showDiscountDialog && (
+          <ApplyDiscountDialog
+            open={showDiscountDialog}
+            onOpenChange={setShowDiscountDialog}
+            products={selectedProducts}
+            onApply={handleApplyDiscount}
+          />
+        )}
+
         {/* Product listing table */}
         <div className="border rounded-lg border-logo-border overflow-hidden mt-6">
           <table className="min-w-full divide-y divide-logo-border">
-            <ProductTableHeader 
+            <ProductTableHeader
               selectAll={selectAll}
               onSelectAll={handleSelectAll}
               selectedProducts={selectedProducts}
+              categories={categories}
+              filteredProducts={filteredProducts}
+              setSelectedProducts={setSelectedProducts}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
             />
             <tbody className="bg-white divide-y divide-logo-border">
               {filteredProducts.length > 0 ? (

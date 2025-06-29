@@ -60,14 +60,18 @@ export default function AddProductPage() {
   const [attributes, setAttributes] = useState<ProductAttributeDTO[]>([]);
   const [variants, setVariants] = useState<ProductVariantDTO[]>([]);
 
-  // Add state for stock modal
+  // Add state for stock modal and attribute index
   const [showStockModal, setShowStockModal] = useState(false);
-  const [selectedVariationIndex, setSelectedVariationIndex] = useState<number>(0);
+  const [stockAttributeIndex, setStockAttributeIndex] = useState<number | null>(null);
   const [stockValues, setStockValues] = useState<{ value: string; stock: number }[]>([]);
 
   // Add drag states for variations
   const [draggedVariationIndex, setDraggedVariationIndex] = useState<number | null>(null);
   const [dragOverVariationIndex, setDragOverVariationIndex] = useState<number | null>(null);
+
+  // Add state for price and productionCost at the parent level
+  const [price, setPrice] = useState(0);
+  const [productionCost, setProductionCost] = useState(0);
 
   // Function to add a new attribute
   const handleAddAttribute = (e: React.MouseEvent) => {
@@ -181,14 +185,27 @@ export default function AddProductPage() {
     setStockValues(newStock);
   };
 
-  // Save stock values
+  // Handler to open stock modal for a specific attribute
+  const openStockModalForAttribute = (index: number) => {
+    setStockAttributeIndex(index);
+    const attr = attributes[index];
+    setStockValues(attr.values.map(value => ({ value, stock: 0 })));
+    setShowStockModal(true);
+  };
+
+  // Save stock values for the selected attribute
   const handleSaveStock = () => {
-    // Update variants with stock values
-    const updatedVariants = [...variants];
-    stockValues.forEach((stockItem, index) => {
-      if (updatedVariants[index]) {
-        updatedVariants[index].stock = stockItem.stock;
+    if (stockAttributeIndex === null) return;
+    const attrName = attributes[stockAttributeIndex].name;
+    const updatedVariants = variants.map(variant => {
+      const attr = variant.attributes?.find(a => a.name === attrName);
+      if (attr) {
+        const stockObj = stockValues.find(sv => sv.value === attr.value);
+        if (stockObj) {
+          return { ...variant, stock: stockObj.stock };
+        }
       }
+      return variant;
     });
     setVariants(updatedVariants);
     setShowStockModal(false);
@@ -235,19 +252,27 @@ export default function AddProductPage() {
     e.preventDefault();
     
     try {
+      // Validate global price and production cost
+      if (price <= 0 || productionCost <= 0) {
+        alert('Please enter valid price and production cost');
+        return;
+      }
+      // Validate stock for each variant
+      if (variants.some(v => v.stock == null || v.stock < 0)) {
+        alert('Please ensure all variants have valid stock levels');
+        return;
+      }
+      // Assign global price and production cost to each variant
+      const variantsWithPrice = variants.map(v => ({
+        ...v,
+        price,
+        productionCost,
+      }));
+
       // Validate required fields
       if (!basicFormData.name || !basicFormData.description || basicFormData.categoryId === 0) {
         alert('Please fill in all required fields');
         return;
-      }
-
-      // Validate variants have prices and stock if they exist
-      if (variants.length > 0) {
-        const invalidVariants = variants.filter(v => v.price <= 0 || v.stock < 0);
-        if (invalidVariants.length > 0) {
-          alert('Please ensure all variants have valid prices and stock levels');
-          return;
-        }
       }
 
       // Create the complete product data
@@ -261,7 +286,7 @@ export default function AddProductPage() {
         percentageMax: discountSettings.percentageMax,
         maxCap: discountSettings.maxCap,
         attributes: attributes.length > 0 ? attributes : [],
-        variants: variants.length > 0 ? variants : [],
+        variants: variantsWithPrice,
       };
 
       // Log the data being sent
@@ -361,10 +386,7 @@ export default function AddProductPage() {
                   />
 
                   {/* Pricing Section */}
-                  <PricingSection 
-                    formData={discountSettings}
-                    updateFormData={updateDiscountSettings}
-                  />
+                  <PricingSection price={price} setPrice={setPrice} productionCost={productionCost} setProductionCost={setProductionCost} />
 
                   {/* Low Stock Settings Section */}
                   <LowStockSection 
@@ -407,8 +429,7 @@ export default function AddProductPage() {
                           onDelete={() => handleDeleteAttribute(index)}
                           onChange={(name) => handleAttributeNameChange(index, name)}
                           onValuesChange={(values) => handleAttributeValuesChange(index, values)}
-                          onAddDefaults={() => handleAddDefaults(index)}
-                          showDefaults={index === 0}
+                          onSetStock={() => openStockModalForAttribute(index)}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>
@@ -423,50 +444,11 @@ export default function AddProductPage() {
                       + Add Attribute
                     </Button>
                   </div>
-
-                  {/* Variants Display */}
-                  {variants.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold mb-4">Generated Variants</h3>
-                      <div className="space-y-2">
-                        {variants.map((variant, index) => (
-                          <div key={index} className="flex items-center space-x-4 p-3 border rounded">
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
-                              </span>
-                            </div>
-                            <Input
-                              type="number"
-                              placeholder="Price"
-                              value={variant.price || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'price', Number(e.target.value))}
-                              className="w-24"
-                            />
-                            <Input
-                              type="number"
-                              placeholder="Production Cost"
-                              value={variant.productionCost || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'productionCost', Number(e.target.value))}
-                              className="w-32"
-                            />
-                            <Input
-                              type="number"
-                              placeholder="Stock"
-                              value={variant.stock || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'stock', Number(e.target.value))}
-                              className="w-20"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </>
               )}
 
               {activeTab === "Stock Management" && (
-                <StockManagementSection variants={variants} />
+                <StockManagementSection variants={variants} setVariants={setVariants} />
               )}
 
               {/* Submit Button */}
@@ -495,22 +477,23 @@ export default function AddProductPage() {
               <DialogTitle>Set Stock for Variations</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {stockValues.map((item, index) => (
-                <div key={index} className="flex items-center space-x-4">
+              {stockValues.map((item, idx) => (
+                <div key={idx} className="flex items-center space-x-4">
                   <Label className="flex-1">{item.value}</Label>
                   <Input
                     type="number"
                     value={item.stock}
-                    onChange={(e) => handleStockChange(index, e.target.value)}
+                    onChange={e => {
+                      const newStock = [...stockValues];
+                      newStock[idx].stock = Number(e.target.value);
+                      setStockValues(newStock);
+                    }}
                     className="w-24"
                   />
                 </div>
               ))}
               <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowStockModal(false)}
-                >
+                <Button variant="outline" onClick={() => setShowStockModal(false)}>
                   Cancel
                 </Button>
                 <Button onClick={handleSaveStock}>Save</Button>

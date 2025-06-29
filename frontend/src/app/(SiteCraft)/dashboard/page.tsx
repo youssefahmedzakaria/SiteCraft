@@ -215,7 +215,7 @@ export default function OverviewPage() {
               analytic={{
                 id: 'sales',
                 title: "Today's Sales",
-                value: `e£${salesTotal?.toFixed(2) ?? '-'}`,
+                value: `EGP ${salesTotal?.toFixed(2) ?? '-'}`,
                 subtitle: 'Revenue today',
               }}
             />

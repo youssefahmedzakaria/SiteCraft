@@ -27,6 +27,7 @@ import {
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
+import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -74,14 +75,18 @@ export default function EditProductPage() {
   const [attributes, setAttributes] = useState<ProductAttributeDTO[]>([]);
   const [variants, setVariants] = useState<ProductVariantDTO[]>([]);
 
-  // Add state for stock modal
+  // Add state for stock modal and attribute index
   const [showStockModal, setShowStockModal] = useState(false);
-  const [selectedVariationIndex, setSelectedVariationIndex] = useState<number>(0);
+  const [stockAttributeIndex, setStockAttributeIndex] = useState<number | null>(null);
   const [stockValues, setStockValues] = useState<{ value: string; stock: number }[]>([]);
 
   // Add drag states for variations
   const [draggedVariationIndex, setDraggedVariationIndex] = useState<number | null>(null);
   const [dragOverVariationIndex, setDragOverVariationIndex] = useState<number | null>(null);
+
+  // Add state for price and productionCost at the parent level
+  const [price, setPrice] = useState(0);
+  const [productionCost, setProductionCost] = useState(0);
 
   // Load existing product data
   useEffect(() => {
@@ -177,6 +182,12 @@ export default function EditProductPage() {
         });
         setVariants(transformedVariants);
         console.log('🔄 Transformed variants:', transformedVariants);
+
+        // Set price and production cost from the first variant (all variants have the same values)
+        if (transformedVariants.length > 0) {
+          setPrice(transformedVariants[0].price || 0);
+          setProductionCost(transformedVariants[0].productionCost || 0);
+        }
       }
 
     } catch (err: any) {
@@ -304,21 +315,32 @@ export default function EditProductPage() {
     setShowStockModal(true);
   };
 
-  // Handle stock changes
-  const handleStockChange = (index: number, value: string) => {
-    const newStock = [...stockValues];
-    newStock[index].stock = Number(value);
-    setStockValues(newStock);
+  // Handler to open stock modal for a specific attribute
+  const openStockModalForAttribute = (index: number) => {
+    setStockAttributeIndex(index);
+    const attr = attributes[index];
+    setStockValues(attr.values.map(value => {
+      const matchingVariant = variants.find(variant =>
+        variant.attributes?.some(a => a.name === attr.name && a.value === value)
+      );
+      return { value, stock: matchingVariant?.stock ?? 0 };
+    }));
+    setShowStockModal(true);
   };
 
-  // Save stock values
+  // Save stock values for the selected attribute
   const handleSaveStock = () => {
-    // Update variants with stock values
-    const updatedVariants = [...variants];
-    stockValues.forEach((stockItem, index) => {
-      if (updatedVariants[index]) {
-        updatedVariants[index].stock = stockItem.stock;
+    if (stockAttributeIndex === null) return;
+    const attrName = attributes[stockAttributeIndex].name;
+    const updatedVariants = variants.map(variant => {
+      const attr = variant.attributes?.find(a => a.name === attrName);
+      if (attr) {
+        const stockObj = stockValues.find(sv => sv.value === attr.value);
+        if (stockObj) {
+          return { ...variant, stock: stockObj.stock };
+        }
       }
+      return variant;
     });
     setVariants(updatedVariants);
     setShowStockModal(false);
@@ -370,20 +392,41 @@ export default function EditProductPage() {
     }
     
     try {
+      // Validate global price and production cost
+      if (price <= 0 || productionCost <= 0) {
+        alert('Please enter valid price and production cost');
+        return;
+      }
+      // Validate stock for each variant
+      if (variants.some(v => v.stock == null || v.stock < 0)) {
+        alert('Please ensure all variants have valid stock levels');
+        return;
+      }
+
       // Validate required fields
       if (!basicFormData.name || !basicFormData.description || basicFormData.categoryId === 0) {
         alert('Please fill in all required fields');
         return;
       }
 
-      // Validate variants have prices and stock if they exist
-      if (variants.length > 0) {
-        const invalidVariants = variants.filter(v => v.price <= 0 || v.stock < 0);
-        if (invalidVariants.length > 0) {
-          alert('Please ensure all variants have valid prices and stock levels');
-          return;
-        }
-      }
+      // Assign global price and production cost to each variant
+      const variantsWithPrice = variants.map(variant => ({
+        ...variant,
+        price,
+        productionCost,
+        // If attributes is a single item with name '', value 'Color: Black, Size: L',
+        // replace it with the correct array of { name, value } pairs parsed from the string
+        attributes:
+          variant.attributes &&
+          variant.attributes.length === 1 &&
+          variant.attributes[0].name === "" &&
+          variant.attributes[0].value.includes(":")
+            ? variant.attributes[0].value.split(", ").map(pair => {
+                const [name, value] = pair.split(": ");
+                return { name: name?.trim() || "", value: value?.trim() || "" };
+              })
+            : variant.attributes || []
+      }));
 
       // Create the complete product data
       const productData: ProductCreateDTO = {
@@ -396,23 +439,7 @@ export default function EditProductPage() {
         percentageMax: discountSettings.percentageMax,
         maxCap: discountSettings.maxCap,
         attributes: attributes.length > 0 ? attributes : [],
-        variants: variants.length > 0
-          ? variants.map(variant => ({
-              ...variant,
-              // If attributes is a single item with name '', value 'Color: Black, Size: L',
-              // replace it with the correct array of { name, value } pairs parsed from the string
-              attributes:
-                variant.attributes &&
-                variant.attributes.length === 1 &&
-                variant.attributes[0].name === "" &&
-                variant.attributes[0].value.includes(":")
-                  ? variant.attributes[0].value.split(", ").map(pair => {
-                      const [name, value] = pair.split(": ");
-                      return { name: name?.trim() || "", value: value?.trim() || "" };
-                    })
-                  : variant.attributes || []
-            }))
-          : [],
+        variants: variantsWithPrice,
       };
 
       // Log the data being sent
@@ -554,8 +581,10 @@ export default function EditProductPage() {
 
                   {/* Pricing Section */}
                   <PricingSection 
-                    formData={discountSettings}
-                    updateFormData={updateDiscountSettings}
+                    price={price} 
+                    setPrice={setPrice} 
+                    productionCost={productionCost} 
+                    setProductionCost={setProductionCost} 
                   />
 
                   {/* Low Stock Settings Section */}
@@ -599,8 +628,7 @@ export default function EditProductPage() {
                           onDelete={() => handleDeleteAttribute(index)}
                           onChange={(name) => handleAttributeNameChange(index, name)}
                           onValuesChange={(values) => handleAttributeValuesChange(index, values)}
-                          onAddDefaults={() => handleAddDefaults(index)}
-                          showDefaults={index === 0}
+                          onSetStock={() => openStockModalForAttribute(index)}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>
@@ -615,105 +643,11 @@ export default function EditProductPage() {
                       + Add Attribute
                     </Button>
                   </div>
-
-                  {/* Variants Display */}
-                  {variants.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold mb-4">Generated Variants</h3>
-                      <div className="space-y-2">
-                        {variants.map((variant, index) => (
-                          <div key={index} className="flex items-center space-x-4 p-3 border rounded">
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
-                              </span>
-                            </div>
-                            <Input
-                              type="number"
-                              placeholder="Price"
-                              value={variant.price || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'price', Number(e.target.value))}
-                              className="w-24"
-                            />
-                            <Input
-                              type="number"
-                              placeholder="Production Cost"
-                              value={variant.productionCost || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'productionCost', Number(e.target.value))}
-                              className="w-32"
-                            />
-                            <Input
-                              type="number"
-                              placeholder="Stock"
-                              value={variant.stock || ''}
-                              onChange={(e) => handleVariantUpdate(index, 'stock', Number(e.target.value))}
-                              className="w-20"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </>
               )}
 
               {activeTab === "Stock Management" && (
-                <div className="space-y-4">
-                  {variants.length > 0 ? (
-                    <>
-                      <div className="mb-2">
-                        <CardTitle className="font-bold text-2xl">
-                          Handle Stock Levels
-                        </CardTitle>
-                        <p className="text-gray-500">
-                          Management of stock levels of different options and
-                          variation.
-                        </p>
-                      </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-start space-x-3">
-                          <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                          <div className="text-sm text-blue-800">
-                            <p className="font-medium mb-1">Stock Management Information</p>
-                            <ul className="list-disc list-inside space-y-1">
-                              <li>Stock levels are managed per variant in the Options and Variations tab</li>
-                              <li>Navigate to the "Product's Options and Variations" tab to set stock levels</li>
-                              <li>Each variant can have different stock quantities</li>
-                              <li>Low stock notifications will be based on individual variant stock levels</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Live Variant Table */}
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                          <thead>
-                            <tr>
-                              <th className="px-4 py-2 border-b">Variant</th>
-                              <th className="px-4 py-2 border-b">SKU</th>
-                              <th className="px-4 py-2 border-b">Stock</th>
-                              <th className="px-4 py-2 border-b">Price</th>
-                              <th className="px-4 py-2 border-b">Production Cost</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {variants.map((variant, index) => (
-                              <tr key={index} className="text-center">
-                                <td className="px-4 py-2 border-b">
-                                  {variant.attributes?.map(attr => `${attr.name} ${attr.value}`).join(', ')}
-                                </td>
-                                <td className="px-4 py-2 border-b">{variant.sku}</td>
-                                <td className="px-4 py-2 border-b">{variant.stock}</td>
-                                <td className="px-4 py-2 border-b">{variant.price}</td>
-                                <td className="px-4 py-2 border-b">{variant.productionCost}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
+                <StockManagementSection variants={variants} setVariants={setVariants} />
               )}
 
               {/* Submit Button */}
@@ -742,22 +676,23 @@ export default function EditProductPage() {
               <DialogTitle>Set Stock for Variations</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {stockValues.map((item, index) => (
-                <div key={index} className="flex items-center space-x-4">
+              {stockValues.map((item, idx) => (
+                <div key={idx} className="flex items-center space-x-4">
                   <Label className="flex-1">{item.value}</Label>
                   <Input
                     type="number"
                     value={item.stock}
-                    onChange={(e) => handleStockChange(index, e.target.value)}
+                    onChange={e => {
+                      const newStock = [...stockValues];
+                      newStock[idx].stock = Number(e.target.value);
+                      setStockValues(newStock);
+                    }}
                     className="w-24"
                   />
                 </div>
               ))}
               <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowStockModal(false)}
-                >
+                <Button variant="outline" onClick={() => setShowStockModal(false)}>
                   Cancel
                 </Button>
                 <Button onClick={handleSaveStock}>Save</Button>
