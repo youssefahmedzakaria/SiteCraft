@@ -786,7 +786,49 @@ export default function CustomizeTemplatePage() {
             searchIconColor={headerAttributes.searchIconColor}
             fontFamily={headerAttributes.fontFamily}
           />
+          
+          {/* Render middle sections dynamically */}
+          {sections.slice(1, sections.length - 1).map((section, index) => {
+            const sectionId = section.id as keyof typeof sectionComponents;
+            const sectionComponent = sectionComponents[sectionId];
+            
+            if (!sectionComponent) {
+              return null;
+            }
 
+            // Get the template for this section
+            let template: string;
+            switch (sectionId) {
+              case "PromoSlider":
+                template = promoAttributes.template;
+                break;
+              case "AboutUs":
+                template = aboutAttributes.template;
+                break;
+              case "Policies":
+                template = policiesAttributes.template;
+                break;
+              case "ContactUs":
+                template = contactAttributes.template;
+                break;
+              default:
+                return null;
+            }
+
+            // Get the component for this template
+            const Component = sectionComponent[template as keyof typeof sectionComponent];
+            
+            if (!Component) {
+              return null;
+            }
+
+            return (
+              <div key={section.id}>
+                {Component}
+              </div>
+            );
+          })}
+          
           <Footer
             companyName={footerAttributes.brandName}
             textColor={footerAttributes.textColor}
