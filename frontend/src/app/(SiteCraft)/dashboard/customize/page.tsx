@@ -19,6 +19,7 @@ import {
 } from "@/lib/customization";
 import Navbar from "@/components/e-commerce/navbar/Navbar";
 import { Footer } from "@/components/e-commerce/footer/Footer";
+import { LeftAlignedPromo, MinimalLeftPromo, MinimalRightPromo, OverlayPromo, RightAlignedPromo, SplitPromo } from "@/components/e-commerce/promo";
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
@@ -374,26 +375,174 @@ export default function CustomizeTemplatePage() {
             searchIconColor={headerAttributes.searchIconColor}
             fontFamily={headerAttributes.fontFamily}
           />
-          <CenteredPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            backgroundColor={promoAttributes.backgroundColor}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
+          {promoAttributes.template === "CenteredPromo" && (
+            <CenteredPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              backgroundColor={promoAttributes.backgroundColor}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
+
+          {promoAttributes.template === "LeftAlignedPromo" && (
+            <LeftAlignedPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
+
+          {promoAttributes.template === "RightAlignedPromo" && (
+            <RightAlignedPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
+
+          {promoAttributes.template === "MinimalLeftPromo" && (
+            <MinimalLeftPromo
+              isClickable={false}
+              id={promoAttributes.id}
+              slides={promoAttributes.slides}
+              autoplay={promoAttributes.autoPlay}
+              showArrows={promoAttributes.showArrows}
+              titleFont={promoAttributes.titleFont}
+              titleColor={promoAttributes.titleColor}
+              titleSize={promoAttributes.titleSize}
+              descriptionFont={promoAttributes.descriptionFont}
+              descriptionColor={promoAttributes.descriptionColor}
+              descriptionSize={promoAttributes.descriptionSize}
+              buttonFont={promoAttributes.buttonFont}
+              buttonColor={promoAttributes.buttonColor}
+              buttonTextColor={promoAttributes.buttonTextColor}
+              buttonSize={promoAttributes.buttonSize}
+              buttonRadius={promoAttributes.buttonRadius}
+              backgroundColor={promoAttributes.backgroundColor}
+              imageObjectFit={promoAttributes.imageObjectFit}
+            />
+          )}
+
+          {
+            promoAttributes.template === "MinimalRightPromo" && (
+              <MinimalRightPromo
+                isClickable={false}
+                id={promoAttributes.id}
+                slides={promoAttributes.slides}
+                autoplay={promoAttributes.autoPlay}
+                showArrows={promoAttributes.showArrows}
+                titleFont={promoAttributes.titleFont}
+                titleColor={promoAttributes.titleColor}
+                titleSize={promoAttributes.titleSize}
+                descriptionFont={promoAttributes.descriptionFont}
+                descriptionColor={promoAttributes.descriptionColor}
+                descriptionSize={promoAttributes.descriptionSize}
+                buttonFont={promoAttributes.buttonFont}
+                buttonColor={promoAttributes.buttonColor}
+                buttonTextColor={promoAttributes.buttonTextColor}
+                buttonSize={promoAttributes.buttonSize}
+                buttonRadius={promoAttributes.buttonRadius}
+                backgroundColor={promoAttributes.backgroundColor}
+                imageObjectFit={promoAttributes.imageObjectFit}
+              />
+            )
+          }
+
+          {
+            promoAttributes.template === "OverlayPromo" && (
+              <OverlayPromo
+                isClickable={false}
+                id={promoAttributes.id}
+                slides={promoAttributes.slides}
+                autoplay={promoAttributes.autoPlay}
+                showArrows={promoAttributes.showArrows}
+                titleFont={promoAttributes.titleFont}
+                titleColor={promoAttributes.titleColor}
+                titleSize={promoAttributes.titleSize}
+                descriptionFont={promoAttributes.descriptionFont}
+                descriptionColor={promoAttributes.descriptionColor}
+                descriptionSize={promoAttributes.descriptionSize}
+                buttonFont={promoAttributes.buttonFont}
+                buttonColor={promoAttributes.buttonColor}
+                buttonTextColor={promoAttributes.buttonTextColor}
+                buttonSize={promoAttributes.buttonSize}
+                buttonRadius={promoAttributes.buttonRadius}
+                backgroundColor={promoAttributes.backgroundColor}
+                imageObjectFit={promoAttributes.imageObjectFit}
+              />
+            )
+          }
+
+          {
+            promoAttributes.template === "SplitPromo" && (
+              <SplitPromo
+                isClickable={false}
+                id={promoAttributes.id}
+                slides={promoAttributes.slides}
+                autoplay={promoAttributes.autoPlay}
+                showArrows={promoAttributes.showArrows}
+                titleFont={promoAttributes.titleFont}
+                titleColor={promoAttributes.titleColor}
+                titleSize={promoAttributes.titleSize}
+                // descriptionFont={promoAttributes.descriptionFont}
+                // descriptionColor={promoAttributes.descriptionColor}
+                // descriptionSize={promoAttributes.descriptionSize}
+                buttonFont={promoAttributes.buttonFont}
+                buttonColor={promoAttributes.buttonColor}
+                buttonTextColor={promoAttributes.buttonTextColor}
+                buttonSize={promoAttributes.buttonSize}
+                buttonRadius={promoAttributes.buttonRadius}
+                backgroundColor={promoAttributes.backgroundColor}
+                imageObjectFit={promoAttributes.imageObjectFit}
+                // className={promoAttributes.className}
+              />
+            )
+          }
+
           <ProductList
             isClickable={false}
             products={[

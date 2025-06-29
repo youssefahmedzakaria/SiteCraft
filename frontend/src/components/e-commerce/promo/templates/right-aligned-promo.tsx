@@ -67,7 +67,6 @@ export function RightAlignedPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-
   id,
 }: RightAlignedPromoProps) {
   return (
