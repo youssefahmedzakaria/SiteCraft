@@ -13,21 +13,20 @@ interface CustomVariationSectionProps {
   onDelete: () => void;
   onChange: (name: string) => void;
   onValuesChange: (values: string[]) => void;
-  onAddDefaults?: () => void;
-  showDefaults: boolean;
+  onSetStock: () => void;
   isDragging?: boolean;
 }
 
 export function CustomVariationSection({
   name,
+  index,
   values,
   onDelete,
   onChange,
   onValuesChange,
-  onAddDefaults,
-  showDefaults,
+  onSetStock,
   isDragging,
-}: CustomVariationSectionProps) {
+}: CustomVariationSectionProps & { index: number }) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
@@ -99,12 +98,10 @@ export function CustomVariationSection({
             className="font-bold w-48"
             placeholder="Variation Name"
           />
-          {showDefaults && (
+          {index === 0 && (
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                onAddDefaults?.();
-              }}
+              type="button"
+              onClick={onSetStock}
               className="ml-2 text-sm text-logo-dark-button hover:underline"
             >
               + Set Stock

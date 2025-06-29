@@ -260,10 +260,14 @@ public class ProductController {
             @SuppressWarnings("unchecked")
             List<Long> productIds = (List<Long>) discountData.get("productIds");
             String discountType = (String) discountData.get("discountType");
-            Double discountValue = (Double) discountData.get("discountValue");
-            Double minCap = (Double) discountData.get("minCap");
-            Double percentageMax = (Double) discountData.get("percentageMax");
-            Double maxCap = (Double) discountData.get("maxCap");
+            Number discountValueNum = (Number) discountData.get("discountValue");
+            Double discountValue = discountValueNum == null ? null : discountValueNum.doubleValue();
+            Number minCapNum = (Number) discountData.get("minCap");
+            Double minCap = minCapNum == null ? null : minCapNum.doubleValue();
+            Number percentageMaxNum = (Number) discountData.get("percentageMax");
+            Double percentageMax = percentageMaxNum == null ? null : percentageMaxNum.doubleValue();
+            Number maxCapNum = (Number) discountData.get("maxCap");
+            Double maxCap = maxCapNum == null ? null : maxCapNum.doubleValue();
 
             Map<String, Object> result = productService.applyDiscountToProducts(
                     productIds, discountType, discountValue, minCap, percentageMax, maxCap, storeId);
