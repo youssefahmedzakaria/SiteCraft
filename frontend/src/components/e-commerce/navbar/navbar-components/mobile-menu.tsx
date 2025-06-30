@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Navigation } from "./navigation"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
+import { useResizeObserver } from '../../../../hooks/useResizeObserver'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -27,6 +28,7 @@ interface MobileMenuProps {
   dividerColor?: string
   onSearch?: (query: string) => void
   products?: any[]
+  isCustomize?: boolean
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -41,12 +43,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   dividerColor = "border-transparent",
   onSearch,
   products = [],
+  isCustomize = false,
 }) => {
   const path = usePathname()
   const pathSegments = path.split("/")
   const subdomain = pathSegments[2]
 
   const [isSearchVisible, setIsSearchVisible] = useState(false)
+
+  // Responsive to div size when isCustomize is true
+  const [menuRef, menuSize] = useResizeObserver<HTMLDivElement>()
+  const isCompact = isCustomize && menuSize.width > 0 && menuSize.width < 300
 
   const handleSearchToggle = () => {
     setIsSearchVisible(!isSearchVisible)
@@ -64,7 +71,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex backdrop-blur">
       <div
-        className="w-64 h-full shadow-lg"
+        ref={menuRef}
+        className={`${isCompact ? "w-48" : "w-64"} h-full shadow-lg`}
         style={{
           backgroundColor: backgroundColor.includes("[")
             ? backgroundColor.split("-[")[1]?.slice(0, -1) || "#000000"
@@ -73,8 +81,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4">
-          <h2 className="text-xl font-semibold">Menu</h2>
+        <div className={`flex items-center justify-between ${isCompact ? "p-2" : "p-4"}`}>
+          <h2 className={`${isCompact ? "text-lg" : "text-xl"} font-semibold`}>Menu</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={handleSearchToggle}
@@ -82,7 +90,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               aria-label="Toggle search"
             >
               <Search
-                className="h-5 w-5"
+                className={`${isCompact ? "h-4 w-4" : "h-5 w-5"}`}
                 style={{
                   color: searchIconColor.includes("[")
                     ? searchIconColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
@@ -92,7 +100,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </button>
             <button onClick={onClose} className="p-1 hover:opacity-80">
               <X
-                className="h-6 w-6"
+                className={`${isCompact ? "h-5 w-5" : "h-6 w-6"}`}
                 style={{
                   color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
                 }}
@@ -102,23 +110,32 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         </div>
 
         {isSearchVisible && (
-          <div className="px-4 py-3 border-b border-white/10">
+          <div className={`${isCompact ? "px-2 py-2" : "px-4 py-3"} border-b border-white/10`}>
             <FullSearchBar
               onSearch={handleSearch}
               iconColor={searchIconColor}
               backgroundColor="bg-white/20"
               textColor={textColor}
               placeholder="Search products..."
+              isCustomize={isCustomize}
+              containerWidth={menuSize.width}
             />
           </div>
         )}
 
-        <div className="px-4 py-3">
-          <Navigation menuItems={NavMenuItems} textColor={textColor} orientation="vertical" onClick={onClose} />
+        <div className={`${isCompact ? "px-2 py-2" : "px-4 py-3"}`}>
+          <Navigation
+            menuItems={NavMenuItems}
+            textColor={textColor}
+            orientation="vertical"
+            onClick={onClose}
+            isCustomize={isCustomize}
+            containerWidth={menuSize.width}
+          />
           <div className="py-1 overflow-y-auto"></div>
           <Link
             href={`/e-commerce/${subdomain}/profile`}
-            className="block py-2 text-sm hover:underline"
+            className={`block py-2 ${isCompact ? "text-xs" : "text-sm"} hover:underline`}
             style={{
               color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
             }}
@@ -127,7 +144,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </Link>
           <Link
             href={`/e-commerce/${subdomain}/cart`}
-            className="block py-2 text-sm hover:underline"
+            className={`block py-2 ${isCompact ? "text-xs" : "text-sm"} hover:underline`}
             style={{
               color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
             }}
@@ -136,7 +153,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </Link>
           <Link
             href={`/e-commerce/${subdomain}/favorites`}
-            className="block py-2 text-sm hover:underline"
+            className={`block py-2 ${isCompact ? "text-xs" : "text-sm"} hover:underline`}
             style={{
               color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
             }}
@@ -150,7 +167,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link
               key={item.label}
               href={item.href}
-              className="block px-4 py-3 text-sm hover:bg-white/10 transition-colors"
+              className={`block ${isCompact ? "px-2 py-2 text-xs" : "px-4 py-3 text-sm"} hover:bg-white/10 transition-colors`}
               style={{
                 color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
               }}

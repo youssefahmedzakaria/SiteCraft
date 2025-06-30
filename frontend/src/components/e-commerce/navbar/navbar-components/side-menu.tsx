@@ -4,6 +4,7 @@ import type React from "react"
 import { X } from "lucide-react"
 import { Navigation } from "./navigation"
 import { FullSearchBar } from "./full-search-bar"
+import { useResizeObserver } from "../../../../hooks/useResizeObserver"
 
 export interface SideMenuProps {
   isOpen: boolean
@@ -16,6 +17,7 @@ export interface SideMenuProps {
   searchIconColor?: string
   dividerColor?: string
   position?: "left" | "right"
+  isCustomize?: boolean
 }
 
 export const SideMenu: React.FC<SideMenuProps> = ({
@@ -29,14 +31,20 @@ export const SideMenu: React.FC<SideMenuProps> = ({
   searchIconColor = "text-gray-400",
   dividerColor = "border-transparent",
   position = "left",
+  isCustomize = false,
 }) => {
+  // Responsive to div size when isCustomize is true
+  const [menuRef, menuSize] = useResizeObserver<HTMLDivElement>()
+  const isCompact = isCustomize && menuSize.width > 0 && menuSize.width < 300
+
   if (!isOpen) return null
 
   return (
     <div className={`fixed inset-0 z-50 flex backdrop-blur ${position === "left" ? "flex-row-reverse" : ""}`}>
       <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="w-64 h-full shadow-lg"
+        ref={menuRef}
+        className={`${isCompact ? "w-48" : "w-64"} h-full shadow-lg`}
         style={{
           backgroundColor: backgroundColor.includes("[")
             ? backgroundColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
@@ -45,11 +53,11 @@ export const SideMenu: React.FC<SideMenuProps> = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4">
-          <h2 className="text-xl font-semibold">Menu</h2>
+        <div className={`flex items-center justify-between ${isCompact ? "p-2" : "p-4"}`}>
+          <h2 className={`${isCompact ? "text-lg" : "text-xl"} font-semibold`}>Menu</h2>
           <button onClick={onClose} className="p-1 hover:opacity-80">
             <X
-              className="h-6 w-6"
+              className={`${isCompact ? "h-5 w-5" : "h-6 w-6"}`}
               style={{
                 color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : "#000000",
               }}
@@ -58,13 +66,26 @@ export const SideMenu: React.FC<SideMenuProps> = ({
         </div>
 
         {fullSearchBar && (
-          <div className="px-4 py-3">
-            <FullSearchBar iconColor={searchIconColor} backgroundColor="bg-white/20" textColor={textColor} />
+          <div className={`${isCompact ? "px-2 py-2" : "px-4 py-3"}`}>
+            <FullSearchBar
+              iconColor={searchIconColor}
+              backgroundColor="bg-white/20"
+              textColor={textColor}
+              isCustomize={isCustomize}
+              containerWidth={menuSize.width}
+            />
           </div>
         )}
 
-        <div className="py-4 px-4">
-          <Navigation menuItems={menuItems} textColor={textColor} orientation="vertical" onClick={onClose} />
+        <div className={`${isCompact ? "py-2 px-2" : "py-4 px-4"}`}>
+          <Navigation
+            menuItems={menuItems}
+            textColor={textColor}
+            orientation="vertical"
+            onClick={onClose}
+            isCustomize={isCustomize}
+            containerWidth={menuSize.width}
+          />
         </div>
       </div>
     </div>
