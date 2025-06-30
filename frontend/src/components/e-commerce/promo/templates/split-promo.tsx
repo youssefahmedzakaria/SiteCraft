@@ -100,7 +100,10 @@ export function SplitPromo({
   return (
     <section
       id={id}
-      className={cn("grid grid-rows-2 gap-0 md:grid-cols-2 md:grid-rows-1 w-full h-auto md:h-[400px]", className)}
+      className={cn(
+        "grid grid-rows-2 gap-0 md:grid-cols-2 md:grid-rows-1 w-full h-auto md:h-[400px]",
+        className
+      )}
       style={{
         backgroundColor: backgroundColor?.includes("[")
           ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
@@ -108,9 +111,12 @@ export function SplitPromo({
       }}
     >
       {[left, right].map((slide, idx) => (
-        <div key={idx} className="relative h-[250px] md:h-full w-full flex flex-col justify-end">
+        <div
+          key={idx}
+          className="relative h-[250px] md:h-full w-full flex flex-col justify-end"
+        >
           <Image
-            src={slide.image || "/placeholder.svg"}
+            src={slide.image || "/placeholder.png"}
             alt={slide.imageAlt}
             fill
             className={`object-${imageObjectFit}`}
@@ -122,14 +128,18 @@ export function SplitPromo({
               className="mb-2 md:mb-3"
               style={{
                 fontFamily: titleFont ? getFontFamily(titleFont) : undefined,
-                color: titleColor?.includes("[") ? titleColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                color: titleColor?.includes("[")
+                  ? titleColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  : "#ffffff",
                 fontSize: titleSize ? getFontSize(titleSize) : undefined,
               }}
             >
               {slide.title}
             </h2>
             {slide.description && (
-              <p className="mb-3 md:mb-4 text-white/80 text-sm md:text-base">{slide.description}</p>
+              <p className="mb-3 md:mb-4 text-white/80 text-sm md:text-base">
+                {slide.description}
+              </p>
             )}
             <Link
               href={isClickable ? slide.buttonLink : "#"}
@@ -143,7 +153,9 @@ export function SplitPromo({
                   ? buttonTextColor.split("-[")[1]?.slice(0, -1) || "#000000"
                   : "#000000",
                 fontSize: buttonSize ? getFontSize(buttonSize) : undefined,
-                borderRadius: buttonRadius ? getBorderRadius(buttonRadius) : undefined,
+                borderRadius: buttonRadius
+                  ? getBorderRadius(buttonRadius)
+                  : undefined,
               }}
             >
               {slide.buttonText}
@@ -152,5 +164,5 @@ export function SplitPromo({
         </div>
       ))}
     </section>
-  )
+  );
 }

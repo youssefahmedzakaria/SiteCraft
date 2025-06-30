@@ -184,7 +184,7 @@ export function RenderPromoSection({
       description: "Add your description here",
       buttonText: "Shop Now",
       buttonLink: "#new-collection",
-      image: "/sample.png",
+      image: "/placeholder.png",
       imageAlt: "New promo image",
     };
     updatePromoAttributes({
@@ -537,15 +537,23 @@ export function RenderPromoSection({
                                   )}
                                 </div>
                                 {/* Delete button */}
-                                <div className="flex justify-end mt-1">
-                                  <button
-                                    onClick={() => handleDeletePromo(index)}
-                                    className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
-                                    title="Delete Promo"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
+                                {promoAttributes.slides.length <= 2 ? (
+                                  <div className="flex justify-end mt-1">
+                                    <div className="pr-2 text-[0.6rem] text-[#FFFFFF] focus:outline-none underline">
+                                      .
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-end mt-1">
+                                    <button
+                                      onClick={() => handleDeletePromo(index)}
+                                      className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
+                                      title="Delete Promo"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </Draggable>
@@ -558,13 +566,16 @@ export function RenderPromoSection({
               </div>
             </div>
 
-            <button
-              onClick={handleAddPromo}
-              className="flex items-center justify-center gap-2 bg-gray-100 border border-gray-400 rounded-md w-full h-10"
-            >
-              <Plus size={18} />
-              Add Promo
-            </button>
+            {promoAttributes.template === "SplitPromo" &&
+            promoAttributes.slides.length >= 2 ? null : (
+              <button
+                onClick={handleAddPromo}
+                className="flex items-center justify-center gap-2 bg-gray-100 border border-gray-400 rounded-md w-full h-10"
+              >
+                <Plus size={18} />
+                Add Promo
+              </button>
+            )}
           </div>
 
           <div className="pt-8 flex justify-start">
