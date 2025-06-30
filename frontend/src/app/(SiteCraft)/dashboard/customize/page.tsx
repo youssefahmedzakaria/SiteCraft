@@ -1,34 +1,37 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/SiteCraft/ui/button"
-import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar"
-import { Eye, X } from "lucide-react"
-import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter"
-import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default"
-import { LeftPolicies } from "@/components/e-commerce/policies/templates/left"
-import { CenteredPolicies } from "@/components/e-commerce/policies/templates/centerd"
-import { MinimalRightContact } from "@/components/e-commerce/contact/templates/minimal-right"
-import { CenteredContact } from "@/components/e-commerce/contact/templates/centered-contact"
-import { LeftAlignedContact } from "@/components/e-commerce/contact/templates/left-aligned"
-import { RightAlignedContact } from "@/components/e-commerce/contact/templates/right-aligned"
-import { MinimalLeftContact } from "@/components/e-commerce/contact/templates/minimal-left"
-import { TopImageAbout } from "@/components/e-commerce/about-us/templates/top-image-about"
-import { CenteredAbout } from "@/components/e-commerce/about-us/templates/centered-about"
-import { LeftAlignedAbout } from "@/components/e-commerce/about-us/templates/left-aligned-about"
-import { RightAlignedAbout } from "@/components/e-commerce/about-us/templates/right-aligned-about"
-import ProductList from "@/components/e-commerce/product-lists/product-list"
-import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo"
-import type {
+"use client";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/SiteCraft/ui/button";
+import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
+import { Eye, X } from "lucide-react";
+import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter";
+import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default";
+import { LeftPolicies } from "@/components/e-commerce/policies/templates/left";
+import { CenteredPolicies } from "@/components/e-commerce/policies/templates/centerd";
+import { MinimalRightContact } from "@/components/e-commerce/contact/templates/minimal-right";
+import { CenteredContact } from "@/components/e-commerce/contact/templates/centered-contact";
+import { LeftAlignedContact } from "@/components/e-commerce/contact/templates/left-aligned";
+import { RightAlignedContact } from "@/components/e-commerce/contact/templates/right-aligned";
+import { MinimalLeftContact } from "@/components/e-commerce/contact/templates/minimal-left";
+import { TopImageAbout } from "@/components/e-commerce/about-us/templates/top-image-about";
+import { CenteredAbout } from "@/components/e-commerce/about-us/templates/centered-about";
+import { LeftAlignedAbout } from "@/components/e-commerce/about-us/templates/left-aligned-about";
+import { RightAlignedAbout } from "@/components/e-commerce/about-us/templates/right-aligned-about";
+import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template";
+import ProductList from "@/components/e-commerce/product-lists/product-list";
+import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo";
+import {
   AboutCustomizationAttributes,
   ContactCustomizationAttributes,
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
   PoliciesCustomizationAttributes,
   PromoCustomizationAttributes,
-} from "@/lib/customization"
-import Navbar from "@/components/e-commerce/navbar/Navbar"
-import { Footer } from "@/components/e-commerce/footer/Footer"
+} from "@/lib/customization";
+import Navbar from "@/components/e-commerce/navbar/Navbar";
+import { Footer } from "@/components/e-commerce/footer/Footer";
 import {
   LeftAlignedPromo,
   MinimalLeftPromo,
@@ -36,61 +39,31 @@ import {
   OverlayPromo,
   RightAlignedPromo,
   SplitPromo,
-} from "@/components/e-commerce/promo"
-import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template"
+} from "@/components/e-commerce/promo";
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/SiteCraft/ui/dialog";
 
 interface Section {
-  id: string
-  title: string
-  expanded: boolean
+  id: string;
+  title: string;
+  expanded: boolean;
 }
 
-const initialSections: Section[] = [
-  {
-    id: "Header&Menu",
-    title: "Header & Menu",
-    expanded: false,
-  },
-  {
-    id: "PromoSlider",
-    title: "Promo Slider",
-    expanded: false,
-  },
-  {
-    id: "Categories",
-    title: "Categories",
-    expanded: false,
-  },
-  {
-    id: "Products",
-    title: "Products",
-    expanded: false,
-  },
-  {
-    id: "AboutUs",
-    title: "About Us",
-    expanded: false,
-  },
-  {
-    id: "Policies",
-    title: "Policies",
-    expanded: false,
-  },
-  {
-    id: "ContactUs",
-    title: "Contact Us",
-    expanded: false,
-  },
-  {
-    id: "Footer",
-    title: "Footer",
-    expanded: false,
-  },
-]
+const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
-  const [selectedTab, setSelectedTab] = useState<"desktop" | "tablet" | "mobile">("desktop")
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [selectedTab, setSelectedTab] = useState<
+    "desktop" | "tablet" | "mobile"
+  >("desktop");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
@@ -98,7 +71,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#00000080]", // bg-black/50
     textColor: "text-[#FFFFFF]", // text-white
     logo: {
-      src: "/logo.png",
+      src: "/ring3.jpg",
       alt: "Custom Logo",
       width: 50,
       height: 50,
@@ -114,15 +87,18 @@ export default function CustomizeTemplatePage() {
     dividerColor: "border-[#E5E7EB]", // border-gray-200
     searchIconColor: "text-[#FFFFFF]", // text-white
     fontFamily: "font-sans",
-  }
+  };
 
   // State for header customization
-  const [headerAttributes, setHeaderAttributes] = useState<HeaderCustomizationAttributes>(initialHeader)
+  const [headerAttributes, setHeaderAttributes] =
+    useState<HeaderCustomizationAttributes>(initialHeader);
 
   // Function to update header attributes
-  const updateHeaderAttributes = (updates: Partial<HeaderCustomizationAttributes>) => {
-    setHeaderAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updateHeaderAttributes = (
+    updates: Partial<HeaderCustomizationAttributes>
+  ) => {
+    setHeaderAttributes((prev) => ({ ...prev, ...updates }));
+  };
 
   const initialPromo: PromoCustomizationAttributes = {
     template: "CenteredPromo",
@@ -132,7 +108,8 @@ export default function CustomizeTemplatePage() {
     slides: [
       {
         title: "Welcome to Our Store",
-        description: "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
+        description:
+          "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
         buttonText: "Shop Now",
         buttonLink: "#new-collection",
         image: "/girl.jpg",
@@ -140,7 +117,8 @@ export default function CustomizeTemplatePage() {
       },
       {
         title: "New Collection",
-        description: "Check out our newest products. Limited time offers with free shipping on all orders.",
+        description:
+          "Check out our newest products. Limited time offers with free shipping on all orders.",
         buttonText: "View Collection",
         buttonLink: "#new-collection",
         image: "/hand.jpg",
@@ -160,15 +138,18 @@ export default function CustomizeTemplatePage() {
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
-  }
+  };
 
   // State for promo customization
-  const [promoAttributes, setPromoAttributes] = useState<PromoCustomizationAttributes>(initialPromo)
+  const [promoAttributes, setPromoAttributes] =
+    useState<PromoCustomizationAttributes>(initialPromo);
 
   // Function to update promo attributes
-  const updatePromoAttributes = (updates: Partial<PromoCustomizationAttributes>) => {
-    setPromoAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updatePromoAttributes = (
+    updates: Partial<PromoCustomizationAttributes>
+  ) => {
+    setPromoAttributes((prev) => ({ ...prev, ...updates }));
+  };
 
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
@@ -186,17 +167,21 @@ export default function CustomizeTemplatePage() {
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
+    // titleFontWeight: "font-bold",
     descriptionFont: "font-sans",
     descriptionSize: "text-lg",
-  }
+  };
 
   // State for about customization
-  const [aboutAttributes, setAboutAttributes] = useState<AboutCustomizationAttributes>(initialAbout)
+  const [aboutAttributes, setAboutAttributes] =
+    useState<AboutCustomizationAttributes>(initialAbout);
 
   // Function to update about attributes
-  const updateAboutAttributes = (updates: Partial<AboutCustomizationAttributes>) => {
-    setAboutAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updateAboutAttributes = (
+    updates: Partial<AboutCustomizationAttributes>
+  ) => {
+    setAboutAttributes((prev) => ({ ...prev, ...updates }));
+  };
 
   const initialPolicies: PoliciesCustomizationAttributes = {
     template: "TitleLeftContentCenterPolicies",
@@ -205,7 +190,8 @@ export default function CustomizeTemplatePage() {
     sections: [
       {
         title: "Shipping Policy",
-        content: "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
+        content:
+          "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
       },
       {
         title: "Return Policy",
@@ -213,7 +199,8 @@ export default function CustomizeTemplatePage() {
       },
       {
         title: "Privacy Policy",
-        content: "We respect your privacy and protect your personal information.",
+        content:
+          "We respect your privacy and protect your personal information.",
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
@@ -229,22 +216,26 @@ export default function CustomizeTemplatePage() {
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
-  }
+  };
 
   // State for policies customization
-  const [policiesAttributes, setPoliciesAttributes] = useState<PoliciesCustomizationAttributes>(initialPolicies)
+  const [policiesAttributes, setPoliciesAttributes] =
+    useState<PoliciesCustomizationAttributes>(initialPolicies);
 
   // Function to update policies attributes
-  const updatePoliciesAttributes = (updates: Partial<PoliciesCustomizationAttributes>) => {
-    setPoliciesAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updatePoliciesAttributes = (
+    updates: Partial<PoliciesCustomizationAttributes>
+  ) => {
+    setPoliciesAttributes((prev) => ({ ...prev, ...updates }));
+  };
 
   const initialContact: ContactCustomizationAttributes = {
     template: "MinimalRightContact",
     id: "contact",
     title: "Contact Us",
     address: "masr el gedida, cairo, egypt",
-    addressUrl: "https://www.google.com/maps?q=30.0890922546387,31.2838287353516",
+    addressUrl:
+      "https://www.google.com/maps?q=30.0890922546387,31.2838287353516",
     openHours: "Monday - Friday: 9:00 AM - 6:00 PM",
     phone: "+1 234 567 890",
     contactEmail: "contact@example.com",
@@ -262,22 +253,25 @@ export default function CustomizeTemplatePage() {
     contentFont: "font-semibold",
     contentColor: "text-[#000000]",
     contentSize: "text-lg",
-  }
+  };
 
   // State for contact customization
-  const [contactAttributes, setContactAttributes] = useState<ContactCustomizationAttributes>(initialContact)
+  const [contactAttributes, setContactAttributes] =
+    useState<ContactCustomizationAttributes>(initialContact);
 
   // Function to update contact attributes
-  const updateContactAttributes = (updates: Partial<ContactCustomizationAttributes>) => {
-    setContactAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updateContactAttributes = (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => {
+    setContactAttributes((prev) => ({ ...prev, ...updates }));
+  };
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "BRAND",
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
-      src: "/logo.png",
+      src: "/ring3.jpg",
       alt: "Company Logo",
       size: "24",
     },
@@ -319,23 +313,127 @@ export default function CustomizeTemplatePage() {
       fontWeight: "font-light",
       fontColor: "text-[#000000]",
     },
-  }
+  };
 
   // State for footer customization
-  const [footerAttributes, setFooterAttributes] = useState<FooterCustomizationAttributes>(initialFooter)
+  const [footerAttributes, setFooterAttributes] =
+    useState<FooterCustomizationAttributes>(initialFooter);
 
   // Function to update footer attributes
-  const updateFooterAttributes = (updates: Partial<FooterCustomizationAttributes>) => {
-    setFooterAttributes((prev) => ({ ...prev, ...updates }))
-  }
+  const updateFooterAttributes = (
+    updates: Partial<FooterCustomizationAttributes>
+  ) => {
+    setFooterAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
+  // Store data state
+  const [storeData, setStoreData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/api/store/getStoreSettings",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        if (data.success && data.store) {
+          setStoreData(data.store);
+
+          // Header (only brandName and logo.src)
+          setHeaderAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo || prev.logo.src,
+            },
+          }));
+
+          // About (only description and secondaryDescription)
+          setAboutAttributes((prev) => ({
+            ...prev,
+            description: data.store.aboutUs?.[0]?.title || prev.description,
+            secondaryDescription:
+              data.store.aboutUs?.[0]?.content || prev.description,
+          }));
+
+          // Policies (only sections)
+          setPoliciesAttributes((prev) => ({
+            ...prev,
+            sections:
+              data.store.policies?.map((p: any) => ({
+                title: p.title,
+                content: p.description,
+              })) || prev.sections,
+          }));
+
+          // Contact (only contactEmail and socialLinks)
+          setContactAttributes((prev) => ({
+            ...prev,
+            contactEmail: data.store.emailAddress || prev.contactEmail,
+            socialLinks: {
+              facebook:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "facebook"
+                )?.link || prev.socialLinks.facebook,
+              instagram:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "instagram"
+                )?.link || prev.socialLinks.instagram,
+              twitter:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "twitter"
+                )?.link || prev.socialLinks.twitter,
+            },
+          }));
+
+          // Footer (only brandName, logo.src, and socialMedia)
+          setFooterAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo ? `/${data.store.logo}` : prev.logo.src,
+            },
+            socialMedia: {
+              facebook:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "facebook"
+                )?.link || prev.socialMedia.facebook,
+              instagram:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "instagram"
+                )?.link || prev.socialMedia.instagram,
+            },
+          }));
+        }
+        console.log(storeData);
+      } catch (error) {
+        console.error("Failed to fetch store data:", error);
+      }
+    };
+    fetchStoreData();
+  }, []);
 
   const sectionComponents = {
     PromoSlider: {
       CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
-      LeftAlignedPromo: <LeftAlignedPromo {...promoAttributes} isClickable={false} />,
-      RightAlignedPromo: <RightAlignedPromo {...promoAttributes} isClickable={false} />,
-      MinimalLeftPromo: <MinimalLeftPromo {...promoAttributes} isClickable={false} />,
-      MinimalRightPromo: <MinimalRightPromo {...promoAttributes} isClickable={false} />,
+      LeftAlignedPromo: (
+        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      RightAlignedPromo: (
+        <RightAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalLeftPromo: (
+        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalRightPromo: (
+        <MinimalRightPromo {...promoAttributes} isClickable={false} />
+      ),
       OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
       SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
@@ -595,214 +693,375 @@ export default function CustomizeTemplatePage() {
       MinimalLeftContact: <MinimalLeftContact {...contactAttributes} />,
     },
     Policies: {
-      TitleLeftContentCenterPolicies: <TitleLeftContentCenterPolicies {...policiesAttributes} />,
+      TitleLeftContentCenterPolicies: (
+        <TitleLeftContentCenterPolicies {...policiesAttributes} />
+      ),
       DefaultPolicies: <DefaultPolicies {...policiesAttributes} />,
       LeftPolicies: <LeftPolicies {...policiesAttributes} />,
       CenteredPolicies: <CenteredPolicies {...policiesAttributes} />,
     },
-  }
+  };
 
-  const [sections, setSections] = useState<Section[]>(initialSections)
+  const [sections, setSections] = useState<Section[]>(initialSections);
+  const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // Warn user before leaving the page if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue =
+        "You have unsaved changes. Are you sure you want to leave? Changes will not be saved.";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  // Helper to build DTOs for each section
+  const buildCustomizationDTOs = () => {
+    // Set storeId to 1 for all sections
+    const storeId = 1;
+    return sections.map((section, idx) => {
+      let value = {};
+      switch (section.id) {
+        case "Header&Menu":
+          value = headerAttributes;
+          break;
+        case "PromoSlider":
+          value = promoAttributes;
+          break;
+        case "AboutUs":
+          value = aboutAttributes;
+          break;
+        case "Policies":
+          value = policiesAttributes;
+          break;
+        case "ContactUs":
+          value = contactAttributes;
+          break;
+        case "Footer":
+          value = footerAttributes;
+          break;
+        // Add cases for Categories, Products, etc. as needed
+        default:
+          value = {};
+      }
+      return {
+        title: section.id,
+        value,
+        index: idx,
+        storeId,
+      };
+    });
+  };
+
+  // API call for editing customization
+  const handleSaveClick = () => {
+    setShowSaveDialog(true);
+  };
+
+  const editCustomizedTemplate = async () => {
+    setIsSaving(true);
+    setSaveMessage("");
+    setShowSaveDialog(false);
+    try {
+      const dtoList = buildCustomizationDTOs();
+      const response = await fetch(
+        "http://localhost:8080/customize/editTemplate",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(dtoList),
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        // Store message in localStorage to show after navigation
+        localStorage.setItem(
+          "customizeSuccessMessage",
+          "Changes saved successfully!"
+        );
+        window.removeEventListener("beforeunload", () => {});
+        router.push("/dashboard");
+      } else {
+        alert(data.message || "Failed to save customization.");
+      }
+    } catch (error) {
+      alert("An error occurred while saving customization.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/customize/getTemplate",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+
+        if (data.success && data["Customized Template"]) {
+          const sortedTemplate = [...data["Customized Template"]].sort(
+            (a, b) => a.index - b.index
+          );
+
+          const loadedSections: Section[] = [];
+
+          sortedTemplate.forEach((section: any, idx: number) => {
+            loadedSections.push({
+              id: section.title,
+              title: section.title.replace("&", " & "),
+              expanded: false, // all sections initially collapsed
+            });
+
+            switch (section.title) {
+              case "Header&Menu":
+                setHeaderAttributes(section.value);
+                break;
+              case "PromoSlider":
+                setPromoAttributes(section.value);
+                break;
+              case "AboutUs":
+                setAboutAttributes(section.value);
+                break;
+              case "Footer":
+                setFooterAttributes(section.value);
+                break;
+              // Add additional cases as you expand your backend support
+            }
+          });
+
+          setSections(loadedSections);
+        }
+      } catch (error) {
+        console.error("Failed to fetch template:", error);
+      }
+    };
+
+    fetchTemplate();
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <div
-        className={`
-        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-        w-80 lg:w-80 bg-white border-r border-gray-200
-        transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col
-      `}
-      >
-        {/* Mobile Close Button */}
-        <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Customize Template</h2>
-          <Button variant="ghost" size="sm" onClick={() => setIsSidebarOpen(false)}>
-            <X className="h-4 w-4" />
-          </Button>
+      {sections.length >= 2 ? (
+        <Sidebar
+          headerAttributes={headerAttributes}
+          updateHeaderAttributes={updateHeaderAttributes}
+          promoAttributes={promoAttributes}
+          updatePromoAttributes={updatePromoAttributes}
+          aboutAttributes={aboutAttributes}
+          updateAboutAttributes={updateAboutAttributes}
+          policiesAttributes={policiesAttributes}
+          updatePoliciesAttributes={updatePoliciesAttributes}
+          contactAttributes={contactAttributes}
+          updateContactAttributes={updateContactAttributes}
+          footerAttributes={footerAttributes}
+          updateFooterAttributes={updateFooterAttributes}
+          sections={sections}
+          setSections={setSections}
+        />
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <span>Loading customization...</span>
         </div>
-
-        {/* Sidebar Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto">
-          <Sidebar
-            headerAttributes={headerAttributes}
-            updateHeaderAttributes={updateHeaderAttributes}
-            promoAttributes={promoAttributes}
-            updatePromoAttributes={updatePromoAttributes}
-            aboutAttributes={aboutAttributes}
-            updateAboutAttributes={updateAboutAttributes}
-            policiesAttributes={policiesAttributes}
-            updatePoliciesAttributes={updatePoliciesAttributes}
-            contactAttributes={contactAttributes}
-            updateContactAttributes={updateContactAttributes}
-            footerAttributes={footerAttributes}
-            updateFooterAttributes={updateFooterAttributes}
-            sections={sections}
-            setSections={setSections}
-          />
-        </div>
-      </div>
+      )}
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar */}
-        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
-          <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-            {/* Mobile Menu Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="lg:hidden bg-transparent"
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </Button>
-
-            {/* Preview Button */}
-            <Button variant="outline" className="bg-white">
-              <span className="flex items-center gap-2">
-                <Eye size={20} />
-                Preview
-              </span>
-            </Button>
-
-            {/* Device Views */}
-            <div className="flex border border-gray-200 rounded-md overflow-hidden">
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "desktop" ? "bg-gray-100" : "bg-white"}`}
-                onClick={() => setSelectedTab("desktop")}
-              >
-                Desktop
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "tablet" ? "bg-gray-100" : "bg-white"}`}
-                onClick={() => setSelectedTab("tablet")}
-              >
-                Tablet
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "mobile" ? "bg-gray-100" : "bg-white"}`}
-                onClick={() => setSelectedTab("mobile")}
-              >
-                Mobile
-              </button>
+      {sections.length >= 2 && (
+        <div className="flex-1 flex flex-col">
+          {/* Toolbar */}
+          <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
+            <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+              {/* preview */}
+              <Button variant="outline" className="bg-white">
+                <span className="flex items-center gap-2">
+                  <Eye size={20} />
+                  Preview
+                </span>
+              </Button>
+              {/* views */}
+              <div className="flex border border-gray-200 rounded-md overflow-hidden">
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("desktop")}
+                >
+                  Desktop
+                </button>
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("tablet")}
+                >
+                  Tablet
+                </button>
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("mobile")}
+                >
+                  Mobile
+                </button>
+              </div>
             </div>
+            {/* go to dashboard on saving  */}
+            <Button
+              className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
+              onClick={handleSaveClick}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+            {saveMessage && (
+              <span className="ml-4 text-green-600 font-semibold">
+                {saveMessage}
+              </span>
+            )}
+            <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Save</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to save your changes?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSaveDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-black text-white"
+                    onClick={editCustomizedTemplate}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : "Confirm"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
-          {/* Save Button */}
-          <Button
-            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
-            onClick={() => {
-              window.location.href = "/dashboard"
-            }}
-          >
-            Save Changes
-          </Button>
-        </div>
-
-        {/* Content preview area */}
-        <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <div
-            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden ${
-              selectedTab === "desktop"
-                ? "w-full max-w-6xl"
-                : selectedTab === "tablet"
+          {/* Content preview area */}
+          <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
+            <div
+              className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
+                selectedTab === "desktop"
+                  ? "w-full max-w-6xl"
+                  : selectedTab === "tablet"
                   ? "w-full max-w-2xl"
                   : "w-full max-w-sm"
-            }`}
-          >
-            <Navbar
-              isCustomize={true}
-              // selectedTab={selectedTab}
-              template={headerAttributes.template}
-              brandName={headerAttributes.brandName}
-              backgroundColor={headerAttributes.backgroundColor}
-              textColor={headerAttributes.textColor}
-              logo={headerAttributes.logo}
-              menuItems={headerAttributes.menuItems.map((item) => ({
-                label: item.label,
-                href: "#",
-                isShown: item.isShown,
-              }))}
-              iconColor={headerAttributes.iconColor}
-              dividerColor={headerAttributes.dividerColor}
-              searchIconColor={headerAttributes.iconColor}
-              fontFamily={headerAttributes.fontFamily}
-            />
+              }`}
+            >
+              <Navbar
+                isCustomize={true}
+                template={headerAttributes.template}
+                brandName={headerAttributes.brandName}
+                backgroundColor={headerAttributes.backgroundColor}
+                textColor={headerAttributes.textColor}
+                logo={headerAttributes.logo}
+                menuItems={headerAttributes.menuItems.map((item) => ({
+                  label: item.label,
+                  href: "#",
+                  isShown: item.isShown,
+                }))}
+                iconColor={headerAttributes.iconColor}
+                dividerColor={headerAttributes.dividerColor}
+                searchIconColor={headerAttributes.searchIconColor}
+                fontFamily={headerAttributes.fontFamily}
+              />
 
-            {/* Render middle sections dynamically */}
-            {sections.slice(1, sections.length - 1).map((section, index) => {
-              const sectionId = section.id as keyof typeof sectionComponents
-              const sectionComponent = sectionComponents[sectionId]
+              {/* Render middle sections dynamically */}
+              {sections.slice(1, sections.length - 1).map((section, index) => {
+                const sectionId = section.id as keyof typeof sectionComponents;
+                const sectionComponent = sectionComponents[sectionId];
 
-              if (!sectionComponent) {
-                return null
-              }
+                if (!sectionComponent) {
+                  return null;
+                }
 
-              // Get the template for this section
-              let template: string
-              switch (sectionId) {
-                case "PromoSlider":
-                  template = promoAttributes.template
-                  break
-                case "Products":
-                  template = "ProductList"
-                  break
-                case "Categories":
-                  template = "FeaturedGrid"
-                  break
-                case "AboutUs":
-                  template = aboutAttributes.template
-                  break
-                case "Policies":
-                  template = policiesAttributes.template
-                  break
-                case "ContactUs":
-                  template = contactAttributes.template
-                  break
-                default:
-                  return null
-              }
+                // Get the template for this section
+                let template: string;
+                switch (sectionId) {
+                  case "PromoSlider":
+                    template = promoAttributes.template;
+                    break;
+                  case "Products":
+                    template = "ProductList";
+                    break;
+                  case "Categories":
+                    template = "FeaturedGrid";
+                    break;
+                  case "AboutUs":
+                    template = aboutAttributes.template;
+                    break;
+                  case "Policies":
+                    template = policiesAttributes.template;
+                    break;
+                  case "ContactUs":
+                    template = contactAttributes.template;
+                    break;
+                  default:
+                    return null;
+                }
 
-              // Get the component for this template
-              const Component = sectionComponent[template as keyof typeof sectionComponent]
+                // Get the component for this template
+                const Component =
+                  sectionComponent[template as keyof typeof sectionComponent];
 
-              if (!Component) {
-                return null
-              }
+                if (!Component) {
+                  return null;
+                }
 
-              return <div key={section.id}>{Component}</div>
-            })}
+                return <div key={section.id}>{Component}</div>;
+              })}
 
-            <Footer
-              isCustomize={true}
-              selectedTab={selectedTab}
-              companyName={footerAttributes.brandName}
-              textColor={footerAttributes.textColor}
-              companyLogo={{
-                src: footerAttributes.logo.src || "/logo.png",
-                alt: footerAttributes.logo.alt,
-                width: Number.parseInt(footerAttributes.logo.size) || 50,
-                height: Number.parseInt(footerAttributes.logo.size) || 50,
-              }}
-              aboutLinks={footerAttributes.aboutLinks}
-              socialMedia={footerAttributes.socialMedia}
-              socialMediaStyles={footerAttributes.socialMediaStyles}
-              copyrightStyles={footerAttributes.copyrightStyles}
-              backgroundColor={footerAttributes.backgroundColor}
-            />
+              <Footer
+                companyName={footerAttributes.brandName}
+                textColor={footerAttributes.textColor}
+                companyLogo={{
+                  src: footerAttributes.logo.src || "/ring3.jpg",
+                  alt: footerAttributes.logo.alt,
+                  width: parseInt(footerAttributes.logo.size) || 50,
+                  height: parseInt(footerAttributes.logo.size) || 50,
+                }}
+                aboutLinks={footerAttributes.aboutLinks}
+                socialMedia={footerAttributes.socialMedia}
+                socialMediaStyles={footerAttributes.socialMediaStyles}
+                copyrightStyles={footerAttributes.copyrightStyles}
+                backgroundColor={footerAttributes.backgroundColor}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
-  )
+  );
 }

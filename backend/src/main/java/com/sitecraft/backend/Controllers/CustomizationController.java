@@ -28,10 +28,15 @@ public class CustomizationController {
     public ResponseEntity<?> getCustomizedTemplate(HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+
             if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+                storeId = 1L; // temporary default storeId
             }
+
 
             List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(storeId);
 
@@ -91,11 +96,7 @@ public class CustomizationController {
     @PutMapping("/editTemplate")
     public ResponseEntity<?> editCustomizedTemplate(HttpSession session, @RequestBody List<CustomizedTemplateDTO> dtoList) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
+
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
@@ -111,7 +112,7 @@ public class CustomizationController {
                 customizedTemplate.add(section);
             }
 
-            customizationService.editCustomizedTemplate(storeId, customizedTemplate);
+            customizationService.editCustomizedTemplate(1L, customizedTemplate);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
