@@ -1,35 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
-import React, { useState } from "react";
-import { Button } from "@/components/SiteCraft/ui/button";
-import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
-import { Eye } from "lucide-react";
-import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter";
-import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default";
-import { LeftPolicies } from "@/components/e-commerce/policies/templates/left";
-import { CenteredPolicies } from "@/components/e-commerce/policies/templates/centerd";
-import { MinimalRightContact } from "@/components/e-commerce/contact/templates/minimal-right";
-import { CenteredContact } from "@/components/e-commerce/contact/templates/centered-contact";
-import { LeftAlignedContact } from "@/components/e-commerce/contact/templates/left-aligned";
-import { RightAlignedContact } from "@/components/e-commerce/contact/templates/right-aligned";
-import { MinimalLeftContact } from "@/components/e-commerce/contact/templates/minimal-left";
-import { TopImageAbout } from "@/components/e-commerce/about-us/templates/top-image-about";
-import { CenteredAbout } from "@/components/e-commerce/about-us/templates/centered-about";
-import { LeftAlignedAbout } from "@/components/e-commerce/about-us/templates/left-aligned-about";
-import { RightAlignedAbout } from "@/components/e-commerce/about-us/templates/right-aligned-about";
-import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template";
-import ProductList from "@/components/e-commerce/product-lists/product-list";
-import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo";
-import {
+"use client"
+import { useState } from "react"
+import { Button } from "@/components/SiteCraft/ui/button"
+import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar"
+import { Eye, X } from "lucide-react"
+import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter"
+import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default"
+import { LeftPolicies } from "@/components/e-commerce/policies/templates/left"
+import { CenteredPolicies } from "@/components/e-commerce/policies/templates/centerd"
+import { MinimalRightContact } from "@/components/e-commerce/contact/templates/minimal-right"
+import { CenteredContact } from "@/components/e-commerce/contact/templates/centered-contact"
+import { LeftAlignedContact } from "@/components/e-commerce/contact/templates/left-aligned"
+import { RightAlignedContact } from "@/components/e-commerce/contact/templates/right-aligned"
+import { MinimalLeftContact } from "@/components/e-commerce/contact/templates/minimal-left"
+import { TopImageAbout } from "@/components/e-commerce/about-us/templates/top-image-about"
+import { CenteredAbout } from "@/components/e-commerce/about-us/templates/centered-about"
+import { LeftAlignedAbout } from "@/components/e-commerce/about-us/templates/left-aligned-about"
+import { RightAlignedAbout } from "@/components/e-commerce/about-us/templates/right-aligned-about"
+import ProductList from "@/components/e-commerce/product-lists/product-list"
+import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo"
+import type {
   AboutCustomizationAttributes,
   ContactCustomizationAttributes,
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
   PoliciesCustomizationAttributes,
   PromoCustomizationAttributes,
-} from "@/lib/customization";
-import Navbar from "@/components/e-commerce/navbar/Navbar";
-import { Footer } from "@/components/e-commerce/footer/Footer";
+} from "@/lib/customization"
+import Navbar from "@/components/e-commerce/navbar/Navbar"
+import { Footer } from "@/components/e-commerce/footer/Footer"
 import {
   LeftAlignedPromo,
   MinimalLeftPromo,
@@ -37,13 +36,13 @@ import {
   OverlayPromo,
   RightAlignedPromo,
   SplitPromo,
-} from "@/components/e-commerce/promo";
-import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+} from "@/components/e-commerce/promo"
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template"
 
 interface Section {
-  id: string;
-  title: string;
-  expanded: boolean;
+  id: string
+  title: string
+  expanded: boolean
 }
 
 const initialSections: Section[] = [
@@ -87,12 +86,11 @@ const initialSections: Section[] = [
     title: "Footer",
     expanded: false,
   },
-];
+]
 
 export default function CustomizeTemplatePage() {
-  const [selectedTab, setSelectedTab] = useState<
-    "desktop" | "tablet" | "mobile"
-  >("desktop");
+  const [selectedTab, setSelectedTab] = useState<"desktop" | "tablet" | "mobile">("desktop")
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
@@ -116,18 +114,15 @@ export default function CustomizeTemplatePage() {
     dividerColor: "border-[#E5E7EB]", // border-gray-200
     searchIconColor: "text-[#FFFFFF]", // text-white
     fontFamily: "font-sans",
-  };
+  }
 
   // State for header customization
-  const [headerAttributes, setHeaderAttributes] =
-    useState<HeaderCustomizationAttributes>(initialHeader);
+  const [headerAttributes, setHeaderAttributes] = useState<HeaderCustomizationAttributes>(initialHeader)
 
   // Function to update header attributes
-  const updateHeaderAttributes = (
-    updates: Partial<HeaderCustomizationAttributes>
-  ) => {
-    setHeaderAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updateHeaderAttributes = (updates: Partial<HeaderCustomizationAttributes>) => {
+    setHeaderAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const initialPromo: PromoCustomizationAttributes = {
     template: "CenteredPromo",
@@ -137,8 +132,7 @@ export default function CustomizeTemplatePage() {
     slides: [
       {
         title: "Welcome to Our Store",
-        description:
-          "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
+        description: "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
         buttonText: "Shop Now",
         buttonLink: "#new-collection",
         image: "/girl.jpg",
@@ -146,8 +140,7 @@ export default function CustomizeTemplatePage() {
       },
       {
         title: "New Collection",
-        description:
-          "Check out our newest products. Limited time offers with free shipping on all orders.",
+        description: "Check out our newest products. Limited time offers with free shipping on all orders.",
         buttonText: "View Collection",
         buttonLink: "#new-collection",
         image: "/hand.jpg",
@@ -167,18 +160,15 @@ export default function CustomizeTemplatePage() {
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
-  };
+  }
 
   // State for promo customization
-  const [promoAttributes, setPromoAttributes] =
-    useState<PromoCustomizationAttributes>(initialPromo);
+  const [promoAttributes, setPromoAttributes] = useState<PromoCustomizationAttributes>(initialPromo)
 
   // Function to update promo attributes
-  const updatePromoAttributes = (
-    updates: Partial<PromoCustomizationAttributes>
-  ) => {
-    setPromoAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updatePromoAttributes = (updates: Partial<PromoCustomizationAttributes>) => {
+    setPromoAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
@@ -198,18 +188,15 @@ export default function CustomizeTemplatePage() {
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
     descriptionSize: "text-lg",
-  };
+  }
 
   // State for about customization
-  const [aboutAttributes, setAboutAttributes] =
-    useState<AboutCustomizationAttributes>(initialAbout);
+  const [aboutAttributes, setAboutAttributes] = useState<AboutCustomizationAttributes>(initialAbout)
 
   // Function to update about attributes
-  const updateAboutAttributes = (
-    updates: Partial<AboutCustomizationAttributes>
-  ) => {
-    setAboutAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updateAboutAttributes = (updates: Partial<AboutCustomizationAttributes>) => {
+    setAboutAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const initialPolicies: PoliciesCustomizationAttributes = {
     template: "TitleLeftContentCenterPolicies",
@@ -218,8 +205,7 @@ export default function CustomizeTemplatePage() {
     sections: [
       {
         title: "Shipping Policy",
-        content:
-          "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
+        content: "We offer worldwide shipping with tracking. Orders are processed within 1-2 business days.",
       },
       {
         title: "Return Policy",
@@ -227,8 +213,7 @@ export default function CustomizeTemplatePage() {
       },
       {
         title: "Privacy Policy",
-        content:
-          "We respect your privacy and protect your personal information.",
+        content: "We respect your privacy and protect your personal information.",
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
@@ -244,26 +229,22 @@ export default function CustomizeTemplatePage() {
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
-  };
+  }
 
   // State for policies customization
-  const [policiesAttributes, setPoliciesAttributes] =
-    useState<PoliciesCustomizationAttributes>(initialPolicies);
+  const [policiesAttributes, setPoliciesAttributes] = useState<PoliciesCustomizationAttributes>(initialPolicies)
 
   // Function to update policies attributes
-  const updatePoliciesAttributes = (
-    updates: Partial<PoliciesCustomizationAttributes>
-  ) => {
-    setPoliciesAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updatePoliciesAttributes = (updates: Partial<PoliciesCustomizationAttributes>) => {
+    setPoliciesAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const initialContact: ContactCustomizationAttributes = {
     template: "MinimalRightContact",
     id: "contact",
     title: "Contact Us",
     address: "masr el gedida, cairo, egypt",
-    addressUrl:
-      "https://www.google.com/maps?q=30.0890922546387,31.2838287353516",
+    addressUrl: "https://www.google.com/maps?q=30.0890922546387,31.2838287353516",
     openHours: "Monday - Friday: 9:00 AM - 6:00 PM",
     phone: "+1 234 567 890",
     contactEmail: "contact@example.com",
@@ -281,18 +262,15 @@ export default function CustomizeTemplatePage() {
     contentFont: "font-semibold",
     contentColor: "text-[#000000]",
     contentSize: "text-lg",
-  };
+  }
 
   // State for contact customization
-  const [contactAttributes, setContactAttributes] =
-    useState<ContactCustomizationAttributes>(initialContact);
+  const [contactAttributes, setContactAttributes] = useState<ContactCustomizationAttributes>(initialContact)
 
   // Function to update contact attributes
-  const updateContactAttributes = (
-    updates: Partial<ContactCustomizationAttributes>
-  ) => {
-    setContactAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updateContactAttributes = (updates: Partial<ContactCustomizationAttributes>) => {
+    setContactAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "BRAND",
@@ -341,46 +319,25 @@ export default function CustomizeTemplatePage() {
       fontWeight: "font-light",
       fontColor: "text-[#000000]",
     },
-  };
+  }
 
   // State for footer customization
-  const [footerAttributes, setFooterAttributes] =
-    useState<FooterCustomizationAttributes>(initialFooter);
+  const [footerAttributes, setFooterAttributes] = useState<FooterCustomizationAttributes>(initialFooter)
 
   // Function to update footer attributes
-  const updateFooterAttributes = (
-    updates: Partial<FooterCustomizationAttributes>
-  ) => {
-    setFooterAttributes((prev) => ({ ...prev, ...updates }));
-  };
+  const updateFooterAttributes = (updates: Partial<FooterCustomizationAttributes>) => {
+    setFooterAttributes((prev) => ({ ...prev, ...updates }))
+  }
 
   const sectionComponents = {
     PromoSlider: {
       CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
-      LeftAlignedPromo: (
-        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
-      ),
-      RightAlignedPromo: (
-        <RightAlignedPromo {...promoAttributes} isClickable={false} />
-      ),
-      MinimalLeftPromo: (
-        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
-      ),
-      MinimalRightPromo: (
-        <MinimalRightPromo {...promoAttributes} isClickable={false} />
-      ),
+      LeftAlignedPromo: <LeftAlignedPromo {...promoAttributes} isClickable={false} />,
+      RightAlignedPromo: <RightAlignedPromo {...promoAttributes} isClickable={false} />,
+      MinimalLeftPromo: <MinimalLeftPromo {...promoAttributes} isClickable={false} />,
+      MinimalRightPromo: <MinimalRightPromo {...promoAttributes} isClickable={false} />,
       OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
-      SplitPromo: (
-        <SplitPromo
-          {...promoAttributes}
-          isClickable={false}
-
-          // className={promoAttributes.className}
-          // descriptionFont={promoAttributes.descriptionFont}
-          // descriptionColor={promoAttributes.descriptionColor}
-          // descriptionSize={promoAttributes.descriptionSize}
-        />
-      ),
+      SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
     Products: {
       ProductList: (
@@ -625,42 +582,10 @@ export default function CustomizeTemplatePage() {
       ),
     },
     AboutUs: {
-      TopImageAbout: (
-        <TopImageAbout
-          {
-            ...aboutAttributes
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          }
-        />
-      ),
-      CenteredAbout: (
-        <CenteredAbout
-          {
-            ...aboutAttributes
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          }
-        />
-      ),
-      LeftAlignedAbout: (
-        <LeftAlignedAbout
-          {
-            ...aboutAttributes
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          }
-        />
-      ),
-      RightAlignedAbout: (
-        <RightAlignedAbout
-          {
-            ...aboutAttributes
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          }
-        />
-      ),
+      TopImageAbout: <TopImageAbout {...aboutAttributes} />,
+      CenteredAbout: <CenteredAbout {...aboutAttributes} />,
+      LeftAlignedAbout: <LeftAlignedAbout {...aboutAttributes} />,
+      RightAlignedAbout: <RightAlignedAbout {...aboutAttributes} />,
     },
     ContactUs: {
       MinimalRightContact: <MinimalRightContact {...contactAttributes} />,
@@ -670,108 +595,114 @@ export default function CustomizeTemplatePage() {
       MinimalLeftContact: <MinimalLeftContact {...contactAttributes} />,
     },
     Policies: {
-      TitleLeftContentCenterPolicies: (
-        <TitleLeftContentCenterPolicies
-          {
-            ...policiesAttributes
-            // variant={policiesAttributes.variant}
-          }
-        />
-      ),
-      DefaultPolicies: (
-        <DefaultPolicies
-          {
-            ...policiesAttributes
-            // variant={policiesAttributes.variant}
-          }
-        />
-      ),
-      LeftPolicies: (
-        <LeftPolicies
-          {
-            ...policiesAttributes
-            // variant={policiesAttributes.variant}
-          }
-        />
-      ),
-      CenteredPolicies: (
-        <CenteredPolicies
-          {
-            ...policiesAttributes
-            // variant={policiesAttributes.variant}
-          }
-        />
-      ),
+      TitleLeftContentCenterPolicies: <TitleLeftContentCenterPolicies {...policiesAttributes} />,
+      DefaultPolicies: <DefaultPolicies {...policiesAttributes} />,
+      LeftPolicies: <LeftPolicies {...policiesAttributes} />,
+      CenteredPolicies: <CenteredPolicies {...policiesAttributes} />,
     },
-  };
+  }
 
-  const [sections, setSections] = useState<Section[]>(initialSections);
+  const [sections, setSections] = useState<Section[]>(initialSections)
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <Sidebar
-        headerAttributes={headerAttributes}
-        updateHeaderAttributes={updateHeaderAttributes}
-        promoAttributes={promoAttributes}
-        updatePromoAttributes={updatePromoAttributes}
-        aboutAttributes={aboutAttributes}
-        updateAboutAttributes={updateAboutAttributes}
-        policiesAttributes={policiesAttributes}
-        updatePoliciesAttributes={updatePoliciesAttributes}
-        contactAttributes={contactAttributes}
-        updateContactAttributes={updateContactAttributes}
-        footerAttributes={footerAttributes}
-        updateFooterAttributes={updateFooterAttributes}
-        sections={sections}
-        setSections={setSections}
-      />
+      <div
+        className={`
+        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
+        w-80 lg:w-80 bg-white border-r border-gray-200
+        transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        flex flex-col
+      `}
+      >
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold">Customize Template</h2>
+          <Button variant="ghost" size="sm" onClick={() => setIsSidebarOpen(false)}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Sidebar Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <Sidebar
+            headerAttributes={headerAttributes}
+            updateHeaderAttributes={updateHeaderAttributes}
+            promoAttributes={promoAttributes}
+            updatePromoAttributes={updatePromoAttributes}
+            aboutAttributes={aboutAttributes}
+            updateAboutAttributes={updateAboutAttributes}
+            policiesAttributes={policiesAttributes}
+            updatePoliciesAttributes={updatePoliciesAttributes}
+            contactAttributes={contactAttributes}
+            updateContactAttributes={updateContactAttributes}
+            footerAttributes={footerAttributes}
+            updateFooterAttributes={updateFooterAttributes}
+            sections={sections}
+            setSections={setSections}
+          />
+        </div>
+      </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Toolbar */}
-        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
+        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
           <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-            {/* preview */}
+            {/* Mobile Menu Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="lg:hidden bg-transparent"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </Button>
+
+            {/* Preview Button */}
             <Button variant="outline" className="bg-white">
               <span className="flex items-center gap-2">
                 <Eye size={20} />
                 Preview
               </span>
             </Button>
-            {/* views */}
+
+            {/* Device Views */}
             <div className="flex border border-gray-200 rounded-md overflow-hidden">
               <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
-                }`}
+                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "desktop" ? "bg-gray-100" : "bg-white"}`}
                 onClick={() => setSelectedTab("desktop")}
               >
                 Desktop
               </button>
               <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
-                }`}
+                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "tablet" ? "bg-gray-100" : "bg-white"}`}
                 onClick={() => setSelectedTab("tablet")}
               >
                 Tablet
               </button>
               <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
-                }`}
+                className={`px-2 sm:px-4 py-2 text-sm ${selectedTab === "mobile" ? "bg-gray-100" : "bg-white"}`}
                 onClick={() => setSelectedTab("mobile")}
               >
                 Mobile
               </button>
             </div>
           </div>
-          {/* go to dashboard on saving  */}
+
+          {/* Save Button */}
           <Button
             className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
             onClick={() => {
-              window.location.href = "/dashboard";
+              window.location.href = "/dashboard"
             }}
           >
             Save Changes
@@ -780,13 +711,18 @@ export default function CustomizeTemplatePage() {
 
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <div className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
-            selectedTab === "desktop" ? "w-full max-w-6xl" : 
-            selectedTab === "tablet" ? "w-full max-w-2xl" : 
-            "w-full max-w-sm"
-          }`}>
+          <div
+            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden ${
+              selectedTab === "desktop"
+                ? "w-full max-w-6xl"
+                : selectedTab === "tablet"
+                  ? "w-full max-w-2xl"
+                  : "w-full max-w-sm"
+            }`}
+          >
             <Navbar
               isCustomize={true}
+              selectedTab={selectedTab}
               template={headerAttributes.template}
               brandName={headerAttributes.brandName}
               backgroundColor={headerAttributes.backgroundColor}
@@ -805,57 +741,58 @@ export default function CustomizeTemplatePage() {
 
             {/* Render middle sections dynamically */}
             {sections.slice(1, sections.length - 1).map((section, index) => {
-              const sectionId = section.id as keyof typeof sectionComponents;
-              const sectionComponent = sectionComponents[sectionId];
+              const sectionId = section.id as keyof typeof sectionComponents
+              const sectionComponent = sectionComponents[sectionId]
 
               if (!sectionComponent) {
-                return null;
+                return null
               }
 
               // Get the template for this section
-              let template: string;
+              let template: string
               switch (sectionId) {
                 case "PromoSlider":
-                  template = promoAttributes.template;
-                  break;
+                  template = promoAttributes.template
+                  break
                 case "Products":
-                  template = "ProductList";
-                  break;
+                  template = "ProductList"
+                  break
                 case "Categories":
-                  template = "FeaturedGrid";
-                  break;
+                  template = "FeaturedGrid"
+                  break
                 case "AboutUs":
-                  template = aboutAttributes.template;
-                  break;
+                  template = aboutAttributes.template
+                  break
                 case "Policies":
-                  template = policiesAttributes.template;
-                  break;
+                  template = policiesAttributes.template
+                  break
                 case "ContactUs":
-                  template = contactAttributes.template;
-                  break;
+                  template = contactAttributes.template
+                  break
                 default:
-                  return null;
+                  return null
               }
 
               // Get the component for this template
-              const Component =
-                sectionComponent[template as keyof typeof sectionComponent];
+              const Component = sectionComponent[template as keyof typeof sectionComponent]
 
               if (!Component) {
-                return null;
+                return null
               }
 
-              return <div key={section.id}>{Component}</div>;
+              return <div key={section.id}>{Component}</div>
             })}
 
             <Footer
+              isCustomize={true}
+              selectedTab={selectedTab}
               companyName={footerAttributes.brandName}
               textColor={footerAttributes.textColor}
               companyLogo={{
                 src: footerAttributes.logo.src || "/logo.png",
                 alt: footerAttributes.logo.alt,
-                width: parseInt(footerAttributes.logo.size) || 50,
-                height: parseInt(footerAttributes.logo.size) || 50,
+                width: Number.parseInt(footerAttributes.logo.size) || 50,
+                height: Number.parseInt(footerAttributes.logo.size) || 50,
               }}
               aboutLinks={footerAttributes.aboutLinks}
               socialMedia={footerAttributes.socialMedia}
@@ -867,5 +804,5 @@ export default function CustomizeTemplatePage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

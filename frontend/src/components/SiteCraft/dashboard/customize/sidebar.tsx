@@ -292,18 +292,7 @@ export function Sidebar({
 
   return (
     <>
-      {/* Mobile Sidebar Toggle */}
-      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between h-16">
-        <h1 className="text-lg font-bold">
-          {detailedSection
-            ? `Edit ${detailedSection.title}`
-            : "Customize Template"}
-        </h1>
-        <button onClick={toggleSidebar} className="p-1">
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
+      
       {/* Main Sidebar or Detailed Section Sidebar */}
       {detailedSection ? (
         // Detailed Section Sidebar
