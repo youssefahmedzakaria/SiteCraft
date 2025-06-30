@@ -40,6 +40,8 @@ interface RenderPromoSectionProps {
     updates: Partial<PromoCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
+  promoImages: File[] | undefined;
+  setPromoImages: React.Dispatch<React.SetStateAction<File[] | undefined>>;
 }
 
 export function RenderPromoSection({
@@ -47,6 +49,8 @@ export function RenderPromoSection({
   promoAttributes,
   updatePromoAttributes,
   onDeleteSection,
+  promoImages,
+  setPromoImages,
 }: RenderPromoSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
@@ -131,6 +135,11 @@ export function RenderPromoSection({
     const index = parseInt(indexStr);
     const file = e.target.files?.[0] || null;
     if (file) {
+      // Update promoImages
+      let updatedPromoImages = promoImages ? [...promoImages] : [];
+      updatedPromoImages[index] = file;
+      setPromoImages(updatedPromoImages);
+      // Update preview
       const updatedSlides = [...promoAttributes.slides];
       updatedSlides[index] = {
         ...updatedSlides[index],
@@ -167,12 +176,17 @@ export function RenderPromoSection({
   }
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-
     const items = Array.from(promoAttributes.slides);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-
     updatePromoAttributes({ slides: items });
+    // Reorder promoImages
+    if (promoImages) {
+      const images = Array.from(promoImages);
+      const [reorderedImage] = images.splice(result.source.index, 1);
+      images.splice(result.destination.index, 0, reorderedImage);
+      setPromoImages(images);
+    }
   };
 
   {
@@ -190,11 +204,16 @@ export function RenderPromoSection({
     updatePromoAttributes({
       slides: [...promoAttributes.slides, newPromo],
     });
+    // setPromoImages([...(promoImages || []), undefined]);
   };
 
   const handleDeletePromo = (index: number) => {
     const updatedSlides = promoAttributes.slides.filter((_, i) => i !== index);
     updatePromoAttributes({ slides: updatedSlides });
+    if (promoImages) {
+      const updatedPromoImages = promoImages.filter((_, i) => i !== index);
+      setPromoImages(updatedPromoImages);
+    }
   };
 
   {
@@ -317,7 +336,9 @@ export function RenderPromoSection({
                                         >
                                           <div
                                             className={`relative w-24 h-24 rounded ${
-                                              promo.image ? "" : "bg-gray-100"
+                                              promo.image
+                                                ? ""
+                                                : "bg-gray-100"
                                             } overflow-hidden`}
                                           >
                                             {promo.image ? (

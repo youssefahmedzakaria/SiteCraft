@@ -32,6 +32,8 @@ interface RenderContactSectionProps {
     updates: Partial<ContactCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
+  contactImage: File | undefined;
+  setContactImage: React.Dispatch<React.SetStateAction<File | undefined>>;
 }
 
 export function RenderContactSection({
@@ -39,6 +41,8 @@ export function RenderContactSection({
   contactAttributes,
   updateContactAttributes,
   onDeleteSection,
+  contactImage,
+  setContactImage,
 }: RenderContactSectionProps) {
   {
     /* For image selection in content */
@@ -47,10 +51,11 @@ export function RenderContactSection({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+    setContactImage(file || undefined);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateContactAttributes({ imageUrl: reader.result as string });
+        updateContactAttributes({ image: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -70,7 +75,7 @@ export function RenderContactSection({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateContactAttributes({ imageUrl: reader.result as string });
+        updateContactAttributes({ image: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -215,10 +220,10 @@ export function RenderContactSection({
                     onDrop={handleDropImage}
                     onClick={handleBrowseClick}
                   >
-                    {contactAttributes.imageUrl ? (
+                    {contactAttributes.image ? (
                       <div className="relative w-full h-48">
                         <Image
-                          src={contactAttributes.imageUrl}
+                          src={contactAttributes.image}
                           alt="Preview"
                           fill
                           className="object-contain"

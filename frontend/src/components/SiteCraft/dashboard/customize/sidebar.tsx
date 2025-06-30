@@ -93,6 +93,14 @@ interface SidebarProps {
   ) => void;
   sections: Section[];
   setSections: React.Dispatch<React.SetStateAction<Section[]>>;
+  aboutImage: File | undefined;
+  setAboutImage: React.Dispatch<React.SetStateAction<File | undefined>>;
+  contactImage: File | undefined;
+  setContactImage: React.Dispatch<React.SetStateAction<File | undefined>>;
+  policiestImage: File | undefined;
+  setPoliciesImage: React.Dispatch<React.SetStateAction<File | undefined>>;
+  promoImages: File[] | undefined;
+  setPromoImages: React.Dispatch<React.SetStateAction<File[] | undefined>>;
 }
 
 export function Sidebar({
@@ -112,6 +120,14 @@ export function Sidebar({
   updateFooterAttributes,
   sections,
   setSections,
+  aboutImage,
+  setAboutImage,
+  contactImage,
+  setContactImage,
+  policiestImage,
+  setPoliciesImage,
+  promoImages,
+  setPromoImages,
 }: SidebarProps) {
   // Remove local useState for sections
   // const [sections, setSections] = useState<Section[]>([ ... ]);
@@ -375,6 +391,8 @@ export function Sidebar({
                 promoAttributes={promoAttributes}
                 updatePromoAttributes={updatePromoAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+                promoImages={promoImages}
+                setPromoImages={setPromoImages}
               />
             ) : detailedSection.id === "Categories" ? (
               <RenderCategorySection
@@ -389,6 +407,8 @@ export function Sidebar({
                 aboutAttributes={aboutAttributes}
                 updateAboutAttributes={updateAboutAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+                aboutImage={aboutImage}
+                setAboutImage={setAboutImage}
               />
             ) : detailedSection.id === "Policies" ? (
               <RenderPoliciesSection
@@ -396,6 +416,8 @@ export function Sidebar({
                 policiesAttributes={policiesAttributes}
                 updatePoliciesAttributes={updatePoliciesAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+                policiesImage={policiestImage}
+                setPoliciesImage={setPoliciesImage}
               />
             ) : detailedSection.id === "ContactUs" ? (
               <RenderContactSection
@@ -403,6 +425,8 @@ export function Sidebar({
                 contactAttributes={contactAttributes}
                 updateContactAttributes={updateContactAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+                contactImage={contactImage}
+                setContactImage={setContactImage}
               />
             ) : detailedSection.id === "Footer" ? (
               <RenderFooterSection
