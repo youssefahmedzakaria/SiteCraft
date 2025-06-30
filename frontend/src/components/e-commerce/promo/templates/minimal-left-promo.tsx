@@ -10,7 +10,7 @@ export interface MinimalLeftPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -51,7 +51,7 @@ export function MinimalLeftPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -81,7 +81,7 @@ export function MinimalLeftPromo({
         <PromoSlider
           slides={slides}
           variant="minimalLeft"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}

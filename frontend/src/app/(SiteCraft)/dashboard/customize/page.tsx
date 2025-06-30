@@ -196,7 +196,6 @@ export default function CustomizeTemplatePage() {
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
-    titleFontWeight: "font-bold",
     descriptionFont: "font-sans",
     descriptionSize: "text-lg",
   };

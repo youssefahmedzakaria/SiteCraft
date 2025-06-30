@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { PromoSlide } from "./promo-slide"
@@ -17,7 +17,7 @@ export interface PromoSliderProps {
     imageAlt: string
   }[]
   variant?: "left" | "centered" | "right" | "overlay" | "minimalRight" | "minimalLeft" | "split"
-  autoplay?: boolean
+  autoPlay?: boolean
   autoplaySpeed?: number
   showArrows?: boolean
   className?: string
@@ -40,8 +40,8 @@ export function PromoSlider({
   isClickable,
   slides,
   variant = "left",
-  autoplay = false,
-  autoplaySpeed = 5000,
+  autoPlay = false,
+  autoplaySpeed = 3000,
   showArrows = true,
   className,
   titleFont,
@@ -62,17 +62,17 @@ export function PromoSlider({
   const sliderRef = useRef<HTMLDivElement>(null)
   const totalSlides = slides.length
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1))
-  }
+  }, [totalSlides])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1))
-  }
+  }, [totalSlides])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
-    if (autoplay) {
+    if (autoPlay && totalSlides > 1) {
       interval = setInterval(() => {
         nextSlide()
       }, autoplaySpeed)
@@ -80,7 +80,7 @@ export function PromoSlider({
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [autoplay, autoplaySpeed])
+  }, [autoPlay, autoplaySpeed, nextSlide, totalSlides])
 
   return (
     <div className={cn("relative overflow-hidden", className)} ref={sliderRef}>
