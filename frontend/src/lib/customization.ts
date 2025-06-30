@@ -55,6 +55,38 @@ export interface PromoCustomizationAttributes {
   imageObjectFit: "cover" | "fill" | "contain";
 }
 
+export interface CategoriesCustomizationAttributes {
+  template: string;
+  title: string;
+  bgColor: string;
+  textColor: string;
+  accentColor: string;
+  fontFamily: string;
+  titleFont: string;
+  showTitle: boolean;
+  showMoreButton: boolean;
+  showMoreText: string;
+  showMorebuttonBgColor: string;
+  showMorebuttonTextColor: string;
+  ctaText: string;
+  cornerRadius: "small" | "medium" | "large";
+  showCta: boolean; // button
+  cardVariant: "overlay" | "standard" | "minimal"; // add more if needed
+  showSubtitle: boolean;
+  categories: {
+    id: string;
+    name: string;
+    link: string;
+    media: {
+      mainMedia: {
+        image: {
+          url: string;
+        };
+      };
+    };
+  }[];
+}
+
 export interface AboutCustomizationAttributes {
   template: string;
   id: string;
@@ -153,3 +185,4 @@ export interface FooterCustomizationAttributes {
     fontColor: string;
   };
 }
+
