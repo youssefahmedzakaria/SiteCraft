@@ -1,13 +1,13 @@
 export interface HeaderCustomizationAttributes {
   template:
-    | "template1"
-    | "template2"
-    | "template3"
-    | "template4"
-    | "template5"
-    | "template6"
-    | "template7"
-    | "template8";
+  | "template1"
+  | "template2"
+  | "template3"
+  | "template4"
+  | "template5"
+  | "template6"
+  | "template7"
+  | "template8";
   brandName: string;
   backgroundColor: string;
   textColor: string;

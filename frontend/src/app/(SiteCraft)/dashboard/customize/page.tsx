@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
 import { Eye } from "lucide-react";
@@ -39,6 +40,15 @@ import {
   SplitPromo,
 } from "@/components/e-commerce/promo";
 import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/SiteCraft/ui/dialog";
 
 interface Section {
   id: string;
@@ -46,48 +56,7 @@ interface Section {
   expanded: boolean;
 }
 
-const initialSections: Section[] = [
-  {
-    id: "Header&Menu",
-    title: "Header & Menu",
-    expanded: false,
-  },
-  {
-    id: "PromoSlider",
-    title: "Promo Slider",
-    expanded: false,
-  },
-  {
-    id: "Categories",
-    title: "Categories",
-    expanded: false,
-  },
-  {
-    id: "Products",
-    title: "Products",
-    expanded: false,
-  },
-  {
-    id: "AboutUs",
-    title: "About Us",
-    expanded: false,
-  },
-  {
-    id: "Policies",
-    title: "Policies",
-    expanded: false,
-  },
-  {
-    id: "ContactUs",
-    title: "Contact Us",
-    expanded: false,
-  },
-  {
-    id: "Footer",
-    title: "Footer",
-    expanded: false,
-  },
-];
+const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
   const [selectedTab, setSelectedTab] = useState<
@@ -196,7 +165,7 @@ export default function CustomizeTemplatePage() {
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
-    titleFontWeight: "font-bold",
+    // titleFontWeight: "font-bold",
     descriptionFont: "font-sans",
     descriptionSize: "text-lg",
   };
@@ -707,166 +676,332 @@ export default function CustomizeTemplatePage() {
   };
 
   const [sections, setSections] = useState<Section[]>(initialSections);
+  const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // Warn user before leaving the page if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "You have unsaved changes. Are you sure you want to leave? Changes will not be saved.";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  // Helper to build DTOs for each section
+  const buildCustomizationDTOs = () => {
+    // Set storeId to 1 for all sections
+    const storeId = 1;
+    return sections.map((section, idx) => {
+      let value = {};
+      switch (section.id) {
+        case "Header&Menu":
+          value = headerAttributes;
+          break;
+        case "PromoSlider":
+          value = promoAttributes;
+          break;
+        case "AboutUs":
+          value = aboutAttributes;
+          break;
+        case "Policies":
+          value = policiesAttributes;
+          break;
+        case "ContactUs":
+          value = contactAttributes;
+          break;
+        case "Footer":
+          value = footerAttributes;
+          break;
+        // Add cases for Categories, Products, etc. as needed
+        default:
+          value = {};
+      }
+      return {
+        title: section.id,
+        value,
+        index: idx,
+        storeId,
+      };
+    });
+  };
+
+  // API call for editing customization
+  const handleSaveClick = () => {
+    setShowSaveDialog(true);
+  };
+
+  const editCustomizedTemplate = async () => {
+    setIsSaving(true);
+    setSaveMessage("");
+    setShowSaveDialog(false);
+    try {
+      const dtoList = buildCustomizationDTOs();
+      const response = await fetch("http://localhost:8080/customize/editTemplate", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(dtoList),
+      });
+      const data = await response.json();
+      if (data.success) {
+        // Store message in localStorage to show after navigation
+        localStorage.setItem("customizeSuccessMessage", "Changes saved successfully!");
+        window.removeEventListener("beforeunload", () => {});
+        router.push("/dashboard");
+      } else {
+        alert(data.message || "Failed to save customization.");
+      }
+    } catch (error) {
+      alert("An error occurred while saving customization.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+useEffect(() => {
+  const fetchTemplate = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/customize/getTemplate", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await response.json();
+
+      if (data.success && data["Customized Template"]) {
+        const sortedTemplate = [...data["Customized Template"]].sort((a, b) => a.index - b.index);
+
+        const loadedSections: Section[] = [];
+
+        sortedTemplate.forEach((section: any, idx: number) => {
+          loadedSections.push({
+            id: section.title,
+            title: section.title.replace("&", " & "),
+            expanded: false, // all sections initially collapsed
+          });
+
+          switch (section.title) {
+            case "Header&Menu":
+              setHeaderAttributes(section.value);
+              break;
+            case "PromoSlider":
+              setPromoAttributes(section.value);
+              break;
+            case "AboutUs":
+              setAboutAttributes(section.value);
+              break;
+            case "Footer":
+              setFooterAttributes(section.value);
+              break;
+            // Add additional cases as you expand your backend support
+          }
+        });
+
+        setSections(loadedSections);
+      }
+    } catch (error) {
+      console.error("Failed to fetch template:", error);
+    }
+  };
+
+  fetchTemplate();
+}, []);
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar
-        headerAttributes={headerAttributes}
-        updateHeaderAttributes={updateHeaderAttributes}
-        promoAttributes={promoAttributes}
-        updatePromoAttributes={updatePromoAttributes}
-        aboutAttributes={aboutAttributes}
-        updateAboutAttributes={updateAboutAttributes}
-        policiesAttributes={policiesAttributes}
-        updatePoliciesAttributes={updatePoliciesAttributes}
-        contactAttributes={contactAttributes}
-        updateContactAttributes={updateContactAttributes}
-        footerAttributes={footerAttributes}
-        updateFooterAttributes={updateFooterAttributes}
-        sections={sections}
-        setSections={setSections}
-      />
+      {sections.length >= 2 ? (
+        <Sidebar
+          headerAttributes={headerAttributes}
+          updateHeaderAttributes={updateHeaderAttributes}
+          promoAttributes={promoAttributes}
+          updatePromoAttributes={updatePromoAttributes}
+          aboutAttributes={aboutAttributes}
+          updateAboutAttributes={updateAboutAttributes}
+          policiesAttributes={policiesAttributes}
+          updatePoliciesAttributes={updatePoliciesAttributes}
+          contactAttributes={contactAttributes}
+          updateContactAttributes={updateContactAttributes}
+          footerAttributes={footerAttributes}
+          updateFooterAttributes={updateFooterAttributes}
+          sections={sections}
+          setSections={setSections}
+        />
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <span>Loading customization...</span>
+        </div>
+      )}
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col">
-        {/* Toolbar */}
-        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
-          <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-            {/* preview */}
-            <Button variant="outline" className="bg-white">
-              <span className="flex items-center gap-2">
-                <Eye size={20} />
-                Preview
-              </span>
+      {sections.length >= 2 && (
+        <div className="flex-1 flex flex-col">
+          {/* Toolbar */}
+          <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
+            <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+              {/* preview */}
+              <Button variant="outline" className="bg-white">
+                <span className="flex items-center gap-2">
+                  <Eye size={20} />
+                  Preview
+                </span>
+              </Button>
+              {/* views */}
+              <div className="flex border border-gray-200 rounded-md overflow-hidden">
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("desktop")}
+                >
+                  Desktop
+                </button>
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("tablet")}
+                >
+                  Tablet
+                </button>
+                <button
+                  className={`px-2 sm:px-4 py-2 text-sm ${
+                    selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
+                  }`}
+                  onClick={() => setSelectedTab("mobile")}
+                >
+                  Mobile
+                </button>
+              </div>
+            </div>
+            {/* go to dashboard on saving  */}
+            <Button
+              className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
+              onClick={handleSaveClick}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
             </Button>
-            {/* views */}
-            <div className="flex border border-gray-200 rounded-md overflow-hidden">
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("desktop")}
-              >
-                Desktop
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("tablet")}
-              >
-                Tablet
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("mobile")}
-              >
-                Mobile
-              </button>
+            {saveMessage && (
+              <span className="ml-4 text-green-600 font-semibold">{saveMessage}</span>
+            )}
+            <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Save</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to save your changes?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button className="bg-black text-white" onClick={editCustomizedTemplate} disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Confirm"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Content preview area */}
+          <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
+            <div className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
+              selectedTab === "desktop" ? "w-full max-w-6xl" : 
+              selectedTab === "tablet" ? "w-full max-w-2xl" : 
+              "w-full max-w-sm"
+            }`}>
+              <Navbar
+                isCustomize={true}
+                template={headerAttributes.template}
+                brandName={headerAttributes.brandName}
+                backgroundColor={headerAttributes.backgroundColor}
+                textColor={headerAttributes.textColor}
+                logo={headerAttributes.logo}
+                menuItems={headerAttributes.menuItems.map((item) => ({
+                  label: item.label,
+                  href: "#",
+                  isShown: item.isShown,
+                }))}
+                iconColor={headerAttributes.iconColor}
+                dividerColor={headerAttributes.dividerColor}
+                searchIconColor={headerAttributes.searchIconColor}
+                fontFamily={headerAttributes.fontFamily}
+              />
+
+              {/* Render middle sections dynamically */}
+              {sections.slice(1, sections.length - 1).map((section, index) => {
+                const sectionId = section.id as keyof typeof sectionComponents;
+                const sectionComponent = sectionComponents[sectionId];
+
+                if (!sectionComponent) {
+                  return null;
+                }
+
+                // Get the template for this section
+                let template: string;
+                switch (sectionId) {
+                  case "PromoSlider":
+                    template = promoAttributes.template;
+                    break;
+                  case "Products":
+                    template = "ProductList";
+                    break;
+                  case "Categories":
+                    template = "FeaturedGrid";
+                    break;
+                  case "AboutUs":
+                    template = aboutAttributes.template;
+                    break;
+                  case "Policies":
+                    template = policiesAttributes.template;
+                    break;
+                  case "ContactUs":
+                    template = contactAttributes.template;
+                    break;
+                  default:
+                    return null;
+                }
+
+                // Get the component for this template
+                const Component =
+                  sectionComponent[template as keyof typeof sectionComponent];
+
+                if (!Component) {
+                  return null;
+                }
+
+                return <div key={section.id}>{Component}</div>;
+              })}
+
+              <Footer
+                companyName={footerAttributes.brandName}
+                textColor={footerAttributes.textColor}
+                companyLogo={{
+                  src: footerAttributes.logo.src || "/logo.png",
+                  alt: footerAttributes.logo.alt,
+                  width: parseInt(footerAttributes.logo.size) || 50,
+                  height: parseInt(footerAttributes.logo.size) || 50,
+                }}
+                aboutLinks={footerAttributes.aboutLinks}
+                socialMedia={footerAttributes.socialMedia}
+                socialMediaStyles={footerAttributes.socialMediaStyles}
+                copyrightStyles={footerAttributes.copyrightStyles}
+                backgroundColor={footerAttributes.backgroundColor}
+              />
             </div>
           </div>
-          {/* go to dashboard on saving  */}
-          <Button
-            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
-            onClick={() => {
-              window.location.href = "/dashboard";
-            }}
-          >
-            Save Changes
-          </Button>
         </div>
-
-        {/* Content preview area */}
-        <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-          <div className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
-            selectedTab === "desktop" ? "w-full max-w-6xl" : 
-            selectedTab === "tablet" ? "w-full max-w-2xl" : 
-            "w-full max-w-sm"
-          }`}>
-            <Navbar
-              isCustomize={true}
-              template={headerAttributes.template}
-              brandName={headerAttributes.brandName}
-              backgroundColor={headerAttributes.backgroundColor}
-              textColor={headerAttributes.textColor}
-              logo={headerAttributes.logo}
-              menuItems={headerAttributes.menuItems.map((item) => ({
-                label: item.label,
-                href: "#",
-                isShown: item.isShown,
-              }))}
-              iconColor={headerAttributes.iconColor}
-              dividerColor={headerAttributes.dividerColor}
-              searchIconColor={headerAttributes.iconColor}
-              fontFamily={headerAttributes.fontFamily}
-            />
-
-            {/* Render middle sections dynamically */}
-            {sections.slice(1, sections.length - 1).map((section, index) => {
-              const sectionId = section.id as keyof typeof sectionComponents;
-              const sectionComponent = sectionComponents[sectionId];
-
-              if (!sectionComponent) {
-                return null;
-              }
-
-              // Get the template for this section
-              let template: string;
-              switch (sectionId) {
-                case "PromoSlider":
-                  template = promoAttributes.template;
-                  break;
-                case "Products":
-                  template = "ProductList";
-                  break;
-                case "Categories":
-                  template = "FeaturedGrid";
-                  break;
-                case "AboutUs":
-                  template = aboutAttributes.template;
-                  break;
-                case "Policies":
-                  template = policiesAttributes.template;
-                  break;
-                case "ContactUs":
-                  template = contactAttributes.template;
-                  break;
-                default:
-                  return null;
-              }
-
-              // Get the component for this template
-              const Component =
-                sectionComponent[template as keyof typeof sectionComponent];
-
-              if (!Component) {
-                return null;
-              }
-
-              return <div key={section.id}>{Component}</div>;
-            })}
-
-            <Footer
-              companyName={footerAttributes.brandName}
-              textColor={footerAttributes.textColor}
-              companyLogo={{
-                src: footerAttributes.logo.src || "/logo.png",
-                alt: footerAttributes.logo.alt,
-                width: parseInt(footerAttributes.logo.size) || 50,
-                height: parseInt(footerAttributes.logo.size) || 50,
-              }}
-              aboutLinks={footerAttributes.aboutLinks}
-              socialMedia={footerAttributes.socialMedia}
-              socialMediaStyles={footerAttributes.socialMediaStyles}
-              copyrightStyles={footerAttributes.copyrightStyles}
-              backgroundColor={footerAttributes.backgroundColor}
-            />
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
