@@ -866,22 +866,49 @@ export default function CustomizeTemplatePage() {
 
       {/* Sidebar */}
       {sections.length >= 2 ? (
-        <Sidebar
-          headerAttributes={headerAttributes}
-          updateHeaderAttributes={updateHeaderAttributes}
-          promoAttributes={promoAttributes}
-          updatePromoAttributes={updatePromoAttributes}
-          aboutAttributes={aboutAttributes}
-          updateAboutAttributes={updateAboutAttributes}
-          policiesAttributes={policiesAttributes}
-          updatePoliciesAttributes={updatePoliciesAttributes}
-          contactAttributes={contactAttributes}
-          updateContactAttributes={updateContactAttributes}
-          footerAttributes={footerAttributes}
-          updateFooterAttributes={updateFooterAttributes}
-          sections={sections}
-          setSections={setSections}
-        />
+        <div
+          className={`
+        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
+        w-80 lg:w-80 bg-white border-r border-gray-200
+        transform transition-transform duration-300 ease-in-out
+        ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }
+        flex flex-col
+      `}
+        >
+          {/* Mobile Close Button */}
+          <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold">Customize Template</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Sidebar Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            <Sidebar
+              headerAttributes={headerAttributes}
+              updateHeaderAttributes={updateHeaderAttributes}
+              promoAttributes={promoAttributes}
+              updatePromoAttributes={updatePromoAttributes}
+              aboutAttributes={aboutAttributes}
+              updateAboutAttributes={updateAboutAttributes}
+              policiesAttributes={policiesAttributes}
+              updatePoliciesAttributes={updatePoliciesAttributes}
+              contactAttributes={contactAttributes}
+              updateContactAttributes={updateContactAttributes}
+              footerAttributes={footerAttributes}
+              updateFooterAttributes={updateFooterAttributes}
+              sections={sections}
+              setSections={setSections}
+            />
+          </div>
+        </div>
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <span>Loading customization...</span>
@@ -890,18 +917,41 @@ export default function CustomizeTemplatePage() {
 
       {/* Main content area */}
       {sections.length >= 2 && (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Toolbar */}
-          <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center h-16">
+          <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
             <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-              {/* preview */}
+              {/* Mobile Menu Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="lg:hidden bg-transparent"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </Button>
+
+              {/* Preview Button */}
               <Button variant="outline" className="bg-white">
                 <span className="flex items-center gap-2">
                   <Eye size={20} />
                   Preview
                 </span>
               </Button>
-              {/* views */}
+
+              {/* Device Views */}
               <div className="flex border border-gray-200 rounded-md overflow-hidden">
                 <button
                   className={`px-2 sm:px-4 py-2 text-sm ${
@@ -929,6 +979,7 @@ export default function CustomizeTemplatePage() {
                 </button>
               </div>
             </div>
+            
             {/* go to dashboard on saving  */}
             <Button
               className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
