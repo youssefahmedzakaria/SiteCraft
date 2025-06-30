@@ -473,7 +473,7 @@ export function RenderAboutSection({
                 </DropdownMenu>
               </div>
               {/* font weight */}
-              <div>
+              {/* <div>
                 <label className="block text-sm mb-2">Font Weight</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -531,7 +531,7 @@ export function RenderAboutSection({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </div> */}
             </div>
           )}
 

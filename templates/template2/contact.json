@@ -13,11 +13,11 @@
   },
   "imageUrl": null,
   "showMap": true,
-  "backgroundColor": "bg-white",
+  "backgroundColor": "bg-[#ffffff]",
   "titleFont": "font-semibold",
-  "titleColor": "text-black",
+  "titleColor": "text-[#000000]",
   "titleSize": "text-2xl",
   "contentFont": "font-normal",
-  "contentColor": "text-black",
+  "contentColor": "text-[#000000]",
   "contentSize": "text-sm"
 }

@@ -1,7 +1,6 @@
 {
-  
-    "backgroundColor": "bg-white",
-    "textColor": "text-black",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
     "categories": [
         {
             "name": "category1",
@@ -95,10 +94,10 @@
     "titleFontSize": "text-lg",
     "showCta": true,
     "ctaText": "Shop Now",
-    "overlayColor": "bg-black/30",
+    "overlayColor": "bg-[#ffffff]/30",
     "showScrollbar": false,
-    "scrollBarSliderColor": "bg-gray-400",
-    "scrollBarBgColor": "bg-gray-200",
+    "scrollBarSliderColor": "bg-[#9ca3af]",
+    "scrollBarBgColor": "bg-[#f3f4f6]",
     "showDescription": true,
     "showControls": true,
     "showIcon": true,
@@ -106,7 +105,6 @@
     "cardWidth": "w-full",
     "showMoreButton": true,
     "showMoreText": "Show More",
-    "showMorebuttonBgColor": "bg-blue-500",
-    "showMorebuttonTextColor": "text-white"
-   
+    "showMorebuttonBgColor": "bg-[#1d4ed8]",
+    "showMorebuttonTextColor": "text-[#ffffff]"
 }

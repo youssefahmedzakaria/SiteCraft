@@ -1,8 +1,8 @@
 {
     "template": "template2",
     "brandName": "Brand Name",  
-    "backgroundColor": "#ffffff",
-    "textColor": "#000000",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
     "fontFamily": "sans-serif",
     "logo": {
         "url": "",
@@ -29,8 +29,8 @@
             "href": "/about"
         }
     ],
-    "iconColor": "#000000",
-    "dividerColor": "#cccccc",
-    "searchIconColor": "#000000"
+    "iconColor": "text-[#000000]",
+    "dividerColor": "border-[#cccccc]",
+    "searchIconColor": "text-[#000000]"
 
 }

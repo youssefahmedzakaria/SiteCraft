@@ -800,7 +800,7 @@ export default function CustomizeTemplatePage() {
               }))}
               iconColor={headerAttributes.iconColor}
               dividerColor={headerAttributes.dividerColor}
-              searchIconColor={headerAttributes.searchIconColor}
+              searchIconColor={headerAttributes.iconColor}
               fontFamily={headerAttributes.fontFamily}
             />
 

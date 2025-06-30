@@ -24,8 +24,8 @@ export interface LeftAlignedPromoProps {
   buttonTextColor?: string
   buttonSize?: string
   buttonRadius?: string
-  backgroundColor?: string  
-  imageObjectFit?: "cover" | "fill" | "contain"  
+  backgroundColor?: string
+  imageObjectFit?: "cover" | "fill" | "contain"
 }
 
 export function LeftAlignedPromo({
@@ -68,7 +68,15 @@ export function LeftAlignedPromo({
   imageObjectFit,
 }: LeftAlignedPromoProps) {
   return (
-    <section id={id} className="w-full">
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
@@ -92,5 +100,5 @@ export function LeftAlignedPromo({
         />
       </div>
     </section>
-  );
+  )
 }
