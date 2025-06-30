@@ -1,13 +1,13 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Menu } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { Menu } from "lucide-react"
 import { Logo } from "../navbar-components/logo"
 import { SearchBar } from "../navbar-components/search-bar"
 import { IconsGroup } from "../navbar-components/icons-group"
 import MobileMenu from "../navbar-components/mobile-menu"
-import { useResizeObserver } from '../../../../hooks/useResizeObserver'
+import { useResizeObserver } from "../../../../hooks/useResizeObserver"
 
 export interface NavbarTemplate3Props {
   isCustomize?: boolean
@@ -36,7 +36,7 @@ export interface NavbarTemplate3Props {
 }
 
 export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
-  isCustomize,
+  isCustomize = false,
   brandName,
   backgroundColor = "bg-white",
   textColor = "text-black",
@@ -51,9 +51,27 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
-  // Responsive to div size
+  // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+
+  // For screen responsiveness
+  const [isClient, setIsClient] = useState(false)
+  const [screenWidth, setScreenWidth] = useState(1920)
+
+  useEffect(() => {
+    setIsClient(true)
+    const updateScreenWidth = () => {
+      setScreenWidth(window.innerWidth)
+    }
+
+    updateScreenWidth()
+    window.addEventListener("resize", updateScreenWidth)
+    return () => window.removeEventListener("resize", updateScreenWidth)
+  }, [])
+
+  const isScreenMobile = isClient && screenWidth < 1024
+  const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
 
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
@@ -70,6 +88,7 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
         MobileMenuItems={MobileMenuItems}
         searchIconColor={searchIconColor}
         dividerColor={dividerColor}
+        isCustomize={isCustomize}
       />
 
       <nav
@@ -82,65 +101,35 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
           color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
         }}
       >
-        <div className="max-w-7xl mx-auto px-2 md:px-4">
-          {/* Compact layout for small divs */}
-          {isMobileDiv ? (
+        <div className="w-full max-w-none mx-auto px-4 lg:px-6">
+          {shouldShowMobile ? (
             <div className="flex items-center justify-between h-14">
-              <Logo brandName={brandName} logo={logo} textColor={textColor} />
+              <Logo
+                brandName={brandName}
+                logo={logo}
+                textColor={textColor}
+                isCustomize={isCustomize}
+                containerWidth={navbarSize.width}
+              />
               <button
                 className="p-1 hover:opacity-80"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Open menu"
                 style={{
-                  color: iconColor.includes("[")
-                    ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                    : undefined,
+                  color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
                 }}
               >
                 <Menu className="h-6 w-6" />
               </button>
             </div>
           ) : (
-            <>
-              {/* Desktop Layout */}
-              <div className="hidden md:flex items-center justify-between h-16">
-                {/* Left - Menu Button */}
-                <div className="w-8">
-                  <button
-                    onClick={() => setIsMobileMenuOpen(true)}
-                    className="p-1 hover:opacity-80"
-                    style={{
-                      color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                    }}
-                  >
-                    <Menu className="h-6 w-6" />
-                  </button>
-                </div>
-
-                {/* Center - Brand Name */}
-                <div className="absolute left-1/2 transform -translate-x-1/2">
-                  <Logo brandName={brandName} logo={logo} textColor={textColor} />
-                </div>
-
-                {/* Right - Search and Icons */}
-                <div className="flex items-center space-x-6">
-                  <SearchBar
-                    expanded={isSearchOpen}
-                    setExpanded={setIsSearchOpen}
-                    iconColor={searchIconColor}
-                    backgroundColor="bg-white/20"
-                    textColor={textColor}
-                  />
-                  <IconsGroup iconColor={iconColor} />
-                </div>
-              </div>
-
-              {/* Mobile Layout - Only Logo and Menu Button */}
-              <div className="md:hidden flex items-center justify-between h-16">
-                <Logo brandName={brandName} logo={logo} textColor={textColor} />
+            /* Desktop Layout */
+            <div className="relative flex items-center justify-between h-16 w-full">
+              {/* Left - Menu Button */}
+              <div className="flex-shrink-0 w-8">
                 <button
-                  className="p-1 hover:opacity-80"
                   onClick={() => setIsMobileMenuOpen(true)}
+                  className="p-1 hover:opacity-80"
                   style={{
                     color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
                   }}
@@ -148,7 +137,32 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
                   <Menu className="h-6 w-6" />
                 </button>
               </div>
-            </>
+
+              {/* Center - Brand Name */}
+              <div className="absolute left-1/2 transform -translate-x-1/2">
+                <Logo
+                  brandName={brandName}
+                  logo={logo}
+                  textColor={textColor}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
+              </div>
+
+              {/* Right - Search and Icons */}
+              <div className="flex-shrink-0 flex items-center space-x-6">
+                <SearchBar
+                  expanded={isSearchOpen}
+                  setExpanded={setIsSearchOpen}
+                  iconColor={searchIconColor}
+                  backgroundColor="bg-white/20"
+                  textColor={textColor}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} containerWidth={navbarSize.width} />
+              </div>
+            </div>
           )}
         </div>
       </nav>

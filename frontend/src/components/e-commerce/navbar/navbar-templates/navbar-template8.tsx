@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Menu, Search } from "lucide-react"
 import { Logo } from "../navbar-components/logo"
 import { IconsGroup } from "../navbar-components/icons-group"
@@ -36,7 +36,7 @@ export interface NavbarTemplate8Props {
 }
 
 export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
-  isCustomize,
+  isCustomize = false,
   brandName,
   logo,
   backgroundColor = "bg-[#8B4513]",
@@ -51,9 +51,27 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
 
-  // Responsive to div size
+  // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+
+  // For screen responsiveness
+  const [isClient, setIsClient] = useState(false)
+  const [screenWidth, setScreenWidth] = useState(1920)
+
+  useEffect(() => {
+    setIsClient(true)
+    const updateScreenWidth = () => {
+      setScreenWidth(window.innerWidth)
+    }
+
+    updateScreenWidth()
+    window.addEventListener("resize", updateScreenWidth)
+    return () => window.removeEventListener("resize", updateScreenWidth)
+  }, [])
+
+  const isScreenMobile = isClient && screenWidth < 1024
+  const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
 
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
@@ -70,6 +88,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
         iconColor={iconColor}
         searchIconColor={searchIconColor}
         dividerColor={dividerColor}
+        isCustomize={isCustomize}
       />
 
       <SideMenu
@@ -83,6 +102,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
         iconColor={iconColor}
         dividerColor={dividerColor}
         searchIconColor={searchIconColor}
+        isCustomize={isCustomize}
       />
 
       <nav
@@ -95,11 +115,16 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
           color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : undefined,
         }}
       >
-        <div className="max-w-7xl mx-auto px-2 md:px-4">
-          {/* Compact layout for small divs */}
-          {isMobileDiv ? (
+        <div className="w-full max-w-none mx-auto px-4 lg:px-6">
+          {shouldShowMobile ? (
             <div className="flex items-center justify-between h-14">
-              <Logo brandName={brandName} logo={logo} textColor={textColor || "#fff"} />
+              <Logo
+                brandName={brandName}
+                logo={logo}
+                textColor={textColor || "#fff"}
+                isCustomize={isCustomize}
+                containerWidth={navbarSize.width}
+              />
               <div className="flex items-center gap-2">
                 <button
                   className="p-1 hover:opacity-80"
@@ -128,35 +153,25 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
               </div>
             </div>
           ) : (
-            <>
-              {/* Desktop Layout */}
-              <div className="hidden md:flex items-center justify-between h-16 w-full">
-                {/* Left - Logo and Brand Name */}
-                <div className="flex items-center space-x-2 min-w-0">
-                  <Logo brandName={brandName} logo={logo} textColor={textColor} />
-                </div>
-
-                {/* Right - Icons and side menu button */}
-                <div className="flex items-center space-x-6 justify-end min-w-0">
-                  <IconsGroup iconColor={iconColor} />
-                  <button
-                    onClick={() => setIsSideMenuOpen(true)}
-                    className="p-1 hover:opacity-80"
-                    style={{
-                      color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : undefined,
-                    }}
-                  >
-                    <Menu className="h-6 w-6" />
-                  </button>
-                </div>
+            /* Desktop Layout */
+            <div className="relative flex items-center justify-between h-16 w-full">
+              {/* Left - Logo and Brand Name */}
+              <div className="flex-shrink-0 flex items-center space-x-2 min-w-0">
+                <Logo
+                  brandName={brandName}
+                  logo={logo}
+                  textColor={textColor}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
               </div>
 
-              {/* Mobile Layout - Only Logo and Menu Button */}
-              <div className="md:hidden flex items-center justify-between h-16">
-                <Logo brandName={brandName} logo={logo} textColor={textColor} />
+              {/* Right - Icons and side menu button */}
+              <div className="flex-shrink-0 flex items-center space-x-6 justify-end min-w-0">
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} containerWidth={navbarSize.width} />
                 <button
+                  onClick={() => setIsSideMenuOpen(true)}
                   className="p-1 hover:opacity-80"
-                  onClick={() => setIsMobileMenuOpen(true)}
                   style={{
                     color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : undefined,
                   }}
@@ -164,7 +179,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
                   <Menu className="h-6 w-6" />
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </nav>

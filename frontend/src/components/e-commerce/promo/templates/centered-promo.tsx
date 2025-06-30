@@ -11,7 +11,8 @@ export interface CenteredPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
+  autoplaySpeed?: number
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -51,7 +52,8 @@ export function CenteredPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
+  autoplaySpeed = 5000,
   showArrows = true,
   titleFont,
   titleColor,
@@ -81,7 +83,8 @@ export function CenteredPromo({
         <PromoSlider
           slides={slides}
           variant="centered"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
+          autoplaySpeed={autoplaySpeed}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}

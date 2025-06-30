@@ -4,13 +4,10 @@ import {
   ChevronDown,
   ChevronRight,
   GripVertical,
-  Image as ImageIcon,
-  SearchIcon,
   Eye,
   EyeOff,
 } from "lucide-react";
-import React, { useState, useRef, DragEvent, useEffect } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import { HeaderLayoutItems } from "./headerLayoutItems";
 import {
   DropdownMenu,
@@ -49,13 +46,6 @@ export function RenderHeaderSection({
   headerAttributes,
   updateHeaderAttributes,
 }: RenderHeaderSectionProps) {
-  {
-    /* For image selection in content */
-  }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   {
     /* For expandable sections in design */
   }

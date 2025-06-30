@@ -5,6 +5,7 @@ import { Navigation } from "../navbar-components/navigation"
 import { FullSearchBar } from "../navbar-components/full-search-bar"
 import { IconsGroup } from "../navbar-components/icons-group"
 import MobileMenu from "../navbar-components/mobile-menu"
+import { useEffect } from 'react'
 import { useResizeObserver } from '../../../../hooks/useResizeObserver'
 
 export interface NavbarTemplate1Props {
@@ -35,7 +36,7 @@ export interface NavbarTemplate1Props {
 }
 
 export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
-  isCustomize,
+  isCustomize = false,
   brandName,
   backgroundColor = "bg-white",
   textColor = "text-black",
@@ -50,9 +51,30 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // Responsive to div size
+  // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+
+  // For screen responsiveness - track screen size with proper initialization
+  const [isClient, setIsClient] = useState(false)
+  const [screenWidth, setScreenWidth] = useState(1920) // Default to desktop size
+
+  useEffect(() => {
+    setIsClient(true)
+    const updateScreenWidth = () => {
+      setScreenWidth(window.innerWidth)
+    }
+
+    updateScreenWidth()
+    window.addEventListener("resize", updateScreenWidth)
+    return () => window.removeEventListener("resize", updateScreenWidth)
+  }, [])
+
+  // Only apply screen mobile logic after client-side hydration
+  const isScreenMobile = isClient && screenWidth < 1024
+
+  // Determine if we should show mobile layout
+  const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
 
   const handleSearch = (query: string) => {
     if (onSearch) {
@@ -61,15 +83,16 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
   }
 
   // Filter visible menu items
-  const visibleMenuItems = menuItems?.filter(item => item.isShown !== false) || []
+  const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
 
-  console.log("NavbarTemplate1 props:", {
-    backgroundColor,
-    textColor,
-    fontFamily,
-    iconColor,
-    dividerColor,
-    searchIconColor,
+  // Debug logging (remove in production)
+  console.log({
+    isCustomize,
+    screenWidth,
+    isScreenMobile,
+    isMobileDiv,
+    shouldShowMobile,
+    navbarWidth: navbarSize.width,
   })
 
   return (
@@ -85,34 +108,37 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
         searchIconColor={searchIconColor}
         dividerColor={dividerColor}
         onSearch={handleSearch}
+        isCustomize={isCustomize}
       />
 
       <nav
         ref={navbarRef}
         className={`${isCustomize ? "relative" : "fixed"} top-0 left-0 w-full z-30 backdrop-blur ${fontFamily}`}
         style={{
-          backgroundColor: backgroundColor.includes("[") 
+          backgroundColor: backgroundColor.includes("[")
             ? backgroundColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
             : undefined,
-          color: textColor.includes("[")
-            ? textColor.split("-[")[1]?.slice(0, -1) || "#000000"
-            : undefined,
+          color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
         }}
       >
-        <div className="max-w-7xl mx-auto px-2 md:px-4">
-          {/* Compact layout for small divs (not just mobile screens) */}
-          {isMobileDiv ? (
+        <div className="w-full max-w-none mx-auto px-4 lg:px-6">
+          {/* Mobile layout - when screen is small OR div is small (if customizing) */}
+          {shouldShowMobile ? (
             <div className="flex items-center justify-between h-14">
-              <Logo brandName={brandName} logo={logo} textColor={textColor} />
+              <Logo
+                brandName={brandName}
+                logo={logo}
+                textColor={textColor}
+                isCustomize={isCustomize}
+                containerWidth={navbarSize.width}
+              />
               <div className="flex items-center gap-2">
                 <button
                   className="p-1 hover:opacity-80"
                   onClick={() => setIsMobileMenuOpen(true)}
                   aria-label="Toggle search"
                   style={{
-                    color: iconColor.includes("[")
-                      ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                      : undefined,
+                    color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
                   }}
                 >
                   <Search className="h-6 w-6" />
@@ -122,9 +148,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
                   onClick={() => setIsMobileMenuOpen(true)}
                   aria-label="Open menu"
                   style={{
-                    color: iconColor.includes("[")
-                      ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                      : undefined,
+                    color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
                   }}
                 >
                   <Menu className="h-6 w-6" />
@@ -132,68 +156,53 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
               </div>
             </div>
           ) : (
+            /* Desktop layout - when screen is large AND div is large (if customizing) */
             <>
-              <div className="relative flex items-center justify-between h-16">
+              <div className="relative flex items-center justify-between h-16 w-full">
                 {/* Left - Logo and Brand */}
-                <Logo brandName={brandName} logo={logo} textColor={textColor} />
+                <div className="flex-shrink-0">
+                  <Logo
+                    brandName={brandName}
+                    logo={logo}
+                    textColor={textColor}
+                    isCustomize={isCustomize}
+                    containerWidth={navbarSize.width}
+                  />
+                </div>
 
-                {/* Center - Search (Hide on mobile or small div) */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-md hidden md:block">
+                {/* Center - Search */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-md px-4">
                   <FullSearchBar
                     iconColor={searchIconColor}
                     backgroundColor="bg-white/20"
                     textColor={textColor}
                     onSearch={handleSearch}
+                    isCustomize={isCustomize}
+                    containerWidth={navbarSize.width}
                   />
                 </div>
 
-                {/* Right - Icons on desktop / Menu button on mobile or small div */}
-                <div className="flex items-center gap-2">
-                  <div className="hidden md:flex">
-                    <IconsGroup iconColor={iconColor} />
-                  </div>
-                  <button
-                    className="md:hidden p-1 hover:opacity-80"
-                    onClick={() => {
-                      setIsMobileMenuOpen(true)
-                    }}
-                    aria-label="Toggle search"
-                    style={{
-                      color: iconColor.includes("[")
-                        ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                        : undefined,
-                    }}
-                  >
-                    <Search className="h-6 w-6" />
-                  </button>
-                  <button
-                    className="md:hidden p-1 hover:opacity-80"
-                    onClick={() => setIsMobileMenuOpen(true)}
-                    aria-label="Open menu"
-                    style={{
-                      color: iconColor.includes("[")
-                        ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                        : undefined,
-                    }}
-                  >
-                    <Menu className="h-6 w-6" />
-                  </button>
+                {/* Right - Icons */}
+                <div className="flex-shrink-0">
+                  <IconsGroup iconColor={iconColor} isCustomize={isCustomize} containerWidth={navbarSize.width} />
                 </div>
               </div>
 
-              {/* Bottom Navigation - Desktop only, hide on small div */}
+              {/* Bottom Navigation - Desktop only */}
               <div
-                className="hidden md:flex justify-start py-2 border-t"
+                className="flex justify-start py-2 border-t w-full"
                 style={{
                   borderColor: dividerColor.includes("[")
                     ? dividerColor.split("-[")[1]?.slice(0, -1) || "#e5e7eb"
                     : undefined,
                 }}
               >
-                <Navigation 
-                  menuItems={visibleMenuItems} 
+                <Navigation
+                  menuItems={visibleMenuItems}
                   textColor={textColor}
-                  fontFamily={fontFamily} 
+                  fontFamily={fontFamily}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
                 />
               </div>
             </>

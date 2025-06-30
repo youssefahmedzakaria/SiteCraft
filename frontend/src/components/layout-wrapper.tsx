@@ -26,7 +26,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       {!isAuthPage && <SiteCraftNavbar />}
       {isEcommercePage && (
         <Navbar
-          template="template1"
+          template="template2"
           brandName="Jewelry"
           backgroundColor="bg-black/50"
           textColor="text-white"

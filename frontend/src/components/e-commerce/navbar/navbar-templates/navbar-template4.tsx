@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Menu } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { Menu } from "lucide-react"
 import { Logo } from "../navbar-components/logo"
 import { Navigation } from "../navbar-components/navigation"
 import { SearchBar } from "../navbar-components/search-bar"
 import { IconsGroup } from "../navbar-components/icons-group"
 import MobileMenu from "../navbar-components/mobile-menu"
-import { useResizeObserver } from '../../../../hooks/useResizeObserver'
+import { useResizeObserver } from "../../../../hooks/useResizeObserver"
 
 export interface NavbarTemplate4Props {
   isCustomize?: boolean
@@ -37,7 +37,7 @@ export interface NavbarTemplate4Props {
 }
 
 export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
-  isCustomize,
+  isCustomize = false,
   brandName,
   backgroundColor = "bg-white",
   textColor = "text-black",
@@ -52,9 +52,27 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
-  // Responsive to div size
+  // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+
+  // For screen responsiveness
+  const [isClient, setIsClient] = useState(false)
+  const [screenWidth, setScreenWidth] = useState(1920)
+
+  useEffect(() => {
+    setIsClient(true)
+    const updateScreenWidth = () => {
+      setScreenWidth(window.innerWidth)
+    }
+
+    updateScreenWidth()
+    window.addEventListener("resize", updateScreenWidth)
+    return () => window.removeEventListener("resize", updateScreenWidth)
+  }, [])
+
+  const isScreenMobile = isClient && screenWidth < 1024
+  const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
 
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
@@ -71,6 +89,7 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
         iconColor={iconColor}
         searchIconColor={searchIconColor}
         dividerColor={dividerColor}
+        isCustomize={isCustomize}
       />
 
       <nav
@@ -83,61 +102,62 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
           color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
         }}
       >
-        <div className="max-w-7xl mx-auto px-2 md:px-4">
-          {/* Compact layout for small divs */}
-          {isMobileDiv ? (
+        <div className="w-full max-w-none mx-auto px-4 lg:px-6">
+          {shouldShowMobile ? (
             <div className="flex items-center justify-between h-14">
-              <Logo brandName={brandName} logo={logo} textColor={textColor} />
+              <Logo
+                brandName={brandName}
+                logo={logo}
+                textColor={textColor}
+                isCustomize={isCustomize}
+                containerWidth={navbarSize.width}
+              />
               <button
                 className="p-1 hover:opacity-80"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Open menu"
                 style={{
-                  color: iconColor.includes("[")
-                    ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000"
-                    : undefined,
+                  color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
                 }}
               >
                 <Menu className="h-6 w-6" />
               </button>
             </div>
           ) : (
-            <>
-              {/* Desktop Layout */}
-              <div className="hidden md:flex items-center justify-between h-16">
-                {/* Left side - Brand and Navigation */}
-                <div className="flex items-center space-x-8">
-                  <Logo brandName={brandName} logo={logo} textColor={textColor} />
-                  <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
-                </div>
-
-                {/* Right side - Search and Icons */}
-                <div className="flex items-center space-x-6">
-                  <SearchBar
-                    expanded={isSearchOpen}
-                    setExpanded={setIsSearchOpen}
-                    iconColor={searchIconColor}
-                    backgroundColor="bg-white/20"
-                    textColor={textColor}
-                  />
-                  <IconsGroup iconColor={iconColor} />
-                </div>
+            /* Desktop Layout */
+            <div className="relative flex items-center justify-between h-16 w-full">
+              {/* Left side - Brand and Navigation */}
+              <div className="flex-shrink-0 flex items-center space-x-8">
+                <Logo
+                  brandName={brandName}
+                  logo={logo}
+                  textColor={textColor}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
+                <Navigation
+                  menuItems={visibleMenuItems}
+                  textColor={textColor}
+                  fontFamily={fontFamily}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
               </div>
 
-              {/* Mobile Layout - Only Logo and Menu Button */}
-              <div className="md:hidden flex items-center justify-between h-16">
-                <Logo brandName={brandName} logo={logo} textColor={textColor} />
-                <button
-                  className="p-1 hover:opacity-80"
-                  onClick={() => setIsMobileMenuOpen(true)}
-                  style={{
-                    color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                  }}
-                >
-                  <Menu className="h-6 w-6" />
-                </button>
+              {/* Right side - Search and Icons */}
+              <div className="flex-shrink-0 flex items-center space-x-6">
+                <SearchBar
+                  expanded={isSearchOpen}
+                  setExpanded={setIsSearchOpen}
+                  iconColor={searchIconColor}
+                  backgroundColor="bg-white/20"
+                  textColor={textColor}
+                  isCustomize={isCustomize}
+                  containerWidth={navbarSize.width}
+                />
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} containerWidth={navbarSize.width} />
               </div>
-            </>
+            </div>
           )}
         </div>
       </nav>

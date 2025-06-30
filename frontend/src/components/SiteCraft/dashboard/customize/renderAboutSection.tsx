@@ -9,6 +9,7 @@ import {
   GripVertical,
   ImageIcon,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
@@ -30,12 +31,14 @@ interface RenderAboutSectionProps {
   updateAboutAttributes: (
     updates: Partial<AboutCustomizationAttributes>
   ) => void;
+  onDeleteSection?: () => void;
 }
 
 export function RenderAboutSection({
   detailedSectionTab,
   aboutAttributes,
   updateAboutAttributes,
+  onDeleteSection,
 }: RenderAboutSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -118,9 +121,9 @@ export function RenderAboutSection({
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
-        <div className="p-4 space-y-5">
+        <div className="flex flex-col flex-1 min-h-0 p-4 space-y-5">
           {/* About Us Image Section */}
           <div>
             <h3 className="font-medium mb-2">About Us Image</h3>
@@ -200,9 +203,20 @@ export function RenderAboutSection({
               }
             />
           </div>
+          <div className="pt-8 flex justify-start">
+            {onDeleteSection && (
+              <button
+                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
+                onClick={onDeleteSection}
+              >
+                <Trash2 size={16} />
+                Delete Section
+              </button>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
           <AboutLayoutItems
             selectedLayout={
               [
