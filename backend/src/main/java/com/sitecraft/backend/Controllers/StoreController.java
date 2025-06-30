@@ -608,7 +608,7 @@ public class StoreController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            userService.removeStaff((Long) session.getAttribute("storeId"), staffId);
+            userService.removeStaff(storeId, staffId);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
