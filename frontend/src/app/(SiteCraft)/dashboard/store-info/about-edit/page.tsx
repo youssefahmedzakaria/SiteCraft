@@ -9,15 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/SiteCraft
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
 import { getStoreAboutUsById } from "@/lib/store-info";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/SiteCraft/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditAboutUsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const aboutId = searchParams.get('id');
   const { updateExistingAboutUs, aboutLoading } = useStoreInfo();
+  const { isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -29,6 +31,27 @@ export default function EditAboutUsPage() {
   const [error, setError] = useState<string | null>(null);
 
   console.log('📄 Edit About Us Page - About ID:', aboutId);
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to edit about us sections.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load about us data on mount
   useEffect(() => {

@@ -28,11 +28,13 @@ import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params?.id ? parseInt(params.id as string) : null;
+  const { isAuthenticated } = useAuth();
   
   const { handleUpdateProduct, isUpdating, error, clearError } = useProductManagement();
   
@@ -46,6 +48,27 @@ export default function EditProductPage() {
     "Product's Options and Variations",
     "Stock Management",
   ];
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to edit products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
@@ -246,31 +269,19 @@ export default function EditProductPage() {
 
     // Generate all combinations of attribute values
     const combinations = generateCombinations(attrs);
-
-    // Build a map of old variants by key
-    const oldVariantMap: Record<string, ProductVariantDTO> = {};
-    variants.forEach(variant => {
-      const key = (variant.attributes || [])
-        .map(attr => `${attr.name}:${attr.value}`)
-        .join('|');
-      oldVariantMap[key] = variant;
-    });
-
-    // Create new variants, preserving data if possible
+    
+    // Create variants from combinations
     const newVariants: ProductVariantDTO[] = combinations.map((combination, index) => {
       const variantAttributes: VariantAttributeDTO[] = combination.map((value, attrIndex) => ({
         name: attrs[attrIndex].name,
         value: value
       }));
-      const key = variantAttributes.map(attr => `${attr.name}:${attr.value}`).join('|');
-      const old = oldVariantMap[key];
+
       return {
-        stock: old?.stock || 0,
-        price: old?.price || 0,
-        productionCost: old?.productionCost || 0,
-        attributes: variantAttributes,
-        id: old?.id,
-        sku: old?.sku,
+        stock: 0,
+        price: 0,
+        productionCost: 0,
+        attributes: variantAttributes
       };
     });
 
@@ -315,16 +326,18 @@ export default function EditProductPage() {
     setShowStockModal(true);
   };
 
+  // Handle stock changes
+  const handleStockChange = (index: number, value: string) => {
+    const newStock = [...stockValues];
+    newStock[index].stock = Number(value);
+    setStockValues(newStock);
+  };
+
   // Handler to open stock modal for a specific attribute
   const openStockModalForAttribute = (index: number) => {
     setStockAttributeIndex(index);
     const attr = attributes[index];
-    setStockValues(attr.values.map(value => {
-      const matchingVariant = variants.find(variant =>
-        variant.attributes?.some(a => a.name === attr.name && a.value === value)
-      );
-      return { value, stock: matchingVariant?.stock ?? 0 };
-    }));
+    setStockValues(attr.values.map(value => ({ value, stock: 0 })));
     setShowStockModal(true);
   };
 

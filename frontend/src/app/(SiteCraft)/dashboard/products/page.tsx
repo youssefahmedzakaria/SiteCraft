@@ -27,6 +27,7 @@ import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/d
 import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { SimplifiedProduct } from "@/lib/products";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
@@ -58,6 +59,7 @@ export default function ProductPage() {
   } = useProductStatistics();
 
   const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
 
   // Fetch categories from backend
   useEffect(() => {
@@ -230,16 +232,19 @@ export default function ProductPage() {
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
-              <p className="text-gray-600">Please log in to view product statistics and manage products.</p>
-            </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view product statistics and manage products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
           </div>
-        </main>
+        </div>
       </div>
     );
   }

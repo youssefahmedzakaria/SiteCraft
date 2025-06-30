@@ -8,13 +8,15 @@ import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/SiteCraft/ui/card";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/SiteCraft/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AddAboutUsPage() {
   const router = useRouter();
   const { addNewAboutUs, aboutLoading } = useStoreInfo();
+  const { isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -25,6 +27,27 @@ export default function AddAboutUsPage() {
   const [error, setError] = useState<string | null>(null);
 
   console.log('📄 Add About Us Page - Current state:', { formData, aboutLoading, error });
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new about us sections.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

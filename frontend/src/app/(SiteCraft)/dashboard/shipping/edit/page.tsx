@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronDown, Loader2, AlertCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { updateShippingInfo, getStoreShippingInfo } from "@/lib/shipping";
 import { ShippingInfo } from "@/lib/shipping";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditShippingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const shippingId = searchParams.get('id');
+  const { isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState({
     governmentName: "",
@@ -25,6 +27,27 @@ export default function EditShippingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to edit shipping locations.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load shipping info data
   useEffect(() => {

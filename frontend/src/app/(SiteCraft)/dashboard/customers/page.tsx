@@ -15,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/SiteCraft/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +33,9 @@ export default function CustomersPage() {
     handleSuspendCustomer,
     refetchCustomers
   } = useCustomerManagement();
+
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   // Filter customers based on search query and status filter
   const filteredCustomers = customers.filter((customer) => {
@@ -66,6 +71,27 @@ export default function CustomersPage() {
             </div>
           </div>
         </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view and manage customers.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }

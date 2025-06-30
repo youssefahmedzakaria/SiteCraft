@@ -21,10 +21,12 @@ import {
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AddProductPage() {
   const router = useRouter();
   const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
+  const { isAuthenticated } = useAuth();
   
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
@@ -36,6 +38,27 @@ export default function AddProductPage() {
     "Product's Options and Variations",
     "Stock Management",
   ];
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Form state for basic product info
   const [basicFormData, setBasicFormData] = useState({
