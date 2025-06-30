@@ -15,7 +15,7 @@ public class CustomizationService {
     private CustomizedTemplateSectionRepo customizedTemplateSectionRepo;
     public List<CustomizedTemplateSection> getCustomizedTemplate(Long storeId) {
         try {
-            return customizedTemplateSectionRepo.findByStoreId(storeId);
+            return customizedTemplateSectionRepo.findByStoreIdAndIndexNot(storeId,-1);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get customized template sections: " + e.getMessage());
         }

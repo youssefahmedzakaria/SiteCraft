@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
 

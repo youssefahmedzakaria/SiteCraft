@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -69,7 +70,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#00000080]", // bg-black/50
     textColor: "text-[#FFFFFF]", // text-white
     logo: {
-      src: "/logo.png",
+      src: "/ring3.jpg",
       alt: "Custom Logo",
       width: 50,
       height: 50,
@@ -269,7 +270,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
-      src: "/logo.png",
+      src: "/ring3.jpg",
       alt: "Company Logo",
       size: "24",
     },
@@ -323,6 +324,79 @@ export default function CustomizeTemplatePage() {
   ) => {
     setFooterAttributes((prev) => ({ ...prev, ...updates }));
   };
+
+  // Store data state
+  const [storeData, setStoreData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/store/getStoreSettings", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.success && data.store) {
+          setStoreData(data.store);
+
+          // Header (only brandName and logo.src)
+          setHeaderAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo || prev.logo.src,
+            },
+          }));
+
+          // About (only description and secondaryDescription)
+          setAboutAttributes((prev) => ({
+            ...prev,
+            description: data.store.aboutUs?.[0]?.title || prev.description,
+            secondaryDescription: data.store.aboutUs?.[0]?.content || prev.description
+          }));
+
+          // Policies (only sections)
+          setPoliciesAttributes((prev) => ({
+            ...prev,
+            sections: data.store.policies?.map((p: any) => ({
+              title: p.title,
+              content: p.description,
+            })) || prev.sections,
+          }));
+
+          // Contact (only contactEmail and socialLinks)
+          setContactAttributes((prev) => ({
+            ...prev,
+            contactEmail: data.store.emailAddress || prev.contactEmail,
+            socialLinks: {
+              facebook: data.store.socialMediaAccounts?.find((acc: any) => acc.name.toLowerCase() === "facebook")?.link || prev.socialLinks.facebook,
+              instagram: data.store.socialMediaAccounts?.find((acc: any) => acc.name.toLowerCase() === "instagram")?.link || prev.socialLinks.instagram,
+              twitter: data.store.socialMediaAccounts?.find((acc: any) => acc.name.toLowerCase() === "twitter")?.link || prev.socialLinks.twitter,
+            },
+          }));
+
+          // Footer (only brandName, logo.src, and socialMedia)
+          setFooterAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo ? `/${data.store.logo}` : prev.logo.src,
+            },
+            socialMedia: {
+              facebook: data.store.socialMediaAccounts?.find((acc: any) => acc.name.toLowerCase() === "facebook")?.link || prev.socialMedia.facebook,
+              instagram: data.store.socialMediaAccounts?.find((acc: any) => acc.name.toLowerCase() === "instagram")?.link || prev.socialMedia.instagram,
+            },
+          }));
+        }
+        console.log(storeData);
+      } catch (error) {
+        console.error("Failed to fetch store data:", error);
+      }
+    };
+    fetchStoreData();
+  }, []);
 
   const sectionComponents = {
     PromoSlider: {
@@ -767,53 +841,53 @@ export default function CustomizeTemplatePage() {
     }
   };
 
-useEffect(() => {
-  const fetchTemplate = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/customize/getTemplate", {
-        method: "GET",
-        credentials: "include",
-      });
-      const data = await response.json();
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/customize/getTemplate", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await response.json();
 
-      if (data.success && data["Customized Template"]) {
-        const sortedTemplate = [...data["Customized Template"]].sort((a, b) => a.index - b.index);
+        if (data.success && data["Customized Template"]) {
+          const sortedTemplate = [...data["Customized Template"]].sort((a, b) => a.index - b.index);
 
-        const loadedSections: Section[] = [];
+          const loadedSections: Section[] = [];
 
-        sortedTemplate.forEach((section: any, idx: number) => {
-          loadedSections.push({
-            id: section.title,
-            title: section.title.replace("&", " & "),
-            expanded: false, // all sections initially collapsed
+          sortedTemplate.forEach((section: any, idx: number) => {
+            loadedSections.push({
+              id: section.title,
+              title: section.title.replace("&", " & "),
+              expanded: false, // all sections initially collapsed
+            });
+
+            switch (section.title) {
+              case "Header&Menu":
+                setHeaderAttributes(section.value);
+                break;
+              case "PromoSlider":
+                setPromoAttributes(section.value);
+                break;
+              case "AboutUs":
+                setAboutAttributes(section.value);
+                break;
+              case "Footer":
+                setFooterAttributes(section.value);
+                break;
+              // Add additional cases as you expand your backend support
+            }
           });
 
-          switch (section.title) {
-            case "Header&Menu":
-              setHeaderAttributes(section.value);
-              break;
-            case "PromoSlider":
-              setPromoAttributes(section.value);
-              break;
-            case "AboutUs":
-              setAboutAttributes(section.value);
-              break;
-            case "Footer":
-              setFooterAttributes(section.value);
-              break;
-            // Add additional cases as you expand your backend support
-          }
-        });
-
-        setSections(loadedSections);
+          setSections(loadedSections);
+        }
+      } catch (error) {
+        console.error("Failed to fetch template:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch template:", error);
-    }
-  };
+    };
 
-  fetchTemplate();
-}, []);
+    fetchTemplate();
+  }, []);
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
@@ -987,7 +1061,7 @@ useEffect(() => {
                 companyName={footerAttributes.brandName}
                 textColor={footerAttributes.textColor}
                 companyLogo={{
-                  src: footerAttributes.logo.src || "/logo.png",
+                  src: footerAttributes.logo.src || "/ring3.jpg",
                   alt: footerAttributes.logo.alt,
                   width: parseInt(footerAttributes.logo.size) || 50,
                   height: parseInt(footerAttributes.logo.size) || 50,

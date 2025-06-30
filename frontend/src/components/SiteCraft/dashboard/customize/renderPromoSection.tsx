@@ -184,7 +184,7 @@ export function RenderPromoSection({
       description: "Add your description here",
       buttonText: "Shop Now",
       buttonLink: "#new-collection",
-      image: "/sample.png",
+      image: "/girl.jpg",
       imageAlt: "New promo image",
     };
     updatePromoAttributes({
