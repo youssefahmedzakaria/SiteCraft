@@ -586,143 +586,185 @@ export default function CustomizeTemplatePage() {
   // Store data state
   const [storeData, setStoreData] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchStoreData = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/api/store/getStoreSettings",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (data.success && data.store) {
-          setStoreData(data.store);
+  const [isLoading, setIsLoading] = useState(true);
 
-          // Header (only brandName and logo.src)
-          setHeaderAttributes((prev) => ({
-            ...prev,
-            brandName: data.store.storeName || prev.brandName,
-            logo: {
-              ...prev.logo,
-              src: data.store.logo || prev.logo.src,
-            },
-          }));
-
-          // About (only description and secondaryDescription)
-          setAboutAttributes((prev) => ({
-            ...prev,
-            description: data.store.aboutUs?.[0]?.title || prev.description,
-            secondaryDescription:
-              data.store.aboutUs?.[0]?.content || prev.description,
-          }));
-
-          // Policies (only sections)
-          setPoliciesAttributes((prev) => ({
-            ...prev,
-            sections:
-              data.store.policies?.map((p: any) => ({
-                title: p.title,
-                content: p.description,
-              })) || prev.sections,
-          }));
-
-          // Contact (only contactEmail and socialLinks)
-          setContactAttributes((prev) => ({
-            ...prev,
-            contactEmail: data.store.emailAddress || prev.contactEmail,
-            socialLinks: {
-              facebook:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialLinks.facebook,
-              instagram:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialLinks.instagram,
-              twitter:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "twitter"
-                )?.link || prev.socialLinks.twitter,
-            },
-          }));
-
-          // Footer (only brandName, logo.src, and socialMedia)
-          setFooterAttributes((prev) => ({
-            ...prev,
-            brandName: data.store.storeName || prev.brandName,
-            logo: {
-              ...prev.logo,
-              src: data.store.logo || prev.logo.src,
-            },
-            socialMedia: {
-              facebook:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialMedia.facebook,
-              instagram:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialMedia.instagram,
-            },
-          }));
+  const fetchStoreData = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/store/getStoreSettings",
+        {
+          method: "GET",
+          credentials: "include",
         }
-      } catch (error) {
-        console.error("Failed to fetch store data:", error);
+      );
+      const data = await response.json();
+      if (data.success && data.store) {
+        setStoreData(data.store);
+        // About (only description and secondaryDescription)
+        setAboutAttributes((prev) => ({
+          ...prev,
+          description: data.store.aboutUs?.[0]?.title || prev.description,
+          secondaryDescription:
+            data.store.aboutUs?.[0]?.content || prev.description,
+        }));
+        // Policies (only sections)
+        setPoliciesAttributes((prev) => ({
+          ...prev,
+          sections:
+            data.store.policies?.map((p: any) => ({
+              title: p.title,
+              content: p.description,
+            })) || prev.sections,
+        }));
+        // Contact (only contactEmail and socialLinks)
+        setContactAttributes((prev) => ({
+          ...prev,
+          contactEmail: data.store.emailAddress || prev.contactEmail,
+          socialLinks: {
+            facebook:
+              data.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "facebook"
+              )?.link || prev.socialLinks.facebook,
+            instagram:
+              data.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "instagram"
+              )?.link || prev.socialLinks.instagram,
+            twitter:
+              data.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "twitter"
+              )?.link || prev.socialLinks.twitter,
+          },
+        }));
       }
-    };
-    const fetchTemplate = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/customize/getTemplate",
-          {
-            method: "GET",
-            credentials: "include",
-          }
+    } catch (error) {
+      console.error("Failed to fetch store data:", error);
+    }
+  };
+
+  // Add a useEffect to update header/footer logo and other attributes when storeData changes
+  React.useEffect(() => {
+    if (!storeData) return;
+    // Update header logo
+    setHeaderAttributes((prev) => ({
+      ...prev,
+      brandName: storeData.storeName || prev.brandName,
+      logo: {
+        ...prev.logo,
+        src:
+          storeData.logo && storeData.logo !== ""
+            ? storeData.logo
+            : "/placeholder.png",
+      },
+    }));
+    // Update about
+    setAboutAttributes((prev) => ({
+      ...prev,
+      description: storeData.aboutUs?.[0]?.title || prev.description,
+      secondaryDescription: storeData.aboutUs?.[0]?.content || prev.description,
+    }));
+    // Update policies
+    setPoliciesAttributes((prev) => ({
+      ...prev,
+      sections:
+        storeData.policies?.map((p: any) => ({
+          title: p.title,
+          content: p.description,
+        })) || prev.sections,
+    }));
+    // Update contact
+    setContactAttributes((prev) => ({
+      ...prev,
+      contactEmail: storeData.emailAddress || prev.contactEmail,
+      socialLinks: {
+        facebook:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "facebook"
+          )?.link || prev.socialLinks.facebook,
+        instagram:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "instagram"
+          )?.link || prev.socialLinks.instagram,
+        twitter:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "twitter"
+          )?.link || prev.socialLinks.twitter,
+      },
+    }));
+    // Update footer logo and social media
+    setFooterAttributes((prev) => ({
+      ...prev,
+      brandName: storeData.storeName || prev.brandName,
+      logo: {
+        ...prev.logo,
+        src:
+          storeData.logo && storeData.logo !== ""
+            ? storeData.logo
+            : "/placeholder.png",
+      },
+      socialMedia: {
+        facebook:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "facebook"
+          )?.link || prev.socialMedia.facebook,
+        instagram:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "instagram"
+          )?.link || prev.socialMedia.instagram,
+      },
+    }));
+  }, [storeData]);
+
+  const fetchTemplate = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/customize/getTemplate",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      if (data.success && data["Customized Template"]) {
+        const sortedTemplate = [...data["Customized Template"]].sort(
+          (a, b) => a.index - b.index
         );
-        const data = await response.json();
-
-        if (data.success && data["Customized Template"]) {
-          const sortedTemplate = [...data["Customized Template"]].sort(
-            (a, b) => a.index - b.index
-          );
-
-          const loadedSections: Section[] = [];
-
-          sortedTemplate.forEach((section: any, idx: number) => {
-            loadedSections.push({
-              id: section.title,
-              title: section.title.replace("&", " & "),
-              expanded: false, // all sections initially collapsed
-            });
-
-            switch (section.title) {
-              case "Header&Menu":
-                setHeaderAttributes(section.value);
-                break;
-              case "PromoSlider":
-                setPromoAttributes(section.value);
-                break;
-              case "AboutUs":
-                setAboutAttributes(section.value);
-                break;
-              case "Footer":
-                setFooterAttributes(section.value);
-                break;
-              // Add additional cases as you expand your backend support
-            }
+        const loadedSections: Section[] = [];
+        sortedTemplate.forEach((section: any, idx: number) => {
+          loadedSections.push({
+            id: section.title,
+            title: section.title.replace("&", " & "),
+            expanded: false, // all sections initially collapsed
           });
-
-          setSections(loadedSections);
-        }
-      } catch (error) {
-        console.error("Failed to fetch template:", error);
+          switch (section.title) {
+            case "Header&Menu":
+              setHeaderAttributes(section.value);
+              break;
+            case "PromoSlider":
+              setPromoAttributes(section.value);
+              break;
+            case "AboutUs":
+              setAboutAttributes(section.value);
+              break;
+            case "Footer":
+              setFooterAttributes(section.value);
+              break;
+            // Add additional cases as you expand your backend support
+          }
+        });
+        setSections(loadedSections);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch template:", error);
+    }
+  };
 
-    fetchTemplate();
-    fetchStoreData();
+  useEffect(() => {
+    const fetchAll = async () => {
+      await Promise.all([fetchTemplate(), fetchStoreData()]);
+      setIsLoading(false);
+    };
+    fetchAll();
+    // ...rest of your code (console logs, etc.)
     console.log("Footer image", footerAttributes.logo.src);
     console.log("Header image", headerAttributes.logo.src);
   }, []);
@@ -856,6 +898,15 @@ export default function CustomizeTemplatePage() {
     }
   };
 
+  // Replace the main render logic to show loading until data is ready
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <span>Loading customization...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Mobile Sidebar Overlay */}
@@ -867,9 +918,9 @@ export default function CustomizeTemplatePage() {
       )}
 
       {/* Sidebar */}
-      {sections.length >= 2 ? (
-        <div
-          className={`
+
+      <div
+        className={`
         fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
         w-80 lg:w-80 bg-white border-r border-gray-200
         transform transition-transform duration-300 ease-in-out
@@ -878,253 +929,246 @@ export default function CustomizeTemplatePage() {
         }
         flex flex-col
       `}
-        >
-          {/* Mobile Close Button */}
-          <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold">Customize Template</h2>
+      >
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold">Customize Template</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Sidebar Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <Sidebar
+            headerAttributes={headerAttributes}
+            updateHeaderAttributes={updateHeaderAttributes}
+            promoAttributes={promoAttributes}
+            updatePromoAttributes={updatePromoAttributes}
+            categoryAttributes={categoryAttributes}
+            updateCategoryAttributes={updateCategoryAttributes}
+            aboutAttributes={aboutAttributes}
+            updateAboutAttributes={updateAboutAttributes}
+            policiesAttributes={policiesAttributes}
+            updatePoliciesAttributes={updatePoliciesAttributes}
+            contactAttributes={contactAttributes}
+            updateContactAttributes={updateContactAttributes}
+            footerAttributes={footerAttributes}
+            updateFooterAttributes={updateFooterAttributes}
+            sections={sections}
+            setSections={setSections}
+            aboutImage={aboutImage}
+            setAboutImage={setAboutImage}
+            contactImage={contactImage}
+            setContactImage={setContactImage}
+            policiestImage={policiesImage}
+            setPoliciesImage={setPoliciesImage}
+            promoImages={promoImages}
+            setPromoImages={setPromoImages}
+          />
+        </div>
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Toolbar */}
+        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
+          <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+            {/* Mobile Menu Button */}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden bg-transparent"
+              onClick={() => setIsSidebarOpen(true)}
             >
-              <X className="h-4 w-4" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
             </Button>
+
+            {/* Preview Button */}
+            <Button variant="outline" className="bg-white">
+              <span className="flex items-center gap-2">
+                <Eye size={20} />
+                Preview
+              </span>
+            </Button>
+
+            {/* Device Views */}
+            <div className="flex border border-gray-200 rounded-md overflow-hidden">
+              <button
+                className={`px-2 sm:px-4 py-2 text-sm ${
+                  selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
+                }`}
+                onClick={() => setSelectedTab("desktop")}
+              >
+                Desktop
+              </button>
+              <button
+                className={`px-2 sm:px-4 py-2 text-sm ${
+                  selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
+                }`}
+                onClick={() => setSelectedTab("tablet")}
+              >
+                Tablet
+              </button>
+              <button
+                className={`px-2 sm:px-4 py-2 text-sm ${
+                  selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
+                }`}
+                onClick={() => setSelectedTab("mobile")}
+              >
+                Mobile
+              </button>
+            </div>
           </div>
 
-          {/* Sidebar Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto">
-            <Sidebar
-              headerAttributes={headerAttributes}
-              updateHeaderAttributes={updateHeaderAttributes}
-              promoAttributes={promoAttributes}
-              updatePromoAttributes={updatePromoAttributes}
-              categoryAttributes={categoryAttributes}
-              updateCategoryAttributes={updateCategoryAttributes}
-              aboutAttributes={aboutAttributes}
-              updateAboutAttributes={updateAboutAttributes}
-              policiesAttributes={policiesAttributes}
-              updatePoliciesAttributes={updatePoliciesAttributes}
-              contactAttributes={contactAttributes}
-              updateContactAttributes={updateContactAttributes}
-              footerAttributes={footerAttributes}
-              updateFooterAttributes={updateFooterAttributes}
-              sections={sections}
-              setSections={setSections}
-              aboutImage={aboutImage}
-              setAboutImage={setAboutImage}
-              contactImage={contactImage}
-              setContactImage={setContactImage}
-              policiestImage={policiesImage}
-              setPoliciesImage={setPoliciesImage}
-              promoImages={promoImages}
-              setPromoImages={setPromoImages}
+          {/* go to dashboard on saving  */}
+          <Button
+            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
+            onClick={handleSaveClick}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+          {saveMessage && (
+            <span className="ml-4 text-green-600 font-semibold">
+              {saveMessage}
+            </span>
+          )}
+          <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Save</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to save your changes?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSaveDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-black text-white"
+                  onClick={editCustomizedTemplate}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Confirm"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Content preview area */}
+        <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
+          <div
+            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
+              selectedTab === "desktop"
+                ? "w-full max-w-6xl"
+                : selectedTab === "tablet"
+                ? "w-full max-w-2xl"
+                : "w-full max-w-sm"
+            }`}
+          >
+            <Navbar
+              isCustomize={true}
+              template={headerAttributes.template}
+              brandName={headerAttributes.brandName}
+              backgroundColor={headerAttributes.backgroundColor}
+              textColor={headerAttributes.textColor}
+              logo={headerAttributes.logo}
+              menuItems={headerAttributes.menuItems.map((item) => ({
+                label: item.label,
+                href: "#",
+                isShown: item.isShown,
+              }))}
+              iconColor={headerAttributes.iconColor}
+              dividerColor={headerAttributes.dividerColor}
+              searchIconColor={headerAttributes.searchIconColor}
+              fontFamily={headerAttributes.fontFamily}
+            />
+
+            {/* Render middle sections dynamically */}
+            {sections.slice(1, sections.length - 1).map((section, index) => {
+              const sectionId = section.id as keyof typeof sectionComponents;
+              const sectionComponent = sectionComponents[sectionId];
+
+              if (!sectionComponent) {
+                return null;
+              }
+
+              // Get the template for this section
+              let template: string;
+              switch (sectionId) {
+                case "PromoSlider":
+                  template = promoAttributes.template;
+                  break;
+                case "Products":
+                  template = "ProductList";
+                  break;
+                case "Categories":
+                  template = "FeaturedGrid";
+                  break;
+                case "AboutUs":
+                  template = aboutAttributes.template;
+                  break;
+                case "Policies":
+                  template = policiesAttributes.template;
+                  break;
+                case "ContactUs":
+                  template = contactAttributes.template;
+                  break;
+                default:
+                  return null;
+              }
+
+              // Get the component for this template
+              const Component =
+                sectionComponent[template as keyof typeof sectionComponent];
+
+              if (!Component) {
+                return null;
+              }
+
+              return <div key={section.id}>{Component}</div>;
+            })}
+
+            <Footer
+              companyName={footerAttributes.brandName}
+              textColor={footerAttributes.textColor}
+              companyLogo={{
+                src: footerAttributes.logo.src || "/placeholder.png",
+                alt: footerAttributes.logo.alt,
+                width: parseInt(footerAttributes.logo.size) || 50,
+                height: parseInt(footerAttributes.logo.size) || 50,
+              }}
+              aboutLinks={footerAttributes.aboutLinks}
+              socialMedia={footerAttributes.socialMedia}
+              socialMediaStyles={footerAttributes.socialMediaStyles}
+              copyrightStyles={footerAttributes.copyrightStyles}
+              backgroundColor={footerAttributes.backgroundColor}
             />
           </div>
         </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <span>Loading customization...</span>
-        </div>
-      )}
-
-      {/* Main content area */}
-      {sections.length >= 2 && (
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Toolbar */}
-          <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
-            <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-              {/* Mobile Menu Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="lg:hidden bg-transparent"
-                onClick={() => setIsSidebarOpen(true)}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </Button>
-
-              {/* Preview Button */}
-              <Button variant="outline" className="bg-white">
-                <span className="flex items-center gap-2">
-                  <Eye size={20} />
-                  Preview
-                </span>
-              </Button>
-
-              {/* Device Views */}
-              <div className="flex border border-gray-200 rounded-md overflow-hidden">
-                <button
-                  className={`px-2 sm:px-4 py-2 text-sm ${
-                    selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
-                  }`}
-                  onClick={() => setSelectedTab("desktop")}
-                >
-                  Desktop
-                </button>
-                <button
-                  className={`px-2 sm:px-4 py-2 text-sm ${
-                    selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
-                  }`}
-                  onClick={() => setSelectedTab("tablet")}
-                >
-                  Tablet
-                </button>
-                <button
-                  className={`px-2 sm:px-4 py-2 text-sm ${
-                    selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
-                  }`}
-                  onClick={() => setSelectedTab("mobile")}
-                >
-                  Mobile
-                </button>
-              </div>
-            </div>
-
-            {/* go to dashboard on saving  */}
-            <Button
-              className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
-              onClick={handleSaveClick}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-            {saveMessage && (
-              <span className="ml-4 text-green-600 font-semibold">
-                {saveMessage}
-              </span>
-            )}
-            <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Confirm Save</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to save your changes?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowSaveDialog(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-black text-white"
-                    onClick={editCustomizedTemplate}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Confirm"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          {/* Content preview area */}
-          <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-            <div
-              className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
-                selectedTab === "desktop"
-                  ? "w-full max-w-6xl"
-                  : selectedTab === "tablet"
-                  ? "w-full max-w-2xl"
-                  : "w-full max-w-sm"
-              }`}
-            >
-              <Navbar
-                isCustomize={true}
-                template={headerAttributes.template}
-                brandName={headerAttributes.brandName}
-                backgroundColor={headerAttributes.backgroundColor}
-                textColor={headerAttributes.textColor}
-                logo={headerAttributes.logo}
-                menuItems={headerAttributes.menuItems.map((item) => ({
-                  label: item.label,
-                  href: "#",
-                  isShown: item.isShown,
-                }))}
-                iconColor={headerAttributes.iconColor}
-                dividerColor={headerAttributes.dividerColor}
-                searchIconColor={headerAttributes.searchIconColor}
-                fontFamily={headerAttributes.fontFamily}
-              />
-
-              {/* Render middle sections dynamically */}
-              {sections.slice(1, sections.length - 1).map((section, index) => {
-                const sectionId = section.id as keyof typeof sectionComponents;
-                const sectionComponent = sectionComponents[sectionId];
-
-                if (!sectionComponent) {
-                  return null;
-                }
-
-                // Get the template for this section
-                let template: string;
-                switch (sectionId) {
-                  case "PromoSlider":
-                    template = promoAttributes.template;
-                    break;
-                  case "Products":
-                    template = "ProductList";
-                    break;
-                  case "Categories":
-                    template = "FeaturedGrid";
-                    break;
-                  case "AboutUs":
-                    template = aboutAttributes.template;
-                    break;
-                  case "Policies":
-                    template = policiesAttributes.template;
-                    break;
-                  case "ContactUs":
-                    template = contactAttributes.template;
-                    break;
-                  default:
-                    return null;
-                }
-
-                // Get the component for this template
-                const Component =
-                  sectionComponent[template as keyof typeof sectionComponent];
-
-                if (!Component) {
-                  return null;
-                }
-
-                return <div key={section.id}>{Component}</div>;
-              })}
-
-              <Footer
-                companyName={footerAttributes.brandName}
-                textColor={footerAttributes.textColor}
-                companyLogo={{
-                  src: footerAttributes.logo.src || "/placeholder.png",
-                  alt: footerAttributes.logo.alt,
-                  width: parseInt(footerAttributes.logo.size) || 50,
-                  height: parseInt(footerAttributes.logo.size) || 50,
-                }}
-                aboutLinks={footerAttributes.aboutLinks}
-                socialMedia={footerAttributes.socialMedia}
-                socialMediaStyles={footerAttributes.socialMediaStyles}
-                copyrightStyles={footerAttributes.copyrightStyles}
-                backgroundColor={footerAttributes.backgroundColor}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
