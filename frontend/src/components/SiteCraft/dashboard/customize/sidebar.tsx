@@ -299,15 +299,14 @@ export function Sidebar({
   };
 
   return (
-    <>
-      
+    <div className="w-full h-full">
       {/* Main Sidebar or Detailed Section Sidebar */}
       {detailedSection ? (
         // Detailed Section Sidebar
         <div
           className={`${
             sidebarOpen ? "block" : "hidden"
-          } w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0 h-screen flex flex-col`}
+          } w-full h-full border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0 flex flex-col`}
         >
           <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16 flex-shrink-0">
             <h1 className="text-lg font-bold">
@@ -404,10 +403,7 @@ export function Sidebar({
         <div
           className={`${
             sidebarOpen ? "block" : "hidden"
-          } md:block w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0 ${
-            sidebarOpen &&
-            "h-screen md:h-auto fixed md:static z-10 top-16 left-0 right-0 md:top-0"
-          }`}
+          } w-full h-full border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0 flex flex-col`}
         >
           <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16">
             <h1 className="text-lg font-bold">Customize Template</h1>
@@ -633,6 +629,6 @@ export function Sidebar({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

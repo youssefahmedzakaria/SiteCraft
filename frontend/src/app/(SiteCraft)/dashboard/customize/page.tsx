@@ -722,7 +722,7 @@ export default function CustomizeTemplatePage() {
           >
             <Navbar
               isCustomize={true}
-              selectedTab={selectedTab}
+              // selectedTab={selectedTab}
               template={headerAttributes.template}
               brandName={headerAttributes.brandName}
               backgroundColor={headerAttributes.backgroundColor}

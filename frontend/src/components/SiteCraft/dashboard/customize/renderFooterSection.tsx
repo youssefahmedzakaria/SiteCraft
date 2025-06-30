@@ -381,7 +381,7 @@ export function RenderFooterSection({
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="block text-sm mb-2">Text Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
@@ -409,7 +409,7 @@ export function RenderFooterSection({
                     }}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
