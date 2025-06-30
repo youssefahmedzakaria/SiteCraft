@@ -46,7 +46,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       }
     } catch (error: any) {
       console.error('Login error:', error)
-      set({ loginError: error.message || 'Login failed' })
+      set({ loginError: 'Login failed, Please check email and password' })
       return false
     } finally {
       set({ isLoading: false })

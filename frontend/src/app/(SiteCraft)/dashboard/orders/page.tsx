@@ -130,26 +130,38 @@ export default function OrdersPage() {
 
         <div className="border-t border-logo-border mt-6 space-y-2 pt-3">
           {/* Search and filters */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Search Bar */}
-            <SearchBar 
-              placeholder="Search orders by ID, customer name, or email" 
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-
-            {/* Filter Button */}
-            <FilterButton
-              onApplyFilters={handleFiltersApply}
-              statuses={orderStatuses}
-              initialStatus={statusFilter}
-              initialDateRange={dateRange}
-            />
-
-            {/* Export button */}
-            <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-              <span>Export Orders</span>
-            </Button>
+            <div className="flex-grow">
+              <SearchBar 
+                placeholder="Search orders by ID, customer name, or email" 
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <FilterButton
+                onApplyFilters={handleFiltersApply}
+                statuses={orderStatuses}
+                initialStatus={statusFilter}
+                initialDateRange={dateRange}
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <Button
+                onClick={refetchOrders}
+                variant="outline"
+                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
+              </Button>
+            </div>
+            <div className="flex-shrink-0">
+              <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                <span>Export Orders</span>
+              </Button>
+            </div>
           </div>
 
           {/* Active filter indicators */}
@@ -250,20 +262,6 @@ export default function OrdersPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Refresh button for fallback */}
-          {orders.length === 0 && !isLoading && (
-            <div className="mt-6 text-center">
-              <Button
-                onClick={refetchOrders}
-                variant="outline"
-                className="flex items-center space-x-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span>Refresh Orders</span>
-              </Button>
-            </div>
-          )}
         </div>
       </main>
     </div>

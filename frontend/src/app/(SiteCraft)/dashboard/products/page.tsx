@@ -205,6 +205,11 @@ export default function ProductPage() {
     // Optionally: refresh products list
   };
 
+  const handleRefreshAll = () => {
+    refetchStats();
+    fetchProducts();
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-gray-100">
@@ -319,7 +324,7 @@ export default function ProductPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={refetchStats}
+                onClick={handleRefreshAll}
                 className="text-red-600 hover:text-red-800"
               >
                 Retry
@@ -330,17 +335,16 @@ export default function ProductPage() {
 
         {/* Stats cards */}
         <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-700">Product Statistics</h3>
+          <div className="flex justify-end items-center">
             <Button
               variant="outline"
               size="sm"
-              onClick={refetchStats}
+              onClick={handleRefreshAll}
               disabled={statsLoading}
               className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${statsLoading ? 'animate-spin' : ''}`} />
-              Refresh Stats
+              Refresh
             </Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -478,7 +482,7 @@ export default function ProductPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="py-8 text-center text-muted-foreground"
                   >
                     {products.length === 0
@@ -490,20 +494,6 @@ export default function ProductPage() {
             </tbody>
           </table>
         </div>
-
-        {/* Refresh button for fallback */}
-        {products.length === 0 && !isLoading && (
-          <div className="mt-6 text-center">
-            <Button
-              variant="outline"
-              onClick={fetchProducts}
-              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              <span>Refresh Products</span>
-            </Button>
-          </div>
-        )}
       </main>
     </div>
   );

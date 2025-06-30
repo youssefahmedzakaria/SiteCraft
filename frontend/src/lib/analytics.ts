@@ -10,18 +10,18 @@ export interface DateRangeDTO {
 
 export interface DailySales {
   date: string;
-  totalSales: number; // Backend returns 'totalSales', not 'sales'
+  totalSales: number; 
 }
 
 export interface DailyNetProfit {
   date: string;
-  netProfit: number; // Backend returns 'netProfit', not 'profit'
+  netProfit: number; 
 }
 
 export interface CategorySales {
   categoryName: string;
   totalSales: number;
-  percentage?: number; // Optional since backend doesn't return this
+  percentage?: number; 
 }
 
 export interface ProductSales {
@@ -41,7 +41,7 @@ export interface ProductSales {
     categoryId: number;
     categoryName: string;
   };
-  quantitySold: number; // Backend returns 'quantitySold', not 'unitsSold'
+  quantitySold: number; 
 }
 
 export interface SalesByProduct {
@@ -59,43 +59,6 @@ export interface WishlistTrend {
   productName: string;
   wishlistCount: number;
 }
-
-// Fallback data for when backend returns empty or no data
-const fallbackDailySales: DailySales[] = [
-  { date: '2024-01-01', totalSales: 0 },
-  { date: '2024-01-02', totalSales: 0 },
-  { date: '2024-01-03', totalSales: 0 },
-  { date: '2024-01-04', totalSales: 0 },
-  { date: '2024-01-05', totalSales: 0 },
-  { date: '2024-01-06', totalSales: 0 },
-  { date: '2024-01-07', totalSales: 0 },
-];
-
-const fallbackDailyNetProfit: DailyNetProfit[] = [
-  { date: '2024-01-01', netProfit: 0 },
-  { date: '2024-01-02', netProfit: 0 },
-  { date: '2024-01-03', netProfit: 0 },
-  { date: '2024-01-04', netProfit: 0 },
-  { date: '2024-01-05', netProfit: 0 },
-  { date: '2024-01-06', netProfit: 0 },
-  { date: '2024-01-07', netProfit: 0 },
-];
-
-const fallbackCategorySales: CategorySales[] = [
-  { categoryName: 'No Data', totalSales: 0, percentage: 100 },
-];
-
-const fallbackProductSales: ProductSales[] = [
-  { product: { id: 0, name: 'No Products', description: '', discountType: null, discountValue: null, minCap: null, percentageMax: null, maxCap: null, images: [], variants: [], attributes: [], reviews: [], categoryId: 0, categoryName: '' }, quantitySold: 0 },
-];
-
-const fallbackSourceCount: SourceCount[] = [
-  { source: 'No Data', count: 0 },
-];
-
-const fallbackWishlistTrends: WishlistTrend[] = [
-  { productName: 'No Items', wishlistCount: 0 },
-];
 
 // Analytics Service
 export class AnalyticsService {
@@ -191,23 +154,23 @@ export class AnalyticsService {
       });
 
       if (!response.ok) {
-        console.warn('Failed to fetch daily sales, using fallback');
-        return fallbackDailySales;
+        console.warn('Failed to fetch daily sales, returning empty array');
+        return [];
       }
 
       const data = await response.json();
       console.log('📊 Daily sales response:', data);
-      return data && data.length > 0 ? data : fallbackDailySales;
+      return data && data.length > 0 ? data : [];
     } catch (error) {
       console.warn('Error fetching daily sales:', error);
-      return fallbackDailySales;
+      return [];
     }
   }
 
   // Get daily net profit
   static async getDailyNetProfit(dateRange: DateRangeDTO): Promise<DailyNetProfit[]> {
     try {
-      console.log('🔍 Fetching daily net profit with dateRange:', dateRange);
+      console.log('🔄 Fetching daily net profit with dateRange:', dateRange);
       const response = await fetch(`${this.baseUrl}/profit/daily`, {
         method: 'POST',
         headers: {
@@ -219,15 +182,15 @@ export class AnalyticsService {
 
       if (!response.ok) {
         console.warn('Failed to fetch daily net profit, using fallback');
-        return fallbackDailyNetProfit;
+        return [];
       }
 
       const data = await response.json();
       console.log('📊 Daily net profit response:', data);
-      return data && data.length > 0 ? data : fallbackDailyNetProfit;
+      return data && data.length > 0 ? data : [];
     } catch (error) {
       console.warn('Error fetching daily net profit:', error);
-      return fallbackDailyNetProfit;
+      return [];
     }
   }
 
@@ -245,14 +208,14 @@ export class AnalyticsService {
 
       if (!response.ok) {
         console.warn('Failed to fetch sales by category, using fallback');
-        return fallbackCategorySales;
+        return [];
       }
 
       const data = await response.json();
-      return data && data.length > 0 ? data : fallbackCategorySales;
+      return data && data.length > 0 ? data : [];
     } catch (error) {
       console.warn('Error fetching sales by category:', error);
-      return fallbackCategorySales;
+      return [];
     }
   }
 
@@ -271,15 +234,15 @@ export class AnalyticsService {
 
       if (!response.ok) {
         console.warn('Failed to fetch top products, using fallback');
-        return fallbackProductSales;
+        return [];
       }
 
       const data = await response.json();
       console.log('📊 Top products response:', data);
-      return data && data.length > 0 ? data : fallbackProductSales;
+      return data && data.length > 0 ? data : [];
     } catch (error) {
       console.warn('Error fetching top products:', error);
-      return fallbackProductSales;
+      return [];
     }
   }
 
@@ -297,14 +260,14 @@ export class AnalyticsService {
 
       if (!response.ok) {
         console.warn('Failed to fetch customer acquisition, using fallback');
-        return fallbackSourceCount;
+        return [];
       }
 
       const data = await response.json();
-      return data && data.length > 0 ? data : fallbackSourceCount;
+      return data && data.length > 0 ? data : [];
     } catch (error) {
       console.warn('Error fetching customer acquisition:', error);
-      return fallbackSourceCount;
+      return [];
     }
   }
 
@@ -370,7 +333,7 @@ export class AnalyticsService {
 
       if (!response.ok) {
         console.warn('Failed to fetch wishlist trends, using fallback');
-        return fallbackWishlistTrends;
+        return [];
       }
 
       const data = await response.json();
@@ -380,11 +343,11 @@ export class AnalyticsService {
             productName: item.productName,
             wishlistCount: item.saveCount,
           }))
-        : fallbackWishlistTrends;
+        : [];
       return mapped;
     } catch (error) {
       console.warn('Error fetching wishlist trends:', error);
-      return fallbackWishlistTrends;
+      return [];
     }
   }
 }
@@ -392,66 +355,39 @@ export class AnalyticsService {
 // Data mapping functions to convert backend data to frontend format
 
 export const mapDailySalesToChartData = (data: DailySales[]): Datum[] => {
-  console.log('🔄 Mapping daily sales data:', data);
-  
   if (!data || data.length === 0) {
-    console.log('⚠️ No daily sales data, using fallback');
-    return fallbackDailySales.map(item => ({
-      day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
-      sales: item.totalSales
-    }));
+    return [];
   }
-
-  const mappedData = data.map(item => {
+  return data.map(item => {
     const date = new Date(item.date);
     const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
     return {
       day: label,
       sales: item.totalSales
     };
   });
-  
-  console.log('✅ Mapped daily sales data:', mappedData);
-  return mappedData;
 };
 
 export const mapDailyNetProfitToChartData = (data: DailyNetProfit[]): Datum[] => {
-  console.log('🔄 Mapping daily net profit data:', data);
-  
   if (!data || data.length === 0) {
-    console.log('⚠️ No daily net profit data, using fallback');
-    return fallbackDailyNetProfit.map(item => ({
-      day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
-      sales: item.netProfit
-    }));
+    return [];
   }
-
-  const mappedData = data.map(item => {
+  return data.map(item => {
     const date = new Date(item.date);
     const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
     return {
       day: label,
       sales: item.netProfit
     };
   });
-  
-  console.log('✅ Mapped daily net profit data:', mappedData);
-  return mappedData;
 };
 
 export const mapCategorySalesToChartData = (data: CategorySales[]): Datum[] => {
   if (!data || data.length === 0) {
-    return fallbackCategorySales.map(item => ({
-      status: item.categoryName,
-      value: 100 // Default percentage
-    }));
+    return [];
   }
-
   // Calculate total sales to compute percentages
   const totalSales = data.reduce((sum, item) => sum + item.totalSales, 0);
-
   return data.map(item => ({
     status: item.categoryName,
     value: totalSales > 0 ? Math.round((item.totalSales / totalSales) * 100) : 0
@@ -460,12 +396,8 @@ export const mapCategorySalesToChartData = (data: CategorySales[]): Datum[] => {
 
 export const mapTopProductsToChartData = (data: ProductSales[]): Datum[] => {
   if (!data || data.length === 0) {
-    return fallbackProductSales.map(item => ({
-      product: item.product.name,
-      units: item.quantitySold
-    }));
+    return [];
   }
-
   return data.map(item => ({
     product: item.product.name,
     units: item.quantitySold
@@ -474,12 +406,8 @@ export const mapTopProductsToChartData = (data: ProductSales[]): Datum[] => {
 
 export const mapCustomerAcquisitionToChartData = (data: SourceCount[]): Datum[] => {
   if (!data || data.length === 0) {
-    return fallbackSourceCount.map(item => ({
-      source: item.source,
-      value: item.count
-    }));
+    return [];
   }
-
   return data.map(item => ({
     source: item.source,
     value: item.count
@@ -488,12 +416,8 @@ export const mapCustomerAcquisitionToChartData = (data: SourceCount[]): Datum[] 
 
 export const mapWishlistTrendsToChartData = (data: WishlistTrend[]): Datum[] => {
   if (!data || data.length === 0) {
-    return fallbackWishlistTrends.map(item => ({
-      item: item.productName,
-      units: item.wishlistCount
-    }));
+    return [];
   }
-
   return data.map(item => ({
     item: item.productName,
     units: item.wishlistCount

@@ -136,38 +136,52 @@ export default function CustomersPage() {
 
         {/* Filters and search */}
         <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Search Bar */}
-            <SearchBar 
-              placeholder="Search by name or email..." 
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-
+            <div className="flex-grow">
+              <SearchBar 
+                placeholder="Search by name or email..." 
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
             {/* Status Filter */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                >
-                  <span className="ml-2">{statusFilter}</span>
-                  <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setStatusFilter("All")}>
-                  All
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("Active")}>
-                  Active
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("Suspended")}>
-                  Suspended
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex-shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                  >
+                    <span className="ml-2">{statusFilter}</span>
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setStatusFilter("All")}> 
+                    All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter("Active")}> 
+                    Active
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter("Suspended")}> 
+                    Suspended
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            {/* Refresh Button */}
+            <div className="flex-shrink-0">
+              <Button
+                onClick={refetchCustomers}
+                variant="outline"
+                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -201,20 +215,6 @@ export default function CustomersPage() {
             </tbody>
           </table>
         </div>
-
-        {/* Refresh button for fallback */}
-        {customers.length === 0 && !isLoading && (
-          <div className="mt-6 text-center">
-            <Button
-              onClick={refetchCustomers}
-              variant="outline"
-              className="flex items-center space-x-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh Customers</span>
-            </Button>
-          </div>
-        )}
       </main>
     </div>
   );

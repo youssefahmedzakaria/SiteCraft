@@ -14,11 +14,20 @@ import {
   PackageOpen,
   ShoppingBag,
   Tags,
+  X,
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { format } from "date-fns";
 
 export default function ReportsPage() {
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
+  // Default to last 30 days
+  const defaultDateRange = (() => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 30);
+    return { from: startDate, to: endDate };
+  })();
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>(defaultDateRange);
 
   // map report IDs to your static icon paths
   const iconMap: Record<string, React.ReactNode> = {
@@ -35,9 +44,58 @@ export default function ReportsPage() {
     iconSrc: iconMap[r.id] || "/icons/default.svg",
   }));
 
-  const handleDownload = (id: string) => {
-    console.log(`Downloading report ${id}`);
-    // TODO: wire up real download logic here
+  // Map report IDs to backend endpoints and whether they need a date range
+  const reportEndpoints: Record<string, { url: string; needsDateRange: boolean; filename: string }> = {
+    "rep-001": { url: "http://localhost:8080/reports/session-creation/report.pdf", needsDateRange: true, filename: "session-creation-report.pdf" },
+    "rep-002": { url: "http://localhost:8080/reports/product-analytics/report.pdf", needsDateRange: true, filename: "product-analytics-report.pdf" },
+    "rep-003": { url: "http://localhost:8080/reports/customer-engagement/report.pdf", needsDateRange: true, filename: "customer-engagement-report.pdf" },
+    "rep-004": { url: "http://localhost:8080/reports/sales-summary/report.pdf", needsDateRange: true, filename: "sales-summary-report.pdf" },
+    "rep-005": { url: "http://localhost:8080/reports/inventory-status/report.pdf", needsDateRange: false, filename: "inventory-status-report.pdf" },
+  };
+
+  // Helper to convert date range to backend format
+  function toDateRangeDTO(range: { from: Date; to: Date }) {
+    return {
+      startDate: range.from.toISOString().split('T')[0],
+      endDate: range.to.toISOString().split('T')[0],
+    };
+  }
+
+  const handleDownload = async (id: string) => {
+    const endpoint = reportEndpoints[id];
+    if (!endpoint) return;
+
+    let fetchOptions: RequestInit = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {},
+    };
+
+    if (endpoint.needsDateRange) {
+      if (!dateRange) {
+        alert('Please select a date range first.');
+        return;
+      }
+      fetchOptions.headers = { 'Content-Type': 'application/json' };
+      fetchOptions.body = JSON.stringify(toDateRangeDTO(dateRange));
+    }
+
+    try {
+      const res = await fetch(endpoint.url, fetchOptions);
+      if (!res.ok) throw new Error('Failed to download report');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = endpoint.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Error downloading report.');
+      console.error(err);
+    }
   };
 
   return (
@@ -58,6 +116,24 @@ export default function ReportsPage() {
                 onApply={setDateRange}
               />
             </div>
+
+            {/* Date Range Display (like analytics) */}
+            {dateRange && (
+              <div className="flex flex-wrap gap-2 items-center mt-2">
+                <span className="text-sm text-gray-600">Showing data for:</span>
+                <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                  <span>
+                    {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                  </span>
+                  <button
+                    onClick={() => setDateRange(undefined)}
+                    className="ml-1 hover:text-gray-600"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">

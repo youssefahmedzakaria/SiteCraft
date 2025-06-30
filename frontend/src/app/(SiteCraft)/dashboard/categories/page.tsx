@@ -112,6 +112,12 @@ export default function CategoriesPage() {
     }
   });
 
+  const handleRefreshAll = () => {
+    fetchCategories();
+    // If you have a separate fetchStatistics, call it here as well.
+    // fetchStatistics();
+  };
+
   if (isLoading || !isClient) {
     return (
       <div className="flex min-h-screen bg-gray-100">
@@ -222,17 +228,16 @@ export default function CategoriesPage() {
 
         {/* Stats cards */}
         <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-700">Category Statistics</h3>
+          <div className="flex justify-end items-center">
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchCategories}
+              onClick={handleRefreshAll}
               disabled={isLoading}
               className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh Stats
+              Refresh
             </Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -340,20 +345,6 @@ export default function CategoriesPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Refresh button for fallback */}
-          {categories.length === 0 && !isLoading && (
-            <div className="mt-6 text-center">
-              <Button
-                variant="outline"
-                onClick={fetchCategories}
-                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                <span>Refresh Categories</span>
-              </Button>
-            </div>
-          )}
         </div>
       </main>
     </div>

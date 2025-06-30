@@ -90,15 +90,6 @@ export default function StoreInfoPage() {
                 Manage store policies and about us content
               </h2>
             </div>
-            <Button 
-              onClick={refreshStoreInfo} 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
           </div>
         </div>
 
@@ -106,7 +97,7 @@ export default function StoreInfoPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">
-              Store Policies ({policies.length})
+              Store Policies: {policies.length}
             </h3>
             <div className="flex justify-end">
               <Link href="/dashboard/store-info/policy-add">
@@ -120,13 +111,8 @@ export default function StoreInfoPage() {
           
           {policies.length === 0 ? (
             <div className="border rounded-lg border-logo-border p-8 text-center">
-              <p className="text-gray-500 mb-4">No policies found</p>
-              <Link href="/dashboard/store-info/policy-add">
-                <Button variant="outline">
-                  <Plus size={16} className="mr-2" />
-                  Add Your First Policy
-                </Button>
-              </Link>
+              <p className="text-gray-500 mb-2">No policies found</p>
+              <p className="text-xs text-gray-400">Add your first policy to get started.</p>
             </div>
           ) : (
             <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
@@ -146,7 +132,7 @@ export default function StoreInfoPage() {
         <div className="mt-10">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">
-              About Us ({aboutSections.length})
+              About Us: {aboutSections.length}
             </h3>
             <div className="flex justify-end">
               <Link href="/dashboard/store-info/about-add">
@@ -160,13 +146,8 @@ export default function StoreInfoPage() {
           
           {aboutSections.length === 0 ? (
             <div className="border rounded-lg border-logo-border p-8 text-center">
-              <p className="text-gray-500 mb-4">No about us sections found</p>
-              <Link href="/dashboard/store-info/about-add">
-                <Button variant="outline">
-                  <Plus size={16} className="mr-2" />
-                  Add Your First Section
-                </Button>
-              </Link>
+              <p className="text-gray-500 mb-2">No about us sections found</p>
+              <p className="text-xs text-gray-400">Add your first section to get started.</p>
             </div>
           ) : (
             <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">

@@ -55,13 +55,13 @@ export default function AddPolicyPage() {
       <Sidebar />
       
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="max-w-2xl mx-auto">
+        
           {/* Header */}
           <div className="mb-6">
-            <Link href="/dashboard/store-info" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
+            {/* <Link href="/dashboard/store-info" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Store Info
-            </Link>
+            </Link> */}
             <h1 className="text-2xl md:text-3xl font-bold">Add New Policy</h1>
             <p className="text-gray-600 mt-2">Create a new policy for your store</p>
           </div>
@@ -148,7 +148,7 @@ export default function AddPolicyPage() {
               </form>
             </CardContent>
           </Card>
-        </div>
+        
       </main>
     </div>
   );

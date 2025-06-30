@@ -262,19 +262,25 @@ export default function OverviewPage() {
               <h2 className="text-lg font-semibold mb-2">Last 7 Days</h2>
               <div className="flex-1 border rounded-lg border-logo-border bg-white p-1 md:p-2 flex items-center justify-center">
                 <div className="w-full max-w-md">
-                  <AnimatedChartWrapper delay={0}>
-                    <BarChartCard
-                      hideContainerBorder
-                      data={dailySales.map((s) => ({
-                        date: s.date,
-                        sales: s.sales,
-                      }))}
-                      dataKey="sales"
-                      nameKey="date"
-                      title=""
-                      subtitle=""
-                    />
-                  </AnimatedChartWrapper>
+                  {dailySales.length === 0 ? (
+                    <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg">
+                      No Sales to preview
+                    </div>
+                  ) : (
+                    <AnimatedChartWrapper delay={0}>
+                      <BarChartCard
+                        hideContainerBorder
+                        data={dailySales.map((s) => ({
+                          date: s.date,
+                          sales: s.sales,
+                        }))}
+                        dataKey="sales"
+                        nameKey="date"
+                        title=""
+                        subtitle=""
+                      />
+                    </AnimatedChartWrapper>
+                  )}
                 </div>
               </div>
             </section>
@@ -292,8 +298,10 @@ export default function OverviewPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={2} className="px-4 py-8 text-center text-gray-500">
-                          No products sold yet
+                        <td colSpan={2} className="h-64">
+                          <div className="flex items-center justify-center h-full w-full text-gray-500 text-lg">
+                            No products sold yet
+                          </div>
                         </td>
                       </tr>
                     )}

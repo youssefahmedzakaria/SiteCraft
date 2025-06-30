@@ -124,65 +124,107 @@ export default function AnalyticsPage() {
 
               {/* Charts grid */}
               <div className="grid gap-6 sm:grid-cols-2 mb-8">
-                <AnimatedChartWrapper delay={0}>
-                  <LineChartCard
-                    data={data.salesData}
-                    dataKey="sales"
-                    nameKey="day"
-                    title="Revenue Overview"
-                    subtitle="Total sales by period"
-                  />
-                </AnimatedChartWrapper>
+                {/* Revenue Overview */}
+                {data.salesData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No sales data to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={0}>
+                    <LineChartCard
+                      data={data.salesData}
+                      dataKey="sales"
+                      nameKey="day"
+                      title="Revenue Overview"
+                      subtitle="Total sales by period"
+                    />
+                  </AnimatedChartWrapper>
+                )}
 
-                <AnimatedChartWrapper delay={40}>
-                  <LineChartCard
-                    data={data.netProfitData}
-                    dataKey="sales"
-                    nameKey="day"
-                    title="Net Profit"
-                    subtitle="Profit by period"
-                  />
-                </AnimatedChartWrapper>
+                {/* Net Profit */}
+                {data.netProfitData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No profit data to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={40}>
+                    <LineChartCard
+                      data={data.netProfitData}
+                      dataKey="sales"
+                      nameKey="day"
+                      title="Net Profit"
+                      subtitle="Profit by period"
+                    />
+                  </AnimatedChartWrapper>
+                )}
 
-                <AnimatedChartWrapper delay={80}>
-                  <PieChartCard
-                    data={data.salesByCategoryData}
-                    dataKey="value"
-                    nameKey="status"
-                    title="Sales by Category"
-                    subtitle="Distribution by percentage"
-                  />
-                </AnimatedChartWrapper>
+                {/* Sales by Category */}
+                {data.salesByCategoryData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No category sales data to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={80}>
+                    <PieChartCard
+                      data={data.salesByCategoryData}
+                      dataKey="value"
+                      nameKey="status"
+                      title="Sales by Category"
+                      subtitle="Distribution by percentage"
+                    />
+                  </AnimatedChartWrapper>
+                )}
 
-                <AnimatedChartWrapper delay={120}>
-                  <RadarChartCard
-                    data={data.customerAcquisitionData}
-                    dataKey="value"
-                    nameKey="source"
-                    title="Customer Acquisition"
-                    subtitle="Customers by source"
-                  />
-                </AnimatedChartWrapper>
+                {/* Customer Acquisition */}
+                {data.customerAcquisitionData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No customer acquisition data to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={120}>
+                    <RadarChartCard
+                      data={data.customerAcquisitionData}
+                      dataKey="value"
+                      nameKey="source"
+                      title="Customer Acquisition"
+                      subtitle="Customers by source"
+                    />
+                  </AnimatedChartWrapper>
+                )}
 
-                <AnimatedChartWrapper delay={160}>
-                  <HorizontalBarChartCard
-                    data={data.topSellingProductsData}
-                    dataKey="units"
-                    nameKey="product"
-                    title="Top Selling Products"
-                    subtitle="Units sold"
-                  />
-                </AnimatedChartWrapper>
+                {/* Top Selling Products */}
+                {data.topSellingProductsData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No top selling products to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={160}>
+                    <HorizontalBarChartCard
+                      data={data.topSellingProductsData}
+                      dataKey="units"
+                      nameKey="product"
+                      title="Top Selling Products"
+                      subtitle="Units sold"
+                    />
+                  </AnimatedChartWrapper>
+                )}
 
-                <AnimatedChartWrapper delay={200}>
-                  <BarChartCard
-                    data={data.wishlistTrendsData}
-                    dataKey="units"
-                    nameKey="item"
-                    title="Wishlist Trends"
-                    subtitle="Most wished items"
-                  />
-                </AnimatedChartWrapper>
+                {/* Wishlist Trends */}
+                {data.wishlistTrendsData.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg border rounded-lg border-logo-border bg-white">
+                    No wishlist data to display.
+                  </div>
+                ) : (
+                  <AnimatedChartWrapper delay={200}>
+                    <BarChartCard
+                      data={data.wishlistTrendsData}
+                      dataKey="units"
+                      nameKey="item"
+                      title="Wishlist Trends"
+                      subtitle="Most wished items"
+                    />
+                  </AnimatedChartWrapper>
+                )}
               </div>
             </>
           )}

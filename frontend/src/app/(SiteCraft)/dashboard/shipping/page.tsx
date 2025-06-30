@@ -100,19 +100,12 @@ export default function ShippingPage() {
                 Manage shipping rates and delivery locations
               </h2>
             </div>
-            <Button 
-              onClick={refreshShippingInfo} 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
           </div>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <div></div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+            <h3 className="text-lg font-semibold">
+              Shipping Locations: {shippingInfo.length}
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:justify-end">
               <Link href="/dashboard/shipping/add" className="w-full sm:w-auto">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover w-full">
                   <Plus size={16} />
@@ -156,21 +149,10 @@ export default function ShippingPage() {
 
         {/* Shipping Table */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              Shipping Locations ({shippingInfo.length})
-            </h3>
-          </div>
-          
           {shippingInfo.length === 0 ? (
             <div className="border rounded-lg border-logo-border p-8 text-center">
-              <p className="text-gray-500 mb-4">No shipping locations found</p>
-              <Link href="/dashboard/shipping/add">
-                <Button variant="outline">
-                  <Plus size={16} className="mr-2" />
-                  Add Your First Location
-                </Button>
-              </Link>
+              <p className="text-gray-500 mb-2">No shipping locations found</p>
+              <p className="text-xs text-gray-400">Add your first location to get started.</p>
             </div>
           ) : (
             <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
