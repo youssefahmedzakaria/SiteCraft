@@ -69,7 +69,6 @@ export interface AboutCustomizationAttributes {
   imageObjectFit: "cover" | "fill" | "contain";
   titleFont: string;
   titleSize: string;
-  titleFontWeight: string;
   descriptionFont: string;
   descriptionSize: string;
 }

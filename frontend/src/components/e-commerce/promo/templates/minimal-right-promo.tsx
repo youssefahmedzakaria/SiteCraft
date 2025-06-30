@@ -1,5 +1,4 @@
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface MinimalRightPromoProps {
   isClickable?: boolean
@@ -69,7 +68,15 @@ export function MinimalRightPromo({
   imageObjectFit,
 }: MinimalRightPromoProps) {
   return (
-    <section id={id} className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
@@ -92,5 +99,5 @@ export function MinimalRightPromo({
         />
       </div>
     </section>
-  );
+  )
 }

@@ -1,5 +1,4 @@
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface OverlayPromoProps {
   isClickable?: boolean
@@ -25,7 +24,7 @@ export interface OverlayPromoProps {
   buttonSize?: string
   buttonRadius?: string
   backgroundColor?: string
-  imageObjectFit?: "cover" | "fill" | "contain" 
+  imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
 }
 
@@ -69,7 +68,15 @@ export function OverlayPromo({
   id,
 }: OverlayPromoProps) {
   return (
-    <section id={id} className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
@@ -92,5 +99,5 @@ export function OverlayPromo({
         />
       </div>
     </section>
-  );
+  )
 }

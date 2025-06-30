@@ -16,7 +16,7 @@ export interface PromoSliderProps {
     image: string
     imageAlt: string
   }[]
-  variant?: "left" | "centered" | "right" | "overlay" | "minimalRight" | "minimalLeft"| "split"
+  variant?: "left" | "centered" | "right" | "overlay" | "minimalRight" | "minimalLeft" | "split"
   autoplay?: boolean
   autoplaySpeed?: number
   showArrows?: boolean
@@ -117,32 +117,30 @@ export function PromoSlider({
       </div>
 
       {showArrows && totalSlides > 1 && (
-  <>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent"
-      onClick={prevSlide}
-      aria-label="Previous slide"
-    >
-      <ChevronLeft className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
-    </Button>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent"
-      onClick={nextSlide}
-      aria-label="Next slide"
-    >
-      <ChevronRight className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
-    </Button>
-  </>
-)}
-
-
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent z-30"
+            onClick={prevSlide}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent z-30"
+            onClick={nextSlide}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
+          </Button>
+        </>
+      )}
 
       {totalSlides > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2">
+        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2 z-30">
           {slides.map((_, index) => (
             <button
               key={index}

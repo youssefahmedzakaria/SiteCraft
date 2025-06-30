@@ -581,7 +581,7 @@ export function RenderHeaderSection({
                   </div>
                 </div>
 
-                <div className="color-picker-container">
+                {/* <div className="color-picker-container">
                   <label className="block text-sm mb-2">
                     Search Icon Color
                   </label>
@@ -613,7 +613,7 @@ export function RenderHeaderSection({
                       }}
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           )}

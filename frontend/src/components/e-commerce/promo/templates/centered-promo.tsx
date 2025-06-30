@@ -1,5 +1,4 @@
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface CenteredPromoProps {
   isClickable?: boolean
@@ -29,7 +28,7 @@ export interface CenteredPromoProps {
   imageObjectFit?: "cover" | "fill" | "contain"
 }
 
-export function CenteredPromo({ 
+export function CenteredPromo({
   isClickable = true,
   id,
   slides = [
@@ -39,7 +38,7 @@ export function CenteredPromo({
         "This is your website. Here, you have everything to tell your story. Add as many pages as necessary to your site and. Every section is fully customizable. Change images, colors, and text to suit your needs effortlessly.",
       buttonText: "Shop Now",
       buttonLink: "/shop",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.svg?height=600&width=800",
       imageAlt: "Promotional image",
     },
     {
@@ -48,7 +47,7 @@ export function CenteredPromo({
         "Discover our latest summer collection with styles perfect for any occasion. Limited time offer with free shipping on all orders.",
       buttonText: "Shop Now",
       buttonLink: "/summer-collection",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.svg?height=600&width=800",
       imageAlt: "Summer collection promotional image",
     },
   ],
@@ -69,7 +68,15 @@ export function CenteredPromo({
   imageObjectFit,
 }: CenteredPromoProps) {
   return (
-    <section id={id} className={cn("w-full relative", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full relative"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}

@@ -1,15 +1,14 @@
-"use client";
-import React from "react";
-import { User, ShoppingBag, Heart } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+"use client"
+import type React from "react"
+import { User, ShoppingBag, Heart } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export interface IconsGroupProps {
-  iconColor?: string;
-  showLabels?: boolean;
-  textColor?: string;
-
-  orientation?: "horizontal" | "vertical";
+  iconColor?: string
+  showLabels?: boolean
+  textColor?: string
+  orientation?: "horizontal" | "vertical"
 }
 
 export const IconsGroup: React.FC<IconsGroupProps> = ({
@@ -18,9 +17,9 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
   textColor = "text-white",
   orientation = "horizontal",
 }) => {
-  const path = usePathname();
-  const pathSegments = path.split("/");
-  const subdomain = pathSegments[2];
+  const path = usePathname()
+  const pathSegments = path.split("/")
+  const subdomain = pathSegments[2]
   const icons = [
     { Icon: User, label: "Profile", href: `/e-commerce/${subdomain}/profile` },
     { Icon: ShoppingBag, label: "Cart", href: `/e-commerce/${subdomain}/cart` },
@@ -29,30 +28,30 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
       label: "Favorites",
       href: `/e-commerce/${subdomain}/favorites`,
     },
-  ];
+  ]
 
   return (
-    <div
-      className={`flex ${
-        orientation === "horizontal" ? "space-x-6" : "flex-col space-y-4"
-      }`}
-    >
+    <div className={`flex ${orientation === "horizontal" ? "space-x-6" : "flex-col space-y-4"}`}>
       {icons.map(({ Icon, label, href }) => (
         <Link
           key={label}
           href={href}
           className={`p-1 hover:opacity-80 flex ${
-            orientation === "horizontal"
-              ? "items-center"
-              : "flex-col items-center"
+            orientation === "horizontal" ? "items-center" : "flex-col items-center"
           }`}
         >
-          <Icon className={`h-5 w-5 ${iconColor}`} />
+          <Icon
+            className="h-5 w-5"
+            style={{
+              color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+            }}
+          />
           {showLabels && (
             <span
-              className={`${
-                orientation === "horizontal" ? "ml-2" : "mt-1"
-              } text-sm ${textColor}`}
+              className={`${orientation === "horizontal" ? "ml-2" : "mt-1"} text-sm`}
+              style={{
+                color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+              }}
             >
               {label}
             </span>
@@ -60,5 +59,5 @@ export const IconsGroup: React.FC<IconsGroupProps> = ({
         </Link>
       ))}
     </div>
-  );
-};
+  )
+}

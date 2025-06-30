@@ -24,16 +24,16 @@
       "content": "All our products comes with a lifetime warranty against manufacturing defects."
     }
   ],
-  "backgroundColor": "bg-white",
-  "titleColor": "text-black",
+  "backgroundColor": "bg-[#ffffff]",
+  "titleColor": "text-[#000000]",
   "titleSize": "text-4xl",
   "titleFont": "font-sans",
   "titleFontWeight": "font-bold",
-  "sectionTitleColor": "text-black",
+  "sectionTitleColor": "text-[#000000]",
   "sectionTitleSize": "text-2xl",
   "sectionTitleFont": "font-serif",
   "sectionTitleFontWeight": "font-medium",
-  "sectionContentColor": "text-gray-600",
+  "sectionContentColor": "text-[#cccccc]",
   "sectionContentSize": "text-lg",
   "sectionContentFont": "font-serif",
   "sectionContentFontWeight": "font-medium"
