@@ -32,6 +32,8 @@ interface RenderAboutSectionProps {
     updates: Partial<AboutCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
+  aboutImage: File | undefined;
+  setAboutImage: React.Dispatch<React.SetStateAction<File | undefined>>;
 }
 
 export function RenderAboutSection({
@@ -39,6 +41,8 @@ export function RenderAboutSection({
   aboutAttributes,
   updateAboutAttributes,
   onDeleteSection,
+  aboutImage,
+  setAboutImage,
 }: RenderAboutSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -91,6 +95,7 @@ export function RenderAboutSection({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+    setAboutImage(file || undefined);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {

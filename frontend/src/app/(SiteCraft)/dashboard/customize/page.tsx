@@ -65,6 +65,12 @@ export default function CustomizeTemplatePage() {
   >("desktop");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [logoImage, setLogoImage] = useState<File | undefined>();
+  const [aboutImage, setAboutImage] = useState<File | undefined>();
+  const [contactImage, setContactImage] = useState<File | undefined>();
+  const [policiesImage, setPoliciesImage] = useState<File | undefined>();
+  const [promoImages, setPromoImages] = useState<File[] | undefined>();
+
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
     brandName: "Jewelry",
@@ -244,7 +250,7 @@ export default function CustomizeTemplatePage() {
       instagram: "https://www.instagram.com",
       twitter: "https://www.x.com",
     },
-    imageUrl: "/ring.jpg",
+    image: "/ring.jpg",
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
@@ -271,7 +277,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
-      src: "/ring3.jpg",
+      url: "/ring3.jpg",
       alt: "Company Logo",
       size: "24",
     },
@@ -397,7 +403,7 @@ export default function CustomizeTemplatePage() {
             brandName: data.store.storeName || prev.brandName,
             logo: {
               ...prev.logo,
-              src: data.store.logo ? `/${data.store.logo}` : prev.logo.src,
+              url: data.store.logo ? `/${data.store.logo}` : prev.logo.url,
             },
             socialMedia: {
               facebook:
@@ -722,6 +728,42 @@ export default function CustomizeTemplatePage() {
     };
   }, []);
 
+  // Helper to remove backend fields from each section's value
+  const stripBackendFields = (sectionId: string, value: any) => {
+    switch (sectionId) {
+      case "Header&Menu": {
+        const { brandName, logo, ...rest } = value;
+        return {
+          ...rest,
+          logo: logo ? { ...logo, src: undefined } : undefined,
+        };
+      }
+      case "PromoSlider":
+        return value;
+      case "AboutUs": {
+        const { description, secondaryDescription, ...rest } = value;
+        return rest;
+      }
+      case "Policies": {
+        const { sections, ...rest } = value;
+        return rest;
+      }
+      case "ContactUs": {
+        const { contactEmail, socialLinks, ...rest } = value;
+        return rest;
+      }
+      case "Footer": {
+        const { brandName, logo, socialMedia, ...rest } = value;
+        return {
+          ...rest,
+          logo: logo ? { ...logo, src: undefined } : undefined,
+        };
+      }
+      default:
+        return value;
+    }
+  };
+
   // Helper to build DTOs for each section
   const buildCustomizationDTOs = () => {
     // Set storeId to 1 for all sections
@@ -753,7 +795,7 @@ export default function CustomizeTemplatePage() {
       }
       return {
         title: section.id,
-        value,
+        value: stripBackendFields(section.id, value),
         index: idx,
         storeId,
       };
@@ -906,6 +948,14 @@ export default function CustomizeTemplatePage() {
               updateFooterAttributes={updateFooterAttributes}
               sections={sections}
               setSections={setSections}
+              aboutImage={aboutImage}
+              setAboutImage={setAboutImage}
+              contactImage={contactImage}
+              setContactImage={setContactImage}
+              policiestImage={policiesImage}
+              setPoliciesImage={setPoliciesImage}
+              promoImages={promoImages}
+              setPromoImages={setPromoImages}
             />
           </div>
         </div>
@@ -979,7 +1029,7 @@ export default function CustomizeTemplatePage() {
                 </button>
               </div>
             </div>
-            
+
             {/* go to dashboard on saving  */}
             <Button
               className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
@@ -1098,7 +1148,7 @@ export default function CustomizeTemplatePage() {
                 companyName={footerAttributes.brandName}
                 textColor={footerAttributes.textColor}
                 companyLogo={{
-                  src: footerAttributes.logo.src || "/ring3.jpg",
+                  src: footerAttributes.logo.url || "/ring3.jpg",
                   alt: footerAttributes.logo.alt,
                   width: parseInt(footerAttributes.logo.size) || 50,
                   height: parseInt(footerAttributes.logo.size) || 50,

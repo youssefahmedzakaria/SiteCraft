@@ -142,7 +142,7 @@ export interface ContactCustomizationAttributes {
     instagram?: string;
     twitter?: string;
   };
-  imageUrl: string;
+  image: string;
   showMap: boolean;
   backgroundColor: string;
   titleFont: string;
@@ -158,7 +158,7 @@ export interface FooterCustomizationAttributes {
   backgroundColor: string;
   textColor: string;
   logo: {
-    src: string | null;
+    url: string | null;
     alt: string;
     size: string;
   };

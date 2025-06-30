@@ -52,6 +52,8 @@ interface RenderPoliciesSectionProps {
     updates: Partial<PoliciesCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
+  policiesImage: File | undefined;
+  setPoliciesImage: React.Dispatch<React.SetStateAction<File | undefined>>;
 }
 
 export function RenderPoliciesSection({
@@ -59,6 +61,8 @@ export function RenderPoliciesSection({
   policiesAttributes,
   updatePoliciesAttributes,
   onDeleteSection,
+  policiesImage,
+  setPoliciesImage,
 }: RenderPoliciesSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
