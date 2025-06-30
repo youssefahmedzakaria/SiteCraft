@@ -1,38 +1,43 @@
-"use client";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+"use client"
+
+import Image from "next/image"
 
 interface CompanyLogoProps {
   logo?: {
-    src: string;
-    alt: string;
-    width: number;
-    height: number;
-  };
-  name: string;
-  textColor: string;
+    src: string
+    alt: string
+    width: number
+    height: number
+  }
+  name: string
+  textColor: string
+  isCustomize?: boolean
+  selectedTab?: "desktop" | "tablet" | "mobile"
 }
 
-export const CompanyLogo = ({ logo, name, textColor }: CompanyLogoProps) => {
-  const path = usePathname();
-  const pathSegments = path.split("/");
-  const subdomain = pathSegments[2];
+export const CompanyLogo = ({ logo, name, textColor, isCustomize = false, selectedTab }: CompanyLogoProps) => {
+  const shouldShowMobile = isCustomize ? selectedTab === "mobile" || selectedTab === "tablet" : false
+
   return (
-    <Link href={`/e-commerce/${subdomain}`} className="flex items-center">
+    <div className="flex items-center">
       {logo ? (
-        <Image 
-          src={logo.src} 
-          alt={logo.alt} 
-          width={logo.width} 
-          height={logo.height}
-          className="h-auto" 
+        <Image
+          src={logo.src || "/placeholder.svg?height=40&width=40"}
+          alt={logo.alt}
+          width={shouldShowMobile ? Math.max(logo.width * 0.8, 24) : logo.width}
+          height={shouldShowMobile ? Math.max(logo.height * 0.8, 24) : logo.height}
+          className="h-auto"
         />
       ) : (
-        <span className={`text-2xl font-bold tracking-wide ${textColor}`}>
+        <span
+          className={`${shouldShowMobile ? "text-lg" : "text-2xl"} font-bold tracking-wide`}
+          style={{
+            color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+          }}
+        >
           {name}
         </span>
       )}
-    </Link>
-  );
-};
+    </div>
+  )
+}

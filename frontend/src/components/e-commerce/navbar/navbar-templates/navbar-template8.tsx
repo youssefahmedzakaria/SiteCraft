@@ -53,7 +53,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
 
   // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 768
 
   // For screen responsiveness
   const [isClient, setIsClient] = useState(false)
@@ -70,7 +70,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
     return () => window.removeEventListener("resize", updateScreenWidth)
   }, [])
 
-  const isScreenMobile = isClient && screenWidth < 1024
+  const isScreenMobile = isClient && screenWidth < 768
   const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
 
   // Filter visible menu items

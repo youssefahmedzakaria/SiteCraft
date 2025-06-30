@@ -53,7 +53,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
 
   // For div responsiveness when isCustomize is true
   const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 1024
+  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 768
 
   // For screen responsiveness - track screen size with proper initialization
   const [isClient, setIsClient] = useState(false)
@@ -71,7 +71,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
   }, [])
 
   // Only apply screen mobile logic after client-side hydration
-  const isScreenMobile = isClient && screenWidth < 1024
+  const isScreenMobile = isClient && screenWidth < 768
 
   // Determine if we should show mobile layout
   const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
