@@ -1,10 +1,14 @@
 package com.sitecraft.backend.Models;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
-@Table(name = "customizedtemplate")
+@Table(name = "customizedtemplatesection")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,17 +21,19 @@ public class CustomizedTemplateSection {
 
     private String title;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String value; // Use String to store JSONB
+    private JsonNode value;
 
     private Integer index;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", referencedColumnName = "id", nullable = false)
-    @JsonIgnore
     private Store store;
 
-
-
+    @JsonIgnore
+    Store getStore() {
+        return store;
+    }
 }
 

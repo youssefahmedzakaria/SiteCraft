@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "initialtemplate")
+@Table(name = "initialtemplatesection")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -10,6 +10,14 @@ import {
   ArrowLeft,
   Images,
   AppWindow,
+  Plus,
+  CheckCircle,
+  Image,
+  LayoutGrid,
+  ShoppingBag,
+  Info,
+  FileText,
+  Phone,
 } from "lucide-react";
 import { RenderPromoSection } from "./renderPromoSection";
 import { RenderHeaderSection } from "./renderHeaderSection";
@@ -31,6 +39,19 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/SiteCraft/ui/dialog";
+import { Button } from "@/components/SiteCraft/ui/button";
+import { CenteredPromo } from "@/components/e-commerce/promo";
+import { FeaturedGridCategoryTemplate } from "@/components/e-commerce/category-lists";
+import { ProductList } from "@/components/e-commerce/product-lists";
+import { TopImageAbout } from "@/components/e-commerce/about-us";
+import { MinimalRightContact } from "@/components/e-commerce/contact";
+import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies";
 
 interface Section {
   id: string;
@@ -157,6 +178,118 @@ export function Sidebar({
     setSections([fixedTop, ...items, fixedBottom]);
   };
 
+  const [addSectionDialogOpen, setAddSectionDialogOpen] = useState(false);
+
+  // List of available sections to add (excluding Header&Menu and Footer)
+  const availableSections: {
+    id: keyof typeof sectionPreviews;
+    title: string;
+  }[] = [
+    { id: "PromoSlider", title: "Promo Slider" },
+    { id: "Categories", title: "Categories" },
+    { id: "Products", title: "Products" },
+    { id: "AboutUs", title: "About Us" },
+    { id: "Policies", title: "Policies" },
+    { id: "ContactUs", title: "Contact Us" },
+  ];
+
+  // Section preview components (minimal, use initial attributes)
+  const sectionPreviews = {
+    PromoSlider: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Image size={20} className="text-blue-500" />
+          <span className="font-semibold">Promo Slider</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Showcase promotional banners or slides to highlight offers and news.
+        </div>
+      </div>
+    ),
+    Categories: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <LayoutGrid size={20} className="text-yellow-500" />
+          <span className="font-semibold">Categories</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Display product categories for easy navigation.
+        </div>
+      </div>
+    ),
+    Products: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <ShoppingBag size={20} className="text-green-500" />
+          <span className="font-semibold">Products</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Showcase featured or new products to attract customers.
+        </div>
+      </div>
+    ),
+    AboutUs: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Info size={20} className="text-indigo-500" />
+          <span className="font-semibold">About Us</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Share your brand story and values with visitors.
+        </div>
+      </div>
+    ),
+    Policies: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <FileText size={20} className="text-gray-500" />
+          <span className="font-semibold">Policies</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Display your store's shipping, return, and privacy policies.
+        </div>
+      </div>
+    ),
+    ContactUs: (
+      <div className="p-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Phone size={20} className="text-pink-500" />
+          <span className="font-semibold">Contact Us</span>
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Let customers reach out with questions or feedback.
+        </div>
+      </div>
+    ),
+  };
+
+  // Add section handler
+  const [selectedSectionIds, setSelectedSectionIds] = useState<
+    (keyof typeof sectionPreviews)[]
+  >([]);
+  const handleSaveAddSection = () => {
+    if (!selectedSectionIds.length) return;
+    const newSectionsToAdd = availableSections.filter(
+      (s) =>
+        selectedSectionIds.includes(s.id) &&
+        !sections.some((sec) => sec.id === s.id)
+    );
+    if (!newSectionsToAdd.length) return;
+    // Insert before Footer
+    const newSections = [
+      ...sections.slice(0, sections.length - 1),
+      ...newSectionsToAdd.map((section) => ({
+        id: section.id,
+        title: section.title,
+        expanded: false,
+      })),
+      sections[sections.length - 1],
+    ];
+    setSections(newSections);
+    setAddSectionDialogOpen(false);
+    setSelectedSectionIds([]);
+  };
+
   return (
     <>
       {/* Mobile Sidebar Toggle */}
@@ -277,6 +410,114 @@ export function Sidebar({
             <h1 className="text-lg font-bold">Customize Template</h1>
           </div>
 
+          {/* Add Section Dialog */}
+          <Dialog
+            open={addSectionDialogOpen}
+            onOpenChange={(open) => {
+              setAddSectionDialogOpen(open);
+              if (!open) setSelectedSectionIds([]);
+            }}
+          >
+            <DialogContent className="max-w-4xl flex flex-col">
+              <DialogHeader>
+                <DialogTitle>Add a Section</DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto mt-2 pr-2">
+                {(() => {
+                  const sectionButtons = availableSections.map(
+                    (section: {
+                      id: keyof typeof sectionPreviews;
+                      title: string;
+                    }) => {
+                      const isSelected = selectedSectionIds.includes(
+                        section.id
+                      );
+                      const isAdded = sections.some((s) => s.id === section.id);
+                      return !isAdded ? (
+                        <button
+                          key={section.id}
+                          type="button"
+                          className={`flex items-center gap-2 w-full border rounded py-2 px-4 transition-colors ${
+                            isSelected
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-white"
+                          } hover:border-blue-400`}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedSectionIds(
+                                selectedSectionIds.filter(
+                                  (id) => id !== section.id
+                                )
+                              );
+                            } else {
+                              setSelectedSectionIds([
+                                ...selectedSectionIds,
+                                section.id,
+                              ]);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            readOnly
+                            className="mr-2 accent-blue-500"
+                          />
+                          <div className="flex-1 text-left">
+                            {sectionPreviews[section.id]}
+                          </div>
+                        </button>
+                      ) : null;
+                    }
+                  );
+                  const hasContent = sectionButtons.some((s) => s !== null);
+                  if (hasContent) {
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sectionButtons}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="flex flex-col items-center justify-center h-full py-12 text-center text-gray-500">
+                        <CheckCircle
+                          size={56}
+                          className="text-green-500 mb-4"
+                        />
+                        <div className="text-xl font-semibold mb-2">
+                          All sections added!
+                        </div>
+                        <div className="text-base">
+                          You have already added all available sections to your
+                          template.
+                        </div>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+              <div className="pt-4 flex justify-end gap-2 border-t mt-4">
+                <Button
+                  onClick={() => setAddSectionDialogOpen(false)}
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveAddSection}
+                  disabled={
+                    !selectedSectionIds.some(
+                      (id) => !sections.some((s) => s.id === id)
+                    )
+                  }
+                  className="bg-black text-white"
+                >
+                  Save
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <div className="sections-container">
             {/* Header (fixed, not draggable) */}
             <div key="header" className="border-b border-gray-200">
@@ -304,40 +545,50 @@ export function Sidebar({
               <Droppable droppableId="sidebar-sections">
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {sections.slice(1, sections.length - 1).map((section, index) => (
-                      <Draggable key={section.id} draggableId={section.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className={`border-b border-gray-200 ${snapshot.isDragging ? "opacity-50" : ""}`}
-                          >
-                            <div className="flex items-center">
-                              <div
-                                {...provided.dragHandleProps}
-                                className="px-2 py-4 cursor-grab flex items-center text-gray-400 hover:text-gray-600"
-                                title="Drag to reorder"
-                              >
-                                <GripVertical size={18} />
-                              </div>
-                              <button
-                                className="flex-1 flex items-center justify-between text-left pr-4"
-                                onClick={() => toggleSection(section.id)}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{section.title}</span>
+                    {sections
+                      .slice(1, sections.length - 1)
+                      .map((section, index) => (
+                        <Draggable
+                          key={section.id}
+                          draggableId={section.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`border-b border-gray-200 ${
+                                snapshot.isDragging ? "opacity-50" : ""
+                              }`}
+                            >
+                              <div className="flex items-center">
+                                <div
+                                  {...provided.dragHandleProps}
+                                  className="px-2 py-4 cursor-grab flex items-center text-gray-400 hover:text-gray-600"
+                                  title="Drag to reorder"
+                                >
+                                  <GripVertical size={18} />
                                 </div>
-                                {section.expanded ? (
-                                  <ChevronDown size={18} />
-                                ) : (
-                                  <ChevronRight size={18} />
-                                )}
-                              </button>
+                                <button
+                                  className="flex-1 flex items-center justify-between text-left pr-4"
+                                  onClick={() => toggleSection(section.id)}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {section.title}
+                                    </span>
+                                  </div>
+                                  {section.expanded ? (
+                                    <ChevronDown size={18} />
+                                  ) : (
+                                    <ChevronRight size={18} />
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
+                          )}
+                        </Draggable>
+                      ))}
                     {provided.placeholder}
                   </div>
                 )}
@@ -351,7 +602,9 @@ export function Sidebar({
                 </div>
                 <button
                   className="flex-1 flex items-center justify-between text-left pr-4"
-                  onClick={() => toggleSection(sections[sections.length - 1].id)}
+                  onClick={() =>
+                    toggleSection(sections[sections.length - 1].id)
+                  }
                 >
                   <div className="flex items-center gap-2">
                     <span className="font-medium">Footer</span>
@@ -363,6 +616,16 @@ export function Sidebar({
                   )}
                 </button>
               </div>
+            </div>
+
+            <div className="my-6 mx-2">
+              <button
+                onClick={() => setAddSectionDialogOpen(true)}
+                className="flex items-center justify-center gap-2 bg-gray-100 border border-gray-400 rounded-md w-full h-10"
+              >
+                <Plus size={18} />
+                Add Section
+              </button>
             </div>
           </div>
         </div>
