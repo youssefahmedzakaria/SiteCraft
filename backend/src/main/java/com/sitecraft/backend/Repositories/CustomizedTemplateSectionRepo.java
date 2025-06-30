@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface CustomizedTemplateSectionRepo extends JpaRepository <CustomizedTemplateSection, Long> {
     List<CustomizedTemplateSection> findByStoreId(Long store);
+    CustomizedTemplateSection findByStoreIdAndTitleAndIndex(Long storeId, String title, int index);
+
 }

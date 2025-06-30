@@ -52,5 +52,9 @@ public class Store {
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CustomizedTemplate> customizedTemplate = new ArrayList<>();
+    private List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
+
+    public Store(Long id) {
+        this.id = id;
+    }
 }
