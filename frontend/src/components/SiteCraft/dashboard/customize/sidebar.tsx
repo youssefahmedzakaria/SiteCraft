@@ -27,6 +27,7 @@ import { RenderPoliciesSection } from "./renderPoliciesSection";
 import { RenderContactSection } from "./renderContactSection";
 import {
   AboutCustomizationAttributes,
+  CategoryCustomizationAttributes,
   ContactCustomizationAttributes,
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
@@ -52,6 +53,7 @@ import { ProductList } from "@/components/e-commerce/product-lists";
 import { TopImageAbout } from "@/components/e-commerce/about-us";
 import { MinimalRightContact } from "@/components/e-commerce/contact";
 import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies";
+import { RenderCategorySection } from "./renderCategorySection";
 
 interface Section {
   id: string;
@@ -68,6 +70,10 @@ interface SidebarProps {
   promoAttributes: PromoCustomizationAttributes;
   updatePromoAttributes: (
     updates: Partial<PromoCustomizationAttributes>
+  ) => void;
+  categoryAttributes: CategoryCustomizationAttributes;
+  updateCategoryAttributes: (
+    updates: Partial<CategoryCustomizationAttributes>
   ) => void;
   aboutAttributes: AboutCustomizationAttributes;
   updateAboutAttributes: (
@@ -94,6 +100,8 @@ export function Sidebar({
   updateHeaderAttributes,
   promoAttributes,
   updatePromoAttributes,
+  categoryAttributes,
+  updateCategoryAttributes,
   aboutAttributes,
   updateAboutAttributes,
   policiesAttributes,
@@ -366,6 +374,13 @@ export function Sidebar({
                 detailedSectionTab={detailedSectionTab}
                 promoAttributes={promoAttributes}
                 updatePromoAttributes={updatePromoAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            ) : detailedSection.id === "Categories" ? (
+              <RenderCategorySection
+                detailedSectionTab={detailedSectionTab}
+                categoryAttributes={categoryAttributes}
+                updateCategoryAttributes={updateCategoryAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
               />
             ) : detailedSection.id === "AboutUs" ? (

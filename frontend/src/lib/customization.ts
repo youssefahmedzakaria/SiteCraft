@@ -1,13 +1,13 @@
 export interface HeaderCustomizationAttributes {
   template:
-  | "template1"
-  | "template2"
-  | "template3"
-  | "template4"
-  | "template5"
-  | "template6"
-  | "template7"
-  | "template8";
+    | "template1"
+    | "template2"
+    | "template3"
+    | "template4"
+    | "template5"
+    | "template6"
+    | "template7"
+    | "template8";
   brandName: string;
   backgroundColor: string;
   textColor: string;
@@ -55,7 +55,7 @@ export interface PromoCustomizationAttributes {
   imageObjectFit: "cover" | "fill" | "contain";
 }
 
-export interface CategoriesCustomizationAttributes {
+export interface CategoryCustomizationAttributes {
   template: string;
   title: string;
   bgColor: string;
@@ -69,10 +69,18 @@ export interface CategoriesCustomizationAttributes {
   showMorebuttonBgColor: string;
   showMorebuttonTextColor: string;
   ctaText: string;
-  cornerRadius: "small" | "medium" | "large";
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined;
   showCta: boolean; // button
-  cardVariant: "overlay" | "standard" | "minimal"; // add more if needed
+  cardVariant:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured"; // add more if needed
   showSubtitle: boolean;
+  cardTextColor: string;
   categories: {
     id: string;
     name: string;
@@ -185,4 +193,3 @@ export interface FooterCustomizationAttributes {
     fontColor: string;
   };
 }
-

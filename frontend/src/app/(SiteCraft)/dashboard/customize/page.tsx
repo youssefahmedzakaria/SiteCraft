@@ -24,6 +24,7 @@ import ProductList from "@/components/e-commerce/product-lists/product-list";
 import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo";
 import {
   AboutCustomizationAttributes,
+  CategoryCustomizationAttributes,
   ContactCustomizationAttributes,
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
@@ -50,6 +51,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/SiteCraft/ui/dialog";
+import { categories } from "@/lib/categories";
 
 interface Section {
   id: string;
@@ -71,7 +73,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#00000080]", // bg-black/50
     textColor: "text-[#FFFFFF]", // text-white
     logo: {
-      src: "/ring3.jpg",
+      src: "/placeholder.png",
       alt: "Custom Logo",
       width: 50,
       height: 50,
@@ -149,6 +151,52 @@ export default function CustomizeTemplatePage() {
     updates: Partial<PromoCustomizationAttributes>
   ) => {
     setPromoAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
+  const initialCategory: CategoryCustomizationAttributes = {
+    template: "FeaturedGrid", // You can adjust this if needed
+    title: "categories",
+    bgColor: "bg-white",
+    textColor: "text-black",
+    accentColor: "bg-blue-500",
+    fontFamily: "font-mono",
+    titleFont: "font-bold",
+    showTitle: true,
+    showMoreButton: true,
+    showMoreText: "Show More",
+    showMorebuttonBgColor: "bg-black",
+    showMorebuttonTextColor: "text-red-500",
+    ctaText: "Shop Now",
+    cornerRadius: "small",
+    showCta: true,
+    cardVariant: "overlay",
+    showSubtitle: true,
+    cardTextColor: "text-black", // Added a reasonable default value
+    categories: [
+      {
+        id: "6",
+        name: "Necklaces",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/neckless.jpg",
+            },
+          },
+        },
+      },
+    ],
+  };
+
+  // State for header customization
+  const [categoryAttributes, setCategoryAttributes] =
+    useState<CategoryCustomizationAttributes>(initialCategory);
+
+  // Function to update header attributes
+  const updateCategoryAttributes = (
+    updates: Partial<CategoryCustomizationAttributes>
+  ) => {
+    setCategoryAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialAbout: AboutCustomizationAttributes = {
@@ -271,7 +319,7 @@ export default function CustomizeTemplatePage() {
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
-      src: "/ring3.jpg",
+      src: "/placeholder.png",
       alt: "Company Logo",
       size: "24",
     },
@@ -325,99 +373,6 @@ export default function CustomizeTemplatePage() {
   ) => {
     setFooterAttributes((prev) => ({ ...prev, ...updates }));
   };
-
-  // Store data state
-  const [storeData, setStoreData] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchStoreData = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/api/store/getStoreSettings",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (data.success && data.store) {
-          setStoreData(data.store);
-
-          // Header (only brandName and logo.src)
-          setHeaderAttributes((prev) => ({
-            ...prev,
-            brandName: data.store.storeName || prev.brandName,
-            logo: {
-              ...prev.logo,
-              src: data.store.logo || prev.logo.src,
-            },
-          }));
-
-          // About (only description and secondaryDescription)
-          setAboutAttributes((prev) => ({
-            ...prev,
-            description: data.store.aboutUs?.[0]?.title || prev.description,
-            secondaryDescription:
-              data.store.aboutUs?.[0]?.content || prev.description,
-          }));
-
-          // Policies (only sections)
-          setPoliciesAttributes((prev) => ({
-            ...prev,
-            sections:
-              data.store.policies?.map((p: any) => ({
-                title: p.title,
-                content: p.description,
-              })) || prev.sections,
-          }));
-
-          // Contact (only contactEmail and socialLinks)
-          setContactAttributes((prev) => ({
-            ...prev,
-            contactEmail: data.store.emailAddress || prev.contactEmail,
-            socialLinks: {
-              facebook:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialLinks.facebook,
-              instagram:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialLinks.instagram,
-              twitter:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "twitter"
-                )?.link || prev.socialLinks.twitter,
-            },
-          }));
-
-          // Footer (only brandName, logo.src, and socialMedia)
-          setFooterAttributes((prev) => ({
-            ...prev,
-            brandName: data.store.storeName || prev.brandName,
-            logo: {
-              ...prev.logo,
-              src: data.store.logo ? `/${data.store.logo}` : prev.logo.src,
-            },
-            socialMedia: {
-              facebook:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialMedia.facebook,
-              instagram:
-                data.store.socialMediaAccounts?.find(
-                  (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialMedia.instagram,
-            },
-          }));
-        }
-        console.log(storeData);
-      } catch (error) {
-        console.error("Failed to fetch store data:", error);
-      }
-    };
-    fetchStoreData();
-  }, []);
 
   const sectionComponents = {
     PromoSlider: {
@@ -590,94 +545,7 @@ export default function CustomizeTemplatePage() {
       ),
     },
     Categories: {
-      FeaturedGrid: (
-        <HorizontalScrollCategoryTemplate
-          isClickable={false}
-          showControls={false}
-          categories={[
-            {
-              name: "Rings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              id: "1",
-            },
-            {
-              name: "Earrings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/earing.jpg",
-                  },
-                },
-              },
-              id: "2",
-            },
-            {
-              name: "Necklaces",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/neckless.jpg",
-                  },
-                },
-              },
-              id: "3",
-            },
-            {
-              name: "Rings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              id: "4",
-            },
-            {
-              name: "Earrings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/earing.jpg",
-                  },
-                },
-              },
-              id: "5",
-            },
-            {
-              name: "Necklaces",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/neckless.jpg",
-                  },
-                },
-              },
-              id: "6",
-            },
-          ]}
-          bgColor="bg-white"
-          textColor="text-black"
-          borderRadius="rounded-lg"
-          showTitle={true}
-          fontFamily="font-sans"
-          hoverEffect={true}
-          cardVariant="featured"
-          showCta={true}
-          ctaText="Shop Now"
-          overlayColor="bg-black/30"
-          showMoreButton={true}
-          showMoreText="Show More"
-          showMorebuttonBgColor="bg-black"
-          showMorebuttonTextColor="text-white"
-        />
-      ),
+      FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
     },
     AboutUs: {
       TopImageAbout: <TopImageAbout {...aboutAttributes} />,
@@ -703,10 +571,155 @@ export default function CustomizeTemplatePage() {
   };
 
   const [sections, setSections] = useState<Section[]>(initialSections);
+
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // Store data state
+  const [storeData, setStoreData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/api/store/getStoreSettings",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        if (data.success && data.store) {
+          setStoreData(data.store);
+
+          // Header (only brandName and logo.src)
+          setHeaderAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo || prev.logo.src,
+            },
+          }));
+
+          // About (only description and secondaryDescription)
+          setAboutAttributes((prev) => ({
+            ...prev,
+            description: data.store.aboutUs?.[0]?.title || prev.description,
+            secondaryDescription:
+              data.store.aboutUs?.[0]?.content || prev.description,
+          }));
+
+          // Policies (only sections)
+          setPoliciesAttributes((prev) => ({
+            ...prev,
+            sections:
+              data.store.policies?.map((p: any) => ({
+                title: p.title,
+                content: p.description,
+              })) || prev.sections,
+          }));
+
+          // Contact (only contactEmail and socialLinks)
+          setContactAttributes((prev) => ({
+            ...prev,
+            contactEmail: data.store.emailAddress || prev.contactEmail,
+            socialLinks: {
+              facebook:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "facebook"
+                )?.link || prev.socialLinks.facebook,
+              instagram:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "instagram"
+                )?.link || prev.socialLinks.instagram,
+              twitter:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "twitter"
+                )?.link || prev.socialLinks.twitter,
+            },
+          }));
+
+          // Footer (only brandName, logo.src, and socialMedia)
+          setFooterAttributes((prev) => ({
+            ...prev,
+            brandName: data.store.storeName || prev.brandName,
+            logo: {
+              ...prev.logo,
+              src: data.store.logo || prev.logo.src,
+            },
+            socialMedia: {
+              facebook:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "facebook"
+                )?.link || prev.socialMedia.facebook,
+              instagram:
+                data.store.socialMediaAccounts?.find(
+                  (acc: any) => acc.name.toLowerCase() === "instagram"
+                )?.link || prev.socialMedia.instagram,
+            },
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch store data:", error);
+      }
+    };
+    const fetchTemplate = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/customize/getTemplate",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+
+        if (data.success && data["Customized Template"]) {
+          const sortedTemplate = [...data["Customized Template"]].sort(
+            (a, b) => a.index - b.index
+          );
+
+          const loadedSections: Section[] = [];
+
+          sortedTemplate.forEach((section: any, idx: number) => {
+            loadedSections.push({
+              id: section.title,
+              title: section.title.replace("&", " & "),
+              expanded: false, // all sections initially collapsed
+            });
+
+            switch (section.title) {
+              case "Header&Menu":
+                setHeaderAttributes(section.value);
+                break;
+              case "PromoSlider":
+                setPromoAttributes(section.value);
+                break;
+              case "AboutUs":
+                setAboutAttributes(section.value);
+                break;
+              case "Footer":
+                setFooterAttributes(section.value);
+                break;
+              // Add additional cases as you expand your backend support
+            }
+          });
+
+          setSections(loadedSections);
+        }
+      } catch (error) {
+        console.error("Failed to fetch template:", error);
+      }
+    };
+
+    fetchTemplate();
+    fetchStoreData();
+    console.log("Footer image", footerAttributes.logo.src);
+    console.log("Header image", headerAttributes.logo.src);
+  }, []);
 
   // Warn user before leaving the page if there are unsaved changes
   useEffect(() => {
@@ -801,59 +814,6 @@ export default function CustomizeTemplatePage() {
     }
   };
 
-  useEffect(() => {
-    const fetchTemplate = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/customize/getTemplate",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-
-        if (data.success && data["Customized Template"]) {
-          const sortedTemplate = [...data["Customized Template"]].sort(
-            (a, b) => a.index - b.index
-          );
-
-          const loadedSections: Section[] = [];
-
-          sortedTemplate.forEach((section: any, idx: number) => {
-            loadedSections.push({
-              id: section.title,
-              title: section.title.replace("&", " & "),
-              expanded: false, // all sections initially collapsed
-            });
-
-            switch (section.title) {
-              case "Header&Menu":
-                setHeaderAttributes(section.value);
-                break;
-              case "PromoSlider":
-                setPromoAttributes(section.value);
-                break;
-              case "AboutUs":
-                setAboutAttributes(section.value);
-                break;
-              case "Footer":
-                setFooterAttributes(section.value);
-                break;
-              // Add additional cases as you expand your backend support
-            }
-          });
-
-          setSections(loadedSections);
-        }
-      } catch (error) {
-        console.error("Failed to fetch template:", error);
-      }
-    };
-
-    fetchTemplate();
-  }, []);
-
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Mobile Sidebar Overlay */}
@@ -896,6 +856,8 @@ export default function CustomizeTemplatePage() {
               updateHeaderAttributes={updateHeaderAttributes}
               promoAttributes={promoAttributes}
               updatePromoAttributes={updatePromoAttributes}
+              categoryAttributes={categoryAttributes}
+              updateCategoryAttributes={updateCategoryAttributes}
               aboutAttributes={aboutAttributes}
               updateAboutAttributes={updateAboutAttributes}
               policiesAttributes={policiesAttributes}
@@ -979,7 +941,7 @@ export default function CustomizeTemplatePage() {
                 </button>
               </div>
             </div>
-            
+
             {/* go to dashboard on saving  */}
             <Button
               className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
@@ -1098,7 +1060,7 @@ export default function CustomizeTemplatePage() {
                 companyName={footerAttributes.brandName}
                 textColor={footerAttributes.textColor}
                 companyLogo={{
-                  src: footerAttributes.logo.src || "/ring3.jpg",
+                  src: footerAttributes.logo.src || "/placeholder.png",
                   alt: footerAttributes.logo.alt,
                   width: parseInt(footerAttributes.logo.size) || 50,
                   height: parseInt(footerAttributes.logo.size) || 50,

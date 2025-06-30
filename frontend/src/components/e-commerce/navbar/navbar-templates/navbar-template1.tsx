@@ -85,16 +85,6 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
 
-  // Debug logging (remove in production)
-  console.log({
-    isCustomize,
-    screenWidth,
-    isScreenMobile,
-    isMobileDiv,
-    shouldShowMobile,
-    navbarWidth: navbarSize.width,
-  })
-
   return (
     <>
       <MobileMenu
