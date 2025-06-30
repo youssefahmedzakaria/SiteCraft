@@ -290,6 +290,14 @@ export function Sidebar({
     setSelectedSectionIds([]);
   };
 
+  // Handler to delete a section and go back to the list
+  const handleDeleteSection = (sectionId: string) => {
+    // Only allow deleting non-header/footer
+    if (sectionId === "Header&Menu" || sectionId === "Footer") return;
+    setSections(sections.filter((s) => s.id !== sectionId));
+    setDetailedSection(null);
+  };
+
   return (
     <>
       {/* Mobile Sidebar Toggle */}
@@ -310,9 +318,9 @@ export function Sidebar({
         <div
           className={`${
             sidebarOpen ? "block" : "hidden"
-          } w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0`}
+          } w-full md:w-64 border-r border-gray-200 bg-white overflow-y-auto flex-shrink-0 h-screen flex flex-col`}
         >
-          <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16">
+          <div className="p-4 border-b border-gray-200 hidden md:flex items-center h-16 flex-shrink-0">
             <h1 className="text-lg font-bold">
               {detailedSection
                 ? `Edit ${detailedSection.title}`
@@ -321,7 +329,7 @@ export function Sidebar({
           </div>
 
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 h-16 flex items-center">
+          <div className="p-4 border-b border-gray-200 h-16 flex items-center flex-shrink-0">
             <button
               onClick={() => {
                 closeDetailedSection(detailedSection.id);
@@ -334,7 +342,7 @@ export function Sidebar({
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 flex-shrink-0">
             <button
               className={`flex-1 py-3 text-center text-sm ${
                 detailedSectionTab === "content"
@@ -358,43 +366,49 @@ export function Sidebar({
           </div>
 
           {/* Detailed Section Content */}
-          {detailedSection.id === "Header&Menu" ? (
-            <RenderHeaderSection
-              detailedSectionTab={detailedSectionTab}
-              headerAttributes={headerAttributes}
-              updateHeaderAttributes={updateHeaderAttributes}
-            />
-          ) : detailedSection.id === "PromoSlider" ? (
-            <RenderPromoSection
-              detailedSectionTab={detailedSectionTab}
-              promoAttributes={promoAttributes}
-              updatePromoAttributes={updatePromoAttributes}
-            />
-          ) : detailedSection.id === "AboutUs" ? (
-            <RenderAboutSection
-              detailedSectionTab={detailedSectionTab}
-              aboutAttributes={aboutAttributes}
-              updateAboutAttributes={updateAboutAttributes}
-            />
-          ) : detailedSection.id === "Policies" ? (
-            <RenderPoliciesSection
-              detailedSectionTab={detailedSectionTab}
-              policiesAttributes={policiesAttributes}
-              updatePoliciesAttributes={updatePoliciesAttributes}
-            />
-          ) : detailedSection.id === "ContactUs" ? (
-            <RenderContactSection
-              detailedSectionTab={detailedSectionTab}
-              contactAttributes={contactAttributes}
-              updateContactAttributes={updateContactAttributes}
-            />
-          ) : detailedSection.id === "Footer" ? (
-            <RenderFooterSection
-              detailedSectionTab={detailedSectionTab}
-              footerAttributes={footerAttributes}
-              updateFooterAttributes={updateFooterAttributes}
-            />
-          ) : null}
+          <div className="flex-1 min-h-0 flex flex-col">
+            {detailedSection.id === "Header&Menu" ? (
+              <RenderHeaderSection
+                detailedSectionTab={detailedSectionTab}
+                headerAttributes={headerAttributes}
+                updateHeaderAttributes={updateHeaderAttributes}
+              />
+            ) : detailedSection.id === "PromoSlider" ? (
+              <RenderPromoSection
+                detailedSectionTab={detailedSectionTab}
+                promoAttributes={promoAttributes}
+                updatePromoAttributes={updatePromoAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            ) : detailedSection.id === "AboutUs" ? (
+              <RenderAboutSection
+                detailedSectionTab={detailedSectionTab}
+                aboutAttributes={aboutAttributes}
+                updateAboutAttributes={updateAboutAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            ) : detailedSection.id === "Policies" ? (
+              <RenderPoliciesSection
+                detailedSectionTab={detailedSectionTab}
+                policiesAttributes={policiesAttributes}
+                updatePoliciesAttributes={updatePoliciesAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            ) : detailedSection.id === "ContactUs" ? (
+              <RenderContactSection
+                detailedSectionTab={detailedSectionTab}
+                contactAttributes={contactAttributes}
+                updateContactAttributes={updateContactAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            ) : detailedSection.id === "Footer" ? (
+              <RenderFooterSection
+                detailedSectionTab={detailedSectionTab}
+                footerAttributes={footerAttributes}
+                updateFooterAttributes={updateFooterAttributes}
+              />
+            ) : null}
+          </div>
         </div>
       ) : (
         // Main Sidebar

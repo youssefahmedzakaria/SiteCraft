@@ -84,58 +84,6 @@ export function RenderFooterSection({
   };
 
   {
-    /* For image selection in content */
-  }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        updateFooterAttributes({
-          logo: {
-            ...footerAttributes.logo,
-            src: reader.result as string,
-          },
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleDragOverImage = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDropImage = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0] || null;
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        updateFooterAttributes({
-          logo: {
-            ...footerAttributes.logo,
-            src: reader.result as string,
-          },
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  {
     /* For About Links in content */
   }
   const [contentLinks, setContentLink] = useState<AboutLink[]>(
@@ -277,55 +225,6 @@ export function RenderFooterSection({
         [section]: true,
       };
     });
-  };
-
-  {
-    /* For design settings */
-  }
-  const [footerSettings, setFooterSettings] = useState({
-    background: "#ffffff",
-    generalText: "#000000",
-    logoWidth: "50px",
-    logoHeight: "50px",
-    aboutLinkFontFamily: "Arial",
-    aboutLinkFontSize: "14px",
-    aboutLinkFontWeight: "normal",
-    aboutLinkColor: "#000000",
-    socialMediaIconColor: "#000000",
-    socialMediaIconHoverColor: "#000000",
-    socialMediaIconSize: "20px",
-    copyrightFontFamily: "Arial",
-    copyrightFontSize: "14px",
-    copyrightFontWeight: "normal",
-    copyrightColor: "#000000",
-  });
-
-  const [aboutLinksFontFamily, setAboutLinksFontFamily] = useState<
-    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  >("inter");
-
-  const handleAboutLinksFontFamilyChange = (
-    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  ) => {
-    setAboutLinksFontFamily(type);
-    setFooterSettings((s) => ({
-      ...s,
-      aboutLinkFontFamily: type ? `${type}px` : "0px",
-    }));
-  };
-
-  const [copyrightFontFamily, setCopyrightFontFamily] = useState<
-    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  >("inter");
-
-  const handleCopyrightFontFamilyChange = (
-    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  ) => {
-    setCopyrightFontFamily(type);
-    setFooterSettings((s) => ({
-      ...s,
-      copyrightFontFamily: type ? `${type}px` : "0px",
-    }));
   };
 
   return (
