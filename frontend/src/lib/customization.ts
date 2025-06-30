@@ -88,7 +88,7 @@ export interface CategoryCustomizationAttributes {
     media: {
       mainMedia: {
         image: {
-          url: string;
+          src: string;
         };
       };
     };
@@ -166,7 +166,7 @@ export interface FooterCustomizationAttributes {
   backgroundColor: string;
   textColor: string;
   logo: {
-    url: string | null;
+    src: string | null;
     alt: string;
     size: string;
   };

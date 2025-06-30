@@ -186,7 +186,7 @@ export default function CustomizeTemplatePage() {
         media: {
           mainMedia: {
             image: {
-              url: "/neckless.jpg",
+              src: "/neckless.jpg",
             },
           },
         },
