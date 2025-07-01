@@ -37,17 +37,16 @@ import {
   GridCategoryTemplate,
   FeaturedGridCategoryTemplate,
   HorizontalScrollCategoryTemplate,
-  ListViewCategoryTemplate,
 } from "@/components/e-commerce/category-lists";
 import {
   GridProductTemplate,
   HorizontalScrollProductTemplate,
-  ListViewProductTemplate,
   FeaturedGridProductTemplate,
 } from "@/components/e-commerce/product-lists";
 import { ProductList } from "@/components/e-commerce/product-lists";
 import { usePathname } from "next/navigation";
 import { link } from "fs";
+import { Description } from "@radix-ui/react-dialog";
 
 export default function Home() {
   const path = usePathname();
@@ -211,31 +210,28 @@ export default function Home() {
             id: "product-8",
           },
         ]}
-        template="featured"
+        template="grid"
         title="Featured Products"
-        titleColor="text-black"
-        titlePosition="top"
+        titleColor="text-blue-600"
         titleFontSize="text-2xl"
         titleFont="font-bold"
-        columns={{ sm: 2, md: 3, lg: 4 }}
         bgColor="bg-white"
-        textColor="text-black"
+        textColor="text-red-800"
         borderRadius="rounded-lg"
         showTitle={true}
-        fontFamily="font-sans"
-        hoverEffect={true}
-        cardVariant="hover"
+        fontFamily="font-mono"
+        cardVariant="default"
         showSubtitle={true}
         showCta={true}
         showMoreButton={true}
         ctaText="Shop Now"
-        cornerRadius="medium"
+        cornerRadius="large"
         cardShadow="shadow-lg"
         showMoreText="All Products"
         showMorebuttonBgColor="bg-black"
         showMorebuttonTextColor="text-white"
       />
-      <FeaturedGridCategoryTemplate
+      <GridCategoryTemplate
         categories={[
           {
             name: "Rings",
@@ -247,6 +243,7 @@ export default function Home() {
               },
             },
             id: "1",
+            Description: "Elegant diamond solitaire ring crafted in 18k gold",
             link: `/e-commerce/${subdomain}/products`,
           },
           {
@@ -259,6 +256,7 @@ export default function Home() {
               },
             },
             id: "2",
+            Description: "Classic pearl drop earrings with sterling silver",
             link: `/e-commerce/${subdomain}/products`,
           },
           {
@@ -271,6 +269,7 @@ export default function Home() {
               },
             },
             id: "3",
+            Description: "Luxurious 14k gold chain necklace",
             link: `/e-commerce/${subdomain}/products`,
           },
           {
@@ -283,6 +282,7 @@ export default function Home() {
               },
             },
             id: "4",
+            Description: "Elegant diamond solitaire ring crafted in 18k gold",
             link: `/e-commerce/${subdomain}/products`,
           },
           {
@@ -295,6 +295,7 @@ export default function Home() {
               },
             },
             id: "5",
+            Description: "Classic pearl drop earrings with sterling silver",
             link: `/e-commerce/${subdomain}/products`,
           },
           {
@@ -307,24 +308,28 @@ export default function Home() {
               },
             },
             id: "6",
-            link: `/e-commerce/${subdomain}/products`,
+            
           },
         ]}
         title="Featured Categories"
         bgColor="bg-white"
-        textColor="text-black"
+        textColor="text-red-600"
         borderRadius="rounded-lg"
         showTitle={true}
+        showSubtitle={true}
         fontFamily="font-sans"
         hoverEffect={true}
         cardVariant="featured"
         showCta={true}
-        ctaText="Shop Now"
+        ctaText="Shop mee"
         overlayColor="bg-black/30"
         showMoreButton={true}
         showMoreText="Show More"
         showMorebuttonBgColor="bg-black"
         showMorebuttonTextColor="text-white"
+        titleColor="text-blue-600"
+        titleFont="font-bold"
+        titleFontSize="text-4xl"
       />
       <TopImageAbout
         id="about"

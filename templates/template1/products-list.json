@@ -1,9 +1,10 @@
 {
-  "template": "grid",
+  "template": "featured",
   "products": [
     {
       "id": "product1",
       "title": "product1",
+      "description": "description of product1",
       "image": null,
       "imageAlt": null,
       "price": "$49.99",
@@ -12,6 +13,7 @@
     {
       "id": "product2",
       "title": "product2",
+      "description": "description of product2",
       "image": null,
       "imageAlt": null,
       "price": "$59.99",
@@ -19,6 +21,7 @@
     },
     {
       "id": "product3",
+      "description": "description of product3",
       "title": "product3",
       "image": null,
       "imageAlt": null,
@@ -27,6 +30,7 @@
     },
     {
       "id": "product4",
+      "description": "description of product4",
       "title": "product4",
       "image": null,
       "imageAlt": null,
@@ -36,6 +40,7 @@
     {
       "id": "product5",
       "title": "product5",
+      "description": "description of product5",
       "image": null,
       "imageAlt": null,
       "price": "$19.99",
@@ -44,6 +49,7 @@
     {
       "id": "product6",
       "title": "product6",
+      "description": "description of product6",
       "image": null,
       "imageAlt": null,
       "price": "$24.99",
@@ -51,13 +57,6 @@
     }
 
   ],
-  "columns": {
-    "sm": 1,
-    "md": 4,
-    "lg": 4,
-    "xl": 4
-  },
-  "gap": "gap-6",
   "bgColor": "bg-[#ffffff]",
   "textColor": "text-[#000000]",
   "accentColor": "bg-[#0000ff]",
@@ -68,19 +67,11 @@
   "showProductTitle": true,
   "showDescription": false,
   "showCta": true,
-  "showControls": true,
-  "showIcon": false,
   "ctaText": "View Product",
-  "imageHeight": "aspect-square",
-  "cardWidth": "w-full",
   "fontFamily": "font-sans",
-  "cardShadow": "shadow-lg",
-  "hoverEffect": true,
   "cardVariant": "default",
   "showSubtitle": false,
   "cornerRadius": "medium",
-  "scrollBarSliderColor": "",
-  "scrollBarBgColor": "bg-[#f3f4f6]",
   "titleColor": "text-[#000000]",
   "titleFontSize": "text-3xl",
   "title": "Featured Products",

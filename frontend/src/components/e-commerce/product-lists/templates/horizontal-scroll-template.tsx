@@ -27,8 +27,6 @@ interface HorizontalScrollProductTemplateProps {
   // Card related props
   cardVariant?:
     | "default"
-    | "compact"
-    | "detailed"
     | "minimal"
     | "hover"
     | "overlay"

@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation"
 
 type CardItemType = "product" | "category"
 
-type CardVariant = "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
+type CardVariant = "default" | "minimal" | "hover" | "overlay" | "featured"
 
 type ImageRatio = "square" | "portrait" | "landscape"
 
@@ -54,6 +54,9 @@ interface FlexibleCardProps {
   overlayColor?: string
   fontFamily?: string
   cardShadow?: string
+  titleColor?: string
+  titleFontSize?: string
+  titleFont?: string
 
   // Effects
   hoverEffect?: boolean
@@ -98,10 +101,11 @@ export default function FlexibleCard({
   bgColor = "bg-white",
   textColor = "text-gray-800",
   accentColor = "bg-blue-600",
-  borderColor = "border-gray-200",
   overlayColor = "bg-black/30",
   fontFamily = "",
   cardShadow = "",
+  titleFontSize = "text-2xl",
+  titleFont = "",
 
   // Effects
   hoverEffect = true,
@@ -143,23 +147,18 @@ export default function FlexibleCard({
     ? accentColor.replace("bg-", "hover:bg-") + "/90"
     : "hover:bg-blue-700"
 
-  // Generate text accent color
-  const textAccentClass = accentColor.startsWith("bg-")
-    ? accentColor.replace("bg-", "text-")
-    : accentColor.startsWith("text-")
-      ? accentColor
-      : "text-blue-600"
-
   // Determine the link path based on the item type
-  const href = linkPath || (isClickable ? (type === "product" ? `/${item.id}` : `/e-commerce/${subdomain}/products`) : "#")
+  const href =
+    linkPath || (isClickable ? (type === "product" ? `/${item.id}` : `/e-commerce/${subdomain}/products`) : "#")
 
   // Get item description
   const description =
     type === "product"
       ? item.additionalInfoSections?.find((section: any) => section.title === "shortDesc")?.description ||
         item.description ||
+        item.Description || // Add this line to check for capitalized Description
         ""
-      : "Explore our collection"
+      : item.description || item.Description || "Explore our collection" // Add Description fallback for categories too
 
   // Get item image
   const imageUrl = item.media?.mainMedia?.image?.url || "/placeholder.svg?height=300&width=300"
@@ -279,11 +278,14 @@ export default function FlexibleCard({
     )
   }
 
+  // Use titleColor if provided, otherwise fall back to textColor
+  const finalTitleFont = titleFont || fontFamily
+
   // Render different card variants
   switch (variant) {
     case "overlay":
       return (
-        <div className={cn("group", fontFamily, className)}>
+        <div className={cn("group", bgColor, finalTitleFont, textColor, className)}>
           <ContentWrapper>
             <div
               className={cn(
@@ -304,13 +306,18 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className={cn("absolute inset-0 flex items-center justify-center", overlayColor)}>
                   <div className={cn("text-center p-4", contentClassName)}>
-                    <h3 className="text-white text-xl font-bold">{item.name}</h3>
-                    {showDescription && <p className="text-white/80 text-sm mt-1">{description}</p>}
-                    <PriceDisplay className="justify-center mt-2 text-white" />
+                    <h3 className={cn(textColor, titleFontSize, "font-bold")}>{item.name}</h3>
+                    {showSubtitle && showDescription && (
+                      <p className={cn(textColor, "opacity-80 text-sm mt-1")}>{description}</p>
+                    )}
+                    <PriceDisplay className={cn("justify-center mt-2", textColor)} />
                     {showCta && (
                       <div
                         onClick={handleCtaClick}
-                        className="mt-3 text-white text-sm font-medium border border-white/60 px-3 py-1 rounded-full inline-block cursor-pointer"
+                        className={cn(
+                          "mt-3 text-sm font-medium border border-white/60 px-3 py-1 rounded-full inline-block cursor-pointer",
+                          textColor,
+                        )}
                       >
                         {ctaText}
                       </div>
@@ -323,106 +330,9 @@ export default function FlexibleCard({
         </div>
       )
 
-    case "compact":
-      return (
-        <div className={cn("group", fontFamily, textColor, className)}>
-          <ContentWrapper>
-            <div
-              className={cn(
-                "relative bg-slate-100 overflow-hidden mb-2",
-                aspectRatioClass,
-                radiusClass,
-                cardShadow,
-                imageClassName,
-              )}
-            >
-              <Image
-                src={imageUrl || "/placeholder.svg"}
-                alt={item.name || "Item image"}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover"
-              />
-            </div>
-          </ContentWrapper>
-          <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className="text-sm font-medium truncate">{item.name}</h3>}
-            {showSubtitle && <p className="text-xs text-gray-500 truncate">{description}</p>}
-            <PriceDisplay className="text-sm" />
-            {showSku && type === "product" && <div className="text-xs text-gray-400">SKU: {item.sku || "N/A"}</div>}
-          </div>
-        </div>
-      )
-
-    case "detailed":
-      return (
-        <div
-          className={cn(
-            "border overflow-hidden transition-shadow",
-            borderColor,
-            radiusClass,
-            cardShadow || "shadow-sm hover:shadow-md",
-            fontFamily,
-            textColor,
-            bgColor,
-            className,
-          )}
-        >
-          <ContentWrapper>
-            <div className={cn("relative bg-slate-100", aspectRatioClass, imageClassName)}>
-              <Image
-                src={imageUrl || "/placeholder.svg"}
-                alt={item.name || "Item image"}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover"
-              />
-            </div>
-          </ContentWrapper>
-          <div className={cn("p-4 space-y-2", contentClassName)}>
-            {showReviews && type === "product" && (
-              <div className="flex items-center">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-xs text-gray-500 ml-2">(24)</span>
-              </div>
-            )}
-
-            {showTitle && <h3 className="font-semibold">{item.name}</h3>}
-
-            {showDescription && <p className="text-sm text-gray-600 line-clamp-2">{description}</p>}
-
-            {showSku && type === "product" && <div className="text-xs text-gray-400">SKU: {item.sku || "N/A"}</div>}
-
-            <div className="flex justify-between items-center pt-2">
-              <PriceDisplay />
-              {showCta && (
-                <button
-                  onClick={handleCtaClick}
-                  className={cn(
-                    "flex items-center gap-1 text-white px-3 py-1.5 rounded text-sm",
-                    buttonBgClass,
-                    buttonHoverClass,
-                  )}
-                >
-                  {type === "product" && <ShoppingCart className="w-4 h-4" />}
-                  {ctaText}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )
-
     case "minimal":
       return (
-        <div className={cn("group", fontFamily, textColor, className)}>
+        <div className={cn("group", finalTitleFont, textColor, className)}>
           <ContentWrapper>
             <div
               className={cn(
@@ -443,7 +353,7 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("mt-2", contentClassName)}>
-            {showTitle && <h3 className="text-sm">{item.name}</h3>}
+            {showTitle && <h3 className={cn("text-sm", textColor, titleFontSize)}>{item.name}</h3>}
             <PriceDisplay className="text-sm mt-1" />
           </div>
         </div>
@@ -451,7 +361,7 @@ export default function FlexibleCard({
 
     case "hover":
       return (
-        <div className={cn("group", fontFamily, textColor, className)}>
+        <div className={cn("group", finalTitleFont, textColor, className)}>
           <ContentWrapper>
             <div
               className={cn(
@@ -510,8 +420,8 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className="font-medium">{item.name}</h3>}
-            {showSubtitle && <p className="text-sm text-gray-500">{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", textColor, titleFontSize)}>{item.name}</h3>}
+            {showSubtitle && <p className={cn("text-sm opacity-70", textColor)}>{description}</p>}
             {showReviews && type === "product" && (
               <div className="flex items-center">
                 <div className="flex">
@@ -533,7 +443,7 @@ export default function FlexibleCard({
 
     case "featured":
       return (
-        <div className={cn("group", fontFamily, className)}>
+        <div className={cn("group", bgColor, textColor, finalTitleFont, className)}>
           <ContentWrapper>
             <div
               className={cn(
@@ -553,11 +463,16 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                   <div className={cn("p-6", contentClassName)}>
-                    <h3 className="text-white text-2xl font-bold">{item.name}</h3>
-                    {showDescription && <p className="text-white/80 mt-1">{description}</p>}
-                    <PriceDisplay className="mt-2 text-white" />
+                    <h3 className={cn(textColor, textColor, "font-bold")}>{item.name}</h3>
+                    {showSubtitle && showDescription && (
+                      <p className={cn(textColor, "opacity-80 mt-1")}>{description}</p>
+                    )}
+                    <PriceDisplay className={cn("mt-2", textColor)} />
                     {showCta && (
-                      <div onClick={handleCtaClick} className="text-white/80 mt-2 cursor-pointer hover:text-white">
+                      <div
+                        onClick={handleCtaClick}
+                        className={cn(textColor, "opacity-80 mt-2 cursor-pointer hover:opacity-100")}
+                      >
                         {ctaText}
                       </div>
                     )}
@@ -571,7 +486,7 @@ export default function FlexibleCard({
 
     default: // default variant
       return (
-        <div className={cn("group", fontFamily, textColor, className)}>
+        <div className={cn("group", finalTitleFont, textColor, className)}>
           <ContentWrapper>
             <div
               className={cn(
@@ -592,13 +507,6 @@ export default function FlexibleCard({
               {type === "product" && (
                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={handleAddToCartAction}
-                    className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                    title={isInCart ? "Remove from Cart" : "Add to Cart"}
-                  >
-                    <ShoppingCart className={`w-5 h-5 ${isInCart ? "fill-blue-500 text-blue-500" : ""}`} />
-                  </button>
-                  <button
                     onClick={handleFavoritesAction}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
                     title={isInFavorites ? "Remove from Favorites" : "Add to Favorites"}
@@ -610,8 +518,8 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className="font-medium">{item.name}</h3>}
-            {showSubtitle && <p className="text-sm text-gray-500">{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", textColor)}>{item.name}</h3>}
+            {showSubtitle && <p className={cn("text-sm", textColor)}>{description}</p>}
             <div className="flex justify-between items-center">
               <PriceDisplay />
               {showCta && (
