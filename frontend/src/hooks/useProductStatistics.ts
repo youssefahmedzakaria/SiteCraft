@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProductStatistics, ProductStatistics } from '@/lib/products';
+import { getProductStatistics, getLowStockNotificationStatistics, ProductStatistics } from '@/lib/products';
 import { useAuth } from './useAuth';
 
 export const useProductStatistics = () => {
@@ -25,10 +25,20 @@ export const useProductStatistics = () => {
         return;
       }
 
-      console.log('🔐 User authenticated:', { userId: user.userId, storeId: user.storeId, role: user.role });
+      // Fetch both regular statistics and low stock notification statistics
+      const [regularStats, lowStockStats] = await Promise.all([
+        getProductStatistics(),
+        getLowStockNotificationStatistics()
+      ]);
       
-      const data = await getProductStatistics();
-      setStats(data);
+      // Combine the statistics, using low stock notification count for lowStockCount
+      const combinedStats: ProductStatistics = {
+        totalProducts: regularStats.totalProducts,
+        lowStockCount: lowStockStats.lowStockCount, // Use the low stock notification count
+        outOfStockCount: regularStats.outOfStockCount
+      };
+      
+      setStats(combinedStats);
     } catch (err) {
       console.error('💥 Error in fetchStats:', err);
       if (err instanceof Error) {

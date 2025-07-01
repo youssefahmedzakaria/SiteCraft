@@ -40,7 +40,9 @@ export const ReportCard: FC<ReportCardProps> = ({ report, onDownload }) => (
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Download size={16} />
+        <Button variant="outline" size="icon" onClick={() => onDownload(report.id)} aria-label={`Download ${report.name}`}>
+          <Download size={16} />
+        </Button>
       </div>
     </CardContent>
   </Card>

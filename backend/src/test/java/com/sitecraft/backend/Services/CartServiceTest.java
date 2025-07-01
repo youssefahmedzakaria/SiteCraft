@@ -472,13 +472,12 @@ public class CartServiceTest {
         // Arrange
         product.setDiscountType("Percentage");
         product.setDiscountValue(new BigDecimal("50.00")); // 50% off
-        product.setPercentageMax(new BigDecimal("30.00")); // Max $30 discount
 
         // Act
         BigDecimal result = cartService.calculateDiscountedPrice(product, new BigDecimal("100.00"));
 
         // Assert
-        assertEquals(new BigDecimal("70.00"), result.setScale(2)); // $100 - $30 = $70
+        assertEquals(new BigDecimal("50.00"), result.setScale(2)); // $100 - 50% = $50
     }
 
     @Test
@@ -499,13 +498,12 @@ public class CartServiceTest {
         // Arrange
         product.setDiscountType("Amount");
         product.setDiscountValue(new BigDecimal("25.00")); // $25 off
-        product.setMinCap(new BigDecimal("50.00")); // Min $50 purchase to qualify
 
         // Act
         BigDecimal result = cartService.calculateDiscountedPrice(product, new BigDecimal("100.00"));
 
         // Assert
-        assertEquals(new BigDecimal("75.00"), result.setScale(2)); // $100 - $25 = $75 (since $100 >= $50)
+        assertEquals(new BigDecimal("75.00"), result.setScale(2)); // $100 - $25 = $75
     }
 
     @Test
@@ -513,13 +511,12 @@ public class CartServiceTest {
         // Arrange
         product.setDiscountType("Amount");
         product.setDiscountValue(new BigDecimal("50.00")); // $50 off
-        product.setMaxCap(new BigDecimal("30.00")); // Max $30 discount
 
         // Act
         BigDecimal result = cartService.calculateDiscountedPrice(product, new BigDecimal("100.00"));
 
         // Assert
-        assertEquals(new BigDecimal("70.00"), result.setScale(2)); // $100 - $30 = $70
+        assertEquals(new BigDecimal("50.00"), result.setScale(2)); // $100 - $50 = $50
     }
 
     @Test
@@ -554,7 +551,6 @@ public class CartServiceTest {
         Product product = new Product();
         product.setDiscountType("fixed");
         product.setDiscountValue(new BigDecimal("100.00"));
-        product.setMinCap(new BigDecimal("1000.00")); // Minimum purchase threshold
         
         BigDecimal originalPrice = new BigDecimal("1499.99");
         
@@ -562,7 +558,7 @@ public class CartServiceTest {
         BigDecimal discountedPrice = cartService.calculateDiscountedPrice(product, originalPrice);
         
         // Assert
-        // Expected: 1499.99 - 100.00 = 1399.99 (since 1499.99 >= 1000.00)
+        // Expected: 1499.99 - 100.00 = 1399.99
         assertEquals(new BigDecimal("1399.99"), discountedPrice);
     }
 
@@ -572,7 +568,6 @@ public class CartServiceTest {
         Product product = new Product();
         product.setDiscountType("fixed");
         product.setDiscountValue(new BigDecimal("100.00"));
-        product.setMinCap(new BigDecimal("2000.00")); // Minimum purchase threshold not met
         
         BigDecimal originalPrice = new BigDecimal("1499.99");
         
@@ -580,8 +575,8 @@ public class CartServiceTest {
         BigDecimal discountedPrice = cartService.calculateDiscountedPrice(product, originalPrice);
         
         // Assert
-        // Expected: 1499.99 (no discount since 1499.99 < 2000.00)
-        assertEquals(new BigDecimal("1499.99"), discountedPrice);
+        // Expected: 1499.99 - 100.00 = 1399.99
+        assertEquals(new BigDecimal("1399.99"), discountedPrice);
     }
 
     @Test

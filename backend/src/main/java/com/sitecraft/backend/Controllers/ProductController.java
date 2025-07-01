@@ -4,6 +4,8 @@ import com.sitecraft.backend.DTOs.ProductCreateDTO;
 import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.ProductImage;
 import com.sitecraft.backend.Services.ProductService;
+import com.sitecraft.backend.Services.LowStockNotificationService;
+import com.sitecraft.backend.Services.ScheduledStockCheckService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,12 @@ public class ProductController {
     
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private LowStockNotificationService lowStockNotificationService;
+    
+    @Autowired
+    private ScheduledStockCheckService scheduledStockCheckService;
 
     @GetMapping
     public ResponseEntity<?> getAllProducts(HttpSession session) {
@@ -91,6 +99,10 @@ public class ProductController {
             ObjectMapper mapper = new ObjectMapper();
             ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
             Product product = productService.createProductWithImages(productDTO, storeId, images);
+            
+            // Check low stock level for the newly created product
+            lowStockNotificationService.checkAndSendLowStockNotification(product);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product created successfully");
@@ -119,6 +131,10 @@ public class ProductController {
             ObjectMapper mapper = new ObjectMapper();
             ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
             Product product = productService.updateProductWithImages(id, productDTO, storeId, images);
+            
+            // Check low stock level for the updated product
+            lowStockNotificationService.checkAndSendLowStockNotification(product);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product updated successfully");
@@ -262,15 +278,9 @@ public class ProductController {
             String discountType = (String) discountData.get("discountType");
             Number discountValueNum = (Number) discountData.get("discountValue");
             Double discountValue = discountValueNum == null ? null : discountValueNum.doubleValue();
-            Number minCapNum = (Number) discountData.get("minCap");
-            Double minCap = minCapNum == null ? null : minCapNum.doubleValue();
-            Number percentageMaxNum = (Number) discountData.get("percentageMax");
-            Double percentageMax = percentageMaxNum == null ? null : percentageMaxNum.doubleValue();
-            Number maxCapNum = (Number) discountData.get("maxCap");
-            Double maxCap = maxCapNum == null ? null : maxCapNum.doubleValue();
 
             Map<String, Object> result = productService.applyDiscountToProducts(
-                    productIds, discountType, discountValue, minCap, percentageMax, maxCap, storeId);
+                    productIds, discountType, discountValue, storeId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -370,4 +380,34 @@ public class ProductController {
                     .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
+
+    // ==================== LOW STOCK NOTIFICATION ENDPOINTS ====================
+
+    @GetMapping("/low-stock-notifications")
+    public ResponseEntity<?> getLowStockNotifications(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Map<String, Object> stats = lowStockNotificationService.getLowStockStatistics(storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Low stock notifications retrieved successfully");
+            response.put("data", stats);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
 }

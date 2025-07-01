@@ -20,6 +20,7 @@ import {
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function CategoriesPage() {
   const [sortType, setSortType] = useState<
@@ -44,6 +45,7 @@ export default function CategoriesPage() {
   } = useCategoryManagement();
 
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   // Handle client-side rendering to avoid hydration mismatch
   useEffect(() => {
@@ -112,6 +114,12 @@ export default function CategoriesPage() {
     }
   });
 
+  const handleRefreshAll = () => {
+    fetchCategories();
+    // If you have a separate fetchStatistics, call it here as well.
+    // fetchStatistics();
+  };
+
   if (isLoading || !isClient) {
     return (
       <div className="flex min-h-screen bg-gray-100">
@@ -132,16 +140,19 @@ export default function CategoriesPage() {
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
-              <p className="text-gray-600">Please log in to view and manage categories.</p>
-            </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view and manage categories.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
           </div>
-        </main>
+        </div>
       </div>
     );
   }
@@ -222,17 +233,16 @@ export default function CategoriesPage() {
 
         {/* Stats cards */}
         <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-700">Category Statistics</h3>
+          <div className="flex justify-end items-center">
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchCategories}
+              onClick={handleRefreshAll}
               disabled={isLoading}
               className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh Stats
+              Refresh
             </Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -340,20 +350,6 @@ export default function CategoriesPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Refresh button for fallback */}
-          {categories.length === 0 && !isLoading && (
-            <div className="mt-6 text-center">
-              <Button
-                variant="outline"
-                onClick={fetchCategories}
-                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                <span>Refresh Categories</span>
-              </Button>
-            </div>
-          )}
         </div>
       </main>
     </div>

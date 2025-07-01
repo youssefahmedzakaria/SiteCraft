@@ -18,7 +18,7 @@ export type Report = {
       id: "rep-002",
       name: "Product Analytics",
       category: "Product Performance",
-      description: "Detailed analysis of product views, sales, and inventory status across all categories."
+      description: "Detailed analysis of product sales, and its inventory status."
     },
     {
       id: "rep-003",

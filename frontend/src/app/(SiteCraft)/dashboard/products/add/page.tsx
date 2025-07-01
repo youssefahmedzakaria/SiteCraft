@@ -21,10 +21,12 @@ import {
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AddProductPage() {
   const router = useRouter();
   const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
+  const { isAuthenticated } = useAuth();
   
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
@@ -37,6 +39,27 @@ export default function AddProductPage() {
     "Stock Management",
   ];
 
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Form state for basic product info
   const [basicFormData, setBasicFormData] = useState({
     name: '',
@@ -48,9 +71,13 @@ export default function AddProductPage() {
   const [discountSettings, setDiscountSettings] = useState({
     discountType: undefined as string | undefined,
     discountValue: undefined as number | undefined,
-    minCap: undefined as number | undefined,
-    percentageMax: undefined as number | undefined,
-    maxCap: undefined as number | undefined,
+  });
+
+  // Low stock notification settings
+  const [lowStockSettings, setLowStockSettings] = useState({
+    lowStockType: undefined as string | undefined,
+    lowStockThreshold: undefined as number | undefined,
+    lowStockEnabled: false,
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -282,11 +309,12 @@ export default function AddProductPage() {
         categoryId: basicFormData.categoryId,
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
-        minCap: discountSettings.minCap,
-        percentageMax: discountSettings.percentageMax,
-        maxCap: discountSettings.maxCap,
         attributes: attributes.length > 0 ? attributes : [],
         variants: variantsWithPrice,
+        // Low stock notification settings
+        lowStockType: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockType : undefined,
+        lowStockThreshold: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockThreshold : undefined,
+        lowStockEnabled: lowStockSettings.lowStockEnabled,
       };
 
       // Log the data being sent
@@ -317,6 +345,11 @@ export default function AddProductPage() {
   // Update discount settings handler
   const updateDiscountSettings = (updates: Partial<typeof discountSettings>) => {
     setDiscountSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update low stock settings handler
+  const updateLowStockSettings = (updates: Partial<typeof lowStockSettings>) => {
+    setLowStockSettings(prev => ({ ...prev, ...updates }));
   };
 
   // Update image files handler
@@ -386,12 +419,19 @@ export default function AddProductPage() {
                   />
 
                   {/* Pricing Section */}
-                  <PricingSection price={price} setPrice={setPrice} productionCost={productionCost} setProductionCost={setProductionCost} />
+                  <PricingSection 
+                    price={price} 
+                    setPrice={setPrice} 
+                    productionCost={productionCost} 
+                    setProductionCost={setProductionCost}
+                    discountSettings={discountSettings}
+                    updateDiscountSettings={updateDiscountSettings}
+                  />
 
                   {/* Low Stock Settings Section */}
                   <LowStockSection 
-                    formData={discountSettings}
-                    updateFormData={updateDiscountSettings}
+                    formData={lowStockSettings}
+                    updateFormData={updateLowStockSettings}
                   />
                 </>
               )}

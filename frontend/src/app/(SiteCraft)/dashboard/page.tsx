@@ -6,7 +6,6 @@ import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import type { Order, TopProduct, DailySale } from "@/lib/overview";
 import { AnimatedChartWrapper } from "@/components/SiteCraft/dashboard/analytics/charts/AnimatedChartWrapper";
 import { BarChartCard } from "@/components/SiteCraft/dashboard/analytics/charts/BarChartCard";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { getFirstAccessiblePage } from "@/lib/sidebarElements";
@@ -104,7 +103,7 @@ const ProductRecord: FC<{ product: TopProduct }> = ({ product }) => (
 // ─── Page Component ────────────────────────────────────────────────────────────
 
 export default function OverviewPage() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useProductStatistics();
   const { statistics: categoryStats, isLoading: categoryStatsLoading, error: categoryStatsError, fetchCategories: refetchCategoryStats } = useCategoryManagement();
@@ -132,8 +131,8 @@ export default function OverviewPage() {
     }
   }, [user, router]);
 
-  // If user is staff, show loading while redirecting
-  if (user && user.role === 'staff') {
+  // Show loading while checking authentication
+  if (authLoading || !isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
@@ -141,11 +140,41 @@ export default function OverviewPage() {
     );
   }
 
-  // Show loading until client-side rendering is complete
-  if (!isClient) {
+  // Check if user is authenticated
+  if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view the overview dashboard.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has owner role
+  if (user?.role !== 'owner') {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+              <p className="text-gray-600">You don't have permission to access this page.</p>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -153,115 +182,119 @@ export default function OverviewPage() {
   // Show loading state
   if (overviewLoading) {
     return (
-      <ProtectedRoute requiredRole="owner">
-        <div className="flex min-h-screen bg-gray-100">
-          <Sidebar />
-          <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-            <div className="flex items-center justify-center h-64">
-              <div className="flex items-center space-x-2">
-                <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-                <span className="text-lg text-gray-600">Loading overview data...</span>
-              </div>
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading overview data...</span>
             </div>
-          </main>
-        </div>
-      </ProtectedRoute>
+          </div>
+        </main>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute requiredRole="owner">
-      <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar />
 
-        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 space-y-6">
-          {/* Header section with title and subtitle */}
-          <div className="mb-6 space-y-2">
-            <h1 className="text-2xl md:text-3xl font-bold">Overview</h1>
+      <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 space-y-6">
+        {/* Header section with title and subtitle */}
+        <div className="mb-6 space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Overview</h1>
+          <div className="flex justify-between items-center">
             <h2 className="text-lg md:text-xl font-semibold text-gray-600">
               Get an overview of your store's performance
             </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refetchOverview}
+              disabled={overviewLoading}
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${overviewLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
           </div>
+        </div>
 
-          {/* Error Alert */}
-          {overviewError && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <span className="text-red-800">{overviewError}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearOverviewError}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  ×
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Overview Stats Cards */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            <GeneralAnalyticsCard
-              analytic={{
-                id: 'orders',
-                title: "Today's Orders",
-                value: orderCount?.toString() ?? '-',
-                subtitle: 'Placed today',
-              }}
-            />
-            <GeneralAnalyticsCard
-              analytic={{
-                id: 'sales',
-                title: "Today's Sales",
-                value: `EGP ${salesTotal?.toFixed(2) ?? '-'}`,
-                subtitle: 'Revenue today',
-              }}
-            />
-          </div>
-
-          {/* 1) Today's Orders */}
-          <section>
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-semibold">Today's Orders</h2>
+        {/* Error Alert */}
+        {overviewError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{overviewError}</span>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={refetchOverview}
-                disabled={overviewLoading}
-                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+                onClick={clearOverviewError}
+                className="text-red-600 hover:text-red-800"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${overviewLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                ×
               </Button>
             </div>
-            <div className="border rounded-lg border-logo-border overflow-x-auto">
-              <table className="min-w-full divide-y divide-logo-border">
-                <OrdersTableHeader />
-                <tbody className="bg-white divide-y divide-logo-border">
-                  {todayOrders.length > 0 ? (
-                    todayOrders.map((order) => (
-                      <OrderRecord key={order.id} order={order} />
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                        No orders today
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
+          </div>
+        )}
 
-          <div className="flex flex-col gap-4 md:flex-row">
-            {/* Last 7 Days Sales */}
-            <section className="flex-1 flex flex-col">
-              <h2 className="text-lg font-semibold mb-2">Last 7 Days</h2>
-              <div className="flex-1 border rounded-lg border-logo-border bg-white p-1 md:p-2 flex items-center justify-center">
-                <div className="w-full max-w-md">
+        {/* Overview Stats Cards */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <GeneralAnalyticsCard
+            analytic={{
+              id: 'orders',
+              title: "Today's Orders",
+              value: orderCount?.toString() ?? '-',
+              subtitle: 'Placed today',
+            }}
+          />
+          <GeneralAnalyticsCard
+            analytic={{
+              id: 'sales',
+              title: "Today's Sales",
+              value: `EGP ${salesTotal?.toFixed(2) ?? '-'}`,
+              subtitle: 'Revenue today',
+            }}
+          />
+        </div>
+
+        {/* 1) Today's Orders */}
+        <section>
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-semibold">Today's Orders</h2>
+          </div>
+          <div className="border rounded-lg border-logo-border overflow-x-auto">
+            <table className="min-w-full divide-y divide-logo-border">
+              <OrdersTableHeader />
+              <tbody className="bg-white divide-y divide-logo-border">
+                {todayOrders.length > 0 ? (
+                  todayOrders.map((order) => (
+                    <OrderRecord key={order.id} order={order} />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                      No orders today
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div className="flex flex-col gap-4 md:flex-row">
+          {/* Last 7 Days Sales */}
+          <section className="flex-1 flex flex-col">
+            <h2 className="text-lg font-semibold mb-2">Last 7 Days</h2>
+            <div className="flex-1 border rounded-lg border-logo-border bg-white p-1 md:p-2 flex items-center justify-center">
+              <div className="w-full max-w-md">
+                {dailySales.length === 0 ? (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg">
+                    No Sales to preview
+                  </div>
+                ) : (
                   <AnimatedChartWrapper delay={0}>
                     <BarChartCard
                       hideContainerBorder
@@ -275,35 +308,37 @@ export default function OverviewPage() {
                       subtitle=""
                     />
                   </AnimatedChartWrapper>
-                </div>
+                )}
               </div>
-            </section>
+            </div>
+          </section>
 
-            {/* Top Selling Products */}
-            <section className="flex-1 flex flex-col">
-              <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
-              <div className="flex-1 border rounded-lg border-logo-border overflow-x-auto">
-                <table className="min-w-full divide-y divide-logo-border">
-                  <ProductsTableHeader />
-                  <tbody className="bg-white divide-y divide-logo-border">
-                    {topProducts.length > 0 ? (
-                      topProducts.map((prod) => (
-                        <ProductRecord key={prod.product} product={prod} />
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={2} className="px-4 py-8 text-center text-gray-500">
+          {/* Top Selling Products */}
+          <section className="flex-1 flex flex-col">
+            <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
+            <div className="flex-1 border rounded-lg border-logo-border overflow-x-auto">
+              <table className="min-w-full divide-y divide-logo-border">
+                <ProductsTableHeader />
+                <tbody className="bg-white divide-y divide-logo-border">
+                  {topProducts.length > 0 ? (
+                    topProducts.map((prod) => (
+                      <ProductRecord key={prod.product} product={prod} />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={2} className="h-64">
+                        <div className="flex items-center justify-center h-full w-full text-gray-500 text-lg">
                           No products sold yet
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </div>
-        </main>
-      </div>
-    </ProtectedRoute>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
   );
 }

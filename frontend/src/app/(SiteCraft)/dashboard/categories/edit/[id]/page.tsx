@@ -12,11 +12,13 @@ import { getCategoryById, getCategoryProducts } from "@/lib/categories";
 import { CategoryCreateDTO } from "@/lib/categories";
 import { SimplifiedProduct, transformProduct } from "@/lib/products";
 import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditCategoryPage() {
   const params = useParams();
   const router = useRouter();
   const categoryId = params.id as string;
+  const { isAuthenticated } = useAuth();
   
   const [activeTab, setActiveTab] = useState<
     "Category's Overview" | "Assign Products"
@@ -39,6 +41,27 @@ export default function EditCategoryPage() {
   
   const tabs = ["Category's Overview", "Assign Products"];
   const { editCategory, assignProductsToCategory } = useCategoryManagement();
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to edit categories.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load category data on component mount
   useEffect(() => {
@@ -106,7 +129,7 @@ export default function EditCategoryPage() {
       console.log('Assigned products:', assignedProducts);
       
       // Update the category
-      await editCategory(parseInt(categoryId), categoryData, imageFile);
+      await editCategory(parseInt(categoryId), categoryData, imageFile || undefined);
       
       // Update assigned products if any are selected
       if (assignedProducts.length > 0) {

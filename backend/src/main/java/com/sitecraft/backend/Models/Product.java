@@ -125,4 +125,42 @@ public class Product {
     public String getCategoryName() {
         return category != null ? category.getName() : null;
     }
+    
+    // Low stock notification helper methods
+    /**
+     * Check if low stock notification is enabled for this product
+     */
+    public boolean isLowStockNotificationEnabled() {
+        return minCap != null && maxCap != null;
+    }
+    
+    /**
+     * Get the current total stock from all variants
+     */
+    public int getCurrentTotalStock() {
+        if (variants == null) return 0;
+        return variants.stream()
+                .mapToInt(variant -> variant.getStock())
+                .sum();
+    }
+    
+    /**
+     * Check if the product is currently at low stock level
+     */
+    public boolean isAtLowStockLevel() {
+        if (!isLowStockNotificationEnabled()) return false;
+        int currentStock = getCurrentTotalStock();
+        return currentStock <= minCap.intValue();
+    }
+    
+    /**
+     * Calculate the total stock capacity from variants (for maxCap)
+     */
+    public BigDecimal calculateTotalStockCapacity() {
+        if (variants == null) return BigDecimal.ZERO;
+        int totalStock = variants.stream()
+                .mapToInt(variant -> variant.getStock())
+                .sum();
+        return BigDecimal.valueOf(totalStock);
+    }
 }

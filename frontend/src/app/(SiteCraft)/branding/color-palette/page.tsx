@@ -170,6 +170,137 @@ const generateMonochromaticPalette = (color: string): string[] => {
   return result;
 };
 
+const generateSplitComplementaryPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate colors at +150° and +210° (split complementary)
+  for (let i = 1; i <= 2; i++) {
+    let newHue = (hsl.h + (150 + (i - 1) * 60) / 360) % 1;
+    const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateTetradicPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate colors at +90°, +180°, and +270°
+  for (let i = 1; i <= 3; i++) {
+    let newHue = (hsl.h + (i * 90) / 360) % 1;
+    const newRgb = hslToRgb(newHue, hsl.s, hsl.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateWarmPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate warm variations (reds, oranges, yellows)
+  const warmHues = [0, 0.08, 0.17]; // Red, orange, yellow
+  for (let i = 1; i < warmHues.length; i++) {
+    const newRgb = hslToRgb(warmHues[i], hsl.s, hsl.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateCoolPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Generate cool variations (greens, blues, purples)
+  const coolHues = [0.33, 0.67, 0.83]; // Green, blue, purple
+  for (let i = 1; i < coolHues.length; i++) {
+    const newRgb = hslToRgb(coolHues[i], hsl.s, hsl.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateHighContrastPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // High contrast variations
+  const highContrastColors = [
+    { h: (hsl.h + 0.5) % 1, s: hsl.s, l: 0.1 }, // Dark complementary
+    { h: hsl.h, s: hsl.s, l: 0.9 }, // Light version
+  ];
+
+  for (const colorConfig of highContrastColors) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateSoftPastelPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Soft pastel variations
+  const pastelVariations = [
+    { h: hsl.h, s: Math.max(0.1, hsl.s * 0.5), l: 0.8 }, // Light pastel
+    { h: (hsl.h + 0.1) % 1, s: Math.max(0.1, hsl.s * 0.6), l: 0.75 }, // Slightly different hue
+  ];
+
+  for (const colorConfig of pastelVariations) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
+const generateDeepRichPalette = (color: string): string[] => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return [];
+
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const result = [color];
+
+  // Deep and rich variations
+  const deepVariations = [
+    { h: hsl.h, s: Math.min(1, hsl.s * 1.2), l: 0.3 }, // Darker, more saturated
+    { h: (hsl.h + 0.05) % 1, s: Math.min(1, hsl.s * 1.1), l: 0.25 }, // Very dark
+  ];
+
+  for (const colorConfig of deepVariations) {
+    const newRgb = hslToRgb(colorConfig.h, colorConfig.s, colorConfig.l);
+    result.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  }
+
+  return result;
+};
+
 interface ColorPalette {
   name: string;
   colors: string[];
@@ -223,6 +354,26 @@ export default function ColorPalettePage() {
     console.log('🎨 Colors loaded from branding page:', { primaryColor, secondaryColor, accentColor });
   }, [isClient]);
 
+  // Load pre-generated palettes from localStorage
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const storedPalettes = localStorage.getItem("colorPalettes");
+    if (storedPalettes) {
+      try {
+        const palettes = JSON.parse(storedPalettes);
+        setPresetPalettes(palettes);
+        console.log('🎨 Pre-generated palettes loaded:', palettes);
+      } catch (err) {
+        console.error('Failed to parse stored palettes:', err);
+        setPresetPalettes([]);
+      }
+    } else {
+      console.log('No pre-generated palettes found in localStorage');
+      setPresetPalettes([]);
+    }
+  }, [isClient]);
+
   // Validate hex color format
   const validateHexColor = (color: string): boolean => {
     return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
@@ -247,88 +398,6 @@ export default function ColorPalettePage() {
     
     return textColor;
   };
-
-  // Generate palette suggestions based on primary color
-  useEffect(() => {
-    if (!isClient) return;
-    
-    const palettes: ColorPalette[] = [
-      {
-        name: "Modern Minimalist",
-        colors: [primaryColor, "#e0e0e0", accentColor],
-      },
-      {
-        name: "Bold and Vibrant",
-        colors: generateTriadicPalette(primaryColor),
-      },
-      {
-        name: "Earthy Tones",
-        colors: [
-          primaryColor,
-          "#8D6E63", // Brown
-          "#43A047", // Green
-        ],
-      },
-      {
-        name: "Pastel Dream",
-        colors: [
-          "#FFB6C1", // Light pink
-          "#FFDAB9", // Peach
-          "#B0E0E6", // Light blue
-        ],
-      },
-      {
-        name: "Dark Mode",
-        colors: [
-          "#121212", // Dark background
-          "#e0e0e0", // Light text
-          "#FF5252", // Accent red
-        ],
-      },
-      {
-        name: "Ocean Breeze",
-        colors: [
-          "#4FC3F7", // Light blue
-          "#FFFDE7", // Light yellow
-          "#00ACC1", // Teal
-        ],
-      },
-      {
-        name: "Sunset Glow",
-        colors: [
-          "#FF7043", // Coral
-          "#FFEB3B", // Yellow
-          "#FF4081", // Pink
-        ],
-      },
-      {
-        name: "Forest Retreat",
-        colors: [
-          "#388E3C", // Green
-          "#A5D6A7", // Light green
-          "#FFEB3B", // Yellow
-        ],
-      },
-      {
-        name: "Urban Chic",
-        colors: [
-          "#424242", // Dark gray
-          "#BDBDBD", // Light gray
-          "#FF9800", // Orange
-        ],
-      },
-      {
-        name: "Royal Elegance",
-        colors: [
-          "#673AB7", // Purple
-          "#FFEB3B", // Yellow
-          "#FF4081", // Pink
-        ],
-      },
-    ];
-
-    setPresetPalettes(palettes);
-  }, [primaryColor, accentColor, isClient]);
 
   const handleSaveChanges = () => {
     if (!isClient) return;
@@ -485,7 +554,7 @@ export default function ColorPalettePage() {
                         )}
                       </div>
                       <div className="flex justify-center space-x-2">
-                        {palette.colors.map((color, colorIndex) => (
+                        {palette.colors.slice(0, 3).map((color, colorIndex) => (
                           <div
                             key={colorIndex}
                             className="w-8 h-8 rounded-full border border-gray-200"
