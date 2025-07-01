@@ -28,6 +28,9 @@ export interface SplitPromoProps {
   backgroundColor?: string
   imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
+  descriptionFont?: string
+  descriptionColor?: string
+  descriptionSize?: string
 }
 
 const getFontFamily = (fontFamily: string) => {
@@ -95,6 +98,9 @@ export function SplitPromo({
   className,
   imageObjectFit = "cover",
   id,
+  descriptionFont,
+  descriptionColor,
+  descriptionSize,
 }: SplitPromoProps) {
   const [left, right] = slides
   return (
@@ -137,7 +143,17 @@ export function SplitPromo({
               {slide.title}
             </h2>
             {slide.description && (
-              <p className="mb-3 md:mb-4 text-white/80 text-sm md:text-base">
+              <p
+                className="mb-3 md:mb-4"
+                style={{
+                  fontFamily: descriptionFont ? getFontFamily(descriptionFont) : undefined,
+                  color: descriptionColor?.includes("[")
+                    ? descriptionColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                    : descriptionColor || "#ffffff",
+                  fontSize: descriptionSize ? getFontSize(descriptionSize) : undefined,
+                  opacity: descriptionColor ? 1 : 0.8,
+                }}
+              >
                 {slide.description}
               </p>
             )}
