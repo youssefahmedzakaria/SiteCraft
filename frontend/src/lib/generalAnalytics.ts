@@ -57,9 +57,9 @@ export const getProductAnalyticsFromStats = (stats: { totalProducts: number; low
   },
   {
     id: '2',
-    title: 'Low Stock Items',
+    title: 'Low Stock Alerts',
     value: stats.lowStockCount.toString(),
-    subtitle: stats.lowStockCount > 0 ? 'Needs attention' : 'All good',
+    subtitle: stats.lowStockCount > 0 ? 'Below notification threshold' : 'All within limits',
   },
   {
     id: '3',

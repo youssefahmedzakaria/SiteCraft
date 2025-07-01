@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.io.File;
 import java.io.IOException;
 
@@ -77,11 +78,11 @@ public class ProductService {
         product.setDiscountValue(
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
-        product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
-        product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
-        product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
         product.setCategory(category);
         product.setStore(store);
+
+        // Handle low stock notification settings
+        handleLowStockSettings(product, productDTO);
 
         Product savedProduct = productRepo.save(product);
 
@@ -181,9 +182,6 @@ public class ProductService {
         if (productDTO.getDiscountValue() != null) product.setDiscountValue(
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
-        if (productDTO.getMinCap() != null) product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
-        if (productDTO.getPercentageMax() != null) product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
-        if (productDTO.getMaxCap() != null) product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
         
         if (productDTO.getCategoryId() != null) {
             Category category = categoryRepo.findById(productDTO.getCategoryId())
@@ -289,6 +287,9 @@ public class ProductService {
                     productVariantsRepo.save(variant);
                 }
             }
+            
+            // Handle low stock notification settings after variants are updated
+            handleLowStockSettings(product, productDTO);
         }
 
         return productRepo.save(product);
@@ -405,8 +406,7 @@ public class ProductService {
 
     @Transactional
     public Map<String, Object> applyDiscountToProducts(List<Long> productIds, String discountType, 
-                                                      Double discountValue, Double minCap, 
-                                                      Double percentageMax, Double maxCap, Long storeId) {
+                                                      Double discountValue, Long storeId) {
         List<Product> products = productRepo.findAllById(productIds);
         products = products.stream()
                 .filter(p -> p.getStore().getId().equals(storeId))
@@ -417,9 +417,6 @@ public class ProductService {
             product.setDiscountValue(
                 discountValue == null ? null : BigDecimal.valueOf(discountValue)
             );
-            product.setMinCap(minCap == null ? null : BigDecimal.valueOf(minCap));
-            product.setPercentageMax(percentageMax == null ? null : BigDecimal.valueOf(percentageMax));
-            product.setMaxCap(maxCap == null ? null : BigDecimal.valueOf(maxCap));
         }
 
         productRepo.saveAll(products);
@@ -560,5 +557,45 @@ public class ProductService {
         product.getImages().remove(image);
         productImageRepo.delete(image);
         productRepo.save(product);
+    }
+    
+    /**
+     * Handle low stock notification settings for a product
+     */
+    private void handleLowStockSettings(Product product, ProductCreateDTO productDTO) {
+        if (productDTO.getLowStockEnabled() != null && productDTO.getLowStockEnabled()) {
+            // Calculate total stock capacity from variants
+            BigDecimal totalStockCapacity = BigDecimal.ZERO;
+            if (productDTO.getVariants() != null) {
+                totalStockCapacity = productDTO.getVariants().stream()
+                        .mapToDouble(variant -> variant.getStock())
+                        .mapToObj(BigDecimal::valueOf)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+            }
+            
+            // Set maxCap to total stock capacity
+            product.setMaxCap(totalStockCapacity);
+            
+            if ("percentage".equals(productDTO.getLowStockType())) {
+                // For percentage-based, calculate minCap from percentage
+                if (productDTO.getLowStockThreshold() != null && totalStockCapacity.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal threshold = totalStockCapacity.multiply(BigDecimal.valueOf(productDTO.getLowStockThreshold()))
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                    product.setMinCap(threshold);
+                    product.setPercentageMax(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
+                }
+            } else if ("number".equals(productDTO.getLowStockType())) {
+                // For number-based, set minCap directly
+                if (productDTO.getLowStockThreshold() != null) {
+                    product.setMinCap(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
+                    product.setPercentageMax(null); // Clear percentage for number-based
+                }
+            }
+        } else {
+            // Disable low stock notification
+            product.setMinCap(null);
+            product.setPercentageMax(null);
+            product.setMaxCap(null);
+        }
     }
 }
