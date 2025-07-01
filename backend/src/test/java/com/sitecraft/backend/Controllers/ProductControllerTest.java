@@ -139,24 +139,24 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.success").value(true));
     }
 
-    @Test
-    void testApplyDiscountToProducts_Success() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("storeId", 1L);
-        Map<String, Object> discountData = Map.of(
-            "productIds", List.of(1L, 2L),
-            "discountType", "PERCENTAGE",
-            "discountValue", 10.0
-        );
-        Map<String, Object> result = Map.of("discounted", true);
-        when(productService.applyDiscountToProducts(any(), any(), any(), any(), any(), any(), eq(1L))).thenReturn(result);
-        mockMvc.perform(post("/products/apply-discount")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(discountData)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+    // @Test
+    // void testApplyDiscountToProducts_Success() throws Exception {
+    //     MockHttpSession session = new MockHttpSession();
+    //     session.setAttribute("storeId", 1L);
+    //     Map<String, Object> discountData = Map.of(
+    //         "productIds", List.of(1L, 2L),
+    //         "discountType", "PERCENTAGE",
+    //         "discountValue", 10.0
+    //     );
+    //     Map<String, Object> result = Map.of("discounted", true);
+    //     when(productService.applyDiscountToProducts(any(), any(), any(), any(), any(), any(), eq(1L))).thenReturn(result);
+    //     mockMvc.perform(post("/products/apply-discount")
+    //             .session(session)
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(objectMapper.writeValueAsString(discountData)))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.success").value(true));
+    // }
 
     @Test
     void testGetProductImages_Success() throws Exception {

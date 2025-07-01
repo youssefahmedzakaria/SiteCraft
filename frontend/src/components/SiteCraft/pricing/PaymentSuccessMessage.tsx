@@ -3,10 +3,11 @@ import { Button } from "@/components/SiteCraft/ui/button";
 
 interface PaymentSuccessMessageProps {
   planName: string | undefined;
+  transactionId?: string | number | undefined;
   onBack: () => void;
 }
 
-const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName, onBack }) => {
+const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName, transactionId, onBack }) => {
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
       <div className="p-6 text-center">
@@ -20,7 +21,7 @@ const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName,
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <div className="text-sm text-gray-600 mb-1">Transaction ID</div>
           <div className="font-mono text-sm text-gray-900">
-            #PMB{Math.random().toString(36).substr(2, 9).toUpperCase()}
+            {transactionId ? `#PMB${transactionId}` : `#PMB${Math.random().toString(36).substr(2, 9).toUpperCase()}`}
           </div>
         </div>
         <Button

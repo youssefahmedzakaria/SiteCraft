@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 interface SimulatedPaymobIframeProps {
   planName: string;
   planPrice: number;
-  onSuccess: () => void;
+  onSuccess: (method: string) => void;
   onCancel: () => void;
 }
 
@@ -11,7 +11,7 @@ const SimulatedPaymobIframe: React.FC<SimulatedPaymobIframeProps> = ({ planName,
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (event.data && event.data.type === 'PAYMOB_SIMULATE_SUCCESS') {
-        onSuccess();
+        onSuccess(event.data.method || 'Card');
       } else if (event.data && event.data.type === 'PAYMOB_SIMULATE_CANCEL') {
         onCancel();
       }
@@ -185,30 +185,53 @@ const SimulatedPaymobIframe: React.FC<SimulatedPaymobIframeProps> = ({ planName,
         </div>
       </div>
       <script>
+      setTimeout(function() {
         // Tab switching
+        let selectedMethod = 'Card';
         const tabCard = document.getElementById('tab-card');
         const tabWallet = document.getElementById('tab-wallet');
         const tabFawry = document.getElementById('tab-fawry');
         const cardFields = document.getElementById('card-fields');
         const walletFields = document.getElementById('wallet-fields');
         const fawryFields = document.getElementById('fawry-fields');
+        
+        function setRequiredForVisibleFields() {
+          document.querySelectorAll('#card-fields input').forEach(input => {
+            input.required = (cardFields.style.display !== 'none');
+          });
+          document.querySelectorAll('#wallet-fields input').forEach(input => {
+            input.required = (walletFields.style.display !== 'none');
+          });
+          document.querySelectorAll('#fawry-fields input').forEach(input => {
+            input.required = (fawryFields.style.display !== 'none');
+          });
+        }
+        
         tabCard.onclick = () => {
           tabCard.classList.add('active'); tabWallet.classList.remove('active'); tabFawry.classList.remove('active');
           cardFields.style.display = ''; walletFields.style.display = 'none'; fawryFields.style.display = 'none';
+          selectedMethod = 'Card';
+          setRequiredForVisibleFields();
         };
         tabWallet.onclick = () => {
           tabWallet.classList.add('active'); tabCard.classList.remove('active'); tabFawry.classList.remove('active');
           cardFields.style.display = 'none'; walletFields.style.display = ''; fawryFields.style.display = 'none';
+          selectedMethod = 'Wallet';
+          setRequiredForVisibleFields();
         };
         tabFawry.onclick = () => {
           tabFawry.classList.add('active'); tabCard.classList.remove('active'); tabWallet.classList.remove('active');
           cardFields.style.display = 'none'; walletFields.style.display = 'none'; fawryFields.style.display = '';
+          selectedMethod = 'Fawry';
+          setRequiredForVisibleFields();
         };
         // Payment simulation
         document.getElementById('pay-form').onsubmit = function(e) {
           e.preventDefault();
-          window.parent.postMessage({ type: 'PAYMOB_SIMULATE_SUCCESS' }, '*');
+          window.parent.postMessage({ type: 'PAYMOB_SIMULATE_SUCCESS', method: selectedMethod }, '*');
         };
+        setRequiredForVisibleFields(); // Set initial required state
+      }, 0);
       </script>
     </body>
     </html>
@@ -225,6 +248,7 @@ const SimulatedPaymobIframe: React.FC<SimulatedPaymobIframeProps> = ({ planName,
       title="Paymob Payment"
       style={{ background: 'transparent' }}
       scrolling="no"
+      sandbox="allow-scripts allow-forms"
     />
   );
 };

@@ -13,6 +13,8 @@ import { motion } from "framer-motion";
 import { CreditCard, Smartphone, Receipt, CheckCircle2, Shield, Lock } from "lucide-react";
 import SimulatedPaymobIframe from "./SimulatedPaymobIframe";
 import PaymentSuccessMessage from "./PaymentSuccessMessage";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export function PricingCards() {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -21,6 +23,10 @@ export function PricingCards() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [paymentDetails, setPaymentDetails] = useState<any>({});
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [subscriptionResult, setSubscriptionResult] = useState<any>(null);
 
   // Define pricing
   const basicMonthly = 100;
@@ -38,12 +44,42 @@ export function PricingCards() {
           <SimulatedPaymobIframe 
             planName={selectedPlan.name} 
             planPrice={selectedPlan.price} 
-            onSuccess={() => setPaymentSuccess(true)}
+            onSuccess={async (method) => {
+              setLoading(true);
+              try {
+                const res = await fetch("http://localhost:8080/api/subscription", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({
+                    plan: selectedPlan.name,
+                    period: selectedPlan.period,
+                    price: selectedPlan.price,
+                    method
+                  })
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                setSubscriptionResult(data);
+                setPaymentSuccess(true);
+              } catch (e) {
+                alert("Subscription failed: " + e);
+                setSelectedPlan(null);
+                setPaymobUrl(null);
+              } finally {
+                setLoading(false);
+              }
+            }}
             onCancel={() => {
               setSelectedPlan(null);
               setPaymobUrl(null);
             }}
           />
+          {loading && (
+            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+              <div className="text-lg font-semibold text-primary">Processing subscription...</div>
+            </div>
+          )}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
               <span>Powered by Paymob</span>
@@ -61,13 +97,18 @@ export function PricingCards() {
   if (paymentSuccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-8 px-4">
-        <PaymentSuccessMessage planName={selectedPlan?.name} onBack={() => {
-          setPaymobUrl(null);
-          setPaymentSuccess(false);
-          setSelectedPlan(null);
-          setPaymentMethod("");
-          setPaymentDetails({});
-        }} />
+        <PaymentSuccessMessage 
+          planName={selectedPlan?.name} 
+          transactionId={subscriptionResult?.paymentLog?.transactionId}
+          onBack={() => {
+            setPaymobUrl(null);
+            setPaymentSuccess(false);
+            setSelectedPlan(null);
+            setPaymentMethod("");
+            setPaymentDetails({});
+            setSubscriptionResult(null);
+          }} 
+        />
       </div>
     );
   }
@@ -198,6 +239,10 @@ export function PricingCards() {
               <Button
                 className="w-full bg-logo-dark-button hover:bg-logo-dark-button/90 transform hover:-translate-y-0.5 transition-all duration-200"
                 onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push("/signup");
+                    return;
+                  }
                   setSelectedPlan({
                     name: "Basic",
                     price: isAnnual ? basicAnnual : basicMonthly,
@@ -291,6 +336,10 @@ export function PricingCards() {
               <Button
                 className="w-full bg-primary hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all duration-200"
                 onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push("/signup");
+                    return;
+                  }
                   setSelectedPlan({
                     name: "Pro",
                     price: isAnnual ? proAnnual : proMonthly,
