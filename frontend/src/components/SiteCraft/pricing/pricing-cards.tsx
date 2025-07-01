@@ -8,11 +8,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/SiteCraft/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { CreditCard, Smartphone, Receipt, CheckCircle2, Shield, Lock } from "lucide-react";
+import SimulatedPaymobIframe from "./SimulatedPaymobIframe";
+import PaymentSuccessMessage from "./PaymentSuccessMessage";
 
 export function PricingCards() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<null | {name: string, price: number, period: string}>(null);
+  const [paymobUrl, setPaymobUrl] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [paymentDetails, setPaymentDetails] = useState<any>({});
 
   // Define pricing
   const basicMonthly = 100;
@@ -21,6 +29,48 @@ export function PricingCards() {
 
   const basicAnnual = Math.round(basicMonthly * 12 * (1 - annualDiscount));
   const proAnnual = Math.round(proMonthly * 12 * (1 - annualDiscount));
+
+  if (selectedPlan && !paymentSuccess) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden animate-in fade-in zoom-in duration-300">
+          {/* Paymob Iframe */}
+          <SimulatedPaymobIframe 
+            planName={selectedPlan.name} 
+            planPrice={selectedPlan.price} 
+            onSuccess={() => setPaymentSuccess(true)}
+            onCancel={() => {
+              setSelectedPlan(null);
+              setPaymobUrl(null);
+            }}
+          />
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+              <span>Powered by Paymob</span>
+              <span>•</span>
+              <span>PCI DSS Compliant</span>
+              <span>•</span>
+              <span>CBE Licensed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentSuccess) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen py-8 px-4">
+        <PaymentSuccessMessage planName={selectedPlan?.name} onBack={() => {
+          setPaymobUrl(null);
+          setPaymentSuccess(false);
+          setSelectedPlan(null);
+          setPaymentMethod("");
+          setPaymentDetails({});
+        }} />
+      </div>
+    );
+  }
 
   return (
     <div className="container py-10">
@@ -145,7 +195,17 @@ export function PricingCards() {
                   </span>
                 </li>
               </ul>
-              <Button className="w-full bg-logo-dark-button hover:bg-logo-dark-button/90 transform hover:-translate-y-0.5 transition-all duration-200">
+              <Button
+                className="w-full bg-logo-dark-button hover:bg-logo-dark-button/90 transform hover:-translate-y-0.5 transition-all duration-200"
+                onClick={() => {
+                  setSelectedPlan({
+                    name: "Basic",
+                    price: isAnnual ? basicAnnual : basicMonthly,
+                    period: isAnnual ? "annual" : "monthly"
+                  });
+                  setPaymobUrl("https://accept.paymob.com/api/acceptance/iframes/your_iframe_id?payment_token=your_token");
+                }}
+              >
                 Select Plan
               </Button>
             </CardContent>
@@ -228,7 +288,17 @@ export function PricingCards() {
                   <span className="text-muted-foreground">Unlimited products</span>
                 </li> */}
               </ul>
-              <Button className="w-full bg-primary hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all duration-200">
+              <Button
+                className="w-full bg-primary hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all duration-200"
+                onClick={() => {
+                  setSelectedPlan({
+                    name: "Pro",
+                    price: isAnnual ? proAnnual : proMonthly,
+                    period: isAnnual ? "annual" : "monthly"
+                  });
+                  setPaymobUrl("https://accept.paymob.com/api/acceptance/iframes/your_iframe_id?payment_token=your_token");
+                }}
+              >
                 Select Plan
               </Button>
             </CardContent>
