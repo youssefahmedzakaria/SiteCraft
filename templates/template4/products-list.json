@@ -93,6 +93,8 @@
   "titleFontSize": "text-3xl",
   "title": "Featured Products",
   "titleFont": "font-bold",
-  "onAddToCart": null,
-  "onAddToFavorite": null
+  "showMoreButton": true,
+  "showMoreText": "Show More",
+  "showMorebuttonBgColor": "bg-[#1d4ed8]",
+  "showMorebuttonTextColor": "text-[#ffffff]"
 }

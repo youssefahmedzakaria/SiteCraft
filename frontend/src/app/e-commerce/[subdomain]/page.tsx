@@ -308,7 +308,8 @@ export default function Home() {
               },
             },
             id: "6",
-            
+            Description: "Luxurious 14k gold chain necklace",
+            link: `/e-commerce/${subdomain}/products`,
           },
         ]}
         title="Featured Categories"
