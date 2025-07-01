@@ -71,9 +71,13 @@ export default function AddProductPage() {
   const [discountSettings, setDiscountSettings] = useState({
     discountType: undefined as string | undefined,
     discountValue: undefined as number | undefined,
-    minCap: undefined as number | undefined,
-    percentageMax: undefined as number | undefined,
-    maxCap: undefined as number | undefined,
+  });
+
+  // Low stock notification settings
+  const [lowStockSettings, setLowStockSettings] = useState({
+    lowStockType: undefined as string | undefined,
+    lowStockThreshold: undefined as number | undefined,
+    lowStockEnabled: false,
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -305,11 +309,12 @@ export default function AddProductPage() {
         categoryId: basicFormData.categoryId,
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
-        minCap: discountSettings.minCap,
-        percentageMax: discountSettings.percentageMax,
-        maxCap: discountSettings.maxCap,
         attributes: attributes.length > 0 ? attributes : [],
         variants: variantsWithPrice,
+        // Low stock notification settings
+        lowStockType: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockType : undefined,
+        lowStockThreshold: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockThreshold : undefined,
+        lowStockEnabled: lowStockSettings.lowStockEnabled,
       };
 
       // Log the data being sent
@@ -340,6 +345,11 @@ export default function AddProductPage() {
   // Update discount settings handler
   const updateDiscountSettings = (updates: Partial<typeof discountSettings>) => {
     setDiscountSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update low stock settings handler
+  const updateLowStockSettings = (updates: Partial<typeof lowStockSettings>) => {
+    setLowStockSettings(prev => ({ ...prev, ...updates }));
   };
 
   // Update image files handler
@@ -409,12 +419,19 @@ export default function AddProductPage() {
                   />
 
                   {/* Pricing Section */}
-                  <PricingSection price={price} setPrice={setPrice} productionCost={productionCost} setProductionCost={setProductionCost} />
+                  <PricingSection 
+                    price={price} 
+                    setPrice={setPrice} 
+                    productionCost={productionCost} 
+                    setProductionCost={setProductionCost}
+                    discountSettings={discountSettings}
+                    updateDiscountSettings={updateDiscountSettings}
+                  />
 
                   {/* Low Stock Settings Section */}
                   <LowStockSection 
-                    formData={discountSettings}
-                    updateFormData={updateDiscountSettings}
+                    formData={lowStockSettings}
+                    updateFormData={updateLowStockSettings}
                   />
                 </>
               )}

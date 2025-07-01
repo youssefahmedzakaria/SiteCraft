@@ -97,9 +97,9 @@ public class WishListService {
         dto.setDescription(product.getDescription());
         dto.setDiscountType(product.getDiscountType());
         dto.setDiscountValue(product.getDiscountValue());
-        dto.setMinCap(product.getMinCap());
-        dto.setPercentageMax(product.getPercentageMax());
-        dto.setMaxCap(product.getMaxCap());
+        dto.setMinCap(null); // minCap - no longer used for discounts
+        dto.setPercentageMax(null); // percentageMax - no longer used for discounts
+        dto.setMaxCap(null); // maxCap - no longer used for discounts
         // Optionally map images and variants if needed
         return dto;
     }
