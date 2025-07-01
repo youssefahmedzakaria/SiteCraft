@@ -21,6 +21,10 @@ const orderStatuses = [
   "Cancelled",
 ];
 
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 export default function EditOrderStatusPage() {
   const params = useParams();
   const router = useRouter();
@@ -38,7 +42,7 @@ export default function EditOrderStatusPage() {
       try {
         const fetchedOrder = await getOrder(Number(orderId));
         setOrder(fetchedOrder);
-        setStatus(fetchedOrder.status);
+        setStatus(capitalize(fetchedOrder.status));
       } catch (err: any) {
         setError(err.message || "Failed to fetch order");
       } finally {
