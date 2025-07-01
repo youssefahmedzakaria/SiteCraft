@@ -26,8 +26,6 @@ interface GridCategoryTemplateProps {
   hoverEffect?: boolean;
   cardVariant?:
     | "default"
-    | "compact"
-    | "detailed"
     | "minimal"
     | "hover"
     | "overlay"
@@ -54,7 +52,7 @@ interface GridCategoryTemplateProps {
 export function GridCategoryTemplate({
   isClickable = true,
   categories,
-  columns = { sm: 2, md: 3, lg: 4, xl: 6 },
+  columns = { sm: 1, md: 3, lg: 4, xl: 5 },
   gap = "gap-4",
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -116,7 +114,7 @@ export function GridCategoryTemplate({
           {categories.map((category) => (
             <FlexibleCard
               isClickable={isClickable}
-              key={category._id}
+              key={category._id || category.id  }
               item={category}
               type="category"
               variant={cardVariant}

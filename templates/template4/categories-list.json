@@ -1,1 +1,91 @@
-null
+{
+    "template": "FeaturedGridCategoryTemplate",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
+    "categories": [{
+            "name": "category1",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "1",
+            "Description": "description of category1",
+            "link":"/e-commerce/${subdomain}/products" 
+        },
+        {
+            "name": "category2",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "2",
+            "Description": "description of category",
+            "link":"/e-commerce/${subdomain}/products" 
+        },
+        {
+            "name": "category3",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "3",
+            "Description": "description of category3",
+            "link":"/e-commerce/${subdomain}/products" 
+        },
+        {
+            "name": "category4",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "4",
+            "Description": "description of category4",
+            "link":"/e-commerce/${subdomain}/products" 
+        },
+        {
+            "name": "category5",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "5",
+            "Description": "description of category5",
+            "link":"/e-commerce/${subdomain}/products" 
+        }
+    ],
+    "showCategoryTitle": "true",
+    "borderRadius": "rounded-lg",
+    "fontFamily": "font-sans",
+    "cardVariant": "overlay",
+    "showSubtitle": true,
+    "cornerRadius": "medium",
+    "accentColor": "bg-blue-500",
+    "title": "Categories",
+    "showTitle": true,
+    "titleFont": "font-serif",
+    "titleColor": "text-blue-500",
+    "titleFontSize": "text-lg",
+    "showCta": true,
+    "ctaText": "Explore Now",
+    "overlayColor": "bg-[#ffffff]/30",
+    "showDescription": true,
+    "showMoreButton": true,
+    "showMoreText": "Show More",
+    "showMorebuttonBgColor": "bg-[#1d4ed8]",
+    "showMorebuttonTextColor": "text-[#ffffff]"
+}

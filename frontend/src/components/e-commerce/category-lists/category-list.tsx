@@ -4,18 +4,10 @@ import { cn } from "@/lib/utils"
 import {GridCategoryTemplate} from "@/components/e-commerce/category-lists/templates/grid-template"
 import {HorizontalScrollCategoryTemplate} from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template"
 import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template"
-import {ListViewCategoryTemplate} from "@/components/e-commerce/category-lists/templates/list-view-template"
 interface CategoryListProps {
   categories: any[]
   template?: "grid" | "horizontal" | "featured" | "list" 
   // Template customization props
-  columns?: {
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-  gap?: string
   bgColor?: string
   textColor?: string
   accentColor?: string
@@ -26,17 +18,12 @@ interface CategoryListProps {
   showCategoryTitle?: boolean
   showDescription?: boolean
   showCta?: boolean
-  showControls?: boolean
-  showIcon?: boolean
   ctaText?: string
-  titlePosition?: "top" | "bottom" | "overlay"
-  imageHeight?: string
-  cardWidth?: string
   fontFamily?: string
   cardShadow?: string
   hoverEffect?: boolean
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured"
   showSubtitle?: boolean
   cornerRadius?: "none" | "small" | "medium" | "large"
   showScrollbar?: boolean
@@ -57,8 +44,6 @@ export default function CategoryList({
   categories,
   template = "grid",
   // Template customization props
-  columns,
-  gap,
   bgColor, 
   textColor,
   accentColor,
@@ -69,12 +54,7 @@ export default function CategoryList({
   showCategoryTitle,
   showDescription,
   showCta,
-  showControls,
-  showIcon,
   ctaText,
-  titlePosition,
-  imageHeight,
-  cardWidth,
   fontFamily,
   cardShadow,
   hoverEffect,
@@ -108,14 +88,8 @@ export default function CategoryList({
             borderRadius={borderRadius}
             borderColor={borderColor}
             showTitle={showTitle}
-            showControls={showControls}
-            imageHeight={imageHeight}
-            cardWidth={cardWidth}
             fontFamily={fontFamily}
             hoverEffect={hoverEffect}
-            showScrollbar={showScrollbar}
-            scrollBarSliderColor={scrollBarSliderColor}
-            scrollBarBgColor={scrollBarBgColor}
             // Card related props
             cardVariant={cardVariant}
             showCardTitle={showCategoryTitle}
@@ -137,6 +111,9 @@ export default function CategoryList({
           />
         )
       case "featured":
+        // Map unsupported "compact" variant to a supported one (e.g., "default")
+        const featuredCardVariant =
+          cardVariant === "default" ? "default" : cardVariant;
         return (
           <FeaturedGridCategoryTemplate
             categories={categories}
@@ -148,7 +125,6 @@ export default function CategoryList({
             showCategoryTitle={showCategoryTitle}
             showCta={showCta}
             ctaText={ctaText}
-            gap={gap}
             fontFamily={fontFamily}
             hoverEffect={hoverEffect}
             // Card related props
@@ -158,41 +134,6 @@ export default function CategoryList({
             cardShadow={cardShadow}
             accentColor={accentColor}
             borderColor={borderColor}
-            titleColor={titleColor}
-            titleFontSize={titleFontSize}
-            title={title}
-            titleFont={titleFont}
-            // Show more button props
-            showMoreButton={showMoreButton}
-            showMoreText={showMoreText}
-            showMorebuttonBgColor={showMorebuttonBgColor}
-            showMorebuttonTextColor={showMorebuttonTextColor}
-          />
-        )
-      case "list":
-        return (
-          <ListViewCategoryTemplate
-            categories={categories}
-            bgColor={bgColor}
-            textColor={textColor}
-            accentColor={accentColor}
-            borderColor={borderColor}
-            borderRadius={borderRadius}
-            showTitle={showTitle}
-            showDescription={showDescription}
-            showIcon={showIcon}
-            gap={gap}
-            fontFamily={fontFamily}
-            hoverEffect={hoverEffect}
-            // Card related props
-            cardVariant={cardVariant}
-            showCardTitle={showCategoryTitle}
-            showSubtitle={showSubtitle}
-            showCta={showCta}
-            ctaText={ctaText}
-            cornerRadius={cornerRadius}
-            cardShadow={cardShadow}
-            overlayColor={overlayColor}
             titleColor={titleColor}
             titleFontSize={titleFontSize}
             title={title}
@@ -208,14 +149,10 @@ export default function CategoryList({
         return (
           <GridCategoryTemplate
             categories={categories}
-            columns={columns}
-            gap={gap}
             bgColor={bgColor}
             textColor={textColor}
             borderRadius={borderRadius}
             showTitle={showTitle}
-            titlePosition={titlePosition || "bottom"}
-            imageHeight={imageHeight}
             fontFamily={fontFamily}
             hoverEffect={hoverEffect}
             // Card related props
