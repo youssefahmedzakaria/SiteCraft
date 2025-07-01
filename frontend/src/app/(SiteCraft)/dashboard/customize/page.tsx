@@ -120,7 +120,7 @@ export default function CustomizeTemplatePage() {
           "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
         buttonText: "Shop Now",
         buttonLink: "#new-collection",
-        image: "/girl.jpg",
+        image: "/placeholder.png",
         imageAlt: "Welcome to our store",
       },
       {
@@ -129,7 +129,7 @@ export default function CustomizeTemplatePage() {
           "Check out our newest products. Limited time offers with free shipping on all orders.",
         buttonText: "View Collection",
         buttonLink: "#new-collection",
-        image: "/hand.jpg",
+        image: "/placeholder.png",
         imageAlt: "New arrivals collection",
       },
     ],
@@ -186,7 +186,7 @@ export default function CustomizeTemplatePage() {
         media: {
           mainMedia: {
             image: {
-              src: "/neckless.jpg",
+              src: "/placeholder.png",
             },
           },
         },
@@ -216,7 +216,7 @@ export default function CustomizeTemplatePage() {
       "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
     descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    image: "/about.jpg",
+    image: "/placeholder.png",
     imageAlt: "About our company",
     imageObjectFit: "cover",
     titleFont: "font-sans",
@@ -298,7 +298,7 @@ export default function CustomizeTemplatePage() {
       instagram: "https://www.instagram.com",
       twitter: "https://www.x.com",
     },
-    image: "/ring.jpg",
+    image: "/placeholder.png",
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
@@ -408,7 +408,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -423,7 +423,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -438,7 +438,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -453,7 +453,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -468,7 +468,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -483,7 +483,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -498,7 +498,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -513,7 +513,7 @@ export default function CustomizeTemplatePage() {
               media: {
                 mainMedia: {
                   image: {
-                    url: "/ring2.jpg",
+                    url: "/placeholder.png",
                   },
                 },
               },
@@ -624,15 +624,21 @@ export default function CustomizeTemplatePage() {
             facebook:
               data.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link || prev.socialLinks.facebook,
+              )?.link ||
+              prev.socialLinks?.facebook ||
+              "",
             instagram:
               data.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link || prev.socialLinks.instagram,
+              )?.link ||
+              prev.socialLinks?.instagram ||
+              "",
             twitter:
               data.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "twitter"
-              )?.link || prev.socialLinks.twitter,
+              )?.link ||
+              prev.socialLinks?.twitter ||
+              "",
           },
         }));
       }
@@ -679,15 +685,21 @@ export default function CustomizeTemplatePage() {
         facebook:
           storeData.socialMediaAccounts?.find(
             (acc: any) => acc.name.toLowerCase() === "facebook"
-          )?.link || prev.socialLinks.facebook,
+          )?.link ||
+          prev.socialLinks?.facebook ||
+          "",
         instagram:
           storeData.socialMediaAccounts?.find(
             (acc: any) => acc.name.toLowerCase() === "instagram"
-          )?.link || prev.socialLinks.instagram,
+          )?.link ||
+          prev.socialLinks?.instagram ||
+          "",
         twitter:
           storeData.socialMediaAccounts?.find(
             (acc: any) => acc.name.toLowerCase() === "twitter"
-          )?.link || prev.socialLinks.twitter,
+          )?.link ||
+          prev.socialLinks?.twitter ||
+          "",
       },
     }));
     // Update footer logo and social media
