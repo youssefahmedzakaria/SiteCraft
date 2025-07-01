@@ -748,6 +748,12 @@ export default function CustomizeTemplatePage() {
             case "Footer":
               setFooterAttributes(section.value);
               break;
+            case "Policies":
+              setPoliciesAttributes(section.value);
+              break;
+            case "ContactUs":
+              setContactAttributes(section.value);
+              break;
             // Add additional cases as you expand your backend support
           }
         });
