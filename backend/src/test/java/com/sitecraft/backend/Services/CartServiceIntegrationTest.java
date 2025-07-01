@@ -170,6 +170,7 @@ public class CartServiceIntegrationTest {
         // Set up product with discount
         product.setDiscountType("Percentage");
         product.setDiscountValue(new BigDecimal("20.00")); // 20% off
+        product.setPercentageMax(new BigDecimal("50.00")); // Max $50 discount
         product = productRepo.save(product);
 
         // Add product to cart

@@ -9,6 +9,9 @@ import type { ProductVariantDTO } from "@/lib/products";
 interface DiscountSettings {
   discountType?: string;
   discountValue?: number;
+  minCap?: number;
+  percentageMax?: number;
+  maxCap?: number;
 }
 
 interface PricingSectionProps {
@@ -16,36 +19,29 @@ interface PricingSectionProps {
   setPrice: (v: number) => void;
   productionCost: number;
   setProductionCost: (v: number) => void;
-  discountSettings: DiscountSettings;
-  updateDiscountSettings: (updates: Partial<DiscountSettings>) => void;
 }
 
-export function PricingSection({ 
-  price, 
-  setPrice, 
-  productionCost, 
-  setProductionCost,
-  discountSettings,
-  updateDiscountSettings
-}: PricingSectionProps) {
-  const [discountEnabled, setDiscountEnabled] = useState(!!discountSettings.discountType);
+export function PricingSection({ price, setPrice, productionCost, setProductionCost }: PricingSectionProps) {
+  const [discountEnabled, setDiscountEnabled] = useState(false);
 
   // Handle form field changes
   const handleDiscountTypeChange = (type: string) => {
-    updateDiscountSettings({ discountType: type });
   };
 
   const handleDiscountValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    updateDiscountSettings({ discountValue: value });
+  };
+
+  const handleMinCapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  };
+
+  const handlePercentageMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  };
+
+  const handleMaxCapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const toggleDiscount = (enabled: boolean) => {
     setDiscountEnabled(enabled);
-    if (!enabled) {
-      // Clear discount settings when disabled
-      updateDiscountSettings({ discountType: undefined, discountValue: undefined });
-    }
   };
 
   return (
@@ -126,7 +122,7 @@ export function PricingSection({
                   <input
                     type="radio"
                     value="percentage"
-                    checked={discountSettings.discountType === "percentage"}
+                    checked={false}
                     onChange={(e) => handleDiscountTypeChange(e.target.value)}
                   />
                   Percentage
@@ -134,8 +130,8 @@ export function PricingSection({
                 <label className="flex items-center gap-2">
                   <input
                     type="radio"
-                    value="amount"
-                    checked={discountSettings.discountType === "amount"}
+                    value="fixed"
+                    checked={false}
                     onChange={(e) => handleDiscountTypeChange(e.target.value)}
                   />
                   Amount
@@ -151,9 +147,9 @@ export function PricingSection({
                 id="discountValue"
                 name="discountValue"
                 type="number"
-                value={discountSettings.discountValue || ""}
+                value={0}
                 onChange={handleDiscountValueChange}
-                placeholder={discountSettings.discountType === "percentage" ? "e.g. 10" : "e.g. 100"}
+                placeholder="e.g. 10, 100"
                 className="w-full"
                 required
               />

@@ -165,7 +165,7 @@ export function ProductTableHeader({
           scope="col"
           className="px-3 md:px-6 py-3 text-left text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell"
         >
-          Price (Discounted Price)
+          Price
         </th>
         <th
           scope="col"

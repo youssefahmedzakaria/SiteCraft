@@ -155,6 +155,9 @@ public class CartService {
 
         String discountType = product.getDiscountType().toLowerCase();
         BigDecimal discountValue = product.getDiscountValue();
+        BigDecimal minCap = product.getMinCap();
+        BigDecimal percentageMax = product.getPercentageMax();
+        BigDecimal maxCap = product.getMaxCap();
 
         BigDecimal discountedPrice = originalPrice;
 
@@ -162,13 +165,31 @@ public class CartService {
             case "percentage":
                 // Calculate percentage discount
                 BigDecimal percentageDiscount = originalPrice.multiply(discountValue).divide(BigDecimal.valueOf(100));
+                
+                // Apply percentage max if set
+                if (percentageMax != null && percentageDiscount.compareTo(percentageMax) > 0) {
+                    percentageDiscount = percentageMax;
+                }
+                
                 discountedPrice = originalPrice.subtract(percentageDiscount);
                 break;
 
             case "amount":
             case "fixed":
+                // Check if minimum purchase threshold is met
+                if (minCap != null && originalPrice.compareTo(minCap) < 0) {
+                    return originalPrice; // No discount applied if minimum threshold not met
+                }
+                
                 // Calculate fixed amount discount
-                discountedPrice = originalPrice.subtract(discountValue);
+                BigDecimal amountDiscount = discountValue;
+                
+                // Apply max cap if set
+                if (maxCap != null && amountDiscount.compareTo(maxCap) > 0) {
+                    amountDiscount = maxCap;
+                }
+                
+                discountedPrice = originalPrice.subtract(amountDiscount);
                 break;
 
             default:
@@ -263,9 +284,9 @@ public class CartService {
                 product.getDescription(),
                 product.getDiscountType(),
                 product.getDiscountValue(),
-                null, // minCap - no longer used for discounts
-                null, // percentageMax - no longer used for discounts
-                null, // maxCap - no longer used for discounts
+                product.getMinCap(),
+                product.getPercentageMax(),
+                product.getMaxCap(),
                 imageDTOs,
                 variantDTOs
             );
@@ -318,9 +339,9 @@ public class CartService {
             product.getDescription(),
             product.getDiscountType(),
             product.getDiscountValue(),
-            null, // minCap - no longer used for discounts
-            null, // percentageMax - no longer used for discounts
-            null, // maxCap - no longer used for discounts
+            product.getMinCap(),
+            product.getPercentageMax(),
+            product.getMaxCap(),
             imageDTOs,
             variantDTOs
         );

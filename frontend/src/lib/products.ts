@@ -69,14 +69,13 @@ export interface ProductCreateDTO {
     description: string
     discountType?: string
     discountValue?: number
+    minCap?: number
+    percentageMax?: number
+    maxCap?: number
     categoryId: number
     attributes?: ProductAttributeDTO[]
     variants?: ProductVariantDTO[]
     imageUrls?: string[]
-    // Low stock notification settings
-    lowStockType?: string // "number" or "percentage"
-    lowStockThreshold?: number // the threshold value
-    lowStockEnabled?: boolean // whether notification is enabled
 }
 
 export interface ProductAttributeDTO {
@@ -108,6 +107,9 @@ export interface SimplifiedProduct {
     status: string
     discountType?: string
     discountValue?: number
+    minCap?: number
+    percentageMax?: number
+    maxCap?: number
     categoryId: number
     storeId: number
     images?: SimplifiedProductImage[]
@@ -329,38 +331,6 @@ export const getProductStatistics = async (): Promise<ProductStatistics> => {
     }
 };
 
-export const getLowStockNotificationStatistics = async (): Promise<ProductStatistics> => {
-    try {
-        const response = await fetch('http://localhost:8080/products/low-stock-notifications', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-            // Transform the low stock notification data to match ProductStatistics interface
-            return {
-                totalProducts: data.data.totalProducts || 0,
-                lowStockCount: data.data.lowStockProducts || 0,
-                outOfStockCount: 0 // We'll keep the original out of stock count from regular statistics
-            };
-        } else {
-            throw new Error(data.message || 'Failed to fetch low stock notification statistics');
-        }
-    } catch (error) {
-        console.error('Error fetching low stock notification statistics:', error);
-        throw error;
-    }
-};
-
 export const getLowStockProducts = async (): Promise<SimplifiedProduct[]> => {
     try {
         console.log('📞 Fetching low stock products...');
@@ -489,6 +459,9 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         status: totalStock > 0 ? 'In Stock' : 'Out Of Stock',
         discountType: product.discountType,
         discountValue: product.discountValue,
+        minCap: product.minCap,
+        percentageMax: product.percentageMax,
+        maxCap: product.maxCap,
         categoryId: categoryId,
         storeId: 0, // This will be set by the backend
         images: transformedImages,

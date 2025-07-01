@@ -340,19 +340,4 @@ public class UserService {
             System.out.println("⚠️ Failed to send staff credentials email: " + e.getMessage());
         }
     }
-    
-    /**
-     * Send low stock notification email
-     */
-    public void sendLowStockNotificationEmail(String email, String subject, String content) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject(subject);
-            message.setText(content);
-            mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("Failed to send low stock notification email: " + e.getMessage());
-        }
-    }
 }

@@ -54,34 +54,6 @@ export function ProductRecord({
     }).format(price);
   };
 
-  // Calculate discounted price
-  const calculateDiscountedPrice = (originalPrice: number, discountType?: string, discountValue?: number) => {
-    if (!discountType || !discountValue) return null;
-    
-    if (discountType.toLowerCase() === 'percentage') {
-      return originalPrice * (1 - discountValue / 100);
-    } else if (discountType.toLowerCase() === 'amount') {
-      return Math.max(0, originalPrice - discountValue);
-    }
-    return null;
-  };
-
-  // Format price with discount display
-  const formatPriceWithDiscount = () => {
-    const originalPrice = product.price;
-    const discountedPrice = calculateDiscountedPrice(originalPrice, product.discountType, product.discountValue);
-    
-    if (discountedPrice !== null) {
-      return (
-        <span>
-          {formatPrice(originalPrice)} <span className="text-green-600">({formatPrice(discountedPrice)})</span>
-        </span>
-      );
-    }
-    
-    return formatPrice(originalPrice);
-  };
-
   // Get status based on stock
   const getStatus = (stock: number) => {
     return stock > 0 ? 'In Stock' : 'Out of Stock';
@@ -109,7 +81,7 @@ export function ProductRecord({
         <div className="text-sm text-gray-500">{getCategoryName(product.categoryId)}</div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-        <div className="text-sm text-gray-500">{formatPriceWithDiscount()}</div>
+        <div className="text-sm text-gray-500">{formatPrice(product.price)}</div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
         <div className="text-sm text-gray-500">{product.stock}</div>
