@@ -336,6 +336,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
       {
         label: "About Us",
@@ -343,6 +344,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
       {
         label: "Policies",
@@ -350,6 +352,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
     ],
     socialMedia: {

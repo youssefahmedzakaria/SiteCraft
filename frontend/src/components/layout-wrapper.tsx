@@ -67,6 +67,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
               font: "font-serif",
               fontSize: "text-lg",
               fontColor: "text-black",
+              isShown: true,
             },
             {
               label: "About Us",
@@ -74,6 +75,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
               font: "font-serif",
               fontSize: "text-lg",
               fontColor: "text-black",
+              isShown: true,
             },
           ]}
           socialMedia={{

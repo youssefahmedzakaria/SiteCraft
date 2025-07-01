@@ -176,6 +176,7 @@ export interface FooterCustomizationAttributes {
     font: string;
     fontSize: string;
     fontColor: string;
+    isShown: boolean;
   }[];
   socialMedia: {
     facebook?: string;
