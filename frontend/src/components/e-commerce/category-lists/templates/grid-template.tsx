@@ -47,6 +47,7 @@ interface GridCategoryTemplateProps {
   showMoreText?: string;
   showMorebuttonBgColor?: string;
   showMorebuttonTextColor?: string;
+  categoryTitleFontSize?: string;
 }
 
 export function GridCategoryTemplate({
@@ -80,6 +81,7 @@ export function GridCategoryTemplate({
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
+  categoryTitleFontSize = "text-lg",
 }: GridCategoryTemplateProps) {
   const path = usePathname();
   const pathSegments = path.split("/");
@@ -98,7 +100,7 @@ export function GridCategoryTemplate({
       <div
         className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
       >
-        {showTitle && titlePosition === "top" && (
+        {showTitle && (
           <h2
             className={cn(
               "text-4xl md:text-6xl font-bold text-center mb-6",

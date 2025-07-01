@@ -42,6 +42,7 @@ interface HorizontalScrollCategoryTemplateProps {
   showMoreText?: string
   showMorebuttonBgColor?: string
   showMorebuttonTextColor?: string
+  categoryTitleFontSize?: string
 }
 
 export function HorizontalScrollCategoryTemplate({
@@ -52,7 +53,7 @@ export function HorizontalScrollCategoryTemplate({
   accentColor = "bg-slate-100",
   borderRadius = "rounded-lg",
   showTitle = true,
-  showControls = true,
+  showControls = false,
   imageHeight = "h-80",
   cardWidth = "w-60",
   fontFamily = "",
@@ -79,6 +80,7 @@ export function HorizontalScrollCategoryTemplate({
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
+  categoryTitleFontSize = "text-lg",
 }: HorizontalScrollCategoryTemplateProps) {
   const path = usePathname()
   const pathSegments = path.split("/")

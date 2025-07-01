@@ -51,6 +51,8 @@ import {
   DialogDescription,
 } from "@/components/SiteCraft/ui/dialog";
 import { categories } from "@/lib/categories";
+import { HorizontalScrollProductTemplate } from "@/components/e-commerce/product-lists";
+import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 
 interface Section {
   id: string;
@@ -160,10 +162,10 @@ export default function CustomizeTemplatePage() {
 
   const initialCategory: CategoryCustomizationAttributes = {
     template: "FeaturedGrid", // You can adjust this if needed
+    isClickable: false,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
-    accentColor: "bg-[#3B82F6]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
@@ -176,16 +178,88 @@ export default function CustomizeTemplatePage() {
     showCta: true,
     cardVariant: "overlay",
     showSubtitle: true,
-    cardTextColor: "text-[#000000]", // Added a reasonable default value
+    overlayColor: "bg-[#00000080]",
+    borderRadius: "rounded-lg",
+    showCategoryTitle: true,
+    titleColor: "text-[#000000]",
+    titleFontSize: "text-2xl",
+    categoryTitleFontSize: "text-lg",
+    // cardTextColor: "text-[#000000]", // Added a reasonable default value
     categories: [
       {
         id: "6",
         name: "Necklaces",
+        Description: "Necklaces",
         link: `/#`,
         media: {
           mainMedia: {
             image: {
-              src: "/placeholder.png",
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "7",
+        name: "Rings",
+        Description: "Rings",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "8",
+        name: "Earrings",
+        Description: "Earrings",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "9",
+        name: "Bracelets",
+        Description: "Bracelets",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "10",
+        name: "Pendants",
+        Description: "Pendants",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "11",
+        name: "Bangles",
+        Description: "Bangles",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
             },
           },
         },
@@ -193,11 +267,11 @@ export default function CustomizeTemplatePage() {
     ],
   };
 
-  // State for header customization
+  // State for category customization
   const [categoryAttributes, setCategoryAttributes] =
     useState<CategoryCustomizationAttributes>(initialCategory);
 
-  // Function to update header attributes
+  // Function to update category attributes
   const updateCategoryAttributes = (
     updates: Partial<CategoryCustomizationAttributes>
   ) => {
@@ -529,16 +603,16 @@ export default function CustomizeTemplatePage() {
           template="featured"
           title="Featured Products"
           titleColor="text-black"
-          titlePosition="top"
+          // titlePosition="top"
           titleFontSize="text-2xl"
           titleFont="font-bold"
-          columns={{ sm: 2, md: 3, lg: 4 }}
+          // columns={{ sm: 2, md: 3, lg: 4 }}
           bgColor="bg-white"
           textColor="text-black"
           borderRadius="rounded-lg"
           showTitle={true}
           fontFamily="font-sans"
-          hoverEffect={true}
+          // hoverEffect={true}
           cardVariant="hover"
           showSubtitle={true}
           showCta={true}
@@ -554,6 +628,8 @@ export default function CustomizeTemplatePage() {
     },
     Categories: {
       FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: <HorizontalScrollCategoryTemplate {...categoryAttributes} />,
+      Grid: <GridCategoryTemplate {...categoryAttributes} />,
     },
     AboutUs: {
       TopImageAbout: <TopImageAbout {...aboutAttributes} />,
@@ -768,6 +844,9 @@ export default function CustomizeTemplatePage() {
             case "ContactUs":
               setContactAttributes(section.value);
               break;
+            // case "Categories":
+            //   setCategoryAttributes(section.value);
+            //   break;
             // Add additional cases as you expand your backend support
           }
         });
@@ -777,6 +856,8 @@ export default function CustomizeTemplatePage() {
       console.error("Failed to fetch template:", error);
     }
   };
+
+
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -1148,7 +1229,7 @@ export default function CustomizeTemplatePage() {
                   template = "ProductList";
                   break;
                 case "Categories":
-                  template = "FeaturedGrid";
+                  template = categoryAttributes.template;
                   break;
                 case "AboutUs":
                   template = aboutAttributes.template;

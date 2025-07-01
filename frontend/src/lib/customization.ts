@@ -56,43 +56,43 @@ export interface PromoCustomizationAttributes {
 }
 
 export interface CategoryCustomizationAttributes {
-  template: string;
-  title: string;
-  bgColor: string;
-  textColor: string;
-  accentColor: string;
-  fontFamily: string;
-  titleFont: string;
-  showTitle: boolean;
-  showMoreButton: boolean;
-  showMoreText: string;
-  showMorebuttonBgColor: string;
-  showMorebuttonTextColor: string;
-  ctaText: string;
-  cornerRadius: "small" | "medium" | "none" | "large" | undefined;
-  showCta: boolean; // button
-  cardVariant:
-    | "default"
-    | "compact"
-    | "detailed"
-    | "minimal"
-    | "hover"
-    | "overlay"
-    | "featured"; // add more if needed
-  showSubtitle: boolean;
-  cardTextColor: string;
+  template: string; //
+  isClickable: boolean; //
+  title: string; //
+  bgColor: string; //
+  textColor: string; //
+  fontFamily: string; //
+  titleFont: string; //
+  showTitle: boolean; //
+  showMoreButton: boolean; //
+  showMoreText: string; //
+  showMorebuttonBgColor: string; //
+  showMorebuttonTextColor: string; //
+  ctaText: string; //
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined; //
+  showCta: boolean; //
+  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
+  showSubtitle: boolean; //
+  overlayColor: string;
+  borderRadius: string;
+  showCategoryTitle: boolean;
+  titleColor: string;
+  titleFontSize: string;
+  categoryTitleFontSize: string;
   categories: {
-    id: string;
-    name: string;
-    link: string;
-    media: {
+  name: string;
+  media: {
       mainMedia: {
-        image: {
-          src: string;
-        };
-      };
-    };
+          image: {
+              url: string;
+          }
+      }
+  };
+  id: string;
+  Description: string;
+  link: string; 
   }[];
+
 }
 
 export interface ProductCustomizationAttributes {

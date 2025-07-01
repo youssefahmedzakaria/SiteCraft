@@ -1,50 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { cn } from "@/lib/utils"
-import {GridCategoryTemplate} from "@/components/e-commerce/category-lists/templates/grid-template"
-import {HorizontalScrollCategoryTemplate} from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template"
-import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template"
+import { cn } from "@/lib/utils";
+import { GridCategoryTemplate } from "@/components/e-commerce/category-lists/templates/grid-template";
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template";
 interface CategoryListProps {
-  categories: any[]
-  template?: "grid" | "horizontal" | "featured" | "list" 
+  categories: any[];
+  template?: "grid" | "horizontal" | "featured" | "list";
   // Template customization props
-  bgColor?: string
-  textColor?: string
-  accentColor?: string
-  borderColor?: string
-  borderRadius?: string
-  overlayColor?: string
-  showTitle?: boolean
-  showCategoryTitle?: boolean
-  showDescription?: boolean
-  showCta?: boolean
-  ctaText?: string
-  fontFamily?: string
-  cardShadow?: string
-  hoverEffect?: boolean
+  bgColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderColor?: string;
+  borderRadius?: string;
+  overlayColor?: string;
+  showTitle?: boolean;
+  showCategoryTitle?: boolean;
+  showDescription?: boolean;
+  showCta?: boolean;
+  ctaText?: string;
+  fontFamily?: string;
+  cardShadow?: string;
+  hoverEffect?: boolean;
   // Card related props
-  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured"
-  showSubtitle?: boolean
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  showScrollbar?: boolean
-  scrollBarSliderColor?: string
-  scrollBarBgColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured";
+  showSubtitle?: boolean;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  showScrollbar?: boolean;
+  scrollBarSliderColor?: string;
+  scrollBarBgColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
   // Show more button props
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export default function CategoryList({
   categories,
   template = "grid",
   // Template customization props
-  bgColor, 
+  bgColor,
   textColor,
   accentColor,
   borderColor,
@@ -71,9 +71,9 @@ export default function CategoryList({
   titleFont,
   // Show more button props
   showMoreButton,
-  showMoreText,   
+  showMoreText,
   showMorebuttonBgColor,
-  showMorebuttonTextColor
+  showMorebuttonTextColor,
 }: CategoryListProps) {
   // Render the selected template with passed props
   const renderTemplate = () => {
@@ -109,7 +109,7 @@ export default function CategoryList({
             showMorebuttonBgColor={showMorebuttonBgColor}
             showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
       case "featured":
         // Map unsupported "compact" variant to a supported one (e.g., "default")
         const featuredCardVariant =
@@ -122,7 +122,7 @@ export default function CategoryList({
             overlayColor={overlayColor}
             borderRadius={borderRadius}
             showTitle={showTitle}
-            showCategoryTitle={showCategoryTitle}
+            showCardTitle={showCategoryTitle}
             showCta={showCta}
             ctaText={ctaText}
             fontFamily={fontFamily}
@@ -144,7 +144,7 @@ export default function CategoryList({
             showMorebuttonBgColor={showMorebuttonBgColor}
             showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
       default: // grid template
         return (
           <GridCategoryTemplate
@@ -173,12 +173,12 @@ export default function CategoryList({
             // Show more button props
             showMoreButton={showMoreButton}
             showMoreText={showMoreText}
-            showMorebuttonBgColor={showMorebuttonBgColor} 
+            showMorebuttonBgColor={showMorebuttonBgColor}
             showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
     }
-  }
+  };
 
-  return <div>{renderTemplate()}</div>
+  return <div>{renderTemplate()}</div>;
 }
