@@ -26,7 +26,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       {!isAuthPage && <SiteCraftNavbar />}
       {isEcommercePage && (
         <Navbar
-          template="template1"
+          template="template2"
           brandName="Jewelry"
           backgroundColor="bg-black/50"
           textColor="text-white"
@@ -46,7 +46,6 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           dividerColor="border-gray-200"
           searchIconColor="text-white"
           fontFamily="font-sans"
-          isRTL={false}
         />
       )}
       <main className="flex-1">{children}</main>

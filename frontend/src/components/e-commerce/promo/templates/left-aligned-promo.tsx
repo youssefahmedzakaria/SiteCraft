@@ -1,6 +1,7 @@
 import { PromoSlider } from "../promo-slider"
 
 export interface LeftAlignedPromoProps {
+  isClickable?: boolean
   id?: string
   slides?: {
     title: string
@@ -10,7 +11,7 @@ export interface LeftAlignedPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -23,11 +24,12 @@ export interface LeftAlignedPromoProps {
   buttonTextColor?: string
   buttonSize?: string
   buttonRadius?: string
-  backgroundColor?: string  
-  imageObjectFit?: "cover" | "fill" | "contain"  
+  backgroundColor?: string
+  imageObjectFit?: "cover" | "fill" | "contain"
 }
 
-export function LeftAlignedPromo({ 
+export function LeftAlignedPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -49,7 +51,7 @@ export function LeftAlignedPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -66,12 +68,20 @@ export function LeftAlignedPromo({
   imageObjectFit,
 }: LeftAlignedPromoProps) {
   return (
-    <section id={id} className="w-full">
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="left"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -86,6 +96,7 @@ export function LeftAlignedPromo({
           buttonRadius={buttonRadius}
           backgroundColor={backgroundColor}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>

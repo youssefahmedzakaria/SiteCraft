@@ -4,15 +4,50 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
-import { CenteredPromo, LeftAlignedPromo, MinimalRightPromo, MinimalLeftPromo, OverlayPromo, RightAlignedPromo, SplitPromo} from "@/components/e-commerce/promo";
-import { CenteredContact, LeftAlignedContact, MinimalLeftContact, MinimalRightContact, RightAlignedContact } from "@/components/e-commerce/contact";
+import {
+  CenteredPromo,
+  LeftAlignedPromo,
+  MinimalRightPromo,
+  MinimalLeftPromo,
+  OverlayPromo,
+  RightAlignedPromo,
+  SplitPromo,
+} from "@/components/e-commerce/promo";
+import {
+  CenteredContact,
+  LeftAlignedContact,
+  MinimalLeftContact,
+  MinimalRightContact,
+  RightAlignedContact,
+} from "@/components/e-commerce/contact";
 import { cn } from "@/lib/utils";
-import { TitleLeftContentCenterPolicies, CenteredPolicies, LeftPolicies, DefaultPolicies } from "@/components/e-commerce/policies";
-import { RightAlignedAbout, CenteredAbout, LeftAlignedAbout,TopImageAbout } from "@/components/e-commerce/about-us";
-import { GridCategoryTemplate, FeaturedGridCategoryTemplate, HorizontalScrollCategoryTemplate, ListViewCategoryTemplate } from "@/components/e-commerce/category-lists";
-import {GridProductTemplate,HorizontalScrollProductTemplate,ListViewProductTemplate,FeaturedGridProductTemplate} from "@/components/e-commerce/product-lists";
+import {
+  TitleLeftContentCenterPolicies,
+  CenteredPolicies,
+  LeftPolicies,
+  DefaultPolicies,
+} from "@/components/e-commerce/policies";
+import {
+  RightAlignedAbout,
+  CenteredAbout,
+  LeftAlignedAbout,
+  TopImageAbout,
+} from "@/components/e-commerce/about-us";
+import {
+  GridCategoryTemplate,
+  FeaturedGridCategoryTemplate,
+  HorizontalScrollCategoryTemplate,
+  ListViewCategoryTemplate,
+} from "@/components/e-commerce/category-lists";
+import {
+  GridProductTemplate,
+  HorizontalScrollProductTemplate,
+  ListViewProductTemplate,
+  FeaturedGridProductTemplate,
+} from "@/components/e-commerce/product-lists";
 import { ProductList } from "@/components/e-commerce/product-lists";
 import { usePathname } from "next/navigation";
+import { link } from "fs";
 
 export default function Home() {
   const path = usePathname();
@@ -21,7 +56,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <CenteredPromo
-        id="home"
+        id="promo"
         slides={[
           {
             title: "Welcome to Our Store",
@@ -212,6 +247,7 @@ export default function Home() {
               },
             },
             id: "1",
+            link: `/e-commerce/${subdomain}/products`,
           },
           {
             name: "Earrings",
@@ -223,6 +259,7 @@ export default function Home() {
               },
             },
             id: "2",
+            link: `/e-commerce/${subdomain}/products`,
           },
           {
             name: "Necklaces",
@@ -234,6 +271,7 @@ export default function Home() {
               },
             },
             id: "3",
+            link: `/e-commerce/${subdomain}/products`,
           },
           {
             name: "Rings",
@@ -245,6 +283,7 @@ export default function Home() {
               },
             },
             id: "4",
+            link: `/e-commerce/${subdomain}/products`,
           },
           {
             name: "Earrings",
@@ -256,6 +295,7 @@ export default function Home() {
               },
             },
             id: "5",
+            link: `/e-commerce/${subdomain}/products`,
           },
           {
             name: "Necklaces",
@@ -267,8 +307,10 @@ export default function Home() {
               },
             },
             id: "6",
+            link: `/e-commerce/${subdomain}/products`,
           },
         ]}
+        title="Featured Categories"
         bgColor="bg-white"
         textColor="text-black"
         borderRadius="rounded-lg"
@@ -355,4 +397,4 @@ export default function Home() {
       />
     </div>
   );
-};
+}

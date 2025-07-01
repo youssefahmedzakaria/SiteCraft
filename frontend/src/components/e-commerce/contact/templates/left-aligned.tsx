@@ -1,4 +1,4 @@
-import Contact from "../contact"
+import {Contact} from "../contact"
 
 interface LeftAlignedContactProps {
   id?: string
@@ -25,5 +25,5 @@ interface LeftAlignedContactProps {
 }
 
 export function LeftAlignedContact(props: LeftAlignedContactProps) {
-  return <Contact {...props} template="left-aligned" />
+  return <Contact {...props} variant="left-aligned" />
 }

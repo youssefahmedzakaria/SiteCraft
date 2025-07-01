@@ -7,6 +7,7 @@ import FlexibleCard from "@/components/e-commerce/card/card-templates";
 import { usePathname } from "next/navigation";
 
 interface GridCategoryTemplateProps {
+  isClickable?: boolean;
   categories: any[];
   columns?: {
     sm?: number;
@@ -51,6 +52,7 @@ interface GridCategoryTemplateProps {
 }
 
 export function GridCategoryTemplate({
+  isClickable = true,
   categories,
   columns = { sm: 2, md: 3, lg: 4, xl: 6 },
   gap = "gap-4",
@@ -113,6 +115,7 @@ export function GridCategoryTemplate({
         <div className={cn("grid", gridCols, gap)}>
           {categories.map((category) => (
             <FlexibleCard
+              isClickable={isClickable}
               key={category._id}
               item={category}
               type="category"
@@ -145,7 +148,7 @@ export function GridCategoryTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={`/e-commerce/${subdomain}/categories`}
+              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

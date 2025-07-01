@@ -7,13 +7,7 @@
         "alt": "Custom Logo"
     },
     "aboutLinks": [
-        {
-            "label": "Contact Us",
-            "href": "#contact-us",
-            "font": "font-serif",
-            "fontSize": "text-lg",
-            "fontColor": "text-black"
-        },
+        
         {
             "label": "Policies",
             "href": "#policies",

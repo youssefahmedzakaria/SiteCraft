@@ -1,7 +1,7 @@
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface OverlayPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -10,7 +10,7 @@ export interface OverlayPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -24,11 +24,12 @@ export interface OverlayPromoProps {
   buttonSize?: string
   buttonRadius?: string
   backgroundColor?: string
-  imageObjectFit?: "cover" | "fill" | "contain" 
+  imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
 }
 
-export function OverlayPromo({ 
+export function OverlayPromo({
+  isClickable = true,
   slides = [
     {
       title: "Your Site Title",
@@ -49,7 +50,7 @@ export function OverlayPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -67,12 +68,20 @@ export function OverlayPromo({
   id,
 }: OverlayPromoProps) {
   return (
-    <section id={id} className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="overlay"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -86,6 +95,7 @@ export function OverlayPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>
