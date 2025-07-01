@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -39,6 +41,9 @@ public class CartControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @InjectMocks
+    private CartController cartController;
 
     private MockHttpSession session;
     private ShoppingCart cart;
@@ -366,6 +371,11 @@ public class CartControllerTest {
                 .andExpect(status().isUnauthorized());
 
         verify(cartService, never()).clearCart(any());
+    }
+
+    @Test
+    void contextLoads() {
+        MockitoAnnotations.openMocks(this);
     }
 
     // Helper classes for testing

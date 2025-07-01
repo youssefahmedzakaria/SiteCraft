@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -483,5 +484,10 @@ public class EcommerceAuthServiceTest {
         assertEquals("Failed to reset password: Customer not found", exception.getMessage());
         verify(customerRepo).findByEmail("nonexistent@example.com");
         verify(customerRepo, never()).save(any());
+    }
+
+    @Test
+    void contextLoads() {
+        MockitoAnnotations.openMocks(this);
     }
 } 
