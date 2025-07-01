@@ -1022,7 +1022,13 @@ export default function CustomizeTemplatePage() {
             </Button>
 
             {/* Preview Button */}
-            <Button variant="outline" className="bg-white">
+            <Button
+              variant="outline"
+              className="bg-white"
+              onClick={() =>
+                window.open(`/e-commerce/${storeData.subdomain}`, "_blank")
+              }
+            >
               <span className="flex items-center gap-2">
                 <Eye size={20} />
                 Preview
@@ -1173,6 +1179,7 @@ export default function CustomizeTemplatePage() {
             })}
 
             <Footer
+              isCustomize={true}
               companyName={footerAttributes.brandName}
               textColor={footerAttributes.textColor}
               companyLogo={{
