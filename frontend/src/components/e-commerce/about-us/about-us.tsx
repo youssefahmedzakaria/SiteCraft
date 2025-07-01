@@ -39,7 +39,7 @@ export function AboutUs({
   secondaryDescription,
 }: AboutUsProps) {
   const variants = {
-    centered: {
+    "centered": {
       container: "py-8 md:py-16",
       content: "container mx-auto px-4",
       title: "text-2xl md:text-4xl lg:text-6xl font-light text-center mb-6 md:mb-12",
@@ -72,7 +72,7 @@ export function AboutUs({
   const style = variants[variant]
 
   return (
-    <section className={cn(style.container, backgroundColor, className)}>
+    <section id={id} className={cn(style.container, backgroundColor, className)}>
       <div className={style.content}>
         {variant === "top-image" ? (
           <>
@@ -96,9 +96,9 @@ export function AboutUs({
                 <h2 className={cn(style.title, titleFont, titleColor, titleSize)}>{title}</h2>
               </div>
               <div className={style.description}>
-                <p className={cn(descriptionSize, descriptionColor)}>{description}</p>
+                <p className={cn(descriptionSize,descriptionFont,descriptionColor)}>{description}</p>
                 {secondaryDescription && (
-                  <p className={cn(descriptionSize, descriptionColor)}>{secondaryDescription}</p>
+                  <p className={cn(descriptionSize,descriptionFont,descriptionColor)}>{secondaryDescription}</p>
                 )}
               </div>
             </div>
@@ -108,9 +108,9 @@ export function AboutUs({
             <div>
               <h2 className={cn(style.title, titleFont, titleColor, titleSize)}>{title}</h2>
               <div className={style.description}>
-                <p className={cn(descriptionSize, descriptionColor, "mb-4")}>{description}</p>
+                <p className={cn(descriptionSize,descriptionFont, descriptionColor, "mb-4")}>{description}</p>
                 {secondaryDescription && (
-                  <p className={cn(descriptionSize, descriptionColor)}>{secondaryDescription}</p>
+                  <p className={cn(descriptionSize,descriptionFont, descriptionColor)}>{secondaryDescription}</p>
                 )}
               </div>
             </div>
@@ -150,9 +150,9 @@ export function AboutUs({
             <div>
               <h2 className={cn(style.title, titleFont, titleColor, titleSize)}>{title}</h2>
               <div className={style.description}>
-                <p className={cn(descriptionSize, descriptionColor, "mb-4")}>{description}</p>
+                <p className={cn(descriptionSize,descriptionFont, descriptionColor, "mb-4")}>{description}</p>
                 {secondaryDescription && (
-                  <p className={cn(descriptionSize, descriptionColor)}>{secondaryDescription}</p>
+                  <p className={cn(descriptionSize,descriptionFont, descriptionColor)}>{secondaryDescription}</p>
                 )}
               </div>
             </div>
@@ -175,9 +175,9 @@ export function AboutUs({
               />
             </div>
             <h2 className={cn(style.title, titleFont, titleColor, titleSize)}>{title}</h2>
-            <p className={cn(descriptionSize, descriptionColor, "mb-4 md:mb-8")}>{description}</p>
+            <p className={cn(descriptionSize, descriptionFont, descriptionColor, "mb-4 md:mb-8")}>{description}</p>
             {secondaryDescription && (
-              <p className={cn(descriptionSize, descriptionColor)}>{secondaryDescription}</p>
+              <p className={cn(descriptionSize, descriptionFont, descriptionColor)}>{secondaryDescription}</p>
             )}
           </div>
         )}

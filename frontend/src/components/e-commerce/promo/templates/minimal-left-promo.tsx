@@ -1,3 +1,4 @@
+
 import { PromoSlider } from "../promo-slider"
 import { cn } from "@/lib/utils"
 
@@ -26,8 +27,6 @@ export interface MinimalLeftPromoProps {
   backgroundColor?: string
   imageObjectFit?: "cover" | "fill" | "contain"
   id?: string
-  scrollEffect?: "zoom-out" | "sticky" | "parallax" | "none"
-  scrollSpeed?: number
 }
 
 export function MinimalLeftPromo({ 
@@ -67,11 +66,9 @@ export function MinimalLeftPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-  scrollEffect,
-  scrollSpeed,
 }: MinimalLeftPromoProps) {
   return (
-    <section className={cn("w-full", backgroundColor)}>
+    <section id={id} className={cn("w-full", backgroundColor)}>
       <div className="promo-new">
         <PromoSlider
           slides={slides}
@@ -90,8 +87,6 @@ export function MinimalLeftPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
-          scrollEffect={scrollEffect}
-          scrollSpeed={scrollSpeed}
         />
       </div>
     </section>

@@ -25,6 +25,7 @@ export interface RightAlignedPromoProps {
   buttonRadius?: string
   backgroundColor?: string
   imageObjectFit?: "cover" | "fill" | "contain"
+  scrollEffect?: "zoom-out" | "sticky" | "parallax" | "none"
   id?: string
 }
 
@@ -64,6 +65,7 @@ export function RightAlignedPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
+  
   id, 
 }: RightAlignedPromoProps) {
   return (
