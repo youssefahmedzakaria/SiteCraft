@@ -3,14 +3,14 @@
 "use client";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { CategoryLayoutItems } from "./categoryLayoutItems";
-import { CategoriesCustomizationAttributes } from "@/lib/customization";
+import { CategoryCustomizationAttributes } from "@/lib/customization";
 import { useState } from "react";
 
 interface RenderCategorySectionProps {
   detailedSectionTab: string;
-  categoryAttributes: CategoriesCustomizationAttributes;
+  categoryAttributes: CategoryCustomizationAttributes;
   updateCategoryAttributes: (
-    updates: Partial<CategoriesCustomizationAttributes>
+    updates: Partial<CategoryCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
 }

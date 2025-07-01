@@ -95,6 +95,46 @@ export interface CategoryCustomizationAttributes {
   }[];
 }
 
+export interface ProductCustomizationAttributes {
+  template: string;
+  title: string;
+  bgColor: string;
+  textColor: string;
+  accentColor: string;
+  fontFamily: string;
+  titleFont: string;
+  showTitle: boolean;
+  showMoreButton: boolean;
+  showMoreText: string;
+  showMorebuttonBgColor: string;
+  showMorebuttonTextColor: string;
+  ctaText: string;
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined;
+  showCta: boolean; // button
+  cardVariant:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured"; // add more if needed
+  showSubtitle: boolean;
+  cardTextColor: string;
+  categories: {
+    id: string;
+    name: string;
+    link: string;
+    media: {
+      mainMedia: {
+        image: {
+          src: string;
+        };
+      };
+    };
+  }[];
+}
+
 export interface AboutCustomizationAttributes {
   template: string;
   id: string;

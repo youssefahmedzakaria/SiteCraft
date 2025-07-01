@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -162,22 +161,22 @@ export default function CustomizeTemplatePage() {
   const initialCategory: CategoryCustomizationAttributes = {
     template: "FeaturedGrid", // You can adjust this if needed
     title: "categories",
-    bgColor: "bg-white",
-    textColor: "text-black",
-    accentColor: "bg-blue-500",
+    bgColor: "bg-[#FFFFFF]",
+    textColor: "text-[#000000]",
+    accentColor: "bg-[#3B82F6]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-black",
-    showMorebuttonTextColor: "text-red-500",
+    showMorebuttonBgColor: "bg-[#000000]",
+    showMorebuttonTextColor: "text-[#EF4444]",
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
     cardVariant: "overlay",
     showSubtitle: true,
-    cardTextColor: "text-black", // Added a reasonable default value
+    cardTextColor: "text-[#000000]", // Added a reasonable default value
     categories: [
       {
         id: "6",
@@ -785,9 +784,6 @@ export default function CustomizeTemplatePage() {
       setIsLoading(false);
     };
     fetchAll();
-    // ...rest of your code (console logs, etc.)
-    console.log("Footer image", footerAttributes.logo.src);
-    console.log("Header image", headerAttributes.logo.src);
   }, []);
 
   // Warn user before leaving the page if there are unsaved changes

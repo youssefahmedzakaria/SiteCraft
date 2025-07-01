@@ -136,7 +136,7 @@ export function RenderPromoSection({
     const file = e.target.files?.[0] || null;
     if (file) {
       // Update promoImages
-      let updatedPromoImages = promoImages ? [...promoImages] : [];
+      const updatedPromoImages = promoImages ? [...promoImages] : [];
       updatedPromoImages[index] = file;
       setPromoImages(updatedPromoImages);
       // Update preview
