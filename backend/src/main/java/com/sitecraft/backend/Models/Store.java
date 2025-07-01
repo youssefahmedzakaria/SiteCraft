@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,14 +45,18 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
-    @Column(name = "subdomain", unique = true)
-    private String subdomain;
 
-    // Constructors
-    public Store() {
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
+
+    public Store(Long id) {
+        this.id = id;
     }
 
-    public Store(Long id, String storeName, String storeType, String logo, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo) {
+
+    public Store(Long id, String storeName, String storeType, String logo, String subdomain, String description, String phoneNumber, String emailAddress, String address, String addressLink, String openingHours, LocalDateTime creationDate, List<SocialMedia> socialMediaAccounts, List<Policy> policies, List<AboutUs> aboutUs, List<ShippingInfo> shippingInfo, List<CustomizedTemplateSection> customizedTemplate) {
         this.id = id;
         this.storeName = storeName;
         this.storeType = storeType;
@@ -67,10 +72,12 @@ public class Store {
         this.policies = policies;
         this.aboutUs = aboutUs;
         this.shippingInfo = shippingInfo;
-
+        this.customizedTemplate = customizedTemplate;
     }
 
-    // Getters and Setters
+    public Store() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -167,12 +174,12 @@ public class Store {
         this.creationDate = creationDate;
     }
 
-    public void setSocialMediaAccounts(List<SocialMedia> socialMediaAccounts) {
-        this.socialMediaAccounts = socialMediaAccounts;
-    }
-
     public List<SocialMedia> getSocialMediaAccounts() {
         return socialMediaAccounts;
+    }
+
+    public void setSocialMediaAccounts(List<SocialMedia> socialMediaAccounts) {
+        this.socialMediaAccounts = socialMediaAccounts;
     }
 
     public List<Policy> getPolicies() {
@@ -199,4 +206,11 @@ public class Store {
         this.shippingInfo = shippingInfo;
     }
 
+    public List<CustomizedTemplateSection> getCustomizedTemplate() {
+        return customizedTemplate;
+    }
+
+    public void setCustomizedTemplate(List<CustomizedTemplateSection> customizedTemplate) {
+        this.customizedTemplate = customizedTemplate;
+    }
 }

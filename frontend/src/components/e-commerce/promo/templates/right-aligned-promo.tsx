@@ -1,7 +1,7 @@
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface RightAlignedPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -10,7 +10,7 @@ export interface RightAlignedPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -29,7 +29,8 @@ export interface RightAlignedPromoProps {
   id?: string
 }
 
-export function RightAlignedPromo({ 
+export function RightAlignedPromo({
+  isClickable = true,
   slides = [
     {
       title: "Your Site Title",
@@ -50,7 +51,7 @@ export function RightAlignedPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -65,16 +66,23 @@ export function RightAlignedPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-  
-  id, 
+  id,
 }: RightAlignedPromoProps) {
   return (
-    <section id={id} className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="right"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -88,6 +96,7 @@ export function RightAlignedPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>

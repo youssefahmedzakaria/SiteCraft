@@ -89,7 +89,7 @@ export default function CheckoutPage() {
           color: theme.textColor,
         }}
       >
-        <div className="text-center py-16">
+        <div className="text-center pt-16 py-16">
           <h1
             className="text-3xl font-bold mb-4"
             style={{ color: theme.textColor }}
@@ -197,7 +197,7 @@ export default function CheckoutPage() {
       className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
       style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
     >
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center pt-16 gap-4 mb-8">
         <h1 className="text-3xl font-bold" style={{ color: theme.textColor }}>
           Checkout
         </h1>

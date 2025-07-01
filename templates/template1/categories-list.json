@@ -1,16 +1,82 @@
 {
-    "template": "FeaturedGridCategoryTemplate",
-    "backgroundColor": "bg-white",
-    "textColor": "text-black",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
     "categories": [
         {
-            "id": "category1",
-            "title": "Category 1",
-            "image": "/category1.jpg",
-            "imageAlt": "Category 1 Image",
-            "link": "/category1"
+            "name": "category1",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "1"
+        },
+        {
+            "name": "category2",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "2"
+        },
+        {
+            "name": "category3",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "3"
+        },
+        {
+            "name": "category4",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "4"
+        },
+        {
+            "name": "category5",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": null
+                    }
+                }
+            },
+            "id": "5"
+        },
+        {
+            "name": "Brooches",
+            "media": {
+                "mainMedia": {
+                    "image": {
+                        "url": "/brooch1.jpg"
+                    }
+                }
+            },
+            "id": "6"
         }
+       
     ],
+    "columns": {
+        "sm": 1,
+        "md": 4,
+        "lg": 4,
+        "xl": 4
+    },
+    "gap": "gap-6",
     "showCategoryTitle": "true",
     "borderRadius": "rounded-lg",
     "fontFamily": "font-sans",
@@ -28,9 +94,17 @@
     "titleFontSize": "text-lg",
     "showCta": true,
     "ctaText": "Shop Now",
-    "overlayColor": "bg-black/30",
+    "overlayColor": "bg-[#ffffff]/30",
+    "showScrollbar": false,
+    "scrollBarSliderColor": "bg-[#9ca3af]",
+    "scrollBarBgColor": "bg-[#f3f4f6]",
+    "showDescription": true,
+    "showControls": true,
+    "showIcon": true,
+    "imageHeight": "aspect-square",
+    "cardWidth": "w-full",
     "showMoreButton": true,
     "showMoreText": "Show More",
-    "showMorebuttonBgColor": "bg-black",
-    "showMorebuttonTextColor": "text-white"
+    "showMorebuttonBgColor": "bg-[#1d4ed8]",
+    "showMorebuttonTextColor": "text-[#ffffff]"
 }

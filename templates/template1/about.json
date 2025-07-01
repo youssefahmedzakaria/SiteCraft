@@ -1,11 +1,17 @@
-{  "template": "topImageAbout",
+{
+    "template": "topImageAbout",
+    "id": "about",
     "title": "About Us",
-    "titleColor": "#000000",
-    "description": "Learn more about our company, our values, and our mission.",
-    "secondaryDescription": "We are committed to providing the best service and products to our customers.",
-    "descriptionColor": "#000000",
-    "backgroundColor": "#ffffff",
-    "image": "about.jpg",
-    "imageAlt": "About Us Image",
-    "imageObjectFit": "cover"
+    "titleColor": "text-[#000000]",
+    "description": "simple description about your brand",
+    "secondaryDescription": "another simple description about your brand",
+    "descriptionColor": "text-[#000000]",
+    "backgroundColor": "bg-[#ffffff]",
+    "image": null,
+    "imageAlt": null,
+    "imageObjectFit": null,
+    "titleFont": "font-serif",
+    "titleSize": "text-4xl",
+    "descriptionFont": "font-sans",
+    "descriptionSize": "text-lg"
 }

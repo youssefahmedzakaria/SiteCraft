@@ -1,0 +1,23 @@
+{
+  "template": "MinimalLeftContact",
+  "id": "contact",
+  "title": "Contact Us",
+  "address": null,
+  "addressUrl": null,
+  "openHours": null,
+  "phone": "+201234567890",
+  "contactEmail": "info@brand.com",
+  "socialLinks": {
+    "facebook": "https://www.facebook.com",
+    "instagram": "https://www.instagram.com"
+  },
+  "imageUrl": null,
+  "showMap": false,
+  "backgroundColor": "bg-white",
+  "titleFont": "font-semibold",
+  "titleColor": "text-black",
+  "titleSize": "text-2xl",
+  "contentFont": "font-normal",
+  "contentColor": "text-black",
+  "contentSize": "text-sm"
+}

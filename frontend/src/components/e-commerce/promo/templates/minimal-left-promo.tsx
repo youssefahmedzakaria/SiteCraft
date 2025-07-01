@@ -1,8 +1,7 @@
-
 import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
 
 export interface MinimalLeftPromoProps {
+  isClickable?: boolean
   slides?: {
     title: string
     description: string
@@ -11,7 +10,7 @@ export interface MinimalLeftPromoProps {
     image: string
     imageAlt: string
   }[]
-  autoplay?: boolean
+  autoPlay?: boolean
   showArrows?: boolean
   titleFont?: string
   titleColor?: string
@@ -29,7 +28,8 @@ export interface MinimalLeftPromoProps {
   id?: string
 }
 
-export function MinimalLeftPromo({ 
+export function MinimalLeftPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -51,7 +51,7 @@ export function MinimalLeftPromo({
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -68,12 +68,20 @@ export function MinimalLeftPromo({
   imageObjectFit,
 }: MinimalLeftPromoProps) {
   return (
-    <section id={id} className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="minimalLeft"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -87,6 +95,7 @@ export function MinimalLeftPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
+          isClickable={isClickable}
         />
       </div>
     </section>

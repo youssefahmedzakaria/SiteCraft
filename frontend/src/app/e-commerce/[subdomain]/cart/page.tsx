@@ -131,7 +131,7 @@ export default function CartPage() {
               <div
                 key={item.id}
                 className={cn(
-                  "flex items-center gap-4 p-4 border",
+                  "flex flex-col lg:flex-row items-center gap-4 p-4 border",
                   theme.borderRadius
                 )}
                 style={{
@@ -139,7 +139,7 @@ export default function CartPage() {
                   borderColor: theme.secondaryColor,
                 }}
               >
-                <div className="relative w-20 h-20 bg-gray-100 rounded-md overflow-hidden">
+                <div className="relative w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                   <Image
                     src={item.image || "/placeholder.svg"}
                     alt={item.name}
@@ -148,73 +148,49 @@ export default function CartPage() {
                   />
                 </div>
 
-                <div className="flex-1">
-                  <h3
-                    className="font-medium"
-                    style={{ color: theme.textColor }}
-                  >
-                    {item.name}
-                  </h3>
-                  <p
-                    className="text-sm"
-                    style={{ color: theme.secondaryColor }}
-                  >
-                    SKU: {item.id}
-                  </p>
-                  <p
-                    className="text-lg font-semibold"
-                    style={{ color: theme.textColor }}
-                  >
-                    ${item.price}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleQuantityChange(item.id, item.quantity - 1)
-                    }
-                    style={{
-                      borderColor: theme.secondaryColor,
-                      color: theme.secondaryColor,
-                    }}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="w-12 text-center">{item.quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleQuantityChange(item.id, item.quantity + 1)
-                    }
-                    style={{
-                      borderColor: theme.secondaryColor,
-                      color: theme.secondaryColor,
-                    }}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                <div className="text-right">
-                  <p
-                    className="font-semibold"
-                    style={{ color: theme.textColor }}
-                  >
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeFromCart(item.id)}
-                    style={{ color: theme.secondaryColor }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+              {/* Product Info and Controls */}
+                <div className="flex flex-col flex-1 w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
+                    <div>
+                      <h3 className="font-medium text-base sm:text-lg" style={{ color: theme.textColor }}>{item.name}</h3>
+                      <p className="text-xs sm:text-sm" style={{ color: theme.secondaryColor }}>SKU: {item.id}</p>
+                      <p className="text-lg font-semibold mt-1" style={{ color: theme.textColor }}>${item.price}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                        className="w-9 h-9 text-2xl"
+                      >
+                        <Minus className="w-6 h-6" />
+                      </Button>
+                      <span className="w-8 text-center text-base">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                        className="w-9 h-9 text-2xl"
+                      >
+                        <Plus className="w-6 h-6" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-base font-bold" style={{ color: theme.textColor }}>
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </span>
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="ml-2 text-red-500 hover:text-red-700"
+                      aria-label="Remove item"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+              </div>
               </div>
             ))}
           </div>

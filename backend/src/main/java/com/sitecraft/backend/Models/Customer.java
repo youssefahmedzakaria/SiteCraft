@@ -26,6 +26,9 @@ public class Customer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wishlist_id")
     @JsonIgnore
@@ -49,6 +52,7 @@ public class Customer {
     @JsonIgnore
     private List<Review> reviews;
 
+
     public Customer(Long id, String name, String email, String password, String gender, String phone, String status, LocalDateTime createdAt, LocalDateTime updatedAt, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
         this.id = id;
         this.name = name;
@@ -67,7 +71,6 @@ public class Customer {
     }
 
     public Customer() {
-
     }
 
     public Long getId() {

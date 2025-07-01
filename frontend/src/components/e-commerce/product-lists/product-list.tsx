@@ -1,69 +1,78 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { GridProductTemplate } from "./templates/grid-template"
-import { HorizontalScrollProductTemplate } from "./templates/horizontal-scroll-template"
-import { FeaturedGridProductTemplate } from "./templates/featured-grid-template"
-import { ListViewProductTemplate } from "./templates/list-view-template"
-import Link from "next/link"
+import { cn } from "@/lib/utils";
+import { GridProductTemplate } from "./templates/grid-template";
+import { HorizontalScrollProductTemplate } from "./templates/horizontal-scroll-template";
+import { FeaturedGridProductTemplate } from "./templates/featured-grid-template";
+import { ListViewProductTemplate } from "./templates/list-view-template";
+import Link from "next/link";
 
 interface ProductListProps {
-  products: any[]
-  template?: "grid" | "horizontal" | "featured" | "list" 
+  isClickable?: boolean;
+  products: any[];
+  template?: "grid" | "horizontal" | "featured" | "list";
   columns?: {
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-  gap?: string
-  bgColor?: string
-  textColor?: string
-  accentColor?: string
-  borderColor?: string
-  borderRadius?: string
-  overlayColor?: string
-  showTitle?: boolean
-  showProductTitle?: boolean
-  showDescription?: boolean
-  showCta?: boolean
-  showControls?: boolean
-  showIcon?: boolean
-  ctaText?: string
-  titlePosition?: "top" | "bottom" | "overlay"
-  imageHeight?: string
-  cardWidth?: string
-  fontFamily?: string
-  cardShadow?: string
-  hoverEffect?: boolean
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: string;
+  bgColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderColor?: string;
+  borderRadius?: string;
+  overlayColor?: string;
+  showTitle?: boolean;
+  showProductTitle?: boolean;
+  showDescription?: boolean;
+  showCta?: boolean;
+  showControls?: boolean;
+  showIcon?: boolean;
+  ctaText?: string;
+  titlePosition?: "top" | "bottom" | "overlay";
+  imageHeight?: string;
+  cardWidth?: string;
+  fontFamily?: string;
+  cardShadow?: string;
+  hoverEffect?: boolean;
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
-  showSubtitle?: boolean
-  cornerRadius?: "none" | "small" | "medium" | "large"
-  showScrollbar?: boolean
-  scrollBarSliderColor?: string
-  scrollBarBgColor?: string
-  titleColor?: string
-  titleFontSize?: string
-  title?: string
-  titleFont?: string
+  cardVariant?:
+    | "default"
+    | "compact"
+    | "detailed"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured";
+  showSubtitle?: boolean;
+  cornerRadius?: "none" | "small" | "medium" | "large";
+  showScrollbar?: boolean;
+  scrollBarSliderColor?: string;
+  scrollBarBgColor?: string;
+  titleColor?: string;
+  titleFontSize?: string;
+  title?: string;
+  titleFont?: string;
   // Product specific props
-  onAddToCart?: (product: any) => void
-  onAddToFavorite?: (product: any) => void
+  onAddToCart?: (product: any) => void;
+  onAddToFavorite?: (product: any) => void;
   // Show more button props
-  showMoreButton?: boolean
-  showMoreText?: string
-  showMorebuttonBgColor?: string
-  showMorebuttonTextColor?: string
+  showMoreButton?: boolean;
+  showMoreText?: string;
+  showMorebuttonBgColor?: string;
+  showMorebuttonTextColor?: string;
 }
 
 export default function ProductList({
+  isClickable = true,
   products,
   template = "grid",
   // Template customization props
   columns,
   gap,
-  bgColor, 
+  bgColor,
   textColor,
   accentColor,
   borderColor,
@@ -101,7 +110,6 @@ export default function ProductList({
   showMoreText = "Show More",
   showMorebuttonBgColor = "blue",
   showMorebuttonTextColor = "white",
-
 }: ProductListProps) {
   // Render the selected template with passed props
   const renderTemplate = () => {
@@ -109,6 +117,7 @@ export default function ProductList({
       case "horizontal":
         return (
           <HorizontalScrollProductTemplate
+            isClickable={isClickable}
             products={products}
             bgColor={bgColor}
             textColor={textColor}
@@ -144,12 +153,13 @@ export default function ProductList({
             showMoreButton={showMoreButton}
             showMoreText={showMoreText}
             showMorebuttonBgColor={showMorebuttonBgColor}
-            showMorebuttonTextColor={showMorebuttonTextColor} 
+            showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
       case "featured":
         return (
           <FeaturedGridProductTemplate
+            isClickable={isClickable}
             products={products}
             bgColor={bgColor}
             textColor={textColor}
@@ -180,12 +190,13 @@ export default function ProductList({
             showMoreButton={showMoreButton}
             showMoreText={showMoreText}
             showMorebuttonBgColor={showMorebuttonBgColor}
-            showMorebuttonTextColor={showMorebuttonTextColor} 
+            showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
       case "list":
         return (
           <ListViewProductTemplate
+            isClickable={isClickable}
             products={products}
             bgColor={bgColor}
             textColor={textColor}
@@ -218,12 +229,13 @@ export default function ProductList({
             showMoreButton={showMoreButton}
             showMoreText={showMoreText}
             showMorebuttonBgColor={showMorebuttonBgColor}
-            showMorebuttonTextColor={showMorebuttonTextColor} 
+            showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
       default: // grid template
         return (
           <GridProductTemplate
+            isClickable={isClickable}
             products={products}
             columns={columns}
             gap={gap}
@@ -257,15 +269,11 @@ export default function ProductList({
             showMoreButton={showMoreButton}
             showMoreText={showMoreText}
             showMorebuttonBgColor={showMorebuttonBgColor}
-            showMorebuttonTextColor={showMorebuttonTextColor} 
+            showMorebuttonTextColor={showMorebuttonTextColor}
           />
-        )
+        );
     }
-  }
+  };
 
-  return(
-    <div className="w-full">
-      {renderTemplate()}
-    </div>
-  )
+  return <div className="w-full">{renderTemplate()}</div>;
 }

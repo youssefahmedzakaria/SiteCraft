@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import FlexibleCard from "@/components/e-commerce/card/card-templates";
 import { usePathname } from "next/navigation";
 interface FeaturedGridCategoryTemplateProps {
+  isClickable?: boolean;
   categories: any[];
   bgColor?: string;
   textColor?: string;
@@ -44,6 +45,7 @@ interface FeaturedGridCategoryTemplateProps {
 }
 
 export default function FeaturedGridCategoryTemplate({
+  isClickable = true,
   categories,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -99,7 +101,7 @@ export default function FeaturedGridCategoryTemplate({
           {/* Featured large category */}
           {featuredCategory && (
             <Link
-              href={`/e-commerce/${subdomain}/products`}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className="md:col-span-2 md:row-span-2 group w-full"
               key={featuredCategory._id}
             >
@@ -147,7 +149,7 @@ export default function FeaturedGridCategoryTemplate({
           {/* All remaining categories */}
           {remainingCategories.map((category) => (
             <Link
-              href={`/e-commerce/${subdomain}/products`}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className="group w-full"
               key={category.id}
             >
@@ -197,7 +199,7 @@ export default function FeaturedGridCategoryTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={`/e-commerce/${subdomain}/categories`}
+              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

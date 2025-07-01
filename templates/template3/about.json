@@ -1,0 +1,17 @@
+{
+    "template": "LeftAlignedAbout",
+    "id": "about",
+    "title": "About Us",
+    "titleColor": "text-[#000000]",
+    "description": "simple description about your brand",
+    "secondaryDescription": "another simple description about your brand",
+    "descriptionColor": "text-[#000000]/80",
+    "backgroundColor": "bg-[#ffffff]",
+    "image": null,
+    "imageAlt": null,
+    "imageObjectFit": null,
+    "titleFont": "font-serif",
+    "titleSize": "text-4xl",
+    "descriptionFont": "font-sans",
+    "descriptionSize": "text-lg"
+}

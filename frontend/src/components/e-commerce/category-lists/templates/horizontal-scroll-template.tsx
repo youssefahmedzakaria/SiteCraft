@@ -9,6 +9,7 @@ import FlexibleCard from "@/components/e-commerce/card/card-templates";
 import { usePathname } from "next/navigation";
 
 interface HorizontalScrollCategoryTemplateProps {
+  isClickable?: boolean;
   categories: any[];
   bgColor?: string;
   textColor?: string;
@@ -51,6 +52,7 @@ interface HorizontalScrollCategoryTemplateProps {
 }
 
 export function HorizontalScrollCategoryTemplate({
+  isClickable = true,
   categories,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -187,6 +189,7 @@ export function HorizontalScrollCategoryTemplate({
                 className={cn("flex-shrink-0", cardWidth)}
               >
                 <FlexibleCard
+                  isClickable={isClickable}
                   item={category}
                   type="category"
                   variant={cardVariant}
@@ -235,7 +238,7 @@ export function HorizontalScrollCategoryTemplate({
       {showMoreButton && (
         <div className="flex justify-end mt-6">
           <Link
-            href={`/e-commerce/${subdomain}/categories`}
+            href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
             className={cn(
               "inline-flex items-center px-6 py-2",
               " hover:bg-opacity-80 transition-colors duration-300",

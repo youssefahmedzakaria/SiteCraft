@@ -1,0 +1,17 @@
+{
+    "template": "CenteredAbout",
+    "id": "about",
+    "title": "know more about us",
+    "titleColor": "text-[#000000]",
+    "description": "simple description about our brand",
+    "secondaryDescription": "another simple description about our brand",
+    "descriptionColor": "text-[#000000]",
+    "backgroundColor": "bg-[#ffffff]",
+    "image": null,
+    "imageAlt": null,
+    "imageObjectFit": null,
+    "titleFont": "font-sans",
+    "titleSize": "text-4xl",
+    "descriptionFont": "font-sans",
+    "descriptionSize": "text-lg"
+}

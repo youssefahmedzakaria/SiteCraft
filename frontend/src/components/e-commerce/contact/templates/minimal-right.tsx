@@ -1,4 +1,4 @@
-import Contact from "../contact"
+import {Contact}from "../contact"
 
 interface MinimalRightContactProps {
   id?: string
@@ -25,5 +25,5 @@ interface MinimalRightContactProps {
 }
 
 export function MinimalRightContact(props: MinimalRightContactProps) {
-  return <Contact {...props} template="minimal-right" />
+  return <Contact {...props} variant="minimal-right" />
 }

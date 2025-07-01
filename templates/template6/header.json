@@ -25,8 +25,8 @@
             "href": "/categories"
         },
         {
-            "label": "Contact",
-            "href": "/contact"
+            "label":"about us",
+            "href": "/about-us"
         }
     ],
     "iconColor": "#000000",

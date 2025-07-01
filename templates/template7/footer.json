@@ -15,13 +15,6 @@
             "fontColor": "text-black"
         },
         {
-            "label": "Policies",
-            "href": "#policies",
-            "font": "font-serif",
-            "fontSize": "text-lg",
-            "fontColor": "text-black"
-        },
-        {
             "label": "About Us",
             "href": "#about-us",
             "font": "font-serif",

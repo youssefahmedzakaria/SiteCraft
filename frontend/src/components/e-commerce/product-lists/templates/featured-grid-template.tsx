@@ -8,6 +8,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 interface FeaturedGridProductTemplateProps {
+  isClickable?: boolean;
   products: any[];
   bgColor?: string;
   textColor?: string;
@@ -49,6 +50,7 @@ interface FeaturedGridProductTemplateProps {
 }
 
 export function FeaturedGridProductTemplate({
+  isClickable,
   products,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -192,7 +194,7 @@ export function FeaturedGridProductTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={`/e-commerce/${subdomain}/products`}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",
