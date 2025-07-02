@@ -17,6 +17,7 @@ public class Order {
 
     private Double price;
     private String status;
+    @Column(name = "issue_date")
     private java.time.LocalDateTime issueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)

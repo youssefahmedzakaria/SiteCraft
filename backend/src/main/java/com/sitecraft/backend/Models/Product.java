@@ -126,41 +126,26 @@ public class Product {
         return category != null ? category.getName() : null;
     }
     
-    // Low stock notification helper methods
-    /**
-     * Check if low stock notification is enabled for this product
-     */
     public boolean isLowStockNotificationEnabled() {
         return minCap != null && maxCap != null;
     }
-    
-    /**
-     * Get the current total stock from all variants
-     */
-    public int getCurrentTotalStock() {
-        if (variants == null) return 0;
-        return variants.stream()
-                .mapToInt(variant -> variant.getStock())
-                .sum();
-    }
-    
     /**
      * Check if the product is currently at low stock level
      */
     public boolean isAtLowStockLevel() {
         if (!isLowStockNotificationEnabled()) return false;
-        int currentStock = getCurrentTotalStock();
-        return currentStock <= minCap.intValue();
-    }
-    
-    /**
-     * Calculate the total stock capacity from variants (for maxCap)
-     */
-    public BigDecimal calculateTotalStockCapacity() {
-        if (variants == null) return BigDecimal.ZERO;
-        int totalStock = variants.stream()
-                .mapToInt(variant -> variant.getStock())
-                .sum();
-        return BigDecimal.valueOf(totalStock);
+        // Only update maxCap if it seems stale (variants exist but maxCap doesn't match)
+        // This avoids overwriting maxCap that was just set by handleLowStockSettings
+        if (variants != null && !variants.isEmpty()) {
+            int currentTotalStock = variants.stream()
+                    .mapToInt(variant -> variant.getStock())
+                    .sum();
+            // Only update if maxCap is significantly different from actual stock
+            // This handles cases where stock changed after maxCap was set
+            if (maxCap.intValue() != currentTotalStock) {
+                this.maxCap = BigDecimal.valueOf(currentTotalStock);
+            }
+        }
+        return maxCap.intValue() <= minCap.intValue();
     }
 }

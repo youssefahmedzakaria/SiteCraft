@@ -81,9 +81,6 @@ public class ProductService {
         product.setCategory(category);
         product.setStore(store);
 
-        // Handle low stock notification settings
-        handleLowStockSettings(product, productDTO);
-
         Product savedProduct = productRepo.save(product);
 
         // Create CategoryProduct entry for many-to-many relationship
@@ -157,6 +154,9 @@ public class ProductService {
                 productVariantsRepo.save(variant);
             }
         }
+
+        // Handle low stock notification settings after variants are created
+        handleLowStockSettings(savedProduct, productDTO);
 
         if (productDTO.getImageUrls() != null && !productDTO.getImageUrls().isEmpty()) {
             for (String imageUrl : productDTO.getImageUrls()) {
@@ -573,19 +573,23 @@ public class ProductService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
             
-            // Set maxCap to total stock capacity
+            // Always set maxCap to total stock capacity (current stock)
             product.setMaxCap(totalStockCapacity);
             
             if ("percentage".equals(productDTO.getLowStockType())) {
-                // For percentage-based, calculate minCap from percentage
-                if (productDTO.getLowStockThreshold() != null && totalStockCapacity.compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal threshold = totalStockCapacity.multiply(BigDecimal.valueOf(productDTO.getLowStockThreshold()))
-                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                    product.setMinCap(threshold);
+                // Percentage-based: Store percentage and calculate minCap from it
+                if (productDTO.getLowStockThreshold() != null) {
                     product.setPercentageMax(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
+                    // Calculate minCap = percentageMax * maxCap / 100
+                    if (totalStockCapacity.compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal minCapFromPercentage = BigDecimal.valueOf(productDTO.getLowStockThreshold())
+                                .multiply(totalStockCapacity)
+                                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                        product.setMinCap(minCapFromPercentage);
+                    }
                 }
             } else if ("number".equals(productDTO.getLowStockType())) {
-                // For number-based, set minCap directly
+                // Number-based: Set minCap directly to user's threshold
                 if (productDTO.getLowStockThreshold() != null) {
                     product.setMinCap(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
                     product.setPercentageMax(null); // Clear percentage for number-based
