@@ -26,10 +26,10 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       {!isAuthPage && <SiteCraftNavbar />}
       {isEcommercePage && (
         <Navbar
-          template="template2"
+          template="template8"
           brandName="Jewelry"
-          backgroundColor="bg-black/50"
-          textColor="text-white"
+          backgroundColor="bg-[#ffffff]"
+          textColor="text-[#000000]"
           logo={{
             src: "/logo.png",
             alt: "Custom Logo",
@@ -42,9 +42,8 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             { label: "About Us", href: `/e-commerce/${subdomain}/#about` },
             { label: "Contact Us", href: `/e-commerce/${subdomain}/#contact` },
           ]}
-          iconColor="text-white"
-          dividerColor="border-gray-200"
-          searchIconColor="text-white"
+          iconColor="text-[#0000ff]"
+          dividerColor="border-[#e5e5e5]"
           fontFamily="font-sans"
         />
       )}

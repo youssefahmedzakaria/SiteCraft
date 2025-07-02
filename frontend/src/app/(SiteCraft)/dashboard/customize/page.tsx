@@ -92,7 +92,6 @@ export default function CustomizeTemplatePage() {
     ],
     iconColor: "text-[#FFFFFF]", // text-white
     dividerColor: "border-[#E5E7EB]", // border-gray-200
-    searchIconColor: "text-[#FFFFFF]", // text-white
     fontFamily: "font-sans",
   };
 
@@ -1125,7 +1124,6 @@ export default function CustomizeTemplatePage() {
               }))}
               iconColor={headerAttributes.iconColor}
               dividerColor={headerAttributes.dividerColor}
-              searchIconColor={headerAttributes.searchIconColor}
               fontFamily={headerAttributes.fontFamily}
             />
 

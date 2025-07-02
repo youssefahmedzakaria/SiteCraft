@@ -10,8 +10,6 @@ export interface NavigationProps {
   orientation?: "horizontal" | "vertical"
   className?: string
   onClick?: () => void
-  isCustomize?: boolean
-  containerWidth?: number
 }
 
 const getFontFamily = (fontFamily: string) => {
@@ -38,20 +36,11 @@ export const Navigation: React.FC<NavigationProps> = ({
   orientation = "horizontal",
   className = "",
   onClick,
-  isCustomize = false,
-  containerWidth = 0,
 }) => {
-  // Responsive to div size when isCustomize is true
-  const isCompact = isCustomize && containerWidth > 0 && containerWidth < 768
-
-  // Combine Tailwind responsive classes with div-responsive logic
-  const spacing = isCompact ? "space-x-2 sm:space-x-3" : "space-x-4 sm:space-x-6"
-  const verticalSpacing = isCompact ? "space-y-1 sm:space-y-2" : "space-y-2 sm:space-y-4"
-
   return (
     <div
       className={`
-      ${orientation === "horizontal" ? `flex ${spacing}` : `flex flex-col ${verticalSpacing}`}
+      ${orientation === "horizontal" ? "flex space-x-6" : "flex flex-col space-y-4"}
       ${className}
     `}
     >
@@ -59,7 +48,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         <Link
           key={item.label}
           href={item.href}
-          className={`${isCompact ? "text-xs sm:text-sm" : "text-sm"} hover:underline transition-all`}
+          className="text-sm hover:underline transition-all"
           style={{
             color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : "#000000",
             fontFamily: getFontFamily(fontFamily),
