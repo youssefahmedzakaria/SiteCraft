@@ -307,7 +307,7 @@ public class UserService {
     private void sendCredentialsEmail(String to, String username, String password) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your Staff Account Credentials");
+        message.setSubject("Your Admin Account Credentials");
         message.setText("Login Email: " + username + "\nPassword: " + password);
         mailSender.send(message);
     }
@@ -353,6 +353,67 @@ public class UserService {
             mailSender.send(message);
         } catch (Exception e) {
             System.err.println("Failed to send low stock notification email: " + e.getMessage());
+        }
+    }
+
+    public void sendCustomMail(String email, String subject, String message) {
+        try {
+            org.springframework.mail.SimpleMailMessage mail = new org.springframework.mail.SimpleMailMessage();
+            mail.setTo(email);
+            mail.setSubject(subject);
+            mail.setText(message);
+            mailSender.send(mail);
+        } catch (Exception e) {
+            System.err.println("Failed to send custom mail: " + e.getMessage());
+        }
+    }
+
+    // Global admin management
+    public List<UserRole> getAllGlobalAdmins() {
+        return userRoleRepo.findByRoleAndStoreIdIsNull("admin");
+    }
+
+    @Transactional
+    public void addGlobalAdminByEmail(String email) {
+        List<Users> users = userRepo.findAllByEmail(email);
+        if (!users.isEmpty()) {
+            throw new RuntimeException("A user with this email already exists.");
+        }
+        final Users user;
+        UserRole adminRole = null;
+        try {
+                // Create new user with random password
+                String randomPassword = UUID.randomUUID().toString().substring(0, 8);
+                Users newUser = new Users();
+                newUser.setId(null); // Ensure id is not set
+                newUser.setEmail(email);
+                newUser.setName(email.split("@")[0]); // Use prefix as name
+                newUser.setPassword(passwordEncoder.encode(randomPassword));
+                user = userRepo.save(newUser);
+                // Send credentials email
+                sendCredentialsEmail(email, email, randomPassword);
+            // Now user is effectively final
+            adminRole = new UserRole("admin", user, null);
+            userRoleRepo.save(adminRole);
+        } catch (Exception e) {
+            // If a duplicate key or unique constraint violation occurs, remove the admin role if it was created
+            if (adminRole != null && adminRole.getId() != null) {
+                try {
+                    userRoleRepo.delete(adminRole);
+                } catch (Exception ignored) {}
+            }
+            throw new RuntimeException("Failed to add admin: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public void removeGlobalAdmin(Long userId) {
+        Users user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        userRoleRepo.deleteByUserAndRoleAndStoreIdIsNull(user, "admin");
+        // Check if user has any other roles
+        UserRole remainingRole = userRoleRepo.findByUser(user);
+        if (remainingRole == null) {
+            userRepo.deleteById(userId);
         }
     }
 }

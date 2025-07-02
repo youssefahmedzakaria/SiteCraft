@@ -47,6 +47,8 @@ public class Store {
     @Column(name = "subdomain", unique = true)
     private String subdomain;
 
+    private String status;
+
     // Constructors
     public Store() {
     }
@@ -197,6 +199,14 @@ public class Store {
 
     public void setShippingInfo(List<ShippingInfo> shippingInfo) {
         this.shippingInfo = shippingInfo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

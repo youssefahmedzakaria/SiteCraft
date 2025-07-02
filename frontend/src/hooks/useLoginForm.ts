@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from './useAuth'
 import { useRouter } from 'next/navigation'
+import { getSession } from '../lib/auth'
 
 export const useLoginForm = () => {
   const [email, setEmail] = useState('')
@@ -18,7 +19,12 @@ export const useLoginForm = () => {
 
     const success = await login(email, password)
     if (success) {
-      router.push('/dashboard')
+      const session = await getSession();
+      if (session?.role === 'admin') {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
     }
   }
 

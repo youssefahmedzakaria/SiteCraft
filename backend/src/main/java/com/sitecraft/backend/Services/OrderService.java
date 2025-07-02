@@ -216,4 +216,13 @@ public class OrderService {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
     }
+
+    public List<Order> getOrdersByStoreAndDateRange(Long storeId, java.time.LocalDate start, java.time.LocalDate end) {
+        List<Order> allOrders = getAllOrders(storeId);
+        return allOrders.stream()
+                .filter(order -> order.getIssueDate() != null &&
+                        !order.getIssueDate().toLocalDate().isBefore(start) &&
+                        !order.getIssueDate().toLocalDate().isAfter(end))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
