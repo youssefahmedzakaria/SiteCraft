@@ -56,6 +56,7 @@ export interface PromoCustomizationAttributes {
 }
 
 export interface CategoryCustomizationAttributes {
+  id : string;
   template: string; //
   isClickable: boolean; //
   title: string; //
@@ -95,23 +96,24 @@ export interface CategoryCustomizationAttributes {
 }
 
 export interface ProductCustomizationAttributes {
-   template: string; //
-  isClickable: boolean; //
-  title: string; //
-  bgColor: string; //
-  textColor: string; //
-  fontFamily: string; //
-  titleFont: string; //
-  showTitle: boolean; //
-  showMoreButton: boolean; //
-  showMoreText: string; //
-  showMorebuttonBgColor: string; //
-  showMorebuttonTextColor: string; //
-  ctaText: string; //
-  cornerRadius: "small" | "medium" | "none" | "large" | undefined; //
-  showCta: boolean; //
-  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
-  showSubtitle: boolean; //
+  id : string;
+  template: string; 
+  isClickable: boolean; 
+  title: string; 
+  bgColor: string; 
+  textColor: string; 
+  fontFamily: string; 
+  titleFont: string; 
+  showTitle: boolean; 
+  showMoreButton: boolean; 
+  showMoreText: string; 
+  showMorebuttonBgColor: string; 
+  showMorebuttonTextColor: string; 
+  ctaText: string;
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined; 
+  showCta: boolean; 
+  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; 
+  showSubtitle: boolean; 
   overlayColor: string;
   showProductTitle: boolean;
   titleColor: string;

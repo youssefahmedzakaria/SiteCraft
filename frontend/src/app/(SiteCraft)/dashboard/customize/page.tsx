@@ -70,7 +70,6 @@ const initialSections: Section[] = [];
 export default function CustomizeTemplatePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const [logoImage, setLogoImage] = useState<File | undefined>();
   const [aboutImage, setAboutImage] = useState<File | undefined>();
   const [contactImage, setContactImage] = useState<File | undefined>();
   const [policiesImage, setPoliciesImage] = useState<File | undefined>();
@@ -163,6 +162,7 @@ export default function CustomizeTemplatePage() {
   };
 
   const initialCategory: CategoryCustomizationAttributes = {
+    id: "categories",
     template: "FeaturedGrid", // You can adjust this if needed
     isClickable: false,
     title: "categories",
@@ -280,6 +280,7 @@ export default function CustomizeTemplatePage() {
   };
 
   const initialProduct: ProductCustomizationAttributes = {
+    id: "products",
     template: "FeaturedGrid", // You can adjust this if needed
     isClickable: false,
     title: "products",
@@ -769,26 +770,29 @@ export default function CustomizeTemplatePage() {
           });
           switch (section.title) {
             case "Header&Menu":
-              setHeaderAttributes(section.value);
+              updateHeaderAttributes(section.value);
               break;
             case "PromoSlider":
-              setPromoAttributes(section.value);
+              updatePromoAttributes(section.value);
               break;
             case "AboutUs":
-              setAboutAttributes(section.value);
+              updateAboutAttributes(section.value);
               break;
             case "Footer":
-              setFooterAttributes(section.value);
+              updateFooterAttributes(section.value);
               break;
             case "Policies":
-              setPoliciesAttributes(section.value);
+              updatePoliciesAttributes(section.value);
               break;
             case "ContactUs":
-              setContactAttributes(section.value);
+              updateContactAttributes(section.value);
               break;
-            // case "Categories":
-            //   setCategoryAttributes(section.value);
-            //   break;
+            case "Categories":
+              updateCategoryAttributes(section.value);
+              break;
+            case "Products":
+              updateProductAttributes(section.value);
+              break;
             // Add additional cases as you expand your backend support
           }
         });
@@ -833,6 +837,14 @@ export default function CustomizeTemplatePage() {
       }
       case "PromoSlider":
         return value;
+      case "Categories": {
+        const { categories, ...rest } = value;
+        return rest;
+      }
+      case "Products": {
+        const { products, ...rest } = value;
+        return rest;
+      }
       case "AboutUs": {
         const { description, secondaryDescription, ...rest } = value;
         return rest;
@@ -869,6 +881,12 @@ export default function CustomizeTemplatePage() {
           break;
         case "PromoSlider":
           value = promoAttributes;
+          break;
+        case "Categories":
+          value = categoryAttributes;
+          break;
+        case "Products":
+          value = productAttributes;
           break;
         case "AboutUs":
           value = aboutAttributes;
@@ -939,7 +957,7 @@ export default function CustomizeTemplatePage() {
   // Replace the main render logic to show loading until data is ready
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="h-screen flex-1 flex items-center justify-center">
         <span>Loading customization...</span>
       </div>
     );
