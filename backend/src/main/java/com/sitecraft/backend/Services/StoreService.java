@@ -43,7 +43,9 @@ public class StoreService {
         System.out.println("🏪 StoreService.createStore called for user ID: " + userId);
         try {
             store.setCreationDate(LocalDateTime.now());
+            store.setStatus("active");
             System.out.println("📅 Store creation date set");
+            System.out.println("✅ Store status set to active");
 
             Store savedStore = storeRepo.save(store);
             System.out.println("✅ Store saved with ID: " + savedStore.getId());
