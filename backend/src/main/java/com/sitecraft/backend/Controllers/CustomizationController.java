@@ -55,6 +55,29 @@ public class CustomizationController {
         }
     }
 
+    @GetMapping("/getTemplateBySubdomain/{subdomain}")
+    public ResponseEntity<?> getCustomizedTemplateBySubdomain(@PathVariable String subdomain) {
+        try {
+            Store store = storeRepo.findBySubdomain(subdomain);
+
+
+            List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(store.getId());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Customized Template retrieved successfully");
+            response.put("Customized Template", customizedTemplate);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
     @PostMapping("/addTemplate")
     public ResponseEntity<?> addCustomizedTemplate(HttpSession session, @RequestBody List<CustomizedTemplateDTO> dtoList) {
         try {
@@ -128,6 +151,3 @@ public class CustomizationController {
     }
 
 }
-
-
-
