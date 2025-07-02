@@ -24,6 +24,6 @@ interface MinimalRightContactProps {
   titleSize?: string
 }
 
-export function MinimalRightContact(props: MinimalRightContactProps) {
-  return <Contact {...props} variant="minimal-right" />
+export function MinimalRightContact(props: MinimalRightContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="minimal-right" />
 }

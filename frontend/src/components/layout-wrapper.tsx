@@ -49,7 +49,6 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       ],
       iconColor: "text-[#FFFFFF]", // text-white
       dividerColor: "border-[#E5E7EB]", // border-gray-200
-      searchIconColor: "text-[#FFFFFF]", // text-white
       fontFamily: "font-sans",
     });
   const [footerAttributes, setFooterAttributes] =
@@ -219,20 +218,25 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       {!isAuthPage && <SiteCraftNavbar />}
       {isEcommercePage && (
         <Navbar
-          template={headerAttributes?.template}
-          brandName={headerAttributes?.brandName}
-          backgroundColor={headerAttributes?.backgroundColor}
-          textColor={headerAttributes?.textColor}
-          logo={headerAttributes.logo}
-          menuItems={headerAttributes.menuItems.map((item) => ({
-            label: item.label,
-            href: "#",
-            isShown: item.isShown,
-          }))}
-          iconColor={headerAttributes.iconColor}
-          dividerColor={headerAttributes.dividerColor}
-          searchIconColor={headerAttributes.searchIconColor}
-          fontFamily={headerAttributes.fontFamily}
+          template="template8"
+          brandName="Jewelry"
+          backgroundColor="bg-[#ffffff]"
+          textColor="text-[#000000]"
+          logo={{
+            src: "/logo.png",
+            alt: "Custom Logo",
+            width: 50,
+            height: 50,
+          }}
+          menuItems={[
+            { label: "Home", href: `/e-commerce/${subdomain}` },
+            { label: "Products", href: `/e-commerce/${subdomain}/products` },
+            { label: "About Us", href: `/e-commerce/${subdomain}/#about` },
+            { label: "Contact Us", href: `/e-commerce/${subdomain}/#contact` },
+          ]}
+          iconColor="text-[#0000ff]"
+          dividerColor="border-[#e5e5e5]"
+          fontFamily="font-sans"
         />
       )}
       <main className="flex-1">{children}</main>

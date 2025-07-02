@@ -1,13 +1,13 @@
 "use client"
+
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Menu } from "lucide-react"
 import { Logo } from "../navbar-components/logo"
 import { Navigation } from "../navbar-components/navigation"
 import { SearchBar } from "../navbar-components/search-bar"
 import { IconsGroup } from "../navbar-components/icons-group"
 import MobileMenu from "../navbar-components/mobile-menu"
-import { useResizeObserver } from "../../../../hooks/useResizeObserver"
 
 export interface NavbarTemplate2Props {
   isCustomize?: boolean
@@ -32,49 +32,51 @@ export interface NavbarTemplate2Props {
   }>
   iconColor?: string
   dividerColor?: string
-  searchIconColor?: string
 }
 
+// Utility for font family (local, not imported)
+const getFontFamily = (fontFamily: string) => {
+  switch (fontFamily) {
+    case "font-inter":
+      return "Inter, sans-serif";
+    case "font-roboto":
+      return "Roboto, sans-serif";
+    case "font-open-sans":
+      return "Open Sans, sans-serif";
+    case "font-poppins":
+      return "Poppins, sans-serif";
+    case "font-lato":
+      return "Lato, sans-serif";
+    default:
+      return "system-ui, sans-serif";
+  }
+};
+
 export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
-  isCustomize = false,
+  isCustomize,
   brandName,
+  MobileMenuItems,
   backgroundColor = "bg-white",
   textColor = "text-black",
   fontFamily = "font-sans",
   logo,
   menuItems = [],
-  MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
-  searchIconColor = "text-gray-400",
 }) => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  // For div responsiveness when isCustomize is true
-  const [navbarRef, navbarSize] = useResizeObserver<HTMLDivElement>()
-  const isMobileDiv = isCustomize && navbarSize.width > 0 && navbarSize.width < 768
-
-  // For screen responsiveness - track screen size with proper initialization
-  const [isClient, setIsClient] = useState(false)
-  const [screenWidth, setScreenWidth] = useState(1920)
-
-  useEffect(() => {
-    setIsClient(true)
-    const updateScreenWidth = () => {
-      setScreenWidth(window.innerWidth)
-    }
-
-    updateScreenWidth()
-    window.addEventListener("resize", updateScreenWidth)
-    return () => window.removeEventListener("resize", updateScreenWidth)
-  }, [])
-
-  const isScreenMobile = isClient && screenWidth < 768
-  const shouldShowMobile = isCustomize ? isMobileDiv || isScreenMobile : isScreenMobile
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
+
+  console.log("NavbarTemplate2 props:", {
+    backgroundColor,
+    textColor,
+    fontFamily,
+    iconColor,
+    dividerColor,
+  })
 
   return (
     <>
@@ -86,82 +88,65 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
         textColor={textColor}
         iconColor={iconColor}
         MobileMenuItems={MobileMenuItems || []}
-        searchIconColor={searchIconColor}
         dividerColor={dividerColor}
-        isCustomize={isCustomize}
       />
 
       <nav
-        ref={navbarRef}
-        className={`${isCustomize ? "relative" : "fixed"} top-0 left-0 w-full z-30 backdrop-blur ${fontFamily}`}
+        className={`${isCustomize ? "relative" : "fixed"} top-0 left-0 w-full z-30 backdrop-blur`}
         style={{
           backgroundColor: backgroundColor.includes("[")
             ? backgroundColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
-            : undefined,
-          color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+            : backgroundColor,
+          color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : textColor,
+          fontFamily: getFontFamily(fontFamily),
         }}
       >
-        <div className="w-full max-w-none mx-auto px-4 lg:px-6">
-          {shouldShowMobile ? (
-            // Mobile layout
-            <div className="flex items-center justify-between h-14">
-              <Logo
-                brandName={brandName}
-                logo={logo}
-                textColor={textColor}
-                isCustomize={isCustomize}
-                containerWidth={navbarSize.width}
-              />
-              <button
-                className="p-1 hover:opacity-80"
-                onClick={() => setIsMobileMenuOpen(true)}
-                style={{
-                  color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                }}
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
-          ) : (
-            // Desktop Layout
-            <div className="w-full">
-              {/* Top bar with icons on the right */}
-              <div className="flex items-center justify-between pt-4 w-full">
-                <div className="w-1/3" />
-                <div className="w-1/3 flex justify-center">
-                  <Logo
-                    brandName={brandName}
-                    logo={logo}
-                    textColor={textColor}
-                    isCustomize={isCustomize}
-                    containerWidth={navbarSize.width}
-                  />
-                </div>
-                <div className="w-1/3 flex justify-end space-x-4">
-                  <SearchBar
-                    expanded={isSearchOpen}
-                    setExpanded={setIsSearchOpen}
-                    iconColor={searchIconColor}
-                    backgroundColor="bg-white/20"
-                    textColor={textColor}
-                    isCustomize={isCustomize}
-                    containerWidth={navbarSize.width}
-                  />
-                  <IconsGroup iconColor={iconColor} isCustomize={isCustomize} containerWidth={navbarSize.width} />
-                </div>
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Desktop Layout */}
+          <div className="hidden md:block w-full">
+            {/* Top bar with icons on the right */}
+            <div className="flex items-center justify-between pt-4">
+              <div className="w-1/3" />
+              <div className="w-1/3 flex justify-center">
+                <Logo brandName={brandName} logo={logo} textColor={textColor} />
               </div>
-              {/* Menu items centered below logo */}
-              <div className="flex justify-center h-10 mt-4 w-full">
-                <Navigation
-                  menuItems={visibleMenuItems}
+              <div className="w-1/3 flex justify-end space-x-4">
+                <SearchBar
+                  expanded={isSearchOpen}
+                  setExpanded={setIsSearchOpen}
+                  iconColor={iconColor}
+                  backgroundColor="bg-white/20"
                   textColor={textColor}
-                  fontFamily={fontFamily}
-                  isCustomize={isCustomize}
-                  containerWidth={navbarSize.width}
                 />
+                <IconsGroup iconColor={iconColor} />
               </div>
             </div>
-          )}
+            {/* Menu items centered below logo */}
+            <div className="flex justify-center h-10 mt-4">
+              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+            </div>
+          </div>
+
+          {/* Mobile Layout */}
+          <div className="md:hidden w-full">
+            <div className="flex items-center justify-between py-4">
+              <Logo brandName={brandName} logo={logo} textColor={textColor} />
+              <div className="flex items-center space-x-6">
+                <button
+                  className="p-1 hover:opacity-80"
+                  onClick={isCustomize ? undefined : () => setIsMobileMenuOpen(true)}
+                  style={{
+                    color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                    opacity: isCustomize ? 0.5 : 1,
+                    pointerEvents: isCustomize ? 'none' : undefined,
+                  }}
+                  disabled={isCustomize}
+                >
+                  <Menu className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </nav>
     </>
