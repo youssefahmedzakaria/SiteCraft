@@ -95,13 +95,9 @@ export function RenderAboutSection({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setAboutImage(file || undefined);
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateAboutAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setAboutImage(file);
+      updateAboutAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
@@ -117,11 +113,8 @@ export function RenderAboutSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateAboutAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setAboutImage(file);
+      updateAboutAttributes({ image: URL.createObjectURL(file) });
     }
   };
 

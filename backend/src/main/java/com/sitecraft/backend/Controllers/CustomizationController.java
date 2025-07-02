@@ -29,11 +29,13 @@ public class CustomizationController {
     @GetMapping("/getTemplate")
     public ResponseEntity<?> getCustomizedTemplate(HttpSession session) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in sessionaaaa."));
-            }
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+
+            Long storeId = 1L;
 
             List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(storeId);
 
@@ -93,7 +95,7 @@ public class CustomizationController {
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
-                Store store = storeRepo.findById(dto.storeId())
+                Store store = storeRepo.findById(storeId)
                         .orElseThrow(() -> new RuntimeException("Store not found"));
 
                 CustomizedTemplateSection section = new CustomizedTemplateSection();
@@ -123,15 +125,17 @@ public class CustomizationController {
     @PutMapping("/editTemplate")
     public ResponseEntity<?> editCustomizedTemplate(HttpSession session, @RequestBody List<CustomizedTemplateDTO> dtoList) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+
+            Long storeId = 1L;
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
-                Store store = storeRepo.findById(dto.storeId())
+                Store store = storeRepo.findById(storeId)
                         .orElseThrow(() -> new RuntimeException("Store not found"));
 
                 CustomizedTemplateSection section = new CustomizedTemplateSection();
@@ -143,7 +147,7 @@ public class CustomizationController {
                 customizedTemplate.add(section);
             }
 
-            customizationService.editCustomizedTemplate(1L, customizedTemplate);
+            customizationService.editCustomizedTemplate(storeId, customizedTemplate);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -161,11 +165,13 @@ public class CustomizationController {
     @PostMapping("/saveImage")
     public ResponseEntity<?> saveImage(HttpSession session, @RequestPart(value = "image") MultipartFile image) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+
+            Long storeId = 1L;
 
             String filename = "customize" + storeId + "_" + image.getOriginalFilename();
             String relativePath = "/uploads/stores/" + storeId + "/customize/";

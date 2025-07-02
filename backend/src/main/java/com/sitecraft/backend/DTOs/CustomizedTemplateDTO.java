@@ -5,6 +5,5 @@ import com.fasterxml.jackson.databind.JsonNode;
 public record CustomizedTemplateDTO(
         String title,
         JsonNode value,
-        Integer index,
-        Long storeId
+        Integer index
 ) {}

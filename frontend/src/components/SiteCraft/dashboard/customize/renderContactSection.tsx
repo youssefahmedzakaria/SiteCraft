@@ -51,13 +51,9 @@ export function RenderContactSection({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setContactImage(file || undefined);
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateContactAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setContactImage(file);
+      updateContactAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
@@ -73,11 +69,8 @@ export function RenderContactSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateContactAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setContactImage(file);
+      updateContactAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
@@ -249,7 +242,7 @@ export function RenderContactSection({
               </div>
             </div>
           </div>
-          
+
           <div className="pt-8 flex justify-start">
             {onDeleteSection && (
               <button

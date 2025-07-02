@@ -873,58 +873,18 @@ export default function CustomizeTemplatePage() {
     }
   };
 
-  // Helper to build DTOs for each section
-  const buildCustomizationDTOs = () => {
-    // Set storeId to 1 for all sections
-    const storeId = 1;
-    return sections.map((section, idx) => {
-      let value = {};
-      switch (section.id) {
-        case "Header&Menu":
-          value = headerAttributes;
-          break;
-        case "PromoSlider":
-          value = promoAttributes;
-          break;
-        case "Categories":
-          value = categoryAttributes;
-          break;
-        case "Products":
-          value = productAttributes;
-          break;
-        case "AboutUs":
-          value = aboutAttributes;
-          break;
-        case "Policies":
-          value = policiesAttributes;
-          break;
-        case "ContactUs":
-          value = contactAttributes;
-          break;
-        case "Footer":
-          value = footerAttributes;
-          break;
-        // Add cases for Categories, Products, etc. as needed
-        default:
-          value = {};
-      }
-      return {
-        title: section.id,
-        value: stripBackendFields(section.id, value),
-        index: idx,
-        storeId,
-      };
-    });
-  };
-
   // API call for editing customization
   const handleSaveClick = () => {
     setShowSaveDialog(true);
   };
 
   const handleCustomizedImages = async () => {
+    let updatedSlides = [...promoAttributes.slides];
+    let updatedAboutImage = aboutAttributes.image;
+    let updatedContactImage = contactAttributes.image;
+
     try {
-      if (promoImages !== undefined && promoImages.length > 0) {
+      if (promoImages && promoImages.length > 0) {
         for (let i = 0; i < promoImages.length; i++) {
           const formData = new FormData();
           formData.append("image", promoImages[i]);
@@ -939,12 +899,10 @@ export default function CustomizeTemplatePage() {
           const data = await response.json();
           if (!data.success) {
             alert(data.message || "Failed to save customization Image.");
-            return;
+            return null;
           } else {
             const url = data.url;
-            const updatedSlides = [...promoAttributes.slides];
             updatedSlides[i] = { ...updatedSlides[i], image: url };
-            updatePromoAttributes({ slides: updatedSlides });
           }
         }
       }
@@ -962,10 +920,9 @@ export default function CustomizeTemplatePage() {
         const data = await response.json();
         if (!data.success) {
           alert(data.message || "Failed to save customization Image.");
-          return;
+          return null;
         } else {
-          const url = data.url;
-          updateAboutAttributes({ image: url });
+          updatedAboutImage = data.url;
         }
       }
       if (contactImage !== undefined) {
@@ -982,24 +939,86 @@ export default function CustomizeTemplatePage() {
         const data = await response.json();
         if (!data.success) {
           alert(data.message || "Failed to save customization Image.");
-          return;
+          return null;
         } else {
-          const url = data.url;
-          updateContactAttributes({ image: url });
+          updatedContactImage = data.url;
         }
       }
+
+      // Update state ONCE after all uploads
+      updatePromoAttributes({ slides: updatedSlides });
+      updateAboutAttributes({ image: updatedAboutImage });
+      updateContactAttributes({ image: updatedContactImage });
+
+      // Return the new values for use in DTOs
+      return {
+        updatedSlides,
+        updatedAboutImage,
+        updatedContactImage,
+      };
     } catch (error) {
       alert("An error occurred while saving customization Images.");
+      return null;
     }
   };
 
   const editCustomizedTemplate = async () => {
     setIsSaving(true);
     setSaveMessage("");
-    setShowSaveDialog(false);
+    setShowSaveDialog(true);
     try {
-      const dtoList = buildCustomizationDTOs();
-      await handleCustomizedImages();
+      // 1. Upload images and get new values
+      const imagesResult = await handleCustomizedImages();
+      if (!imagesResult) {
+        setIsSaving(false);
+        return;
+      }
+
+      // 2. Use the new values to build DTOs
+      const { updatedSlides, updatedAboutImage, updatedContactImage } =
+        imagesResult;
+
+      // Build DTOs using the latest values
+      // const storeId = 1;
+      const dtoList = sections.map((section, idx) => {
+        let value = {};
+        switch (section.id) {
+          case "Header&Menu":
+            value = headerAttributes;
+            break;
+          case "PromoSlider":
+            value = { ...promoAttributes, slides: updatedSlides };
+            break;
+          case "Categories":
+            value = categoryAttributes;
+            break;
+          case "Products":
+            value = productAttributes;
+            break;
+          case "AboutUs":
+            value = { ...aboutAttributes, image: updatedAboutImage };
+            break;
+          case "Policies":
+            value = policiesAttributes;
+            break;
+          case "ContactUs":
+            value = { ...contactAttributes, image: updatedContactImage };
+            break;
+          case "Footer":
+            value = footerAttributes;
+            break;
+          default:
+            value = {};
+        }
+        return {
+          title: section.id,
+          value: stripBackendFields(section.id, value),
+          index: idx,
+          // storeId,
+        };
+      });
+
+      // 3. Send to backend
       const response = await fetch(
         "http://localhost:8080/customize/editTemplate",
         {
@@ -1013,7 +1032,6 @@ export default function CustomizeTemplatePage() {
       );
       const data = await response.json();
       if (data.success) {
-        // Store message in localStorage to show after navigation
         localStorage.setItem(
           "customizeSuccessMessage",
           "Changes saved successfully!"
@@ -1024,7 +1042,7 @@ export default function CustomizeTemplatePage() {
         alert(data.message || "Failed to save customization.");
       }
     } catch (error) {
-      alert("An error occurred while saving customization.");
+      alert(`An error occurred while saving customization. ${error}`);
     } finally {
       setIsSaving(false);
     }

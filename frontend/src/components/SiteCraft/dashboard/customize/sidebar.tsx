@@ -401,8 +401,7 @@ export function Sidebar({
                 updateProductAttributes={updateProductAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
               />
-            )
-            : detailedSection.id === "AboutUs" ? (
+            ) : detailedSection.id === "AboutUs" ? (
               <RenderAboutSection
                 detailedSectionTab={detailedSectionTab}
                 aboutAttributes={aboutAttributes}

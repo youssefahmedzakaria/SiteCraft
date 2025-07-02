@@ -161,6 +161,9 @@ export function RenderPromoSection({
     const index = parseInt(indexStr);
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
+      const updatedPromoImages = promoImages ? [...promoImages] : [];
+      updatedPromoImages[index] = file;
+      setPromoImages(updatedPromoImages);
       const updatedSlides = [...promoAttributes.slides];
       updatedSlides[index] = {
         ...updatedSlides[index],
@@ -335,9 +338,7 @@ export function RenderPromoSection({
                                         >
                                           <div
                                             className={`relative w-24 h-24 rounded ${
-                                              promo.image
-                                                ? ""
-                                                : "bg-gray-100"
+                                              promo.image ? "" : "bg-gray-100"
                                             } overflow-hidden`}
                                           >
                                             {promo.image ? (
