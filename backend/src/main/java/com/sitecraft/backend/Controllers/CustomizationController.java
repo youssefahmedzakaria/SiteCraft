@@ -1,9 +1,13 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.DTOs.CustomizedTemplateDTO;
+import com.sitecraft.backend.Models.Category;
 import com.sitecraft.backend.Models.CustomizedTemplateSection;
+import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Repositories.StoreRepo;
+import com.sitecraft.backend.Services.CategoryService;
 import com.sitecraft.backend.Services.CustomizationService;
+import com.sitecraft.backend.Services.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customize")
@@ -25,6 +30,10 @@ public class CustomizationController {
     private CustomizationService customizationService;
     @Autowired
     private StoreRepo storeRepo;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping("/getTemplate")
     public ResponseEntity<?> getCustomizedTemplate(HttpSession session) {
@@ -192,4 +201,58 @@ public class CustomizationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    @GetMapping("/getProducts")
+    public ResponseEntity<?> getAllProducts(HttpSession session) {
+        try {
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+            Long storeId = 1L;
+            List<Product> products = productService.getAllProducts(storeId).stream().limit(6).collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Products retrieved successfully");
+            response.put("products", products);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/getCategories")
+    public ResponseEntity<?> getAllCategories(HttpSession session) {
+        try {
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+            Long storeId = 1L;
+
+            List<Category> categories = categoryService.getAllCategories(storeId).stream().limit(6).collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Categories retrieved successfully");
+            response.put("categories", categories);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
 }
