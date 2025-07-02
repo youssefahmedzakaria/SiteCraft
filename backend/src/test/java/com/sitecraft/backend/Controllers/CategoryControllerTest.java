@@ -144,7 +144,7 @@ public class CategoryControllerTest {
     void testGetCategoryProducts_Success() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("storeId", 1L);
-        List<Product> products = List.of(new Product());
+        List<com.sitecraft.backend.DTOs.ProductDTO> products = List.of(new com.sitecraft.backend.DTOs.ProductDTO());
         when(categoryService.getCategoryProducts(2L, 1L)).thenReturn(products);
         mockMvc.perform(get("/categories/2/products").session(session))
                 .andExpect(status().isOk())

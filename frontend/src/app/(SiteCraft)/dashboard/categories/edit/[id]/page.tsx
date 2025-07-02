@@ -15,34 +15,53 @@ import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function EditCategoryPage() {
+  // All hooks at the top
   const params = useParams();
   const router = useRouter();
   const categoryId = params.id as string;
   const { isAuthenticated } = useAuth();
-  
-  const [activeTab, setActiveTab] = useState<
-    "Category's Overview" | "Assign Products"
-  >("Category's Overview");
-  
-  // State for maintaining data across tab switches
+  const [activeTab, setActiveTab] = useState<"Category's Overview" | "Assign Products">("Category's Overview");
   const [assignedProducts, setAssignedProducts] = useState<SimplifiedProduct[]>([]);
   const [categoryName, setCategoryName] = useState('');
   const [categoryDescription, setCategoryDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
-  
-  // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  
   const tabs = ["Category's Overview", "Assign Products"];
   const { editCategory, assignProductsToCategory } = useCategoryManagement();
 
-  // Check if user is authenticated
+  // Load category data on component mount
+  useEffect(() => {
+    const loadCategoryData = async () => {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+        if (!categoryId) {
+          setLoadError('Category ID is required');
+          return;
+        }
+        const category = await getCategoryById(parseInt(categoryId));
+        setCategoryName(category.name);
+        setCategoryDescription(category.description);
+        setExistingImageUrl(category.image);
+        const products = await getCategoryProducts(parseInt(categoryId));
+        const transformedProducts = products.map((product: any) => transformProduct(product));
+        setAssignedProducts(transformedProducts);
+      } catch (error) {
+        setLoadError(error instanceof Error ? error.message : 'Failed to load category data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCategoryData();
+  }, [categoryId]);
+
+  // Early returns after all hooks
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen bg-gray-100">
@@ -63,45 +82,41 @@ export default function EditCategoryPage() {
     );
   }
 
-  // Load category data on component mount
-  useEffect(() => {
-    const loadCategoryData = async () => {
-      try {
-        setIsLoading(true);
-        setLoadError(null);
-        
-        if (!categoryId) {
-          setLoadError('Category ID is required');
-          return;
-        }
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading category data...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
-        console.log('Loading category data for ID:', categoryId);
-        
-        // Load category details
-        const category = await getCategoryById(parseInt(categoryId));
-        setCategoryName(category.name);
-        setCategoryDescription(category.description);
-        setExistingImageUrl(category.image);
-        
-        // Load assigned products
-        const products = await getCategoryProducts(parseInt(categoryId));
-        // Transform the products to match SimplifiedProduct interface
-        const transformedProducts = products.map((product: any) => transformProduct(product));
-        setAssignedProducts(transformedProducts);
-        
-        console.log('Category data loaded successfully:', category);
-        console.log('Assigned products:', transformedProducts);
-        
-      } catch (error) {
-        console.error('💥 Error loading category data:', error);
-        setLoadError(error instanceof Error ? error.message : 'Failed to load category data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCategoryData();
-  }, [categoryId]);
+  if (loadError) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Category</h2>
+              <p className="text-gray-600 mb-4">{loadError}</p>
+              <Link href="/dashboard/categories">
+                <Button variant="outline">Back to Categories</Button>
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,44 +167,6 @@ export default function EditCategoryPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center space-x-2">
-              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="text-lg text-gray-600">Loading category data...</span>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (loadError) {
-    return (
-      <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Category</h2>
-              <p className="text-gray-600 mb-4">{loadError}</p>
-              <Link href="/dashboard/categories">
-                <Button variant="outline">Back to Categories</Button>
-              </Link>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -269,6 +246,7 @@ export default function EditCategoryPage() {
                 <AssignProducts 
                   assignedProducts={assignedProducts}
                   setAssignedProducts={setAssignedProducts}
+                  categoryId={categoryId ? parseInt(categoryId) : 0}
                 />
               )}
 

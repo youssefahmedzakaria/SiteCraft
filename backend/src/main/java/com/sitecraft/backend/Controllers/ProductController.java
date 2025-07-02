@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/products")
@@ -43,11 +44,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getAllProducts(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Products retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -69,11 +73,12 @@ public class ProductController {
             }
 
             Product product = productService.getProductById(id, storeId);
+            com.sitecraft.backend.DTOs.ProductDTO productDTO = new com.sitecraft.backend.DTOs.ProductDTO(product);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product retrieved successfully");
-            response.put("data", product);
+            response.put("data", productDTO);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -135,10 +140,12 @@ public class ProductController {
             // Check low stock level for the updated product
             lowStockNotificationService.checkAndSendLowStockNotification(product);
             
+            com.sitecraft.backend.DTOs.ProductDTO productResponseDTO = new com.sitecraft.backend.DTOs.ProductDTO(product);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product updated successfully");
-            response.put("data", product);
+            response.put("data", productResponseDTO);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -222,11 +229,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getLowStockItems(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Low stock items retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -248,11 +258,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getOutOfStockItems(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Out of stock items retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

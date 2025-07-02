@@ -246,29 +246,8 @@ public class CartService {
 
     private ProductDTO createSimplifiedProductDTO(Product product) {
         try {
-            // Create minimal ProductDTO to avoid lazy loading issues
-            List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
-            if (product.getImages() != null) {
-                for (ProductImage img : product.getImages()) {
-                    imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
-                }
-            }
-            
-            // Don't include variants in the product DTO to avoid circular references
-            List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
-            
-            return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getDiscountType(),
-                product.getDiscountValue(),
-                null, // minCap - no longer used for discounts
-                null, // percentageMax - no longer used for discounts
-                null, // maxCap - no longer used for discounts
-                imageDTOs,
-                variantDTOs
-            );
+            // Use the new ProductDTO constructor that takes a Product object
+            return new ProductDTO(product);
         } catch (Exception e) {
             System.err.println("Error creating simplified ProductDTO: " + e.getMessage());
             e.printStackTrace();
@@ -298,32 +277,8 @@ public class CartService {
 
     private ProductDTO mapProductToDTO(Product product) {
         if (product == null) return null;
-        List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
-        if (product.getImages() != null) {
-            for (ProductImage img : product.getImages()) {
-                imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
-            }
-        }
-        List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
-        if (product.getVariants() != null) {
-            for (ProductVariants v : product.getVariants()) {
-                if (v.getPrice() != null) {
-                    variantDTOs.add(mapVariantToDTO(v, product));
-                }
-            }
-        }
-        return new ProductDTO(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getDiscountType(),
-            product.getDiscountValue(),
-            null, // minCap - no longer used for discounts
-            null, // percentageMax - no longer used for discounts
-            null, // maxCap - no longer used for discounts
-            imageDTOs,
-            variantDTOs
-        );
+        // Use the new ProductDTO constructor that takes a Product object
+        return new ProductDTO(product);
     }
 
     private ProductVariantDTO mapVariantToDTO(ProductVariants variant, Product product) {

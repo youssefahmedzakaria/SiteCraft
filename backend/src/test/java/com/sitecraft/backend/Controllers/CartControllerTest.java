@@ -84,11 +84,7 @@ public class CartControllerTest {
         cartProduct.setProduct(product);
 
         // Setup DTOs
-        ProductDTO productDTO = new ProductDTO(
-            1L, "Test Product", "Test Description", 
-            null, null, null, null, null, 
-            Arrays.asList(), Arrays.asList()
-        );
+        ProductDTO productDTO = new ProductDTO(product);
 
         ProductVariantDTO variantDTO = new ProductVariantDTO(
             1L, "TEST-SKU-001", 10, 

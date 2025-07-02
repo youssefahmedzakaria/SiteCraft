@@ -68,9 +68,6 @@ public class ProductService {
         Store store = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-        Category category = categoryRepo.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
@@ -78,7 +75,6 @@ public class ProductService {
         product.setDiscountValue(
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
-        product.setCategory(category);
         product.setStore(store);
 
         // Handle low stock notification settings
@@ -86,11 +82,19 @@ public class ProductService {
 
         Product savedProduct = productRepo.save(product);
 
-        // Create CategoryProduct entry for many-to-many relationship
-        CategoryProduct categoryProduct = new CategoryProduct();
-        categoryProduct.setCategory(category);
-        categoryProduct.setProduct(savedProduct);
-        categoryProductRepo.save(categoryProduct);
+        // Create CategoryProduct entries for many-to-many relationship
+        List<Long> categoryIds = productDTO.getAllCategoryIds();
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            for (Long categoryId : categoryIds) {
+                Category category = categoryRepo.findById(categoryId)
+                        .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                
+                CategoryProduct categoryProduct = new CategoryProduct();
+                categoryProduct.setCategory(category);
+                categoryProduct.setProduct(savedProduct);
+                categoryProductRepo.save(categoryProduct);
+            }
+        }
 
         Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
 
@@ -183,26 +187,42 @@ public class ProductService {
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
         
-        if (productDTO.getCategoryId() != null) {
-            Category category = categoryRepo.findById(productDTO.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            
-            // Update the direct category relationship
-            product.setCategory(category);
-            
+        List<Long> categoryIds = productDTO.getAllCategoryIds();
+        if (categoryIds != null && !categoryIds.isEmpty()) {
             // Update the many-to-many relationship through CategoryProduct table
-            // First, remove existing CategoryProduct entries for this product
-            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findAll()
-                    .stream()
-                    .filter(cp -> cp.getProduct().getId().equals(id))
-                    .toList();
-            categoryProductRepo.deleteAll(existingCategoryProducts);
+            // First, get existing CategoryProduct entries for this product
+            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findByProductId(id);
             
-            // Create new CategoryProduct entry
-            CategoryProduct categoryProduct = new CategoryProduct();
-            categoryProduct.setCategory(category);
-            categoryProduct.setProduct(product);
-            categoryProductRepo.save(categoryProduct);
+            // Create a set of existing category IDs for quick lookup
+            Set<Long> existingCategoryIds = existingCategoryProducts.stream()
+                    .map(cp -> cp.getCategory().getId())
+                    .collect(Collectors.toSet());
+            
+            // Create a set of new category IDs
+            Set<Long> newCategoryIds = new HashSet<>(categoryIds);
+            
+            // Remove categories that are no longer needed
+            List<CategoryProduct> toRemove = existingCategoryProducts.stream()
+                    .filter(cp -> !newCategoryIds.contains(cp.getCategory().getId()))
+                    .collect(Collectors.toList());
+            categoryProductRepo.deleteAll(toRemove);
+            
+            // Add new categories that don't already exist
+            for (Long categoryId : categoryIds) {
+                if (!existingCategoryIds.contains(categoryId)) {
+                    Category category = categoryRepo.findById(categoryId)
+                            .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                    
+                    CategoryProduct categoryProduct = new CategoryProduct();
+                    categoryProduct.setCategory(category);
+                    categoryProduct.setProduct(product);
+                    categoryProductRepo.save(categoryProduct);
+                }
+            }
+        } else if (productDTO.getCategoryId() == null && productDTO.getCategoryIds() == null) {
+            // If no categories are provided, remove all existing category relationships
+            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findByProductId(id);
+            categoryProductRepo.deleteAll(existingCategoryProducts);
         }
 
         // Only update variants and attributes if they are provided in the DTO

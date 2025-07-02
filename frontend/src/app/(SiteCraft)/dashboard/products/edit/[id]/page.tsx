@@ -78,7 +78,8 @@ export default function EditProductPage() {
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: 0,
+    categoryId: 0, // Keep for backward compatibility
+    categoryIds: [], // New field for multiple categories
   });
 
   // Discount settings
@@ -132,10 +133,12 @@ export default function EditProductPage() {
       console.log('✅ Product loaded:', product);
 
       // Set basic form data
+      const categoryIds = product.categories ? product.categories.map(cat => cat.id) : [];
       setBasicFormData({
         name: product.name,
         description: product.description,
-        categoryId: product.categoryId || 0,
+        categoryId: product.categoryId || (categoryIds.length > 0 ? categoryIds[0] : 0), // Keep first category for backward compatibility
+        categoryIds: categoryIds, // Extract category IDs from categories array
       });
 
       // Set discount settings
@@ -219,6 +222,15 @@ export default function EditProductPage() {
           setPrice(transformedVariants[0].price || 0);
           setProductionCost(transformedVariants[0].productionCost || 0);
         }
+      } else {
+        // If no variants exist, create a default variant
+        const defaultVariant: ProductVariantDTO = {
+          stock: 0,
+          price: 0,
+          productionCost: 0,
+          attributes: []
+        };
+        setVariants([defaultVariant]);
       }
 
     } catch (err: any) {
@@ -271,7 +283,14 @@ export default function EditProductPage() {
   // Function to generate all possible variant combinations
   const generateVariants = (attrs: ProductAttributeDTO[]) => {
     if (attrs.length === 0) {
-      setVariants([]);
+      // Create a default variant when no attributes are provided
+      const defaultVariant: ProductVariantDTO = {
+        stock: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
+        attributes: [] // No attributes for default variant
+      };
+      setVariants([defaultVariant]);
       return;
     }
 
@@ -287,8 +306,8 @@ export default function EditProductPage() {
 
       return {
         stock: 0,
-        price: 0,
-        productionCost: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
         attributes: variantAttributes
       };
     });
@@ -403,6 +422,25 @@ export default function EditProductPage() {
     setDragOverVariationIndex(null);
   };
 
+  // Handler to distribute stock among all variants
+  const handleDistributeStock = () => {
+    if (variants.length === 0) return;
+    const totalStockStr = prompt('Enter total stock to distribute among all variants:');
+    if (!totalStockStr) return;
+    const totalStock = parseInt(totalStockStr, 10);
+    if (isNaN(totalStock) || totalStock < 0) {
+      alert('Please enter a valid positive number.');
+      return;
+    }
+    const base = Math.floor(totalStock / variants.length);
+    const remainder = totalStock % variants.length;
+    const newVariants = variants.map((variant, idx) => ({
+      ...variant,
+      stock: base + (idx < remainder ? 1 : 0),
+    }));
+    setVariants(newVariants);
+  };
+
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,46 +456,60 @@ export default function EditProductPage() {
         alert('Please enter valid price and production cost');
         return;
       }
+
+      // Ensure we have at least one variant (create default if none exist)
+      let finalVariants = variants;
+      if (variants.length === 0) {
+        // Create a default variant if none exist
+        finalVariants = [{
+          stock: 0,
+          price: price,
+          productionCost: productionCost,
+          attributes: []
+        }];
+      } else {
+        // Update existing variants with current global price and production cost
+        finalVariants = variants.map(variant => ({
+          ...variant,
+          price,
+          productionCost,
+          // If attributes is a single item with name '', value 'Color: Black, Size: L',
+          // replace it with the correct array of { name, value } pairs parsed from the string
+          attributes:
+            variant.attributes &&
+            variant.attributes.length === 1 &&
+            variant.attributes[0].name === "" &&
+            variant.attributes[0].value.includes(":")
+              ? variant.attributes[0].value.split(", ").map(pair => {
+                  const [name, value] = pair.split(": ");
+                  return { name: name?.trim() || "", value: value?.trim() || "" };
+                })
+              : variant.attributes || []
+        }));
+      }
+
       // Validate stock for each variant
-      if (variants.some(v => v.stock == null || v.stock < 0)) {
+      if (finalVariants.some(v => v.stock == null || v.stock < 0)) {
         alert('Please ensure all variants have valid stock levels');
         return;
       }
 
       // Validate required fields
-      if (!basicFormData.name || !basicFormData.description || basicFormData.categoryId === 0) {
+      if (!basicFormData.name || !basicFormData.description || (basicFormData.categoryIds || []).length === 0) {
         alert('Please fill in all required fields');
         return;
       }
-
-      // Assign global price and production cost to each variant
-      const variantsWithPrice = variants.map(variant => ({
-        ...variant,
-        price,
-        productionCost,
-        // If attributes is a single item with name '', value 'Color: Black, Size: L',
-        // replace it with the correct array of { name, value } pairs parsed from the string
-        attributes:
-          variant.attributes &&
-          variant.attributes.length === 1 &&
-          variant.attributes[0].name === "" &&
-          variant.attributes[0].value.includes(":")
-            ? variant.attributes[0].value.split(", ").map(pair => {
-                const [name, value] = pair.split(": ");
-                return { name: name?.trim() || "", value: value?.trim() || "" };
-              })
-            : variant.attributes || []
-      }));
 
       // Create the complete product data
       const productData: ProductCreateDTO = {
         name: basicFormData.name,
         description: basicFormData.description,
-        categoryId: basicFormData.categoryId,
+        categoryId: basicFormData.categoryId, // Keep for backward compatibility
+        categoryIds: basicFormData.categoryIds, // New field for multiple categories
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],
-        variants: variantsWithPrice,
+        variants: finalVariants,
         // Low stock notification settings
         lowStockType: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockType : undefined,
         lowStockThreshold: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockThreshold : undefined,
@@ -503,6 +555,18 @@ export default function EditProductPage() {
   const updateImageFiles = (files: File[]) => {
     setImageFiles(files);
   };
+
+  // UseEffect to regenerate variants when attributes change
+  useEffect(() => {
+    generateVariants(attributes);
+  }, [attributes]);
+
+  // UseEffect to regenerate default variant when price or production cost changes
+  useEffect(() => {
+    if (attributes.length === 0) {
+      generateVariants(attributes);
+    }
+  }, [price, productionCost]);
 
   // Loading state
   if (isLoading) {
@@ -657,7 +721,7 @@ export default function EditProductPage() {
                           onDelete={() => handleDeleteAttribute(index)}
                           onChange={(name) => handleAttributeNameChange(index, name)}
                           onValuesChange={(values) => handleAttributeValuesChange(index, values)}
-                          onSetStock={() => openStockModalForAttribute(index)}
+                          onSetStock={index === 0 ? handleDistributeStock : () => {}}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>

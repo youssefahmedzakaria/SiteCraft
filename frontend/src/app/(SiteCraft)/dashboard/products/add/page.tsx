@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/SiteCraft/ui/button";
@@ -64,7 +64,8 @@ export default function AddProductPage() {
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: 2,
+    categoryId: undefined as number | undefined, // Remove default category
+    categoryIds: [] as number[], // Start with empty array
   });
 
   // Discount settings
@@ -142,7 +143,14 @@ export default function AddProductPage() {
   // Function to generate all possible variant combinations
   const generateVariants = (attrs: ProductAttributeDTO[]) => {
     if (attrs.length === 0) {
-      setVariants([]);
+      // Create a default variant when no attributes are provided
+      const defaultVariant: ProductVariantDTO = {
+        stock: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
+        attributes: [] // No attributes for default variant
+      };
+      setVariants([defaultVariant]);
       return;
     }
 
@@ -158,8 +166,8 @@ export default function AddProductPage() {
 
       return {
         stock: 0,
-        price: 0,
-        productionCost: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
         attributes: variantAttributes
       };
     });
@@ -223,18 +231,22 @@ export default function AddProductPage() {
   // Save stock values for the selected attribute
   const handleSaveStock = () => {
     if (stockAttributeIndex === null) return;
-    const attrName = attributes[stockAttributeIndex].name;
-    const updatedVariants = variants.map(variant => {
-      const attr = variant.attributes?.find(a => a.name === attrName);
-      if (attr) {
-        const stockObj = stockValues.find(sv => sv.value === attr.value);
-        if (stockObj) {
-          return { ...variant, stock: stockObj.stock };
-        }
-      }
-      return variant;
-    });
-    setVariants(updatedVariants);
+    // Sum all entered stock values
+    const totalStock = stockValues.reduce((sum, sv) => sum + (parseInt(sv.stock as any, 10) || 0), 0);
+    if (isNaN(totalStock) || totalStock < 0) {
+      alert('Please enter valid stock values.');
+      return;
+    }
+    // Distribute totalStock among all variants
+    if (variants.length > 0) {
+      const base = Math.floor(totalStock / variants.length);
+      const remainder = totalStock % variants.length;
+      const updatedVariants = variants.map((variant, idx) => ({
+        ...variant,
+        stock: base + (idx < remainder ? 1 : 0),
+      }));
+      setVariants(updatedVariants);
+    }
     setShowStockModal(false);
   };
 
@@ -284,20 +296,34 @@ export default function AddProductPage() {
         alert('Please enter valid price and production cost');
         return;
       }
+
+      // Ensure we have at least one variant (create default if none exist)
+      let finalVariants = variants;
+      if (variants.length === 0) {
+        // Create a default variant if none exist
+        finalVariants = [{
+          stock: 0,
+          price: price,
+          productionCost: productionCost,
+          attributes: []
+        }];
+      } else {
+        // Update existing variants with current global price and production cost
+        finalVariants = variants.map(v => ({
+          ...v,
+          price,
+          productionCost,
+        }));
+      }
+
       // Validate stock for each variant
-      if (variants.some(v => v.stock == null || v.stock < 0)) {
+      if (finalVariants.some(v => v.stock == null || v.stock < 0)) {
         alert('Please ensure all variants have valid stock levels');
         return;
       }
-      // Assign global price and production cost to each variant
-      const variantsWithPrice = variants.map(v => ({
-        ...v,
-        price,
-        productionCost,
-      }));
 
       // Validate required fields
-      if (!basicFormData.name || !basicFormData.description || basicFormData.categoryId === 0) {
+      if (!basicFormData.name || !basicFormData.description || (basicFormData.categoryIds || []).length === 0) {
         alert('Please fill in all required fields');
         return;
       }
@@ -306,11 +332,12 @@ export default function AddProductPage() {
       const productData: ProductCreateDTO = {
         name: basicFormData.name,
         description: basicFormData.description,
-        categoryId: basicFormData.categoryId,
+        categoryId: basicFormData.categoryId, // Keep for backward compatibility
+        categoryIds: basicFormData.categoryIds, // New field for multiple categories
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],
-        variants: variantsWithPrice,
+        variants: finalVariants,
         // Low stock notification settings
         lowStockType: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockType : undefined,
         lowStockThreshold: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockThreshold : undefined,
@@ -356,6 +383,18 @@ export default function AddProductPage() {
   const updateImageFiles = (files: File[]) => {
     setImageFiles(files);
   };
+
+  // UseEffect to regenerate variants when attributes change
+  useEffect(() => {
+    generateVariants(attributes);
+  }, [attributes]);
+
+  // UseEffect to regenerate default variant when price or production cost changes
+  useEffect(() => {
+    if (attributes.length === 0) {
+      generateVariants(attributes);
+    }
+  }, [price, productionCost]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">

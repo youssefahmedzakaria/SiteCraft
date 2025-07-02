@@ -13,7 +13,7 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
 
     Optional<Category> findByNameAndStoreId(String name, Long storeId);
 
-    @Query("SELECT COUNT(p) FROM Product p WHERE p.category.id = :categoryId")
+    @Query("SELECT COUNT(cp) FROM CategoryProduct cp WHERE cp.category.id = :categoryId")
     Long countProductsByCategoryId(@Param("categoryId") Long categoryId);
 
     boolean existsByNameAndStoreId(String name, Long storeId);

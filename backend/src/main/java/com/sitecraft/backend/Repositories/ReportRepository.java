@@ -132,7 +132,8 @@ public interface ReportRepository extends JpaRepository<Session, Long> {
              COALESCE(SUM(pv.stock), 0)
       FROM ProductVariants pv
       JOIN pv.product p
-      JOIN p.category  c
+      JOIN p.categoryProducts cp
+      JOIN cp.category c
       WHERE p.store.id = :storeId
       GROUP BY c.name
       ORDER BY c.name

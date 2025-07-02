@@ -6,15 +6,16 @@ import {
   ModalTitle,
   ModalFooter,
 } from "@/components/SiteCraft/ui/modal";
-import { SimplifiedProduct, getProducts } from "@/lib/products";
+import { SimplifiedProduct, getProducts, removeProductFromCategory } from "@/lib/products";
 import { useProductManagement } from "@/hooks/useProductManagement";
 
 interface AssignProductsProps {
   assignedProducts: SimplifiedProduct[];
   setAssignedProducts: (products: SimplifiedProduct[]) => void;
+  categoryId: number;
 }
 
-export default function AssignProducts({ assignedProducts, setAssignedProducts }: AssignProductsProps) {
+export default function AssignProducts({ assignedProducts, setAssignedProducts, categoryId }: AssignProductsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<SimplifiedProduct[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,7 +37,7 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts }
       const filtered = products.filter(
         (product) =>
           product.name.toLowerCase().includes(lowercaseQuery) ||
-          (product.category?.title || '').toLowerCase().includes(lowercaseQuery) ||
+          (product.categories && product.categories.some(cat => cat.title.toLowerCase().includes(lowercaseQuery))) ||
           product.id.toString().includes(lowercaseQuery)
       );
       setFilteredProducts(filtered);
@@ -77,10 +78,15 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts }
     return selectedProducts.some((p) => p.id === product.id);
   };
 
-  const handleRemoveProduct = (productId: number, e: React.MouseEvent) => {
+  const handleRemoveProduct = async (productId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setAssignedProducts(assignedProducts.filter((p) => p.id !== productId));
+    try {
+      await removeProductFromCategory(categoryId, productId);
+      setAssignedProducts(assignedProducts.filter((p) => p.id !== productId));
+    } catch (err: any) {
+      alert('Failed to remove product from category: ' + (err.message || err));
+    }
   };
 
   const handleCheckboxChange = (
@@ -164,7 +170,9 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts }
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
-                      {product.category?.title || 'Uncategorized'}
+                      {product.categories && product.categories.length > 0
+                        ? product.categories.map(cat => cat.title).join(', ')
+                        : 'Uncategorized'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
                       {product.stock}
@@ -265,7 +273,9 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts }
                             {product.name}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
-                            {product.category?.title || 'Uncategorized'}
+                            {product.categories && product.categories.length > 0
+                              ? product.categories.map(cat => cat.title).join(', ')
+                              : 'Uncategorized'}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
                             {product.stock}
