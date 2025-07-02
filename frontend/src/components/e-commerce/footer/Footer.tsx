@@ -145,7 +145,7 @@ export const Footer = ({
               iconSize: socialMediaStyles.iconSize || 20,
               iconColor:
                 socialMediaStyles.iconColor || textColor || "#374151",
-              hoverColor: socialMediaStyles.hoverColor || "#3b82f6",
+              hoverColor: socialMediaStyles.hoverColor || textColor || "#3b82f6",
             }}
             textColor={textColor}
             isCustomize={isCustomize}

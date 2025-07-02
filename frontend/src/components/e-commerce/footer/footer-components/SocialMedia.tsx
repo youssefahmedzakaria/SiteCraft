@@ -48,7 +48,7 @@ export const SocialMedia = ({
   }
 
   const iconColor = getColor(styles.iconColor || textColor || "text-gray-600")
-  const hoverColor = getColor(styles.hoverColor ||textColor|| "text-gray-400")
+  const hoverColor = getColor(styles.hoverColor || "text-gray-400")
 
   return (
     <div className={`flex ${shouldShowMobile ? "gap-3" : "gap-4 md:gap-6"} ${className}`}>

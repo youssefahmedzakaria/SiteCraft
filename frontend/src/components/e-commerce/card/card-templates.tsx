@@ -166,11 +166,20 @@ export default function FlexibleCard({
 
   // Get price value - handle multiple price structures
   const getPrice = () => {
-    return item.price?.value || item.price?.price || 0
+    // Use priceAfterDiscount if present, otherwise fallback to value/price
+    if (item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount)) {
+      return item.price.priceAfterDiscount;
+    }
+    return item.price?.value || item.price?.price || 0;
   }
 
   const getOriginalPrice = () => {
-    return item.price?.originalPrice || item.originalPrice || null
+    // If priceAfterDiscount is present, original is price/ value
+    if (item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount)) {
+      return item.price?.price || item.price?.value || null;
+    }
+    // Otherwise, check for originalPrice fields
+    return item.price?.originalPrice || item.originalPrice || null;
   }
 
   const formatPrice = (price: number) => {
@@ -255,28 +264,44 @@ export default function FlexibleCard({
 
   // Enhanced price display component
   const PriceDisplay = ({ className = "" }: { className?: string }) => {
-    if (!showPrice || type !== "product") return null
+    if (!showPrice || type !== "product") return null;
 
-    const currentPrice = getPrice()
-    const originalPrice = getOriginalPrice()
-    const isOnSale = originalPrice && originalPrice > currentPrice
+    const currentPrice = getPrice();
+    const originalPrice = getOriginalPrice();
+    const isDiscounted = item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount);
+    const isOnSale = originalPrice && originalPrice > currentPrice;
+    const discountPercent = originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : null;
 
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        {isOnSale ? (
+        {isDiscounted || isOnSale ? (
           <>
+            <span className={cn("font-semibold", textColor)}>${formatPrice(currentPrice)}</span>
             <span className="text-sm line-through text-gray-500">${formatPrice(originalPrice)}</span>
-            <span className={cn("font-bold text-red-600")}>${formatPrice(currentPrice)}</span>
-            <span className="px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700 rounded-md">
-              {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
-            </span>
           </>
         ) : (
           <span className={cn("font-semibold", textColor)}>${formatPrice(currentPrice)}</span>
         )}
       </div>
-    )
-  }
+    );
+  };
+
+  // Helper to render discount badge next to product name
+  const DiscountBadge = () => {
+    const currentPrice = getPrice();
+    const originalPrice = getOriginalPrice();
+    const isDiscounted = item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount);
+    const isOnSale = originalPrice && originalPrice > currentPrice;
+    const discountPercent = originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : null;
+    if ((isDiscounted || isOnSale) && discountPercent && discountPercent > 0) {
+      return (
+        <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+          {discountPercent}% OFF
+        </span>
+      );
+    }
+    return null;
+  };
 
   // Use titleColor if provided, otherwise fall back to textColor
   const finalTitleFont = titleFont || fontFamily
@@ -306,7 +331,7 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className={cn("absolute inset-0 flex items-center justify-center", overlayColor)}>
                   <div className={cn("text-center p-4", contentClassName)}>
-                    <h3 className={cn(textColor, titleFontSize, "font-bold")}>{item.name}</h3>
+                    <h3 className={cn(textColor, titleFontSize, "font-bold flex items-center justify-center gap-2")}>{item.name}<DiscountBadge /></h3>
                     {showSubtitle && showDescription && (
                       <p className={cn(textColor, "opacity-80 text-sm mt-1")}>{description}</p>
                     )}
@@ -353,7 +378,7 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("mt-2", contentClassName)}>
-            {showTitle && <h3 className={cn("text-sm", textColor, titleFontSize)}>{item.name}</h3>}
+            {showTitle && <h3 className={cn("text-sm", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
             <PriceDisplay className="text-sm mt-1" />
           </div>
         </div>
@@ -420,7 +445,7 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor, titleFontSize)}>{item.name}</h3>}
+            {showTitle && <h3 className={cn("font-medium", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
             {showSubtitle && <p className={cn("text-sm opacity-70", textColor)}>{description}</p>}
             {showReviews && type === "product" && (
               <div className="flex items-center">
@@ -463,7 +488,7 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                   <div className={cn("p-6", contentClassName)}>
-                    <h3 className={cn(textColor, textColor, "font-bold")}>{item.name}</h3>
+                    <h3 className={cn(textColor, textColor, "font-bold flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>
                     {showSubtitle && showDescription && (
                       <p className={cn(textColor, "opacity-80 mt-1")}>{description}</p>
                     )}
@@ -518,7 +543,7 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor)}>{item.name}</h3>}
+            {showTitle && <h3 className={cn("font-medium", textColor, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
             {showSubtitle && <p className={cn("text-sm", textColor)}>{description}</p>}
             <div className="flex justify-between items-center">
               <PriceDisplay />

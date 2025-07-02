@@ -118,10 +118,13 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
 
               <button
                 className="md:hidden p-1 hover:opacity-80"
-                onClick={() => setIsMobileMenuOpen(true)}
+                onClick={isCustomize ? undefined : () => setIsMobileMenuOpen(true)}
                 style={{
                   color: iconColor.includes("[") ? iconColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                  opacity: isCustomize ? 0.5 : 1,
+                  pointerEvents: isCustomize ? 'none' : undefined,
                 }}
+                disabled={isCustomize}
               >
                 <Menu className="h-6 w-6" />
               </button>

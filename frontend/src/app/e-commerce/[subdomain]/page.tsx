@@ -100,6 +100,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-1",
@@ -115,6 +116,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: null,
             },
             description: "This is a description of the product",
             id: "product-2",
@@ -130,6 +132,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-3",
@@ -145,6 +148,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-4",
@@ -160,6 +164,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-5",
@@ -175,6 +180,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-6",
@@ -190,6 +196,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-7",
@@ -205,6 +212,7 @@ export default function Home() {
             },
             price: {
               price: 100,
+              priceAfterDiscount: 50,
             },
             description: "This is a description of the product",
             id: "product-8",
@@ -220,7 +228,7 @@ export default function Home() {
         borderRadius="rounded-lg"
         showTitle={true}
         fontFamily="font-mono"
-        cardVariant="default"
+        cardVariant="hover"
         showSubtitle={true}
         showCta={true}
         showMoreButton={true}

@@ -24,6 +24,6 @@ interface CenteredContactProps {
   titleSize?: string
 }
 
-export function CenteredContact(props: CenteredContactProps) {
-  return <Contact {...props} variant="centered" />
+export function CenteredContact(props: CenteredContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="centered" />
 }
