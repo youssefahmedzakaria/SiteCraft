@@ -149,7 +149,7 @@ export default function ProfilePage() {
       lastName: "yahia",
       email: "amnayahia@gmail.com",
       phone: "+201117518970",
-      avatar: "/placeholder.svg?height=100&width=100",
+      avatar: "/placeholder.png?height=100&width=100",
     };
     setUser(mockUser);
     setProfileData(mockUser);
@@ -1174,7 +1174,7 @@ export default function ProfilePage() {
                                     className={`relative w-20 h-20 bg-gray-100 ${defaultTheme.borderRadius} overflow-hidden`}
                                   >
                                     <Image
-                                      src="/placeholder.svg?height=80&width=80"
+                                      src="/placeholder.png?height=80&width=80"
                                       alt={item.name}
                                       width={80}
                                       height={80}

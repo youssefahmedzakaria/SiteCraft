@@ -1,32 +1,32 @@
-import { PromoSlider } from "../promo-slider"
+import { PromoSlider } from "../promo-slider";
 
 export interface CenteredPromoProps {
-  isClickable?: boolean
-  id?: string
+  isClickable?: boolean;
+  id?: string;
   slides?: {
-    title: string
-    description: string
-    buttonText: string
-    buttonLink: string
-    image: string
-    imageAlt: string
-  }[]
-  autoPlay?: boolean
-  autoplaySpeed?: number
-  showArrows?: boolean
-  titleFont?: string
-  titleColor?: string
-  titleSize?: string
-  descriptionFont?: string
-  descriptionColor?: string
-  descriptionSize?: string
-  buttonFont?: string
-  buttonColor?: string
-  buttonTextColor?: string
-  buttonSize?: string
-  buttonRadius?: string
-  backgroundColor?: string
-  imageObjectFit?: "cover" | "fill" | "contain"
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    image: string;
+    imageAlt: string;
+  }[];
+  autoPlay?: boolean;
+  autoplaySpeed?: number;
+  showArrows?: boolean;
+  titleFont?: string;
+  titleColor?: string;
+  titleSize?: string;
+  descriptionFont?: string;
+  descriptionColor?: string;
+  descriptionSize?: string;
+  buttonFont?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonSize?: string;
+  buttonRadius?: string;
+  backgroundColor?: string;
+  imageObjectFit?: "cover" | "fill" | "contain";
 }
 
 export function CenteredPromo({
@@ -39,7 +39,7 @@ export function CenteredPromo({
         "This is your website. Here, you have everything to tell your story. Add as many pages as necessary to your site and. Every section is fully customizable. Change images, colors, and text to suit your needs effortlessly.",
       buttonText: "Shop Now",
       buttonLink: "/shop",
-      image: "/placeholder.svg?height=600&width=800",
+      image: "/placeholder.png?height=600&width=800",
       imageAlt: "Promotional image",
     },
     {
@@ -48,7 +48,7 @@ export function CenteredPromo({
         "Discover our latest summer collection with styles perfect for any occasion. Limited time offer with free shipping on all orders.",
       buttonText: "Shop Now",
       buttonLink: "/summer-collection",
-      image: "/placeholder.svg?height=600&width=800",
+      image: "/placeholder.png?height=600&width=800",
       imageAlt: "Summer collection promotional image",
     },
   ],
@@ -103,5 +103,5 @@ export function CenteredPromo({
         />
       </div>
     </section>
-  )
+  );
 }

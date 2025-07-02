@@ -78,7 +78,7 @@ export default function CustomizeTemplatePage() {
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
-    brandName: "Jewelry",
+    brandName: "Brand Name",
     backgroundColor: "bg-[#00000080]", // bg-black/50
     textColor: "text-[#FFFFFF]", // text-white
     logo: {
@@ -479,12 +479,12 @@ export default function CustomizeTemplatePage() {
   };
 
   const initialFooter: FooterCustomizationAttributes = {
-    brandName: "BRAND",
+    brandName: "Brand Name",
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
       src: "/placeholder.png",
-      alt: "Company Logo",
+      alt: "Brand Logo",
       size: "24",
     },
     aboutLinks: [

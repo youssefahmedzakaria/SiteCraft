@@ -106,7 +106,7 @@ export default function FavoritesPage() {
           >
             <div className="relative aspect-square bg-gray-100">
               <Image
-                src={item.image || "/placeholder.svg"}
+                src={item.image || "/placeholder.png"}
                 alt={item.name}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"

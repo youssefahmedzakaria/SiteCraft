@@ -141,37 +141,64 @@ export default function CartPage() {
               >
                 <div className="relative w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                   <Image
-                    src={item.image || "/placeholder.svg"}
+                    src={item.image || "/placeholder.png"}
                     alt={item.name}
                     fill
                     className="object-cover"
                   />
                 </div>
 
-              {/* Product Info and Controls */}
+                {/* Product Info and Controls */}
                 <div className="flex flex-col flex-1 w-full">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
                     <div>
-                      <h3 className="font-medium text-base sm:text-lg" style={{ color: theme.textColor }}>{item.name}</h3>
-                      <p className="text-xs sm:text-sm" style={{ color: theme.secondaryColor }}>SKU: {item.id}</p>
-                      <p className="text-lg font-semibold mt-1" style={{ color: theme.textColor }}>${item.price}</p>
+                      <h3
+                        className="font-medium text-base sm:text-lg"
+                        style={{ color: theme.textColor }}
+                      >
+                        {item.name}
+                      </h3>
+                      <p
+                        className="text-xs sm:text-sm"
+                        style={{ color: theme.secondaryColor }}
+                      >
+                        SKU: {item.id}
+                      </p>
+                      <p
+                        className="text-lg font-semibold mt-1"
+                        style={{ color: theme.textColor }}
+                      >
+                        ${item.price}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 mt-2 sm:mt-0">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                        style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity - 1)
+                        }
+                        style={{
+                          borderColor: theme.secondaryColor,
+                          color: theme.secondaryColor,
+                        }}
                         className="w-9 h-9 text-2xl"
                       >
                         <Minus className="w-6 h-6" />
                       </Button>
-                      <span className="w-8 text-center text-base">{item.quantity}</span>
+                      <span className="w-8 text-center text-base">
+                        {item.quantity}
+                      </span>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                        style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity + 1)
+                        }
+                        style={{
+                          borderColor: theme.secondaryColor,
+                          color: theme.secondaryColor,
+                        }}
                         className="w-9 h-9 text-2xl"
                       >
                         <Plus className="w-6 h-6" />
@@ -179,7 +206,10 @@ export default function CartPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-base font-bold" style={{ color: theme.textColor }}>
+                    <span
+                      className="text-base font-bold"
+                      style={{ color: theme.textColor }}
+                    >
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
                     <button
@@ -190,7 +220,7 @@ export default function CartPage() {
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
-              </div>
+                </div>
               </div>
             ))}
           </div>

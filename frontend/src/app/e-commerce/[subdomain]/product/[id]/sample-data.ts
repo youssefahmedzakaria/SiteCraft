@@ -141,7 +141,7 @@ export const reviewsData: Review[] = [
   {
     id: "review-1",
     author: "Sarah Johnson",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     rating: 5,
     date: "2023-11-15",
     title: "Absolutely stunning!",
@@ -164,7 +164,7 @@ export const reviewsData: Review[] = [
   {
     id: "review-3",
     author: "Emily Davis",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     rating: 5,
     date: "2023-09-10",
     title: "Perfect engagement ring",

@@ -22,12 +22,7 @@ interface FeaturedGridProductTemplateProps {
   fontFamily?: string;
   hoverEffect?: boolean;
   // Card related props
-  cardVariant?:
-    | "default"
-    | "minimal"
-    | "hover"
-    | "overlay"
-    | "featured";
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured";
   showSubtitle?: boolean;
   cornerRadius?: "none" | "small" | "medium" | "large";
   cardShadow?: string;
@@ -84,7 +79,7 @@ export function FeaturedGridProductTemplate({
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
-  
+
   // Split products into featured and regular
   const featuredProduct = products[0];
   const regularProducts = products.slice(1);
@@ -120,7 +115,7 @@ export function FeaturedGridProductTemplate({
                 <Image
                   src={
                     featuredProduct.media?.mainMedia?.image?.url ||
-                    "/placeholder.svg?height=600&width=800"
+                    "/placeholder.png?height=600&width=800"
                   }
                   alt={featuredProduct.name}
                   fill
@@ -159,7 +154,7 @@ export function FeaturedGridProductTemplate({
                 <Image
                   src={
                     product.media?.mainMedia?.image?.url ||
-                    "/placeholder.svg?height=256&width=256"
+                    "/placeholder.png?height=256&width=256"
                   }
                   alt={product.name}
                   fill

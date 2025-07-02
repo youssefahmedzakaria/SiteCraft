@@ -57,7 +57,7 @@ export function ProductVariants({
               />
             ) : option.imageUrl ? (
               <Image
-                src={option.imageUrl || "/placeholder.svg"}
+                src={option.imageUrl || "/placeholder.png"}
                 alt={option.label}
                 width={40}
                 height={40}
@@ -127,7 +127,7 @@ export function ProductVariants({
           >
             {option.imageUrl ? (
               <Image
-                src={option.imageUrl || "/placeholder.svg"}
+                src={option.imageUrl || "/placeholder.png"}
                 alt={option.label}
                 width={100}
                 height={100}

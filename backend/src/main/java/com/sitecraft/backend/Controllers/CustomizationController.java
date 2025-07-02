@@ -56,17 +56,24 @@ public class CustomizationController {
     }
 
     @GetMapping("/getTemplateBySubdomain/{subdomain}")
-    public ResponseEntity<?> getCustomizedTemplateBySubdomain(@PathVariable String subdomain) {
+    public ResponseEntity<?> getCustomizedTemplateBySubdomain(@PathVariable String subdomain, HttpSession session) {
         try {
             Store store = storeRepo.findBySubdomain(subdomain);
-
-
-            List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(store.getId());
-
             Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Customized Template retrieved successfully");
-            response.put("Customized Template", customizedTemplate);
+
+            if (store != null) {
+                List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(store.getId());
+
+                response.put("success", true);
+                response.put("message", "Customized Template retrieved successfully");
+                response.put("Customized Template", customizedTemplate);
+
+                session.setAttribute("commerce-storeId", store.getId());
+            } else {
+                response.put("success", false);
+                response.put("message", "Subdomain doesn't exists");
+            }
+
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
