@@ -58,6 +58,7 @@ import {
   HorizontalScrollProductTemplate,
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
+import { form } from "@heroui/theme";
 
 interface Section {
   id: string;
@@ -72,7 +73,6 @@ export default function CustomizeTemplatePage() {
 
   const [aboutImage, setAboutImage] = useState<File | undefined>();
   const [contactImage, setContactImage] = useState<File | undefined>();
-  const [policiesImage, setPoliciesImage] = useState<File | undefined>();
   const [promoImages, setPromoImages] = useState<File[] | undefined>();
 
   const initialHeader: HeaderCustomizationAttributes = {
@@ -662,6 +662,8 @@ export default function CustomizeTemplatePage() {
               "",
           },
         }));
+      } else {
+        alert(data.message || "Failed to fetch template.");
       }
     } catch (error) {
       console.error("Failed to fetch store data:", error);
@@ -797,6 +799,8 @@ export default function CustomizeTemplatePage() {
           }
         });
         setSections(loadedSections);
+      } else {
+        alert(data.message || "Failed to fetch template.");
       }
     } catch (error) {
       console.error("Failed to fetch template:", error);
@@ -918,12 +922,84 @@ export default function CustomizeTemplatePage() {
     setShowSaveDialog(true);
   };
 
+  const handleCustomizedImages = async () => {
+    try {
+      if (promoImages !== undefined && promoImages.length > 0) {
+        for (let i = 0; i < promoImages.length; i++) {
+          const formData = new FormData();
+          formData.append("image", promoImages[i]);
+          const response = await fetch(
+            "http://localhost:8080/customize/saveImage",
+            {
+              method: "POST",
+              credentials: "include",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+          if (!data.success) {
+            alert(data.message || "Failed to save customization Image.");
+            return;
+          } else {
+            const url = data.url;
+            const updatedSlides = [...promoAttributes.slides];
+            updatedSlides[i] = { ...updatedSlides[i], image: url };
+            updatePromoAttributes({ slides: updatedSlides });
+          }
+        }
+      }
+      if (aboutImage !== undefined) {
+        const formData = new FormData();
+        formData.append("image", aboutImage);
+        const response = await fetch(
+          "http://localhost:8080/customize/saveImage",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          alert(data.message || "Failed to save customization Image.");
+          return;
+        } else {
+          const url = data.url;
+          updateAboutAttributes({ image: url });
+        }
+      }
+      if (contactImage !== undefined) {
+        const formData = new FormData();
+        formData.append("image", contactImage);
+        const response = await fetch(
+          "http://localhost:8080/customize/saveImage",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          alert(data.message || "Failed to save customization Image.");
+          return;
+        } else {
+          const url = data.url;
+          updateContactAttributes({ image: url });
+        }
+      }
+    } catch (error) {
+      alert("An error occurred while saving customization Images.");
+    }
+  };
+
   const editCustomizedTemplate = async () => {
     setIsSaving(true);
     setSaveMessage("");
     setShowSaveDialog(false);
     try {
       const dtoList = buildCustomizationDTOs();
+      await handleCustomizedImages();
       const response = await fetch(
         "http://localhost:8080/customize/editTemplate",
         {
@@ -1023,8 +1099,6 @@ export default function CustomizeTemplatePage() {
             setAboutImage={setAboutImage}
             contactImage={contactImage}
             setContactImage={setContactImage}
-            policiestImage={policiesImage}
-            setPoliciesImage={setPoliciesImage}
             promoImages={promoImages}
             setPromoImages={setPromoImages}
           />

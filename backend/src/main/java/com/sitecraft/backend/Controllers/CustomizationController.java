@@ -30,15 +30,10 @@ public class CustomizationController {
     public ResponseEntity<?> getCustomizedTemplate(HttpSession session) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
-
             if (storeId == null) {
-                storeId = 1L; // temporary default storeId
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in sessionaaaa."));
             }
-
 
             List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(storeId);
 
@@ -164,7 +159,7 @@ public class CustomizationController {
     }
 
     @PostMapping("/saveImage")
-    public ResponseEntity<?> saveImage(HttpSession session, @RequestPart(value = "logo") MultipartFile logo) {
+    public ResponseEntity<?> saveImage(HttpSession session, @RequestPart(value = "image") MultipartFile image) {
         try {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
@@ -172,14 +167,14 @@ public class CustomizationController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            String filename = "customize" + storeId + "_" + logo.getOriginalFilename();
+            String filename = "customize" + storeId + "_" + image.getOriginalFilename();
             String relativePath = "/uploads/stores/" + storeId + "/customize/";
             String uploadDir = System.getProperty("user.dir") + relativePath;
 
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
             File destFile = new File(dir, filename);
-            logo.transferTo(destFile);
+            image.transferTo(destFile);
 
             String imagePath = "http://localhost:8080" + relativePath + filename;
             return ResponseEntity.ok().body(Map.of("success", true, "message", "Image saved successfully.", "url", imagePath));

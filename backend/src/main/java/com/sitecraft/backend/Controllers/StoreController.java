@@ -145,7 +145,7 @@ public class StoreController {
             Long storeId = (Long) session.getAttribute("storeId");
             if (storeId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+                        .body(Map.of("success", false, "message", "Store ID not found in sessionzzzz."));
             }
 
             Store store = storeService.getStore(storeId);

@@ -60,7 +60,6 @@ import { RenderProductSection } from "./renderProductSection";
 interface Section {
   id: string;
   title: string;
-  // icon: React.ReactNode;
   expanded: boolean;
 }
 
@@ -103,8 +102,6 @@ interface SidebarProps {
   setAboutImage: React.Dispatch<React.SetStateAction<File | undefined>>;
   contactImage: File | undefined;
   setContactImage: React.Dispatch<React.SetStateAction<File | undefined>>;
-  policiestImage: File | undefined;
-  setPoliciesImage: React.Dispatch<React.SetStateAction<File | undefined>>;
   promoImages: File[] | undefined;
   setPromoImages: React.Dispatch<React.SetStateAction<File[] | undefined>>;
 }
@@ -132,8 +129,6 @@ export function Sidebar({
   setAboutImage,
   contactImage,
   setContactImage,
-  policiestImage,
-  setPoliciesImage,
   promoImages,
   setPromoImages,
 }: SidebarProps) {
@@ -141,18 +136,12 @@ export function Sidebar({
   // const [sections, setSections] = useState<Section[]>([ ... ]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(
-    null
-  );
 
   // New state for the detailed section view
   const [detailedSection, setDetailedSection] = useState<Section | null>(null);
   const [detailedSectionTab, setDetailedSectionTab] = useState<
     "content" | "design"
   >("content");
-
-  // Reference for section DOM elements
-  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   // New function to open detailed section view
   const openDetailedSection = (section: Section) => {
@@ -177,10 +166,6 @@ export function Sidebar({
       openDetailedSection(section);
     }
     return;
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
   };
 
   // New function to close detailed section view
@@ -432,8 +417,6 @@ export function Sidebar({
                 policiesAttributes={policiesAttributes}
                 updatePoliciesAttributes={updatePoliciesAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
-                policiesImage={policiestImage}
-                setPoliciesImage={setPoliciesImage}
               />
             ) : detailedSection.id === "ContactUs" ? (
               <RenderContactSection
