@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +128,11 @@ public class CustomizationController {
     @PutMapping("/editTemplate")
     public ResponseEntity<?> editCustomizedTemplate(HttpSession session, @RequestBody List<CustomizedTemplateDTO> dtoList) {
         try {
-
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
@@ -157,4 +163,32 @@ public class CustomizationController {
         }
     }
 
+    @PostMapping("/saveImage")
+    public ResponseEntity<?> saveImage(HttpSession session, @RequestPart(value = "logo") MultipartFile logo) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String filename = "customize" + storeId + "_" + logo.getOriginalFilename();
+            String relativePath = "/uploads/stores/" + storeId + "/customize/";
+            String uploadDir = System.getProperty("user.dir") + relativePath;
+
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            File destFile = new File(dir, filename);
+            logo.transferTo(destFile);
+
+            String imagePath = "http://localhost:8080" + relativePath + filename;
+            return ResponseEntity.ok().body(Map.of("success", true, "message", "Image saved successfully.", "url", imagePath));
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }
