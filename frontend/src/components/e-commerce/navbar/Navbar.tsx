@@ -28,7 +28,6 @@ export interface NavbarTemplateProps {
   isRTL?: boolean;
   iconColor?: string;
   dividerColor?: string;
-  searchIconColor?: string;
 }
 
 export interface NavbarProps extends NavbarTemplateProps {
@@ -73,7 +72,6 @@ export const Navbar = ({
   menuItems,
   iconColor = "text-black",
   dividerColor = "border-gray-200",
-  searchIconColor = "text-black",
 }: NavbarProps) => {
   const Component = navbarComponents[template] || NavbarTemplate1;
 
@@ -88,7 +86,6 @@ export const Navbar = ({
       menuItems={menuItems}
       iconColor={iconColor}
       dividerColor={dividerColor}
-      searchIconColor={searchIconColor}
     />
   );
 };

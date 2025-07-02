@@ -24,6 +24,6 @@ interface RightAlignedContactProps {
   titleSize?: string
 }
 
-export function RightAlignedContact(props: RightAlignedContactProps) {
-  return <Contact {...props} variant="right-aligned" />
+export function RightAlignedContact(props: RightAlignedContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="right-aligned" />
 }

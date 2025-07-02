@@ -23,7 +23,6 @@ export interface HeaderCustomizationAttributes {
   }[];
   iconColor: string;
   dividerColor: string;
-  searchIconColor: string;
   fontFamily: string;
 }
 

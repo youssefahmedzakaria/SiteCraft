@@ -103,7 +103,7 @@ export function Contact({
       return (
         <div className="w-full h-full relative">
           <Image
-            src={imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`}
+            src={imageUrl}
             alt="Contact illustration"
             fill
             className="object-cover"
