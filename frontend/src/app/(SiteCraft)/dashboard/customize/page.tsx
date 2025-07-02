@@ -28,6 +28,7 @@ import {
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
   PoliciesCustomizationAttributes,
+  ProductCustomizationAttributes,
   PromoCustomizationAttributes,
 } from "@/lib/customization";
 import Navbar from "@/components/e-commerce/navbar/Navbar";
@@ -51,7 +52,11 @@ import {
   DialogDescription,
 } from "@/components/SiteCraft/ui/dialog";
 import { categories } from "@/lib/categories";
-import { HorizontalScrollProductTemplate } from "@/components/e-commerce/product-lists";
+import {
+  FeaturedGridProductTemplate,
+  GridProductTemplate,
+  HorizontalScrollProductTemplate,
+} from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 
 interface Section {
@@ -63,9 +68,6 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
-  const [selectedTab, setSelectedTab] = useState<
-    "desktop" | "tablet" | "mobile"
-  >("desktop");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [logoImage, setLogoImage] = useState<File | undefined>();
@@ -179,7 +181,6 @@ export default function CustomizeTemplatePage() {
     cardVariant: "overlay",
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
-    borderRadius: "rounded-lg",
     showCategoryTitle: true,
     titleColor: "text-[#000000]",
     titleFontSize: "text-2xl",
@@ -276,6 +277,90 @@ export default function CustomizeTemplatePage() {
     updates: Partial<CategoryCustomizationAttributes>
   ) => {
     setCategoryAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
+  const initialProduct: ProductCustomizationAttributes = {
+    template: "FeaturedGrid", // You can adjust this if needed
+    isClickable: false,
+    title: "products",
+    bgColor: "bg-[#FFFFFF]",
+    textColor: "text-[#000000]",
+    fontFamily: "font-mono",
+    titleFont: "font-bold",
+    showTitle: true,
+    showMoreButton: true,
+    showMoreText: "Show More",
+    showMorebuttonBgColor: "bg-[#000000]",
+    showMorebuttonTextColor: "text-[#EF4444]",
+    ctaText: "Shop Now",
+    cornerRadius: "small",
+    showCta: true,
+    cardVariant: "overlay",
+    showSubtitle: true,
+    overlayColor: "bg-[#00000080]",
+    showProductTitle: true,
+    titleColor: "text-[#000000]",
+    titleFontSize: "text-2xl",
+    productTitleFontSize: "text-lg",
+    // cardTextColor: "text-[#000000]", // Added a reasonable default value
+    products: [
+      {
+        id: "1",
+        description: "Description",
+        link: "#",
+        price: "100.00",
+        image: "/placeholder.png",
+        imageAlt: "Product 1",
+        title: "Product 1",
+      },
+      {
+        id: "2",
+        description: "Description",
+        link: "#",
+        price: "200.00",
+        image: "/placeholder.png",
+        imageAlt: "Product 2",
+        title: "Product 2",
+      },
+      {
+        id: "3",
+        description: "Description",
+        link: "#",
+        price: "300.00",
+        image: "/placeholder.png",
+        imageAlt: "Product 3",
+        title: "Product 3",
+      },
+      {
+        id: "4",
+        description: "Description",
+        link: "#",
+        price: "400.00",
+        image: "/placeholder.png",
+        imageAlt: "Product 4",
+        title: "Product 4",
+      },
+      {
+        id: "5",
+        description: "Description",
+        link: "#",
+        price: "500.00",
+        image: "/placeholder.png",
+        imageAlt: "Product 5",
+        title: "Product 5",
+      },
+    ],
+  };
+
+  // State for product customization
+  const [productAttributes, setProductAttributes] =
+    useState<ProductCustomizationAttributes>(initialProduct);
+
+  // Function to update product attributes
+  const updateProductAttributes = (
+    updates: Partial<ProductCustomizationAttributes>
+  ) => {
+    setProductAttributes((prev) => ({ ...prev, ...updates }));
   };
 
   const initialAbout: AboutCustomizationAttributes = {
@@ -475,160 +560,17 @@ export default function CustomizeTemplatePage() {
       SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
     Products: {
-      ProductList: (
-        <ProductList
-          isClickable={false}
-          products={[
-            {
-              name: "Product 1",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-1",
-            },
-            {
-              name: "Product 2",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-2",
-            },
-            {
-              name: "Product 3",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-3",
-            },
-            {
-              name: "Product 4",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-4",
-            },
-            {
-              name: "Product 5",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-5",
-            },
-            {
-              name: "Product 6",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-6",
-            },
-            {
-              name: "Product 7",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-7",
-            },
-            {
-              name: "Product 8",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/placeholder.png",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-8",
-            },
-          ]}
-          template="featured"
-          title="Featured Products"
-          titleColor="text-black"
-          // titlePosition="top"
-          titleFontSize="text-2xl"
-          titleFont="font-bold"
-          // columns={{ sm: 2, md: 3, lg: 4 }}
-          bgColor="bg-white"
-          textColor="text-black"
-          borderRadius="rounded-lg"
-          showTitle={true}
-          fontFamily="font-sans"
-          // hoverEffect={true}
-          cardVariant="hover"
-          showSubtitle={true}
-          showCta={true}
-          showMoreButton={true}
-          ctaText="Shop Now"
-          cornerRadius="medium"
-          cardShadow="shadow-lg"
-          showMoreText="All Products"
-          showMorebuttonBgColor="bg-black"
-          showMorebuttonTextColor="text-white"
-        />
+      FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollProductTemplate {...productAttributes} />
       ),
+      Grid: <GridProductTemplate {...productAttributes} />,
     },
     Categories: {
       FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
-      HorizontalScroll: <HorizontalScrollCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollCategoryTemplate {...categoryAttributes} />
+      ),
       Grid: <GridCategoryTemplate {...categoryAttributes} />,
     },
     AboutUs: {
@@ -857,8 +799,6 @@ export default function CustomizeTemplatePage() {
     }
   };
 
-
-
   useEffect(() => {
     const fetchAll = async () => {
       await Promise.all([fetchTemplate(), fetchStoreData()]);
@@ -1049,6 +989,8 @@ export default function CustomizeTemplatePage() {
             updatePromoAttributes={updatePromoAttributes}
             categoryAttributes={categoryAttributes}
             updateCategoryAttributes={updateCategoryAttributes}
+            productAttributes={productAttributes}
+            updateProductAttributes={updateProductAttributes}
             aboutAttributes={aboutAttributes}
             updateAboutAttributes={updateAboutAttributes}
             policiesAttributes={policiesAttributes}
@@ -1111,34 +1053,6 @@ export default function CustomizeTemplatePage() {
                 Preview
               </span>
             </Button>
-
-            {/* Device Views */}
-            <div className="flex border border-gray-200 rounded-md overflow-hidden">
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "desktop" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("desktop")}
-              >
-                Desktop
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "tablet" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("tablet")}
-              >
-                Tablet
-              </button>
-              <button
-                className={`px-2 sm:px-4 py-2 text-sm ${
-                  selectedTab === "mobile" ? "bg-gray-100" : "bg-white"
-                }`}
-                onClick={() => setSelectedTab("mobile")}
-              >
-                Mobile
-              </button>
-            </div>
           </div>
 
           {/* go to dashboard on saving  */}
@@ -1184,13 +1098,7 @@ export default function CustomizeTemplatePage() {
         {/* Content preview area */}
         <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
           <div
-            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4 ${
-              selectedTab === "desktop"
-                ? "w-full max-w-6xl"
-                : selectedTab === "tablet"
-                ? "w-full max-w-2xl"
-                : "w-full max-w-sm"
-            }`}
+            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4`}
           >
             <Navbar
               isCustomize={true}
@@ -1226,7 +1134,7 @@ export default function CustomizeTemplatePage() {
                   template = promoAttributes.template;
                   break;
                 case "Products":
-                  template = "ProductList";
+                  template = productAttributes.template;
                   break;
                 case "Categories":
                   template = categoryAttributes.template;

@@ -32,6 +32,7 @@ import {
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
   PoliciesCustomizationAttributes,
+  ProductCustomizationAttributes,
 } from "@/lib/customization";
 import { PromoCustomizationAttributes } from "@/lib/customization";
 import {
@@ -54,6 +55,7 @@ import { TopImageAbout } from "@/components/e-commerce/about-us";
 import { MinimalRightContact } from "@/components/e-commerce/contact";
 import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies";
 import { RenderCategorySection } from "./renderCategorySection";
+import { RenderProductSection } from "./renderProductSection";
 
 interface Section {
   id: string;
@@ -74,6 +76,10 @@ interface SidebarProps {
   categoryAttributes: CategoryCustomizationAttributes;
   updateCategoryAttributes: (
     updates: Partial<CategoryCustomizationAttributes>
+  ) => void;
+  productAttributes: ProductCustomizationAttributes;
+  updateProductAttributes: (
+    updates: Partial<ProductCustomizationAttributes>
   ) => void;
   aboutAttributes: AboutCustomizationAttributes;
   updateAboutAttributes: (
@@ -110,6 +116,8 @@ export function Sidebar({
   updatePromoAttributes,
   categoryAttributes,
   updateCategoryAttributes,
+  productAttributes,
+  updateProductAttributes,
   aboutAttributes,
   updateAboutAttributes,
   policiesAttributes,
@@ -401,7 +409,15 @@ export function Sidebar({
                 updateCategoryAttributes={updateCategoryAttributes}
                 onDeleteSection={() => handleDeleteSection(detailedSection.id)}
               />
-            ) : detailedSection.id === "AboutUs" ? (
+            ) : detailedSection.id === "Products" ? (
+              <RenderProductSection
+                detailedSectionTab={detailedSectionTab}
+                productAttributes={productAttributes}
+                updateProductAttributes={updateProductAttributes}
+                onDeleteSection={() => handleDeleteSection(detailedSection.id)}
+              />
+            )
+            : detailedSection.id === "AboutUs" ? (
               <RenderAboutSection
                 detailedSectionTab={detailedSectionTab}
                 aboutAttributes={aboutAttributes}

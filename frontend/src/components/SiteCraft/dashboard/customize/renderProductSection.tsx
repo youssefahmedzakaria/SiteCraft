@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/SiteCraft/ui/input";
-import { CategoryLayoutItems } from "./categoryLayoutItems";
-import { CategoryCustomizationAttributes } from "@/lib/customization";
+import { ProductLayoutItems } from "./productLayoutItems";
+import { ProductCustomizationAttributes } from "@/lib/customization";
 import { useState } from "react";
 import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import {
@@ -12,29 +12,29 @@ import {
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "../../ui/button";
 
-type SectionName = "general" | "title" | "categoryCard";
+type SectionName = "general" | "title" | "productCard";
 
-interface RenderCategorySectionProps {
+interface RenderProductSectionProps {
   detailedSectionTab: string;
-  categoryAttributes: CategoryCustomizationAttributes;
-  updateCategoryAttributes: (
-    updates: Partial<CategoryCustomizationAttributes>
+  productAttributes: ProductCustomizationAttributes;
+  updateProductAttributes: (
+    updates: Partial<ProductCustomizationAttributes>
   ) => void;
   onDeleteSection?: () => void;
 }
 
-export function RenderCategorySection({
+export function RenderProductSection({
   detailedSectionTab,
-  categoryAttributes,
-  updateCategoryAttributes,
+  productAttributes,
+  updateProductAttributes,
   onDeleteSection,
-}: RenderCategorySectionProps) {
+}: RenderProductSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<SectionName, boolean>
   >({
     general: false,
     title: false,
-    categoryCard: false,
+    productCard: false,
   });
 
   const toggleSection = (section: SectionName) => {
@@ -45,27 +45,27 @@ export function RenderCategorySection({
         return {
           general: false,
           title: false,
-          categoryCard: false,
+          productCard: false,
         };
       }
 
       return {
         general: false,
         title: false,
-        categoryCard: false,
+        productCard: false,
         [section]: true,
       };
     });
   };
   const handleTitleChange = (newTitle: string) => {
-    updateCategoryAttributes({ title: newTitle });
+    updateProductAttributes({ title: newTitle });
   };
 
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = ["Grid", "FeaturedGrid", "HorizontalScroll"];
     const templateName = templateNames[layoutId - 1] || "Grid";
-    updateCategoryAttributes({ template: templateName });
+    updateProductAttributes({ template: templateName });
   };
 
   return (
@@ -77,7 +77,7 @@ export function RenderCategorySection({
             <div className="space-y-1">
               <h1 className="text-lg font-semibold tracking-tight">Title</h1>
               <Input
-                value={categoryAttributes.title}
+                value={productAttributes.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Enter section title"
               />
@@ -97,14 +97,14 @@ export function RenderCategorySection({
         </div>
       ) : (
         <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
-          <CategoryLayoutItems
+          <ProductLayoutItems
             selectedLayout={
               [
                 "grid-template",
                 "list-view-template",
                 "featured-grid-template",
                 "horizontal-scroll-template",
-              ].indexOf(categoryAttributes.template) + 1
+              ].indexOf(productAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}
           />
@@ -131,24 +131,24 @@ export function RenderCategorySection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={categoryAttributes.bgColor
+                    value={productAttributes.bgColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         bgColor: `bg-[${e.target.value}]`,
                       });
                     }}
                   />
                   <input
                     type="text"
-                    value={categoryAttributes.bgColor
+                    value={productAttributes.bgColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         bgColor: `bg-[${e.target.value}]`,
                       });
                     }}
@@ -168,13 +168,13 @@ export function RenderCategorySection({
                     >
                       <span className="ml-2">
                         {
-                          categoryAttributes.fontFamily === "font-inter"
+                          productAttributes.fontFamily === "font-inter"
                             ? "Inter"
-                            : categoryAttributes.fontFamily === "font-roboto"
+                            : productAttributes.fontFamily === "font-roboto"
                             ? "Roboto"
-                            : categoryAttributes.fontFamily === "font-open-sans"
+                            : productAttributes.fontFamily === "font-open-sans"
                             ? "Open Sans"
-                            : categoryAttributes.fontFamily === "font-poppins"
+                            : productAttributes.fontFamily === "font-poppins"
                             ? "Poppins"
                             : "Lato" // default
                         }
@@ -185,21 +185,21 @@ export function RenderCategorySection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ fontFamily: "font-inter" })
+                        updateProductAttributes({ fontFamily: "font-inter" })
                       }
                     >
                       Inter
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ fontFamily: "font-roboto" })
+                        updateProductAttributes({ fontFamily: "font-roboto" })
                       }
                     >
                       Roboto
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           fontFamily: "font-open-sans",
                         })
                       }
@@ -208,14 +208,14 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ fontFamily: "font-poppins" })
+                        updateProductAttributes({ fontFamily: "font-poppins" })
                       }
                     >
                       Poppins
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ fontFamily: "font-lato" })
+                        updateProductAttributes({ fontFamily: "font-lato" })
                       }
                     >
                       Lato
@@ -229,27 +229,27 @@ export function RenderCategorySection({
                 <span>Show More Button</span>
                 <Button
                   variant={
-                    categoryAttributes.showMoreButton ? "default" : "outline"
+                    productAttributes.showMoreButton ? "default" : "outline"
                   }
                   size="sm"
                   onClick={() =>
-                    updateCategoryAttributes({
-                      showMoreButton: !categoryAttributes.showMoreButton,
+                    updateProductAttributes({
+                      showMoreButton: !productAttributes.showMoreButton,
                     })
                   }
                 >
-                  {categoryAttributes.showMoreButton ? "Enabled" : "Disabled"}
+                  {productAttributes.showMoreButton ? "Enabled" : "Disabled"}
                 </Button>
               </div>
 
               {/* show more button text */}
-              {categoryAttributes.showMoreButton && (
+              {productAttributes.showMoreButton && (
                 <div>
                   <label className="block text-sm mb-2">Button Text</label>
                   <Input
-                    value={categoryAttributes.showMoreText}
+                    value={productAttributes.showMoreText}
                     onChange={(e) =>
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         showMoreText: e.target.value,
                       })
                     }
@@ -258,30 +258,30 @@ export function RenderCategorySection({
               )}
 
               {/* show morebutton background color */}
-              {categoryAttributes.showMoreButton && (
+              {productAttributes.showMoreButton && (
                 <div className="space-y-2">
                   <label className="block text-sm mb-2">Button Color</label>
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
-                      value={categoryAttributes.showMorebuttonBgColor
+                      value={productAttributes.showMorebuttonBgColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           showMorebuttonBgColor: `bg-[${e.target.value}]`,
                         });
                       }}
                     />
                     <input
                       type="text"
-                      value={categoryAttributes.showMorebuttonBgColor
+                      value={productAttributes.showMorebuttonBgColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           showMorebuttonBgColor: `bg-[${e.target.value}]`,
                         });
                       }}
@@ -291,7 +291,7 @@ export function RenderCategorySection({
               )}
 
               {/* show morebutton text color */}
-              {categoryAttributes.showMoreButton && (
+              {productAttributes.showMoreButton && (
                 <div className="space-y-2">
                   <label className="block text-sm mb-2">
                     Button Text Color
@@ -299,24 +299,24 @@ export function RenderCategorySection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
-                      value={categoryAttributes.showMorebuttonTextColor
+                      value={productAttributes.showMorebuttonTextColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           showMorebuttonTextColor: `text-[${e.target.value}]`,
                         });
                       }}
                     />
                     <input
                       type="text"
-                      value={categoryAttributes.showMorebuttonTextColor
+                      value={productAttributes.showMorebuttonTextColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           showMorebuttonTextColor: `text-[${e.target.value}]`,
                         });
                       }}
@@ -349,24 +349,24 @@ export function RenderCategorySection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={categoryAttributes.titleColor
+                    value={productAttributes.titleColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         titleColor: `text-[${e.target.value}]`,
                       });
                     }}
                   />
                   <input
                     type="text"
-                    value={categoryAttributes.titleColor
+                    value={productAttributes.titleColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         titleColor: `text-[${e.target.value}]`,
                       });
                     }}
@@ -385,17 +385,17 @@ export function RenderCategorySection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {categoryAttributes.titleFontSize === "text-sm"
+                        {productAttributes.titleFontSize === "text-sm"
                           ? "Small"
-                          : categoryAttributes.titleFontSize === "text-base"
+                          : productAttributes.titleFontSize === "text-base"
                           ? "Medium"
-                          : categoryAttributes.titleFontSize === "text-lg"
+                          : productAttributes.titleFontSize === "text-lg"
                           ? "Large"
-                          : categoryAttributes.titleFontSize === "text-xl"
+                          : productAttributes.titleFontSize === "text-xl"
                           ? "XL"
-                          : categoryAttributes.titleFontSize === "text-2xl"
+                          : productAttributes.titleFontSize === "text-2xl"
                           ? "2XL"
-                          : categoryAttributes.titleFontSize === "text-3xl"
+                          : productAttributes.titleFontSize === "text-3xl"
                           ? "3XL"
                           : "4XL"}
                       </span>
@@ -405,49 +405,49 @@ export function RenderCategorySection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-sm" })
+                        updateProductAttributes({ titleFontSize: "text-sm" })
                       }
                     >
                       Small
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-base" })
+                        updateProductAttributes({ titleFontSize: "text-base" })
                       }
                     >
                       Medium
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-lg" })
+                        updateProductAttributes({ titleFontSize: "text-lg" })
                       }
                     >
                       Large
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-xl" })
+                        updateProductAttributes({ titleFontSize: "text-xl" })
                       }
                     >
                       XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-2xl" })
+                        updateProductAttributes({ titleFontSize: "text-2xl" })
                       }
                     >
                       2XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-3xl" })
+                        updateProductAttributes({ titleFontSize: "text-3xl" })
                       }
                     >
                       3XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-4xl" })
+                        updateProductAttributes({ titleFontSize: "text-4xl" })
                       }
                     >
                       4XL
@@ -461,16 +461,16 @@ export function RenderCategorySection({
                 <span>Show Title</span>
                 <Button
                   variant={
-                    categoryAttributes.showCategoryTitle ? "default" : "outline"
+                    productAttributes.showProductTitle ? "default" : "outline"
                   }
                   size="sm"
                   onClick={() =>
-                    updateCategoryAttributes({
-                      showCategoryTitle: !categoryAttributes.showCategoryTitle,
+                    updateProductAttributes({
+                      showProductTitle: !productAttributes.showProductTitle,
                     })
                   }
                 >
-                  {categoryAttributes.showCategoryTitle
+                  {productAttributes.showProductTitle
                     ? "Enabled"
                     : "Disabled"}
                 </Button>
@@ -478,21 +478,21 @@ export function RenderCategorySection({
             </div>
           )}
 
-          {/* Category Card */}
+          {/* Product Card */}
           <div className="flex items-center">
             <button
               className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleSection("categoryCard")}
+              onClick={() => toggleSection("productCard")}
             >
-              <span className="font-medium">Category Card</span>
-              {expandedSections.categoryCard ? (
+              <span className="font-medium">Product Card</span>
+              {expandedSections.productCard ? (
                 <ChevronDown size={18} />
               ) : (
                 <ChevronRight size={18} />
               )}
             </button>
           </div>
-          {expandedSections.categoryCard && (
+          {expandedSections.productCard && (
             <div className="space-y-4">
               {/* Card Variant */}
               <div>
@@ -506,13 +506,13 @@ export function RenderCategorySection({
                     >
                       <span className="ml-2">
                         {
-                          categoryAttributes.cardVariant === "default"
+                          productAttributes.cardVariant === "default"
                             ? "Default"
-                            : categoryAttributes.cardVariant === "overlay"
+                            : productAttributes.cardVariant === "overlay"
                             ? "Overlay"
-                            : categoryAttributes.cardVariant === "minimal"
+                            : productAttributes.cardVariant === "minimal"
                             ? "Minimal"
-                            : categoryAttributes.cardVariant === "hover"
+                            : productAttributes.cardVariant === "hover"
                             ? "Hover"
                             : "Featured" // default
                         }
@@ -523,21 +523,21 @@ export function RenderCategorySection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "default" })
+                        updateProductAttributes({ cardVariant: "default" })
                       }
                     >
                       Default
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "overlay" })
+                        updateProductAttributes({ cardVariant: "overlay" })
                       }
                     >
                       Overlay
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           cardVariant: "minimal",
                         })
                       }
@@ -546,14 +546,14 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "hover" })
+                        updateProductAttributes({ cardVariant: "hover" })
                       }
                     >
                       Hover
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "featured" })
+                        updateProductAttributes({ cardVariant: "featured" })
                       }
                     >
                       Featured
@@ -563,30 +563,30 @@ export function RenderCategorySection({
               </div>
 
               {/* Overlay color */}
-              {categoryAttributes.cardVariant === "overlay" && (
+              {productAttributes.cardVariant === "overlay" && (
                 <div className="space-y-2">
                   <label className="block text-sm mb-2">Overlay Color</label>
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
-                      value={categoryAttributes.overlayColor
+                      value={productAttributes.overlayColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           overlayColor: `bg-[${e.target.value}]`,
                         });
                       }}
                     />
                     <input
                       type="text"
-                      value={categoryAttributes.overlayColor
+                      value={productAttributes.overlayColor
                         .split("-[")[1]
                         .slice(0, -1)}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
-                        updateCategoryAttributes({
+                        updateProductAttributes({
                           overlayColor: `bg-[${e.target.value}]`,
                         });
                       }}
@@ -595,7 +595,7 @@ export function RenderCategorySection({
                 </div>
               )}
 
-              {/* Category title font size */}
+              {/* Product title font size */}
               <div>
                 <label className="block text-sm mb-2">Title Font Size</label>
                 <DropdownMenu>
@@ -606,21 +606,21 @@ export function RenderCategorySection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {categoryAttributes.categoryTitleFontSize === "text-sm"
+                        {productAttributes.productTitleFontSize === "text-sm"
                           ? "Small"
-                          : categoryAttributes.categoryTitleFontSize ===
+                          : productAttributes.productTitleFontSize ===
                             "text-base"
                           ? "Medium"
-                          : categoryAttributes.categoryTitleFontSize ===
+                          : productAttributes.productTitleFontSize ===
                             "text-lg"
                           ? "Large"
-                          : categoryAttributes.categoryTitleFontSize ===
+                          : productAttributes.productTitleFontSize ===
                             "text-xl"
                           ? "XL"
-                          : categoryAttributes.categoryTitleFontSize ===
+                          : productAttributes.productTitleFontSize ===
                             "text-2xl"
                           ? "2XL"
-                          : categoryAttributes.categoryTitleFontSize ===
+                          : productAttributes.productTitleFontSize ===
                             "text-3xl"
                           ? "3XL"
                           : "4XL"}
@@ -631,8 +631,8 @@ export function RenderCategorySection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-sm",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-sm",
                         })
                       }
                     >
@@ -640,8 +640,8 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-base",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-base",
                         })
                       }
                     >
@@ -649,8 +649,8 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-lg",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-lg",
                         })
                       }
                     >
@@ -658,8 +658,8 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-xl",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-xl",
                         })
                       }
                     >
@@ -667,8 +667,8 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-2xl",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-2xl",
                         })
                       }
                     >
@@ -676,15 +676,15 @@ export function RenderCategorySection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-3xl" })
+                        updateProductAttributes({ titleFontSize: "text-3xl" })
                       }
                     >
                       3XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-4xl",
+                        updateProductAttributes({
+                          productTitleFontSize: "text-4xl",
                         })
                       }
                     >
@@ -696,19 +696,19 @@ export function RenderCategorySection({
 
               {/*Show Title */}
               <div className="flex items-center justify-between">
-                <span>Category Title</span>
+                <span>Product Title</span>
                 <Button
                   variant={
-                    categoryAttributes.showCategoryTitle ? "default" : "outline"
+                    productAttributes.showProductTitle ? "default" : "outline"
                   }
                   size="sm"
                   onClick={() =>
-                    updateCategoryAttributes({
-                      showCategoryTitle: !categoryAttributes.showCategoryTitle,
+                    updateProductAttributes({
+                      showProductTitle: !productAttributes.showProductTitle,
                     })
                   }
                 >
-                  {categoryAttributes.showCategoryTitle
+                  {productAttributes.showProductTitle
                     ? "Enabled"
                     : "Disabled"}
                 </Button>
@@ -716,19 +716,19 @@ export function RenderCategorySection({
 
               {/*Show Description */}
               <div className="flex items-center justify-between">
-                <span>Category Description</span>
+                <span>Product Description</span>
                 <Button
                   variant={
-                    categoryAttributes.showSubtitle ? "default" : "outline"
+                    productAttributes.showSubtitle ? "default" : "outline"
                   }
                   size="sm"
                   onClick={() =>
-                    updateCategoryAttributes({
-                      showSubtitle: !categoryAttributes.showSubtitle,
+                    updateProductAttributes({
+                      showSubtitle: !productAttributes.showSubtitle,
                     })
                   }
                 >
-                  {categoryAttributes.showSubtitle ? "Enabled" : "Disabled"}
+                  {productAttributes.showSubtitle ? "Enabled" : "Disabled"}
                 </Button>
               </div>
 
@@ -743,11 +743,11 @@ export function RenderCategorySection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {categoryAttributes.cornerRadius === "none"
+                        {productAttributes.cornerRadius === "none"
                           ? "None"
-                          : categoryAttributes.cornerRadius === "small"
+                          : productAttributes.cornerRadius === "small"
                           ? "Small"
-                          : categoryAttributes.cornerRadius === "medium"
+                          : productAttributes.cornerRadius === "medium"
                           ? "Medium"
                           : "Large"}
                       </span>
@@ -757,28 +757,28 @@ export function RenderCategorySection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "none" })
+                        updateProductAttributes({ cornerRadius: "none" })
                       }
                     >
                       None
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "small" })
+                        updateProductAttributes({ cornerRadius: "small" })
                       }
                     >
                       Small
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "medium" })
+                        updateProductAttributes({ cornerRadius: "medium" })
                       }
                     >
                       Medium
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "large" })
+                        updateProductAttributes({ cornerRadius: "large" })
                       }
                     >
                       Large
@@ -793,24 +793,24 @@ export function RenderCategorySection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={categoryAttributes.textColor
+                    value={productAttributes.textColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         textColor: `text-[${e.target.value}]`,
                       });
                     }}
                   />
                   <input
                     type="text"
-                    value={categoryAttributes.textColor
+                    value={productAttributes.textColor
                       .split("-[")[1]
                       .slice(0, -1)}
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         textColor: `text-[${e.target.value}]`,
                       });
                     }}
@@ -822,26 +822,26 @@ export function RenderCategorySection({
               <div className="flex items-center justify-between">
                 <span>Shop Now</span>
                 <Button
-                  variant={categoryAttributes.showCta ? "default" : "outline"}
+                  variant={productAttributes.showCta ? "default" : "outline"}
                   size="sm"
                   onClick={() =>
-                    updateCategoryAttributes({
-                      showCta: !categoryAttributes.showCta,
+                    updateProductAttributes({
+                      showCta: !productAttributes.showCta,
                     })
                   }
                 >
-                  {categoryAttributes.showCta ? "Enabled" : "Disabled"}
+                  {productAttributes.showCta ? "Enabled" : "Disabled"}
                 </Button>
               </div>
 
               {/* Cta Text*/}
-              {categoryAttributes.showCta && (
+              {productAttributes.showCta && (
                 <div>
                   <label className="block text-sm mb-2">Button Text</label>
                   <Input
-                    value={categoryAttributes.ctaText}
+                    value={productAttributes.ctaText}
                     onChange={(e) =>
-                      updateCategoryAttributes({
+                      updateProductAttributes({
                         ctaText: e.target.value,
                       })
                     }

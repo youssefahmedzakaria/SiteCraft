@@ -74,7 +74,6 @@ export interface CategoryCustomizationAttributes {
   cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
   showSubtitle: boolean; //
   overlayColor: string;
-  borderRadius: string;
   showCategoryTitle: boolean;
   titleColor: string;
   titleFontSize: string;
@@ -96,42 +95,36 @@ export interface CategoryCustomizationAttributes {
 }
 
 export interface ProductCustomizationAttributes {
-  template: string;
-  title: string;
-  bgColor: string;
-  textColor: string;
-  accentColor: string;
-  fontFamily: string;
-  titleFont: string;
-  showTitle: boolean;
-  showMoreButton: boolean;
-  showMoreText: string;
-  showMorebuttonBgColor: string;
-  showMorebuttonTextColor: string;
-  ctaText: string;
-  cornerRadius: "small" | "medium" | "none" | "large" | undefined;
-  showCta: boolean; // button
-  cardVariant:
-    | "default"
-    | "compact"
-    | "detailed"
-    | "minimal"
-    | "hover"
-    | "overlay"
-    | "featured"; // add more if needed
-  showSubtitle: boolean;
-  cardTextColor: string;
-  categories: {
+   template: string; //
+  isClickable: boolean; //
+  title: string; //
+  bgColor: string; //
+  textColor: string; //
+  fontFamily: string; //
+  titleFont: string; //
+  showTitle: boolean; //
+  showMoreButton: boolean; //
+  showMoreText: string; //
+  showMorebuttonBgColor: string; //
+  showMorebuttonTextColor: string; //
+  ctaText: string; //
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined; //
+  showCta: boolean; //
+  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
+  showSubtitle: boolean; //
+  overlayColor: string;
+  showProductTitle: boolean;
+  titleColor: string;
+  titleFontSize: string;
+  productTitleFontSize: string;
+  products: {
     id: string;
-    name: string;
+    description: string;
+    price: string;
     link: string;
-    media: {
-      mainMedia: {
-        image: {
-          src: string;
-        };
-      };
-    };
+    image: string;
+    imageAlt: string;
+    title: string;
   }[];
 }
 
