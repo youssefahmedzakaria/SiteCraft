@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/e-commerce/ui/button";
 import { Input } from "@/components/e-commerce/ui/input";
 import { Label } from "@/components/e-commerce/ui/label";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useLoginForm } from "@/hooks/e-commerce/ecommerceUseLoginForm";
+import { Icons } from "@/components/SiteCraft/icons";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -22,39 +24,18 @@ export default function LoginPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mock authentication - accept any email/password
-    if (email && password) {
-      // Store mock token
-      localStorage.setItem("token", "mock-token-" + Date.now());
-      router.push(`/e-commerce/${subdomain}/profile`);
-    } else {
-      setError("Invalid credentials");
-    }
-
-    setIsLoading(false);
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    isLoading,
+    loginError,
+    onSubmit,
+    clearError,
+  } = useLoginForm();
 
   return (
     <div
@@ -77,10 +58,10 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-6">
-          {error && (
+        <form onSubmit={onSubmit} className="mt-8 space-y-6">
+          {loginError && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-sm">{loginError}</p>
             </div>
           )}
 
@@ -92,12 +73,20 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
+                name="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (loginError) {
+                    clearError();
+                  }
+                }}
+                placeholder="name@example.com"
                 className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
                 style={{ borderColor: defaultTheme.secondaryColor }}
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -113,12 +102,21 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (loginError) {
+                      clearError();
+                    }
+                  }}
+                  placeholder="••••••••"
                   className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
                   style={{ borderColor: defaultTheme.secondaryColor }}
                   required
+                  autoComplete="current-password"
+                  disabled={isLoading}
+                  name="password"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -142,7 +140,7 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between">
             <Link
-              href="/forgot-password"
+              href={`/e-commerce/${subdomain}/forgot-password`}
               className="text-sm hover:underline"
               style={{ color: defaultTheme.textColor }}
             >
@@ -156,7 +154,14 @@ export default function LoginPage() {
             style={{ backgroundColor: defaultTheme.secondaryColor }}
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? (
+              <>
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Sign in"
+            )}
           </Button>
 
           <div className="text-center">

@@ -15,6 +15,9 @@ import {
 import { Separator } from "@/components/e-commerce/ui/separator";
 import { Switch } from "@/components/e-commerce/ui/switch";
 import { usePathname, useRouter } from "next/navigation";
+import { Session } from "inspector/promises";
+import { getSession } from "@/lib/e-commerce/ecommerceAuth";
+import { useAuth } from "@/hooks/e-commerce/ecommerceUseAuth";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -63,7 +66,8 @@ export default function ProfilePage() {
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
-  const [user, setUser] = useState<UserData | null>(null);
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [mock,setMock] = useState<UserData | null>(null);
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [profileData, setProfileData] = useState<UserData | null>(null);
   const [notifications, setNotifications] = useState({
@@ -135,9 +139,7 @@ export default function ProfilePage() {
   ];
 
   useEffect(() => {
-    // Check if user is authenticated (simplified)
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isAuthenticated) {
       router.push(`/e-commerce/${subdomain}/login`);
       return;
     }
@@ -151,7 +153,7 @@ export default function ProfilePage() {
       phone: "+201117518970",
       avatar: "/placeholder.png?height=100&width=100",
     };
-    setUser(mockUser);
+    setMock(mockUser);
     setProfileData(mockUser);
     setIsLoading(false);
   }, [router]);
@@ -183,7 +185,7 @@ export default function ProfilePage() {
   };
 
   const handleSaveProfile = () => {
-    setUser(profileData);
+    setMock(profileData);
     alert("Profile updated successfully!");
   };
 
