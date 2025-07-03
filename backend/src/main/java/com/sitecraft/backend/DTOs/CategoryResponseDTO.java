@@ -1,7 +1,9 @@
 package com.sitecraft.backend.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sitecraft.backend.Models.Category;
+import java.time.LocalDateTime;
 
 public class CategoryResponseDTO {
     private Long id;
@@ -13,11 +15,12 @@ public class CategoryResponseDTO {
     private Long productCount;
     
     @JsonProperty("createdAt")
-    private String createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
 
     public CategoryResponseDTO() {}
 
-    public CategoryResponseDTO(Long id, String name, String description, String image, Long productCount, String createdAt) {
+    public CategoryResponseDTO(Long id, String name, String description, String image, Long productCount, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -32,7 +35,7 @@ public class CategoryResponseDTO {
         this.description = category.getDescription();
         this.image = category.getImage();
         this.productCount = productCount;
-        this.createdAt = "2024-01-01"; // Default value since Category doesn't have createdAt
+        this.createdAt = category.getCreatedAt();
     }
 
     public Long getId() {
@@ -75,11 +78,11 @@ public class CategoryResponseDTO {
         this.productCount = productCount;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 } 

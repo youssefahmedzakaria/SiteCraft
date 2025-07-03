@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,9 @@ public class Category {
 
     private String image;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "store_id")
     @JsonIgnore
@@ -31,13 +35,16 @@ public class Category {
     private List<CategoryProduct> categoryProducts;
 
     // Constructors
-    public Category() {}
+    public Category() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Category(String name, String description, String image, Store store) {
         this.name = name;
         this.description = description;
         this.image = image;
         this.store = store;
+        this.createdAt = LocalDateTime.now();
     }
 
     // Getters and setters
@@ -71,6 +78,14 @@ public class Category {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Store getStore() {

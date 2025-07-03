@@ -1,12 +1,17 @@
 package com.sitecraft.backend.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sitecraft.backend.Models.Category;
+import java.time.LocalDateTime;
 
 public class CategoryDTO {
     private Long id;
     private String name;
     private String description;
     private String image;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
 
     public CategoryDTO() {}
 
@@ -15,6 +20,7 @@ public class CategoryDTO {
         this.name = category.getName();
         this.description = category.getDescription();
         this.image = category.getImage();
+        this.createdAt = category.getCreatedAt();
     }
 
     public Long getId() {
@@ -47,5 +53,13 @@ public class CategoryDTO {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 } 
