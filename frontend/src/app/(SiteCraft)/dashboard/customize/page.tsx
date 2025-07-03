@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -59,6 +60,7 @@ import {
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { form } from "@heroui/theme";
+import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 
 interface Section {
   id: string;
@@ -280,7 +282,7 @@ export default function CustomizeTemplatePage() {
 
   const initialProduct: ProductCustomizationAttributes = {
     id: "products",
-    template: "FeaturedGrid", // You can adjust this if needed
+    template: "HorizontalScroll", // You can adjust this if needed
     isClickable: false,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
@@ -295,7 +297,7 @@ export default function CustomizeTemplatePage() {
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
-    cardVariant: "overlay",
+    cardVariant: "default",
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
@@ -306,48 +308,99 @@ export default function CustomizeTemplatePage() {
     products: [
       {
         id: "1",
-        description: "Description",
-        link: "#",
-        price: "100.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 1",
-        title: "Product 1",
+        name: "product1",
+        description: "description of product1",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
       },
       {
         id: "2",
-        description: "Description",
-        link: "#",
-        price: "200.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 2",
-        title: "Product 2",
+        name: "product2",
+        description: "description of product2",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
       },
       {
         id: "3",
-        description: "Description",
-        link: "#",
-        price: "300.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 3",
-        title: "Product 3",
+        name: "product3",
+        description: "description of product3",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
       },
       {
         id: "4",
-        description: "Description",
-        link: "#",
-        price: "400.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 4",
-        title: "Product 4",
+        name: "product4",
+        description: "description of product4",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
       },
       {
         id: "5",
-        description: "Description",
-        link: "#",
-        price: "500.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 5",
-        title: "Product 5",
+        name: "product5",
+        description: "description of product5",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "6",
+        name: "product6",
+        description: "description of product6",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
       },
     ],
   };
@@ -617,67 +670,6 @@ export default function CustomizeTemplatePage() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchStoreData = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:8080/api/store/getStoreSettings",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-      if (data.success && data.store) {
-        setStoreData(data.store);
-        // About (only description and secondaryDescription)
-        setAboutAttributes((prev) => ({
-          ...prev,
-          description: data.store.aboutUs?.[0]?.title || prev.description,
-          secondaryDescription:
-            data.store.aboutUs?.[0]?.content || prev.description,
-        }));
-        // Policies (only sections)
-        setPoliciesAttributes((prev) => ({
-          ...prev,
-          sections:
-            data.store.policies?.map((p: any) => ({
-              title: p.title,
-              content: p.description,
-            })) || prev.sections,
-        }));
-        // Contact (only contactEmail and socialLinks)
-        setContactAttributes((prev) => ({
-          ...prev,
-          contactEmail: data.store.emailAddress || prev.contactEmail,
-          socialLinks: {
-            facebook:
-              data.store.socialMediaAccounts?.find(
-                (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link ||
-              prev.socialLinks?.facebook ||
-              "",
-            instagram:
-              data.store.socialMediaAccounts?.find(
-                (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link ||
-              prev.socialLinks?.instagram ||
-              "",
-            twitter:
-              data.store.socialMediaAccounts?.find(
-                (acc: any) => acc.name.toLowerCase() === "twitter"
-              )?.link ||
-              prev.socialLinks?.twitter ||
-              "",
-          },
-        }));
-      } else {
-        alert(data.message || "Failed to fetch template.");
-      }
-    } catch (error) {
-      console.error("Failed to fetch store data:", error);
-    }
-  };
-
   // Add a useEffect to update header/footer logo and other attributes when storeData changes
   React.useEffect(() => {
     if (!storeData) return;
@@ -759,25 +751,52 @@ export default function CustomizeTemplatePage() {
 
   const fetchTemplate = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8080/customize/getTemplate",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-      if (data.success && data["Customized Template"]) {
-        const sortedTemplate = [...data["Customized Template"]].sort(
+      const [templateRes, storeRes, productsRes, categoriesRes] =
+        await Promise.all([
+          fetch("http://localhost:8080/customize/getTemplate", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/api/store/getStoreSettings", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getProducts", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getCategories", {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
+
+      const [templateData, storeData, productsData, categoriesData] =
+        await Promise.all([
+          templateRes.json(),
+          storeRes.json(),
+          productsRes.json(),
+          categoriesRes.json(),
+        ]);
+
+      if (
+        templateData.success &&
+        templateData["Customized Template"] &&
+        storeData.success &&
+        storeData.store
+      ) {
+        const sortedTemplate = [...templateData["Customized Template"]].sort(
           (a, b) => a.index - b.index
         );
         const loadedSections: Section[] = [];
-        sortedTemplate.forEach((section: any, idx: number) => {
+
+        sortedTemplate.forEach((section: any) => {
           loadedSections.push({
             id: section.title,
             title: section.title.replace("&", " & "),
-            expanded: false, // all sections initially collapsed
+            expanded: false,
           });
+
           switch (section.title) {
             case "Header&Menu":
               updateHeaderAttributes(section.value);
@@ -803,21 +822,123 @@ export default function CustomizeTemplatePage() {
             case "Products":
               updateProductAttributes(section.value);
               break;
-            // Add additional cases as you expand your backend support
           }
         });
+
         setSections(loadedSections);
-      } else {
-        alert(data.message || "Failed to fetch template.");
+
+        // Store data
+        setStoreData(storeData.store);
+
+        setAboutAttributes((prev) => ({
+          ...prev,
+          description: storeData.store.aboutUs?.[0]?.title || prev.description,
+          secondaryDescription:
+            storeData.store.aboutUs?.[0]?.content || prev.secondaryDescription,
+        }));
+
+        setPoliciesAttributes((prev) => ({
+          ...prev,
+          sections:
+            storeData.store.policies?.map((p: any) => ({
+              title: p.title,
+              content: p.description,
+            })) || prev.sections,
+        }));
+
+        setContactAttributes((prev) => ({
+          ...prev,
+          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          socialLinks: {
+            facebook:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "facebook"
+              )?.link || "",
+            instagram:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "instagram"
+              )?.link || "",
+            twitter:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "twitter"
+              )?.link || "",
+          },
+        }));
+
+        // 👇 Now you can store products and categories:
+        if (productsData.success && productsData.products) {
+          const mappedProducts = productsData.products.map((product: any) => ({
+            id: String(product.id),
+            name: product.name,
+            description: product.description,
+            media: {
+              mainMedia: {
+                image: {
+                  url:
+                    product.images && product.images.length > 0
+                      ? product.images[0].imageUrl
+                      : "/placeholder.png",
+                },
+              },
+            },
+                        price: {
+              price: product.variants[0].price ? product.variants[0].price : 0.00,
+              priceAfterDiscount: product.discountValue
+                ? 
+                    product.discountType === "percentage"
+                      ? parseFloat((product.variants[0].price * (1 - product.discountValue)).toFixed(2))
+                      : parseFloat((product.variants[0].price - product.discountValue).toFixed(2))
+                  
+                  : parseFloat(product.variants[0].price.toFixed(2)),
+            },
+          }));
+
+          setProductAttributes((prev) => ({
+            ...prev,
+            products: mappedProducts,
+          }));
+          console.log("Mapped Products:", mappedProducts);
+        }
+
+        if (categoriesData.success && categoriesData.categories) {
+          const mappedCategories = categoriesData.categories.map(
+            (category: any) => ({
+              id: String(category.id),
+              name: category.name,
+              Description: category.description,
+              link: "#",
+              media: {
+                mainMedia: {
+                  image: {
+                    url:
+                      category.image || "/placeholder.png",
+                  },
+                },
+              },
+            })
+          );
+
+          setCategoryAttributes((prev) => ({
+            ...prev,
+            categories: mappedCategories,
+          }));
+          console.log("Mapped Categories:", mappedCategories);
+        }
+
+        console.log("Categories", categoriesData.categories);
+        console.log("Products", productsData.products);
       }
     } catch (error) {
-      console.error("Failed to fetch template:", error);
+      console.error(
+        "Failed to fetch template, store data, products, or categories:",
+        error
+      );
     }
   };
 
   useEffect(() => {
     const fetchAll = async () => {
-      await Promise.all([fetchTemplate(), fetchStoreData()]);
+      await Promise.all([fetchTemplate()]);
       setIsLoading(false);
     };
     fetchAll();

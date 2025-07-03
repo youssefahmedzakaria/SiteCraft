@@ -120,12 +120,20 @@ export interface ProductCustomizationAttributes {
   productTitleFontSize: string;
   products: {
     id: string;
+    name: string;
     description: string;
-    price: string;
-    link: string;
-    image: string;
-    imageAlt: string;
-    title: string;
+      media: {
+        mainMedia: {
+          image: {
+            url: string
+          }
+        }
+      },
+      price:{
+        price: number,
+        priceAfterDiscount: number
+      }
+
   }[];
 }
 

@@ -154,7 +154,7 @@ export function FeaturedGridProductTemplate({
                 <Image
                   src={
                     product.media?.mainMedia?.image?.url ||
-                    "/placeholder.png?height=256&width=256"
+                    "/placeholder.png"
                   }
                   alt={product.name}
                   fill

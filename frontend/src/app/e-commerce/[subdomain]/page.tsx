@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -434,12 +435,6 @@ export default function Home() {
   // State for contact customization
   const [contactAttributes, setContactAttributes] =
     useState<ContactCustomizationAttributes>(initialContact);
-
-  const updateContactAttributes = (
-    updates: Partial<ContactCustomizationAttributes>
-  ) => {
-    setContactAttributes((prev) => ({ ...prev, ...updates }));
-  };
 
   const sectionComponents = {
     PromoSlider: {
