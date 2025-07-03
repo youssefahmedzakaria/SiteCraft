@@ -368,11 +368,6 @@ export default function CustomizeTemplatePage() {
     id: "about",
     title: "About Us",
     titleColor: "text-[#000000]", // text-black
-    description:
-      "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
-    secondaryDescription:
-      "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
-    descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -380,8 +375,22 @@ export default function CustomizeTemplatePage() {
     titleFont: "font-sans",
     titleSize: "text-4xl",
     // titleFontWeight: "font-bold",
-    descriptionFont: "font-sans",
-    descriptionSize: "text-lg",
+    sections: [
+      {
+        sectionTitle: "Who We Are",
+        description:
+          "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
+      },
+      {
+        sectionTitle: "Our Experience",
+        description:
+          "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
+      },
+    ],
+    sectionColor: "text-#4B5563",
+    sectionSize: "text-lg",
+    sectionFont: "font-sans",
+    sectionFontWeight: "normal",
   };
 
   // State for about customization

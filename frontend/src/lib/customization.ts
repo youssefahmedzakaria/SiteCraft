@@ -134,17 +134,21 @@ export interface AboutCustomizationAttributes {
   id: string;
   title: string;
   titleColor: string;
-  description: string;
-  secondaryDescription: string;
-  descriptionColor: string;
   backgroundColor: string;
   image: string;
   imageAlt: string;
   imageObjectFit: "cover" | "fill" | "contain";
   titleFont: string;
   titleSize: string;
-  descriptionFont: string;
-  descriptionSize: string;
+  sections: {
+    sectionTitle: string;
+    description: string;
+  }[];
+  sectionColor: string;
+  sectionFont: string;
+  sectionSize: string;
+  sectionFontWeight: string;
+  
 }
 
 export interface PoliciesCustomizationAttributes {
