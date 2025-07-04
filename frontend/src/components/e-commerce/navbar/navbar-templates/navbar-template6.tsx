@@ -9,6 +9,7 @@ import { Navigation } from "../navbar-components/navigation"
 import { SearchBar } from "../navbar-components/search-bar"
 import MobileMenu from "../navbar-components/mobile-menu"
 import { usePathname } from "next/navigation"
+import { IconsGroup } from "../navbar-components/icons-group"
 
 export interface NavbarTemplate6Props {
   isCustomize?: boolean
@@ -33,6 +34,7 @@ export interface NavbarTemplate6Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
 }
 
 // Utility for font family (local, not imported)
@@ -64,6 +66,7 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
   MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
 }) => {
   const path = usePathname()
   const pathSegments = path.split("/")
@@ -112,7 +115,7 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
             {/* Left side - Brand and Navigation */}
             <div className="flex items-center space-x-8">
               <Logo brandName={brandName} logo={logo} textColor={textColor} />
-              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
             </div>
 
             {/* Right side - Search and Text Links */}
@@ -123,36 +126,68 @@ export const NavbarTemplate6: React.FC<NavbarTemplate6Props> = ({
                 iconColor={iconColor}
                 backgroundColor="bg-white/20"
                 textColor={textColor}
+                onSearch={onSearch}
               />
 
               <div className="flex items-center space-x-6">
-                <Link
-                  href={`/e-commerce/${subdomain}/profile`}
-                  className="text-sm hover:underline transition-all"
-                  style={{
-                    color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                  }}
-                >
-                  Profile
-                </Link>
-                <Link
-                  href={`/e-commerce/${subdomain}/cart`}
-                  className="text-sm hover:underline transition-all"
-                  style={{
-                    color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                  }}
-                >
-                  Shopping Cart
-                </Link>
-                <Link
-                  href={`/e-commerce/${subdomain}/favorites`}
-                  className="text-sm hover:underline transition-all"
-                  style={{
-                    color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
-                  }}
-                >
-                  Favorites
-                </Link>
+                {isCustomize ? (
+                  <>
+                    <span
+                      className="text-sm opacity-60 cursor-not-allowed"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Profile
+                    </span>
+                    <span
+                      className="text-sm opacity-60 cursor-not-allowed"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Shopping Cart
+                    </span>
+                    <span
+                      className="text-sm opacity-60 cursor-not-allowed"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Favorites
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href={`/e-commerce/${subdomain}/profile`}
+                      className="text-sm hover:underline transition-all"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={`/e-commerce/${subdomain}/cart`}
+                      className="text-sm hover:underline transition-all"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Shopping Cart
+                    </Link>
+                    <Link
+                      href={`/e-commerce/${subdomain}/favorites`}
+                      className="text-sm hover:underline transition-all"
+                      style={{
+                        color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : undefined,
+                      }}
+                    >
+                      Favorites
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { GridProductTemplate } from "@/components/e-commerce/product-lists"
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react"
 import { Button } from "@/components/e-commerce/ui/button"
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/e-commerce/ui/slider"
 import { Checkbox } from "@/components/e-commerce/ui/checkbox"
 import { cn } from "@/lib/utils"
+import { useSearchParams, useRouter } from "next/navigation"
 
 const products = [
   {
@@ -193,7 +194,7 @@ export default function JewelryProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as "overlay" | "default" | "compact" | "detailed" | "minimal" | "hover" | "featured",
+  cardVariant = "hover" as "default" | "minimal" | "hover" | "overlay" | "featured",
   titleFontSize = "text-3xl",
   showMoreButton = false,
 
@@ -205,6 +206,8 @@ export default function JewelryProductsPage({
   enableSorting = true,
   maxPriceLimit = 1500,
 }) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -214,6 +217,17 @@ export default function JewelryProductsPage({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [sortBy, setSortBy] = useState("featured")
   const [showInStockOnly, setShowInStockOnly] = useState(false)
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("")
+
+  // Initialize search from URL params
+  useEffect(() => {
+    const searchFromUrl = searchParams.get('search')
+    if (searchFromUrl) {
+      setSearchQuery(searchFromUrl)
+    }
+  }, [searchParams])
 
   const categories = [
     "Rings",
@@ -230,6 +244,27 @@ export default function JewelryProductsPage({
   // Apply filters
   const getFilteredProducts = () => {
     let filtered = [...products]
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      const searchWords = query.split(/\s+/).filter(word => word.length > 0)
+      
+      filtered = filtered.filter((product) => {
+        const productText = [
+          product.name.toLowerCase(),
+          product.description.toLowerCase(),
+          product.category.toLowerCase()
+        ].join(' ')
+        
+        // Check if all search words are found in the product text
+        return searchWords.every(word => {
+          // Use word boundary regex to prevent partial matches
+          const wordRegex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+          return wordRegex.test(productText)
+        })
+      })
+    }
 
     // Price filter
     if (enablePriceFilter) {
@@ -298,7 +333,28 @@ export default function JewelryProductsPage({
     setSelectedCategories([])
     setSortBy("featured")
     setShowInStockOnly(false)
+    setSearchQuery("")
     setCurrentPage(1)
+    
+    // Clear search from URL
+    const newSearchParams = new URLSearchParams(searchParams)
+    newSearchParams.delete('search')
+    router.replace(`?${newSearchParams.toString()}`)
+  }
+
+  // Handle search from navbar
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+    
+    // Update URL with search parameter
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (query.trim()) {
+      newSearchParams.set('search', query.trim())
+    } else {
+      newSearchParams.delete('search')
+    }
+    router.replace(`?${newSearchParams.toString()}`)
   }
 
   // Generate page numbers for pagination (matching categories page)
@@ -598,6 +654,37 @@ export default function JewelryProductsPage({
                 )}
               </div>
             </div>
+
+            {/* Search Results Display */}
+            {searchQuery.trim() && (
+              <div className="mb-6 p-4 rounded-lg border" style={{ 
+                backgroundColor: theme.backgroundColor + '20', 
+                borderColor: theme.textColor + '30',
+                color: theme.textColor 
+              }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Search results for:</span>
+                    <span className="text-sm font-semibold">"{searchQuery}"</span>
+                    <span className="text-sm opacity-70">({totalItems} products found)</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchQuery("")
+                      const newSearchParams = new URLSearchParams(searchParams)
+                      newSearchParams.delete('search')
+                      router.replace(`?${newSearchParams.toString()}`)
+                    }}
+                    className="text-xs"
+                    style={{ color: theme.textColor, borderColor: theme.textColor }}
+                  >
+                    Clear Search
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Products Display */}
             {currentProducts.length === 0 ? (

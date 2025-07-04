@@ -72,6 +72,41 @@ interface FlexibleCardProps {
   contentClassName?: string;
 }
 
+const getFontFamily = (fontFamily: string) => {
+  switch (fontFamily) {
+    case "font-inter":
+      return "Inter, sans-serif";
+    case "font-roboto":
+      return "Roboto, sans-serif";
+    case "font-open-sans":
+      return "Open Sans, sans-serif";
+    case "font-poppins":
+      return "Poppins, sans-serif";
+    case "font-lato":
+      return "Lato, sans-serif";
+    case "font-serif":
+      return "serif";
+    default:
+      return "system-ui, sans-serif";
+  }
+};
+
+const getFontSize = (fontSize: string) => {
+  const sizeMap: Record<string, string> = {
+    "text-xs": "0.75rem",
+    "text-sm": "0.875rem",
+    "text-base": "1rem",
+    "text-lg": "1.125rem",
+    "text-xl": "1.25rem",
+    "text-2xl": "1.5rem",
+    "text-3xl": "1.875rem",
+    "text-4xl": "2.25rem",
+    "text-5xl": "3rem",
+    "text-6xl": "3.75rem",
+  };
+  return sizeMap[fontSize] || "1rem";
+};
+
 export default function FlexibleCard({
   isClickable,
   // Core data
@@ -263,8 +298,7 @@ export default function FlexibleCard({
 
   // Wrap content in Link if needed
   const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
-    if (!href) return <>{children}</>;
-
+    if (!isClickable || !href || href === "#") return <>{children}</>;
     return (
       <Link
         href={href}
@@ -335,7 +369,13 @@ export default function FlexibleCard({
     case "overlay":
       return (
         <div
-          className={cn("group", bgColor, finalTitleFont, textColor, className)}
+          className={cn("group",className)}
+          style={{backgroundColor: bgColor.includes("[")
+            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : bgColor,
+            color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+            fontFamily: getFontFamily(fontFamily),
+          }}
         >
           <ContentWrapper>
             <div
@@ -365,23 +405,32 @@ export default function FlexibleCard({
                     overlayColor
                   )}
                 >
-                  <div className={cn("text-center p-4", contentClassName)}>
-                    <h3 className={cn(textColor, titleFontSize, "font-bold flex items-center justify-center gap-2")}>{item.name}<DiscountBadge /></h3>
+                  <div className={cn("text-center p-4", contentClassName)}
+                   style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>
+                    <h3 className={cn( "font-bold flex items-center justify-center gap-2")} style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>{item.name}<DiscountBadge /></h3>
                     {showSubtitle && showDescription && (
-                      <p className={cn(textColor, "opacity-80 text-sm mt-1")}>
+                      <p className={cn( "opacity-80 text-sm mt-1")}style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>
                         {description}
                       </p>
                     )}
                     <PriceDisplay
-                      className={cn("justify-center mt-2", textColor)}
+                      className={cn("justify-center mt-2" ,textColor) }
                     />
                     {showCta && (
                       <div
                         onClick={handleCtaClick}
                         className={cn(
                           "mt-3 text-sm font-medium border border-white/60 px-3 py-1 rounded-full inline-block cursor-pointer",
-                          textColor
                         )}
+                        style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                          fontFamily: getFontFamily(fontFamily),
+                        }}
                       >
                         {ctaText}
                       </div>
@@ -417,7 +466,11 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("mt-2", contentClassName)}>
-            {showTitle && <h3 className={cn("text-sm", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
+            {showTitle && <h3 className={cn("text-sm","flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}
+            >{item.name}<DiscountBadge /></h3>}
             <PriceDisplay className="text-sm mt-1" />
           </div>
         </div>
@@ -425,7 +478,11 @@ export default function FlexibleCard({
 
     case "hover":
       return (
-        <div className={cn("group", finalTitleFont, textColor, className)}>
+        <div className={cn("group", className)}
+         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+          fontFamily: getFontFamily(fontFamily),       
+        }}
+        >
           <ContentWrapper>
             <div
               className={cn(
@@ -500,8 +557,14 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
-            {showSubtitle && <p className={cn("text-sm opacity-70", textColor)}>{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    fontFamily: getFontFamily(fontFamily),}}
+            >{item.name}<DiscountBadge /></h3>}
+            {showSubtitle && <p className={cn("text-sm opacity-70")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}
+            >{description}</p>}
             {showReviews && type === "product" && (
               <div className="flex items-center">
                 <div className="flex">
@@ -532,7 +595,11 @@ export default function FlexibleCard({
     case "featured":
       return (
         <div
-          className={cn("group", bgColor, textColor, finalTitleFont, className)}
+          className={cn("group", className)}
+           style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                  fontFamily: getFontFamily(fontFamily),
+                  backgroundColor: bgColor?.includes("[") ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : bgColor, 
+          }}
         >
           <ContentWrapper>
             <div
@@ -557,9 +624,15 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                   <div className={cn("p-6", contentClassName)}>
-                    <h3 className={cn(textColor, textColor, "font-bold flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>
+                    <h3 className={cn("font-bold flex items-center gap-2")}
+                       style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                        fontSize: getFontSize(fontFamily),
+                    }}
+                      >{item.name}<DiscountBadge /></h3>
                     {showSubtitle && showDescription && (
-                      <p className={cn(textColor, "opacity-80 mt-1")}>
+                      <p className={cn("opacity-80 mt-1")}
+                       style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}>
                         {description}
                       </p>
                     )}
@@ -585,7 +658,10 @@ export default function FlexibleCard({
 
     default: // default variant
       return (
-        <div className={cn("group", finalTitleFont, textColor, className)}>
+        <div className={cn("group" ,className)}
+         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                   fontFamily: getFontFamily(fontFamily),}}
+        >
           <ContentWrapper>
             <div
               className={cn(
@@ -629,8 +705,14 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
-            {showSubtitle && <p className={cn("text-sm", textColor)}>{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    fontSize: getFontSize(fontFamily),
+                    }}
+            >{item.name}<DiscountBadge /></h3>}
+            {showSubtitle && <p className={cn("text-sm")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}>{description}</p>}
             <div className="flex justify-between items-center">
               <PriceDisplay />
               {showCta && (
