@@ -27,6 +27,7 @@ export const FullSearchBar: React.FC<FullSearchBarProps> = ({
     e.preventDefault()
     if (onSearch) {
       onSearch(searchQuery)
+      setSearchQuery("")
     }
   }
 

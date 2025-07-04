@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/e-commerce/ui/button";
+import { useRouter, usePathname } from "next/navigation";
 
 export interface PromoSlideProps {
   isClickable?: boolean;
@@ -88,7 +89,7 @@ const getBorderRadius = (radius: string) => {
 };
 
 export function PromoSlide({
-  isClickable,
+  isClickable = true,
   title,
   description,
   buttonText,
@@ -157,6 +158,18 @@ export function PromoSlide({
   };
 
   const style = variants[variant];
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const pathSegments = pathname.split("/");
+  const subdomain = pathSegments[2];
+
+  const handlePromoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isClickable && subdomain) {
+      router.push(`/e-commerce/${subdomain}/products`);
+    }
+  };
 
   return (
     <div className={cn("w-full flex-shrink-0", style.container, className)}>
@@ -230,7 +243,7 @@ export function PromoSlide({
         </p>
 
         <Button
-          asChild
+          asChild={false}
           className="w-fit border-0"
           style={{
             fontFamily: buttonFont ? getFontFamily(buttonFont) : undefined,
@@ -245,8 +258,10 @@ export function PromoSlide({
               ? getBorderRadius(buttonRadius)
               : undefined,
           }}
+          onClick={handlePromoClick}
+          disabled={!isClickable}
         >
-          <Link href={isClickable ? buttonLink : "#"}>{buttonText}</Link>
+          {buttonText}
         </Button>
       </div>
     </div>

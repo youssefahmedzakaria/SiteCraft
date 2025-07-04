@@ -72,6 +72,13 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
+
+  const [initialColors, setInitialColors] = useState( {
+    "primary": "#000000",
+    "secondary": "#000000",
+    "accent": "#000000"
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [aboutImage, setAboutImage] = useState<File | undefined>();
