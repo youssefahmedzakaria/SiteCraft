@@ -55,7 +55,7 @@ export interface PromoCustomizationAttributes {
 }
 
 export interface CategoryCustomizationAttributes {
-  id : string;
+  id: string;
   template: string; //
   isClickable: boolean; //
   title: string; //
@@ -71,7 +71,13 @@ export interface CategoryCustomizationAttributes {
   ctaText: string; //
   cornerRadius: "small" | "medium" | "none" | "large" | undefined; //
   showCta: boolean; //
-  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
+  cardVariant:
+    | "overlay"
+    | "default"
+    | "minimal"
+    | "hover"
+    | "featured"
+    | undefined; //
   showSubtitle: boolean; //
   overlayColor: string;
   showCategoryTitle: boolean;
@@ -79,40 +85,39 @@ export interface CategoryCustomizationAttributes {
   titleFontSize: string;
   categoryTitleFontSize: string;
   categories: {
-  name: string;
-  media: {
-      mainMedia: {
-          image: {
-              url: string;
-          }
-      }
-  };
-  id: string;
-  Description: string;
-  link: string; 
+    name: string;
+    images: { id: number; url: string; alt?: string }[];
+    id: string;
+    Description: string;
+    link: string;
   }[];
-
 }
 
 export interface ProductCustomizationAttributes {
-  id : string;
-  template: string; 
-  isClickable: boolean; 
-  title: string; 
-  bgColor: string; 
-  textColor: string; 
-  fontFamily: string; 
-  titleFont: string; 
-  showTitle: boolean; 
-  showMoreButton: boolean; 
-  showMoreText: string; 
-  showMorebuttonBgColor: string; 
-  showMorebuttonTextColor: string; 
+  id: string;
+  template: string;
+  isClickable: boolean;
+  title: string;
+  bgColor: string;
+  textColor: string;
+  fontFamily: string;
+  titleFont: string;
+  showTitle: boolean;
+  showMoreButton: boolean;
+  showMoreText: string;
+  showMorebuttonBgColor: string;
+  showMorebuttonTextColor: string;
   ctaText: string;
-  cornerRadius: "small" | "medium" | "none" | "large" | undefined; 
-  showCta: boolean; 
-  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; 
-  showSubtitle: boolean; 
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined;
+  showCta: boolean;
+  cardVariant:
+    | "overlay"
+    | "default"
+    | "minimal"
+    | "hover"
+    | "featured"
+    | undefined;
+  showSubtitle: boolean;
   overlayColor: string;
   showProductTitle: boolean;
   titleColor: string;
@@ -122,18 +127,10 @@ export interface ProductCustomizationAttributes {
     id: string;
     name: string;
     description: string;
-      media: {
-        mainMedia: {
-          image: {
-            url: string
-          }
-        }
-      },
-      price:{
-        price: number,
-        priceAfterDiscount: number
-      }
-
+    discountType?: string;
+    discountValue?: number;
+    price: number;
+    images: { id: number; url: string; alt?: string }[];
   }[];
 }
 
