@@ -180,14 +180,19 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
                   : "/placeholder.png",
             },
             socialMedia: {
+              ...(prev.socialMedia || {}),
               facebook:
                 dataStore.store.socialMediaAccounts?.find(
                   (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialMedia.facebook,
+                )?.link ||
+                prev.socialMedia?.facebook ||
+                "",
               instagram:
                 dataStore.store.socialMediaAccounts?.find(
                   (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialMedia.instagram,
+                )?.link ||
+                prev.socialMedia?.instagram ||
+                "",
             },
           }));
         }
