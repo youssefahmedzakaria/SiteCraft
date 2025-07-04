@@ -49,19 +49,28 @@ export default function CategorysOverview({
   useEffect(() => { setIsClient(true); }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleImageChange triggered'); // Debug log
     const file = e.target.files?.[0] || null;
     if (file) {
+      console.log('File selected:', file.name, file.size); // Debug log
       setImageFile?.(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview?.(reader.result as string);
+        console.log('Image preview set'); // Debug log
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleBrowseClick = () => {
-    fileInputRef.current?.click();
+    console.log('Browse clicked'); // Debug log
+    console.log('File input ref:', fileInputRef.current); // Debug log
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    } else {
+      console.error('File input ref is null');
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -84,6 +93,16 @@ export default function CategorysOverview({
   const handleClearImage = () => {
     setImageFile?.(null);
     setImagePreview?.(null);
+  };
+
+  const handleChangeImage = () => {
+    console.log('Change Image button clicked'); // Debug log
+    console.log('File input ref:', fileInputRef.current); // Debug log
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    } else {
+      console.error('File input ref is null');
+    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,7 +166,7 @@ export default function CategorysOverview({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={handleClearImage}
+                onClick={handleChangeImage}
               >
                 Change Image
               </Button>

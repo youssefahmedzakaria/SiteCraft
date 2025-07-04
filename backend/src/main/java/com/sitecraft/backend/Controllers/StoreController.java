@@ -57,8 +57,8 @@ public class StoreController {
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
-                // Update store with logo path
-                String logoUrl = "/uploads/stores/" + createdStore.getId() + "/" + filename;
+                // Update store with complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + createdStore.getId() + "/" + filename;
                 createdStore.setLogo(logoUrl);
                 createdStore = storeService.updateStorePartial(createdStore.getId(), createdStore);
             }
@@ -122,14 +122,22 @@ public class StoreController {
             Store existingStore = storeService.getStore(storeId);
             // Delete old logo if a new one is uploaded
             if (logo != null && !logo.isEmpty()) {
-                    String oldLogoPath = System.getProperty("user.dir") +existingStore.getLogo();
-                    System.out.println("------------------------------------------------------------------------");
-                    System.out.println(oldLogoPath);
-                    System.out.println("------------------------------------------------------------------------");
-                    File oldLogoFile = new File(oldLogoPath);
-                    if (oldLogoFile.exists()) {
-                        boolean deleted = oldLogoFile.delete();
-                        System.out.println("Old logo deleted: " + deleted);
+                    String oldLogoUrl = existingStore.getLogo();
+                    if (oldLogoUrl != null) {
+                        String oldLogoPath;
+                        if (oldLogoUrl.startsWith("http://localhost:8080")) {
+                            oldLogoPath = System.getProperty("user.dir") + oldLogoUrl.substring("http://localhost:8080".length());
+                        } else {
+                            oldLogoPath = System.getProperty("user.dir") + oldLogoUrl;
+                        }
+                        System.out.println("------------------------------------------------------------------------");
+                        System.out.println(oldLogoPath);
+                        System.out.println("------------------------------------------------------------------------");
+                        File oldLogoFile = new File(oldLogoPath);
+                        if (oldLogoFile.exists()) {
+                            boolean deleted = oldLogoFile.delete();
+                            System.out.println("Old logo deleted: " + deleted);
+                        }
                     }
 
 
@@ -146,8 +154,8 @@ public class StoreController {
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
-                // Set new logo path relative to project (or public URL if you're serving it)
-                String logoUrl = "/uploads/stores/" + storeId + "/" + filename;
+                // Set complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + storeId + "/" + filename;
                 updatedStore.setLogo(logoUrl);
             }
 
@@ -651,5 +659,116 @@ public class StoreController {
                     "message", e.getMessage()
             ));
         }
+    }
+
+    // --------------------------------- Store Colors Management -----------------------------------------------
+
+    @PostMapping("/colors")
+    public ResponseEntity<?> saveStoreColors(
+            @RequestBody Map<String, String> colors,
+            HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String primary = colors.get("primary");
+            String secondary = colors.get("secondary");
+            String accent = colors.get("accent");
+
+            // Validate hex color format
+            if (!isValidHexColor(primary) || !isValidHexColor(secondary) || !isValidHexColor(accent)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Invalid hex color format"));
+            }
+
+            storeService.updateStoreColors(storeId, primary, secondary, accent);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors saved successfully",
+                    "colors", Map.of(
+                            "primary", primary,
+                            "secondary", secondary,
+                            "accent", accent
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to save store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/colors")
+    public ResponseEntity<?> updateStoreColors(
+            @RequestBody Map<String, String> colors,
+            HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String primary = colors.get("primary");
+            String secondary = colors.get("secondary");
+            String accent = colors.get("accent");
+
+            // Validate hex color format
+            if (!isValidHexColor(primary) || !isValidHexColor(secondary) || !isValidHexColor(accent)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Invalid hex color format"));
+            }
+
+            storeService.updateStoreColors(storeId, primary, secondary, accent);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors updated successfully",
+                    "colors", Map.of(
+                            "primary", primary,
+                            "secondary", secondary,
+                            "accent", accent
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to update store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/colors")
+    public ResponseEntity<?> getStoreColors(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String colorsJson = storeService.getStoreColors(storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors retrieved successfully",
+                    "colors", colorsJson
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to retrieve store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    // Helper method to validate hex color format
+    private boolean isValidHexColor(String color) {
+        return color != null && color.matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
     }
 }
