@@ -193,7 +193,7 @@ export default function JewelryProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as "overlay" | "default" | "compact" | "detailed" | "minimal" | "hover" | "featured",
+  cardVariant = "hover" as "overlay" | "default" | "minimal" | "hover" | "featured",
   titleFontSize = "text-3xl",
   showMoreButton = false,
 
