@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { createStore } from "@/lib/auth";
 import { getStoreSettings, updateStoreInfo } from "@/lib/store-info";
+import { saveStoreColors, updateStoreColors } from "@/lib/store-colors";
 import { useRouter } from "next/navigation";
 import { RefreshCw, AlertCircle } from "lucide-react";
 
@@ -21,6 +22,7 @@ interface StoreData {
   address?: string;
   addressLink?: string;
   openingHours?: string;
+  subdomain?: string;
 }
 
 function rgbToHex([r, g, b]: number[]): string {
@@ -579,10 +581,12 @@ export default function BrandingPage() {
   const [accentColor, setAccentColor] = useState("#ff6b6b");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [storeType, setStoreType] = useState("");
+  const [subdomain, setSubdomain] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [existingStore, setExistingStore] = useState<StoreData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isClient, setIsClient] = useState(false);
   const { user, updateSessionAfterStoreCreation } = useAuth();
   const router = useRouter();
@@ -609,6 +613,7 @@ export default function BrandingPage() {
           // Pre-fill form with existing data
           setStoreName(storeData.storeName || "My Store");
           setStoreType(storeData.storeType || "");
+          setSubdomain(storeData.subdomain || "");
           
           console.log('✅ Existing store data loaded:', storeData);
         }
@@ -692,6 +697,14 @@ export default function BrandingPage() {
       });
   }, [existingStore?.logo, isClient]);
 
+  const handleStoreNameChange = (value: string) => {
+    setStoreName(value);
+    // Clear store name error when user starts typing
+    if (errors.storeName) {
+      setErrors(prev => ({ ...prev, storeName: '' }));
+    }
+  };
+
   const handleSaveChanges = async () => {
     if (!isClient || !user?.userId) {
       alert('User not authenticated');
@@ -721,11 +734,25 @@ export default function BrandingPage() {
         const storeData = {
           storeName: storeName.trim(),
           storeType: storeType,
-          description: existingStore.description || `Store updated for ${storeName}`
+          description: existingStore.description || `Store updated for ${storeName}`,
+          subdomain: subdomain.trim() || undefined
         };
 
         const result = await updateStoreInfo(storeData, logoFile || undefined);
         console.log('✅ Store updated successfully:', result);
+        
+        // Update store colors in database
+        try {
+          await updateStoreColors({
+            primary: validPrimaryColor,
+            secondary: validSecondaryColor,
+            accent: validAccentColor
+          });
+          console.log('✅ Store colors updated in database');
+        } catch (colorError) {
+          console.error('⚠️ Failed to update colors in database:', colorError);
+          // Continue anyway, don't block the flow
+        }
         
         // Show success message and redirect to color palette
         alert('Store updated successfully!');
@@ -752,6 +779,19 @@ export default function BrandingPage() {
         if (result.store && result.store.id) {
           await updateSessionAfterStoreCreation(result.store.id, 'owner');
           console.log('✅ Session updated with store information');
+          
+          // Save store colors to database
+          try {
+            await saveStoreColors({
+              primary: validPrimaryColor,
+              secondary: validSecondaryColor,
+              accent: validAccentColor
+            });
+            console.log('✅ Store colors saved to database');
+          } catch (colorError) {
+            console.error('⚠️ Failed to save colors to database:', colorError);
+            // Continue anyway, don't block the flow
+          }
         }
       }
 
@@ -766,7 +806,22 @@ export default function BrandingPage() {
       router.push('/branding/color-palette');
     } catch (error) {
       console.error('💥 Error saving store:', error);
-      alert(`Failed to save store: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Clear any existing errors
+      setErrors({});
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('subdomain') || error.message.includes('unique constraint') || error.message.includes('already taken')) {
+          setErrors({ storeName: 'A store with this name already exists. Please choose a different store name.' });
+        } else if (error.message.includes('duplicate key')) {
+          setErrors({ storeName: 'This store name is already taken. Please choose a different name.' });
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsCreating(false);
     }
@@ -1001,11 +1056,17 @@ export default function BrandingPage() {
                     <Input
                       id="storeName"
                       value={storeName}
-                      onChange={(e) => setStoreName(e.target.value)}
+                      onChange={(e) => handleStoreNameChange(e.target.value)}
                       placeholder="Your Store Name"
-                      className="w-full"
+                      className={`w-full ${errors.storeName ? 'border-red-500' : ''}`}
                       required
                     />
+                    {errors.storeName && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        {errors.storeName}
+                      </p>
+                    )}
                   </div>
 
                   {/* Store Type */}
