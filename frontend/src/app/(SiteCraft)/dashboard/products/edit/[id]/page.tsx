@@ -186,22 +186,17 @@ export default function EditProductPage() {
         const transformedVariants: ProductVariantDTO[] = product.variants.map(variant => {
           let variantAttributes = variantIdToAttributes[variant.id];
           if (!variantAttributes || variantAttributes.length === 0 || (variantAttributes.length === 1 && variantAttributes[0].name === "Default" && variantAttributes[0].value === "Default")) {
-            // Parse the SKU and use everything after the second '|', then format nicely
-            let parsedName = variant.sku || "-";
-            if (parsedName.includes("|")) {
-              const parts = parsedName.split("|");
+            // Parse the SKU and use everything after the second '|', then format as array of { name, value }
+            let parsedAttributes: { name: string; value: string }[] = [];
+            if (variant.sku && variant.sku.includes("|")) {
+              const parts = variant.sku.split("|");
               const attributes = parts.length > 2 ? parts.slice(2) : [parts[parts.length - 1]];
-              parsedName = attributes
-                .map(attr => {
-                  const [name, value] = attr.split("-");
-                  if (!name || !value) return attr;
-                  return `${name.charAt(0).toUpperCase() + name.slice(1)}: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
-                })
-                .join(", ");
+              parsedAttributes = attributes.map(attr => {
+                const [name, value] = attr.split("-");
+                return name && value ? { name, value } : { name: "", value: attr };
+              });
             }
-            // Remove leading colons, spaces, and any other unwanted characters
-            parsedName = parsedName.replace(/^[:|\s]+/, "").trim();
-            variantAttributes = [{ name: "", value: parsedName }];
+            variantAttributes = parsedAttributes;
           }
           return {
             id: variant.id,
@@ -552,11 +547,6 @@ export default function EditProductPage() {
   const updateImageFiles = (files: File[]) => {
     setImageFiles(files);
   };
-
-  // UseEffect to regenerate variants when attributes change
-  useEffect(() => {
-    generateVariants(attributes);
-  }, [attributes]);
 
   // UseEffect to regenerate default variant when price or production cost changes
   useEffect(() => {
