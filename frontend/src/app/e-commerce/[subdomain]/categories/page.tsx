@@ -49,24 +49,25 @@ export default function CategoriesPage({
   titleFontSize = "text-3xl",
   showMoreButton = false,
 }) {
-  const {
-    categories,
-    statistics,
-    isLoading,
-    error,
-    clearError,
-    fetchCategories,
-  } = useCategoryManagement();
+  const { backendCategories } = useCategoryManagement();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItemsPerPage, setSelectedItemsPerPage] =
     useState(itemsPerPage);
 
   // Calculate pagination
-  const totalItems = categories.length;
+  const totalItems = backendCategories.length;
   const totalPages = Math.ceil(totalItems / selectedItemsPerPage);
   const startIndex = (currentPage - 1) * selectedItemsPerPage;
   const endIndex = startIndex + selectedItemsPerPage;
-  const currentCategories = categories.slice(startIndex, endIndex);
+  const currentCategories = backendCategories
+    .slice(startIndex, endIndex)
+    .map((category) => ({
+      name: category.name,
+      images: [{ id: category.id, url: category.image, alt: category.name }],
+      id: category.id,
+      Description: category.description,
+      link: `/${category.id}`,
+    }));
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
