@@ -534,7 +534,7 @@ export default function Home() {
         // ---------------------Store Settings----------------------------------
         setAboutAttributes((prev) => ({
           ...prev,
-          section:
+          sections:
             storeData.aboutUs?.map((p: any) => ({
               sectionTitle: p.title,
               description: p.content,

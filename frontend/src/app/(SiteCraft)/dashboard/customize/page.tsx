@@ -595,88 +595,6 @@ export default function CustomizeTemplatePage() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Add a useEffect to update header/footer logo and other attributes when storeData changes
-  React.useEffect(() => {
-    if (!storeData) return;
-    // Update header logo
-    setHeaderAttributes((prev) => ({
-      ...prev,
-      brandName: storeData.storeName || prev.brandName,
-      logo: {
-        ...prev.logo,
-        src:
-          storeData.logo && storeData.logo !== ""
-            ? storeData.logo
-            : "/placeholder.png",
-      },
-    }));
-    // Update about
-    setAboutAttributes((prev) => ({
-      ...prev,
-      section:
-        storeData.aboutUs?.map((p: any) => ({
-          sectionTitle: p.title,
-          description: p.content,
-        })) || prev.sections,
-    }));
-    // Update policies
-    setPoliciesAttributes((prev) => ({
-      ...prev,
-      sections:
-        storeData.policies?.map((p: any) => ({
-          title: p.title,
-          content: p.description,
-        })) || prev.sections,
-    }));
-    // Update contact
-    setContactAttributes((prev) => ({
-      ...prev,
-      contactEmail: storeData.emailAddress || prev.contactEmail,
-      socialLinks: {
-        facebook:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "facebook"
-          )?.link ||
-          prev.socialLinks?.facebook ||
-          "",
-        instagram:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "instagram"
-          )?.link ||
-          prev.socialLinks?.instagram ||
-          "",
-        twitter:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "twitter"
-          )?.link ||
-          prev.socialLinks?.twitter ||
-          "",
-      },
-    }));
-    // Update footer logo and social media
-    setFooterAttributes((prev) => ({
-      ...prev,
-      brandName: storeData.storeName || prev.brandName,
-      logo: {
-        ...prev.logo,
-        src:
-          storeData.logo && storeData.logo !== ""
-            ? storeData.logo
-            : "/placeholder.png",
-      },
-      socialMedia: {
-        facebook:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "facebook"
-          )?.link || prev.socialMedia.facebook,
-        instagram:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "instagram"
-          )?.link || prev.socialMedia.instagram,
-      },
-    }));
-  }, [storeData]);
-
   const fetchTemplate = async () => {
     try {
       const [templateRes, storeRes, productsRes, categoriesRes] =
@@ -758,12 +676,24 @@ export default function CustomizeTemplatePage() {
         // Store data
         setStoreData(storeData.store);
 
-        console.log("fetched store", storeData);
+        console.log("fetched store", storeData.store);
+
+        setHeaderAttributes((prev) => ({
+          ...prev,
+          brandName: storeData.store.storeName || prev.brandName,
+          logo: {
+            ...prev.logo,
+            src:
+              storeData.store.logo && storeData.store.logo !== ""
+                ? storeData.store.logo
+                : "/placeholder.png",
+          },
+        }));
 
         setAboutAttributes((prev) => ({
           ...prev,
-          section:
-            storeData.aboutUs?.map((p: any) => ({
+          sections:
+            storeData.store.aboutUs?.map((p: any) => ({
               sectionTitle: p.title,
               description: p.content,
             })) || prev.sections,
@@ -780,7 +710,11 @@ export default function CustomizeTemplatePage() {
 
         setContactAttributes((prev) => ({
           ...prev,
-          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          address: storeData.store.address || "",
+          addressUrl: storeData.store.addressLink || "",
+          openHours: storeData.store.openingHours || "",
+          phone: storeData.store.phoneNumber || "",
+          contactEmail: storeData.store.emailAddress || "",
           socialLinks: {
             facebook:
               storeData.store.socialMediaAccounts?.find(
@@ -794,6 +728,29 @@ export default function CustomizeTemplatePage() {
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link || "",
+          },
+
+        }));
+
+        setFooterAttributes((prev) => ({
+          ...prev,
+          brandName: storeData.store.storeName || prev.brandName,
+          logo: {
+            ...prev.logo,
+            src:
+              storeData.store.logo && storeData.store.logo !== ""
+                ? storeData.store.logo
+                : "/placeholder.png",
+          },
+          socialMedia: {
+            facebook:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "facebook"
+              )?.link || prev.socialMedia.facebook,
+            instagram:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "instagram"
+              )?.link || prev.socialMedia.instagram,
           },
         }));
 
@@ -854,9 +811,6 @@ export default function CustomizeTemplatePage() {
           }));
           console.log("Mapped Categories:", mappedCategories);
         }
-
-        console.log("Categories", categoriesData.categories);
-        console.log("Products", productsData.products);
       }
     } catch (error) {
       console.error(
@@ -909,7 +863,7 @@ export default function CustomizeTemplatePage() {
         return rest;
       }
       case "AboutUs": {
-        const { description, secondaryDescription, ...rest } = value;
+        const { sections, ...rest } = value;
         return rest;
       }
       case "Policies": {
