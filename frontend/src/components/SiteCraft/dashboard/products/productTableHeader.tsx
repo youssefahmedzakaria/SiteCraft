@@ -45,7 +45,7 @@ export function ProductTableHeader({
   };
   const handleCategoryToggle = (categoryName: string) => {
     const categoryProducts = filteredProducts.filter(
-      (p: any) => categories.find((c: any) => c.id === p.categoryId)?.name === categoryName
+      (p: any) => p.categories && p.categories.some((cat: any) => cat.name === categoryName)
     );
     const allInCategorySelected = categoryProducts.every((p: any) =>
       selectedProducts.includes(p.id)
@@ -108,35 +108,22 @@ export function ProductTableHeader({
                 <DropdownMenuSubTrigger>Select by Category</DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
-                    {categories.map((category: any) => {
-                      const categoryProducts = filteredProducts.filter(
-                        (p: any) => p.categoryId === category.id
-                      );
-                      const isChecked = categoryProducts.length > 0 &&
-                        categoryProducts.every((p: any) => selectedProducts.includes(p.id));
-                      const isIndeterminate = categoryProducts.some((p: any) => selectedProducts.includes(p.id)) && !isChecked;
-                      return (
-                        <DropdownMenuItem
-                          key={category.id}
-                          onClick={() => handleCategoryToggle(category.name)}
-                          disabled={categoryProducts.length === 0}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            ref={el => {
-                              if (el) el.indeterminate = isIndeterminate;
-                            }}
-                            readOnly
-                            className="mr-2"
-                          />
-                          {category.name}
-                          {categoryProducts.length === 0 && (
-                            <span className="ml-2 text-gray-400 text-xs">(no products)</span>
-                          )}
-                        </DropdownMenuItem>
-                      );
-                    })}
+                    {categories.map((category) => (
+                      <DropdownMenuItem
+                        key={category.id}
+                        onClick={() => handleCategoryToggle(category.name)}
+                        className={`flex items-center justify-between ${
+                          selectedCategories.includes(category.name) ? "bg-green-100" : ""
+                        }`}
+                      >
+                        <span>{category.name}</span>
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category.name)}
+                          readOnly
+                        />
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>

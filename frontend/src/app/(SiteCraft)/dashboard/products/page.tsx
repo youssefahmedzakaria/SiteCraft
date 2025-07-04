@@ -92,9 +92,9 @@ export default function ProductPage() {
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
     // Filter by category
     if (categoryFilter !== "All Categories") {
-      if (!product.categoryId) return false;
-      const category = categories.find(c => c.id === product.categoryId);
-      if (!category || category.name !== categoryFilter) {
+      if (!product.categories || product.categories.length === 0) return false;
+      const hasMatchingCategory = product.categories.some(cat => cat.name === categoryFilter);
+      if (!hasMatchingCategory) {
         return false;
       }
     }
@@ -149,9 +149,8 @@ export default function ProductPage() {
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(
       (product: SimplifiedProduct) => {
-        if (!product.categoryId) return false;
-        const categoryObj = categories.find(c => c.id === product.categoryId);
-        return categoryObj && categoryObj.name === category;
+        if (!product.categories || product.categories.length === 0) return false;
+        return product.categories.some(cat => cat.name === category);
       }
     );
     const newSelection = [...selectedProducts];

@@ -78,8 +78,7 @@ export default function EditProductPage() {
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: 0, // Keep for backward compatibility
-    categoryIds: [], // New field for multiple categories
+    categoryIds: [] as number[],
   });
 
   // Discount settings
@@ -137,8 +136,7 @@ export default function EditProductPage() {
       setBasicFormData({
         name: product.name,
         description: product.description,
-        categoryId: product.categoryId || (categoryIds.length > 0 ? categoryIds[0] : 0), // Keep first category for backward compatibility
-        categoryIds: categoryIds, // Extract category IDs from categories array
+        categoryIds: categoryIds,
       });
 
       // Set discount settings
@@ -504,8 +502,7 @@ export default function EditProductPage() {
       const productData: ProductCreateDTO = {
         name: basicFormData.name,
         description: basicFormData.description,
-        categoryId: basicFormData.categoryId, // Keep for backward compatibility
-        categoryIds: basicFormData.categoryIds, // New field for multiple categories
+        categoryIds: basicFormData.categoryIds,
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],

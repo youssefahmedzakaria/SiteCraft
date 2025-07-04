@@ -64,8 +64,7 @@ export default function AddProductPage() {
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: undefined as number | undefined, // Remove default category
-    categoryIds: [] as number[], // Start with empty array
+    categoryIds: [] as number[],
   });
 
   // Discount settings
@@ -332,8 +331,7 @@ export default function AddProductPage() {
       const productData: ProductCreateDTO = {
         name: basicFormData.name,
         description: basicFormData.description,
-        categoryId: basicFormData.categoryId, // Keep for backward compatibility
-        categoryIds: basicFormData.categoryIds, // New field for multiple categories
+        categoryIds: basicFormData.categoryIds,
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],

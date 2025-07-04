@@ -37,12 +37,11 @@ export function ProductRecord({
     }
   };
 
-  // Get category names from product.categories (array of objects with 'title')
+
   const getCategoryNames = () => {
-    if (product.categories && product.categories.length > 0) {
-      return product.categories.map((cat: any) => cat.title).join(', ');
-    }
-    return 'Uncategorized';
+    if (!product.categories || product.categories.length === 0) return 'Uncategorized';
+    return product.categories.map(cat => cat.name).join(', ');
+
   };
 
   // Format price with EGP currency
