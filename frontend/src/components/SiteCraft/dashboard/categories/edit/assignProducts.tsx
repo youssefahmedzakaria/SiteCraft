@@ -160,7 +160,9 @@ export default function AssignProducts() {
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
-                      {product.category?.title || ''}
+                      {product.categories && product.categories.length > 0
+                        ? product.categories.map(cat => cat.name).join(', ')
+                        : 'Uncategorized'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
                       {product.price}
@@ -261,7 +263,9 @@ export default function AssignProducts() {
                             {product.name}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
-                            {product.category?.title || ''}
+                            {product.categories && product.categories.length > 0
+                              ? product.categories.map(cat => cat.name).join(', ')
+                              : 'Uncategorized'}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
                             {product.price}

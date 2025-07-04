@@ -1,40 +1,25 @@
 package com.sitecraft.backend.DTOs;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sitecraft.backend.Models.Category;
 import java.time.LocalDateTime;
 
-public class CategoryResponseDTO {
+public class CategoryDTO {
     private Long id;
     private String name;
     private String description;
     private String image;
     
-    @JsonProperty("productCount")
-    private Long productCount;
-    
-    @JsonProperty("createdAt")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
-    public CategoryResponseDTO() {}
+    public CategoryDTO() {}
 
-    public CategoryResponseDTO(Long id, String name, String description, String image, Long productCount, LocalDateTime createdAt) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.image = image;
-        this.productCount = productCount;
-        this.createdAt = createdAt;
-    }
-
-    public CategoryResponseDTO(Category category, Long productCount) {
+    public CategoryDTO(Category category) {
         this.id = category.getId();
         this.name = category.getName();
         this.description = category.getDescription();
         this.image = category.getImage();
-        this.productCount = productCount;
         this.createdAt = category.getCreatedAt();
     }
 
@@ -68,14 +53,6 @@ public class CategoryResponseDTO {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public Long getProductCount() {
-        return productCount;
-    }
-
-    public void setProductCount(Long productCount) {
-        this.productCount = productCount;
     }
 
     public LocalDateTime getCreatedAt() {

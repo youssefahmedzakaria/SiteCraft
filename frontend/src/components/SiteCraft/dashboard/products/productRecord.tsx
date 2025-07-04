@@ -37,11 +37,12 @@ export function ProductRecord({
     }
   };
 
-  // Get category name from categoryId
-  const getCategoryName = (categoryId: number) => {
-    if (!categoryId) return 'Unknown Category';
-    const category = categories.find(c => c.id === categoryId);
-    return category ? category.name : 'Unknown Category';
+  // Get category names from product.categories (array of objects with 'title')
+  const getCategoryNames = () => {
+    if (product.categories && product.categories.length > 0) {
+      return product.categories.map((cat: any) => cat.title).join(', ');
+    }
+    return 'Uncategorized';
   };
 
   // Format price with EGP currency
@@ -106,7 +107,7 @@ export function ProductRecord({
         <div className="text-sm text-gray-500">{product.name}</div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-        <div className="text-sm text-gray-500">{getCategoryName(product.categoryId)}</div>
+        <div className="text-sm text-gray-500">{getCategoryNames()}</div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
         <div className="text-sm text-gray-500">{formatPriceWithDiscount()}</div>

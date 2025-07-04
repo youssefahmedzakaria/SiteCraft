@@ -12,6 +12,7 @@ import com.sitecraft.backend.DTOs.ProductCreateDTO;
 import java.util.Optional;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.math.BigDecimal;
 
 public class ProductServiceTest {
@@ -78,18 +79,22 @@ public class ProductServiceTest {
         when(dto.getPercentageMax()).thenReturn(null);
         when(dto.getMaxCap()).thenReturn(null);
         when(dto.getCategoryId()).thenReturn(2L);
+        when(dto.getAllCategoryIds()).thenReturn(List.of(2L));
+        
         Product savedProduct = new Product();
         savedProduct.setName("Test Product");
         savedProduct.setDescription("desc");
         savedProduct.setStore(store);
-        savedProduct.setCategory(category);
         when(productRepo.save(any(Product.class))).thenReturn(savedProduct);
         when(categoryProductRepo.save(any(CategoryProduct.class))).thenReturn(new CategoryProduct());
+        
         Product result = productService.createProduct(dto, 1L);
         assertEquals("Test Product", result.getName());
         assertEquals("desc", result.getDescription());
         assertEquals(store, result.getStore());
-        assertEquals(category, result.getCategory());
+        
+        // Verify that CategoryProduct was created
+        verify(categoryProductRepo, times(1)).save(any(CategoryProduct.class));
     }
 
     @Test
@@ -109,6 +114,7 @@ public class ProductServiceTest {
         when(categoryRepo.findById(2L)).thenReturn(Optional.empty());
         ProductCreateDTO dto = mock(ProductCreateDTO.class);
         when(dto.getCategoryId()).thenReturn(2L);
+        when(dto.getAllCategoryIds()).thenReturn(List.of(2L));
         RuntimeException ex = assertThrows(RuntimeException.class, () -> productService.createProduct(dto, 1L));
         assertTrue(ex.getMessage().contains("Category not found"));
     }

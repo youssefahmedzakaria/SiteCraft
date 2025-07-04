@@ -8,7 +8,7 @@ export interface BackendCategory {
         id: number
     }
     productCount: number
-    createdAt?: string
+    createdAt: string
 }
 
 // Frontend interfaces for display
@@ -338,18 +338,26 @@ export const removeProductFromCategory = async (categoryId: number, productId: n
 
 // Helper function to transform backend category to frontend format
 export const transformCategory = (category: BackendCategory): Category => {
-    const productCount = category.productCount || 0;
-    const status = productCount > 0 ? 'Active' : 'Empty';
-    
-    // Use a consistent date format to avoid hydration mismatch
-    // In a real app, you'd get this from the backend
-    const createdAt = category.createdAt || '2024-01-01';
-    
+    // Format the createdAt date for display
+    const formatDate = (dateString: string) => {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return 'Unknown';
+        }
+    };
+
     return {
         id: category.id.toString(),
         title: category.name,
-        numOfProducts: productCount,
-        createdAt: createdAt,
-        status: status,
+        numOfProducts: category.productCount || 0,
+        createdAt: formatDate(category.createdAt),
+        status: (category.productCount || 0) > 0 ? 'Active' : 'Empty'
     };
 };

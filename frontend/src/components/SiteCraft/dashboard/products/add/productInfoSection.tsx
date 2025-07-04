@@ -11,7 +11,8 @@ import { deleteProductImage, getCategories } from '@/lib/products';
 interface BasicFormData {
   name: string;
   description: string;
-  categoryId: number;
+  categoryId?: number; // Keep for backward compatibility
+  categoryIds?: number[]; // New field for multiple categories
 }
 
 interface ProductInfoSectionProps {
@@ -68,8 +69,22 @@ export function ProductInfoSection({
   };
 
   const handleCategoryChange = (categoryId: number) => {
-    updateFormData({ categoryId });
-    setOpenCategories(false);
+    const currentCategoryIds = formData.categoryIds || [];
+    const isSelected = currentCategoryIds.includes(categoryId);
+    
+    let newCategoryIds: number[];
+    if (isSelected) {
+      // Remove category if already selected
+      newCategoryIds = currentCategoryIds.filter(id => id !== categoryId);
+    } else {
+      // Add category if not selected
+      newCategoryIds = [...currentCategoryIds, categoryId];
+    }
+    
+    updateFormData({ 
+      categoryIds: newCategoryIds,
+      categoryId: newCategoryIds.length > 0 ? newCategoryIds[0] : undefined // Keep first for backward compatibility
+    });
   };
 
   // Image handling
@@ -154,11 +169,24 @@ export function ProductInfoSection({
     setDragOverIndex(null);
   };
 
-  // Get selected category name
-  const getSelectedCategoryName = () => {
-    if (formData.categoryId === 0) return "Select category";
-    const category = categories.find(c => c.id === formData.categoryId);
-    return category ? category.name || category.title : "Select category";
+  // Get selected category names
+  const getSelectedCategoryNames = () => {
+    const categoryIds = formData.categoryIds || [];
+    if (categoryIds.length === 0) return "Select categories";
+    
+    const selectedCategories = categories.filter(c => categoryIds.includes(c.id));
+    if (selectedCategories.length === 0) return "Select categories";
+    
+    if (selectedCategories.length === 1) {
+      return selectedCategories[0].name || selectedCategories[0].title;
+    }
+    
+    return `${selectedCategories.length} categories selected`;
+  };
+
+  // Check if a category is selected
+  const isCategorySelected = (categoryId: number) => {
+    return (formData.categoryIds || []).includes(categoryId);
   };
 
   return (
@@ -228,14 +256,14 @@ export function ProductInfoSection({
             htmlFor="category"
             className="block text-sm font-medium text-gray-700"
           >
-            Category <span className="text-red-500">*</span>
+            Categories <span className="text-red-500">*</span>
           </label>
           <div
             className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between cursor-pointer"
             onClick={() => setOpenCategories(!openCategories)}
           >
-            <span className={formData.categoryId === 0 ? "text-gray-500" : ""}>
-              {getSelectedCategoryName()}
+            <span className={(formData.categoryIds || []).length === 0 ? "text-gray-500" : ""}>
+              {getSelectedCategoryNames()}
             </span>
             {openCategories ? (
               <ChevronUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -245,14 +273,20 @@ export function ProductInfoSection({
           </div>
 
           {openCategories && (
-            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10">
+            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10 max-h-60 overflow-y-auto">
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
                   onClick={() => handleCategoryChange(parseInt(category.id))}
                 >
-                  {category.name || category.title}
+                  <input
+                    type="checkbox"
+                    checked={isCategorySelected(parseInt(category.id))}
+                    onChange={() => {}} // Handle change in parent div
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span>{category.name || category.title}</span>
                 </div>
               ))}
             </div>

@@ -122,9 +122,12 @@ public class CategoryService {
     }
 
     // Product assignment
-    public List<Product> getCategoryProducts(Long categoryId, Long storeId) {
+    public List<com.sitecraft.backend.DTOs.ProductDTO> getCategoryProducts(Long categoryId, Long storeId) {
         Category category = getCategoryById(categoryId, storeId);
-        return category.getProducts();
+        List<Product> products = category.getProducts();
+        return products.stream()
+                .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                .collect(Collectors.toList());
     }
 
     public void assignProductsToCategory(Long categoryId, List<Long> productIds, Long storeId) {
@@ -135,14 +138,17 @@ public class CategoryService {
             if (!product.getStore().getId().equals(storeId)) {
                 throw new RuntimeException("Product does not belong to this store");
             }
-            product.setCategory(category);
+            // Only add if not already assigned
+            if (product.getCategories() == null || product.getCategories().stream().noneMatch(cat -> cat.getId().equals(categoryId))) {
+                product.addCategory(category);
+            }
         }
 
         productRepo.saveAll(products);
     }
 
     public void removeProductFromCategory(Long categoryId, Long productId, Long storeId) {
-        getCategoryById(categoryId, storeId); // Validate category access
+        Category category = getCategoryById(categoryId, storeId); // Validate category access
 
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -151,11 +157,16 @@ public class CategoryService {
             throw new RuntimeException("Product does not belong to this store");
         }
 
-        if (product.getCategory() == null || !product.getCategory().getId().equals(categoryId)) {
+        // Check if product belongs to this category
+        boolean belongsToCategory = product.getCategories() != null && 
+                                   product.getCategories().stream()
+                                   .anyMatch(cat -> cat.getId().equals(categoryId));
+        
+        if (!belongsToCategory) {
             throw new RuntimeException("Product does not belong to this category");
         }
 
-        product.setCategory(null);
+        product.removeCategory(category);
         productRepo.save(product);
     }
 
