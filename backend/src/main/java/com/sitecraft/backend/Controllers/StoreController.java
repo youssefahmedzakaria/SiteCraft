@@ -57,8 +57,8 @@ public class StoreController {
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
-                // Update store with logo path
-                String logoUrl = "/uploads/stores/" + createdStore.getId() + "/" + filename;
+                // Update store with complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + createdStore.getId() + "/" + filename;
                 createdStore.setLogo(logoUrl);
                 createdStore = storeService.updateStorePartial(createdStore.getId(), createdStore);
             }
@@ -122,14 +122,22 @@ public class StoreController {
             Store existingStore = storeService.getStore(storeId);
             // Delete old logo if a new one is uploaded
             if (logo != null && !logo.isEmpty()) {
-                    String oldLogoPath = System.getProperty("user.dir") +existingStore.getLogo();
-                    System.out.println("------------------------------------------------------------------------");
-                    System.out.println(oldLogoPath);
-                    System.out.println("------------------------------------------------------------------------");
-                    File oldLogoFile = new File(oldLogoPath);
-                    if (oldLogoFile.exists()) {
-                        boolean deleted = oldLogoFile.delete();
-                        System.out.println("Old logo deleted: " + deleted);
+                    String oldLogoUrl = existingStore.getLogo();
+                    if (oldLogoUrl != null) {
+                        String oldLogoPath;
+                        if (oldLogoUrl.startsWith("http://localhost:8080")) {
+                            oldLogoPath = System.getProperty("user.dir") + oldLogoUrl.substring("http://localhost:8080".length());
+                        } else {
+                            oldLogoPath = System.getProperty("user.dir") + oldLogoUrl;
+                        }
+                        System.out.println("------------------------------------------------------------------------");
+                        System.out.println(oldLogoPath);
+                        System.out.println("------------------------------------------------------------------------");
+                        File oldLogoFile = new File(oldLogoPath);
+                        if (oldLogoFile.exists()) {
+                            boolean deleted = oldLogoFile.delete();
+                            System.out.println("Old logo deleted: " + deleted);
+                        }
                     }
 
 
@@ -146,8 +154,8 @@ public class StoreController {
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
-                // Set new logo path relative to project (or public URL if you're serving it)
-                String logoUrl = "/uploads/stores/" + storeId + "/" + filename;
+                // Set complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + storeId + "/" + filename;
                 updatedStore.setLogo(logoUrl);
             }
 

@@ -219,12 +219,18 @@ public class CategoryService {
         File destFile = new File(dir, filename);
         image.transferTo(destFile);
 
-        return "/uploads/stores/" + storeId + "/categories/" + filename;
+        return "http://localhost:8080/uploads/stores/" + storeId + "/categories/" + filename;
     }
 
     private void deleteCategoryImageFile(String imageUrl) {
         if (imageUrl == null || imageUrl.isBlank()) return;
-        String path = System.getProperty("user.dir") + imageUrl;
+        String relativePath;
+        if (imageUrl.startsWith("http://localhost:8080")) {
+            relativePath = imageUrl.substring("http://localhost:8080".length());
+        } else {
+            relativePath = imageUrl;
+        }
+        String path = System.getProperty("user.dir") + relativePath;
         File file = new File(path);
         if (file.exists()) {
             file.delete();
