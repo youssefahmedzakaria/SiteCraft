@@ -59,6 +59,29 @@ public class CustomerController {
 
     //----------------------------------------(E-commerce)----------------------------------------
 
+    @GetMapping("/getCustomer")
+    public ResponseEntity getCustomer(HttpSession session) {
+        try {
+            Long customerId = (Long) session.getAttribute("customerId");
+            if (customerId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Customer ID not found in session."));
+            }
+
+            Customer customer = customerService.getCustomer(customerId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "customer", customer
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
     @GetMapping("/getInfo")
     public ResponseEntity getCustomerInfo(HttpSession session) {
         try {
