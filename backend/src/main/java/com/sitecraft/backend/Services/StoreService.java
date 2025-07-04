@@ -44,11 +44,27 @@ public class StoreService {
         try {
             store.setCreationDate(LocalDateTime.now());
             store.setStatus("active");
+            
+            // Set default colors if not provided
+            String colors = store.getColors();
+            if (colors == null || colors.isEmpty()) {
+                colors = "{\"primary\": \"#000000\", \"secondary\": \"#ffffff\", \"accent\": \"#ff6b6b\"}";
+            }
+            
             System.out.println("📅 Store creation date set");
             System.out.println("✅ Store status set to active");
+            System.out.println("🎨 Store colors to be set: " + colors);
 
+            // Save the store without colors (because colors field is insertable = false)
             Store savedStore = storeRepo.save(store);
             System.out.println("✅ Store saved with ID: " + savedStore.getId());
+            
+            // Now update the colors using native query
+            storeRepo.updateStoreColors(savedStore.getId(), colors);
+            System.out.println("🎨 Store colors updated using native query");
+            
+            // Refresh the store to get the updated colors
+            savedStore = storeRepo.findById(savedStore.getId()).orElse(savedStore);
             
             Users tempUser = new Users();
             tempUser.setId(userId);
@@ -57,7 +73,7 @@ public class StoreService {
             userRoleRepo.save(ownerRole);
             System.out.println("👑 Owner role created for user ID: " + userId + " and store ID: " + savedStore.getId());
 
-            return storeRepo.save(savedStore);
+            return savedStore;
 
         } catch (Exception e) {
             System.out.println("💥 Error creating store: " + e.getMessage());
@@ -344,6 +360,35 @@ public class StoreService {
             totalStaff, totalOrders, totalSales, lastMonthOrders, lastMonthSales,
             productCount, currentPlan, planRecommendation, offerRecommendation, advice
         );
+    }
+
+    // --------------------------------- Store Colors Management -----------------------------------------------
+
+    @Transactional
+    public Store updateStoreColors(Long storeId, String primary, String secondary, String accent) {
+        // Create JSON string for colors
+        String colorsJson = String.format(
+            "{\"primary\": \"%s\", \"secondary\": \"%s\", \"accent\": \"%s\"}", 
+            primary, secondary, accent
+        );
+        
+        // Use native query to handle JSONB casting
+        storeRepo.updateStoreColors(storeId, colorsJson);
+        
+        // Return the updated store
+        return storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+    }
+
+    public String getStoreColors(Long storeId) {
+        String colors = storeRepo.getStoreColors(storeId);
+        
+        // Return default colors if not set
+        if (colors == null || colors.isEmpty()) {
+            return "{\"primary\": \"#000000\", \"secondary\": \"#ffffff\", \"accent\": \"#ff6b6b\"}";
+        }
+        
+        return colors;
     }
 
 }

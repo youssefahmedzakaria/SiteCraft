@@ -660,4 +660,115 @@ public class StoreController {
             ));
         }
     }
+
+    // --------------------------------- Store Colors Management -----------------------------------------------
+
+    @PostMapping("/colors")
+    public ResponseEntity<?> saveStoreColors(
+            @RequestBody Map<String, String> colors,
+            HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String primary = colors.get("primary");
+            String secondary = colors.get("secondary");
+            String accent = colors.get("accent");
+
+            // Validate hex color format
+            if (!isValidHexColor(primary) || !isValidHexColor(secondary) || !isValidHexColor(accent)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Invalid hex color format"));
+            }
+
+            storeService.updateStoreColors(storeId, primary, secondary, accent);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors saved successfully",
+                    "colors", Map.of(
+                            "primary", primary,
+                            "secondary", secondary,
+                            "accent", accent
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to save store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/colors")
+    public ResponseEntity<?> updateStoreColors(
+            @RequestBody Map<String, String> colors,
+            HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String primary = colors.get("primary");
+            String secondary = colors.get("secondary");
+            String accent = colors.get("accent");
+
+            // Validate hex color format
+            if (!isValidHexColor(primary) || !isValidHexColor(secondary) || !isValidHexColor(accent)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Invalid hex color format"));
+            }
+
+            storeService.updateStoreColors(storeId, primary, secondary, accent);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors updated successfully",
+                    "colors", Map.of(
+                            "primary", primary,
+                            "secondary", secondary,
+                            "accent", accent
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to update store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/colors")
+    public ResponseEntity<?> getStoreColors(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            String colorsJson = storeService.getStoreColors(storeId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Store colors retrieved successfully",
+                    "colors", colorsJson
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to retrieve store colors: " + e.getMessage()
+            ));
+        }
+    }
+
+    // Helper method to validate hex color format
+    private boolean isValidHexColor(String color) {
+        return color != null && color.matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+    }
 }

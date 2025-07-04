@@ -50,6 +50,9 @@ public class Store {
 
     private String status;
 
+    @Column(name = "colors", columnDefinition = "jsonb", insertable = false, updatable = false)
+    private String colors;
+
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
@@ -214,6 +217,14 @@ public class Store {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getColors() {
+        return colors;
+    }
+
+    public void setColors(String colors) {
+        this.colors = colors;
     }
 
     public List<CustomizedTemplateSection> getCustomizedTemplate() {
