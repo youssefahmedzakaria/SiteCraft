@@ -51,7 +51,7 @@ export function StoreInformationSection() {
 
       // Set logo preview if exists
       if (store.logo) {
-        setLogoPreview(`http://localhost:8080${store.logo}`);
+        setLogoPreview(store.logo);
       }
 
       // Set social media data
