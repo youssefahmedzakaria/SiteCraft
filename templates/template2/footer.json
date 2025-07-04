@@ -1,0 +1,47 @@
+{
+    "brandName": "Jewelry",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
+    "Logo": {
+        "src": "/logo.png",
+        "alt": "Custom Logo"
+    },
+    "aboutLinks": [
+        {
+            "label": "Contact Us",
+            "href": "#contact-us",
+            "font": "font-serif",
+            "fontSize": "text-lg",
+            "fontColor": "text-[#000000]"
+        },
+        {
+            "label": "Policies",
+            "href": "#policies",
+            "font": "font-serif",
+            "fontSize": "text-lg",
+            "fontColor": "text-[#000000]"
+        },
+        {
+            "label": "About Us",
+            "href": "#about-us",
+            "font": "font-serif",
+            "fontSize": "text-lg",
+            "fontColor": "text-[#000000]"
+        }
+    ],
+    "socialMedia": {
+        "facebook":"https://www.facebook.com",
+        "instagram":"https://www.instagram.com"
+    },
+    "socialMediaStyles": {
+        "iconSize": 24,
+        "iconColor": "text-[#000000]",
+        "hoverColor": "text-[#000000]"
+    },
+    "copyrightStyles": {
+        "font": "font-sans",
+        "fontSize": "text-s",
+        "fontWeight": "font-light",
+        "fontColor": "text-[#000000]"
+    }
+}

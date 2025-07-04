@@ -25,7 +25,7 @@ public class Customer {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wishlist_id")
     @JsonIgnore
@@ -67,7 +67,6 @@ public class Customer {
     }
 
     public Customer() {
-
     }
 
     public Long getId() {

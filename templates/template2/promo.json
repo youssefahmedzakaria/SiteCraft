@@ -1,0 +1,37 @@
+{
+  "template": "splitPromo",
+  "id": "promo",
+  "slides": [
+    {
+      "title": "our products",
+      "description": "Discover our amazing products .",
+      "buttonText": "Shop Now",
+      "buttonLink": "/products",
+      "image": null,
+      "imageAlt": null
+    },
+    {
+      "title": "New Collection",
+      "description": "Be the first to see our latest arrivals.",
+      "buttonText": "Explore New",
+      "buttonLink": "/products",
+      "image":null ,
+      "imageAlt": null
+    }
+  ],
+  "autoplay": true,
+  "showArrows": true,
+  "titleFont": "font-bold",
+  "titleColor": "text-[#ffffff]",
+  "titleSize": "text-4xl",
+  "descriptionFont": "font-normal",
+  "descriptionColor": "text-[#ffffff]/80",
+  "descriptionSize": "text-lg",
+  "buttonFont": "font-semibold",
+  "buttonColor": "bg-[#ffffff]",
+  "buttonTextColor": "text-[#000000]",
+  "buttonSize": "text-base",
+  "buttonRadius": "rounded-lg",
+  "backgroundColor": "bg-[#000000]",
+  "imageObjectFit": "cover"
+}

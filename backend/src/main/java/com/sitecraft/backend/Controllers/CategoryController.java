@@ -205,7 +205,7 @@ public class CategoryController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            List<Product> products = categoryService.getCategoryProducts(id, storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> products = categoryService.getCategoryProducts(id, storeId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

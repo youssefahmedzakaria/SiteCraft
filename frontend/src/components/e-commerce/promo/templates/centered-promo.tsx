@@ -1,34 +1,36 @@
-import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
+import { PromoSlider } from "../promo-slider";
 
 export interface CenteredPromoProps {
-  id?: string
+  isClickable?: boolean;
+  id?: string;
   slides?: {
-    title: string
-    description: string
-    buttonText: string
-    buttonLink: string
-    image: string
-    imageAlt: string
-  }[]
-  autoplay?: boolean
-  showArrows?: boolean
-  titleFont?: string
-  titleColor?: string
-  titleSize?: string
-  descriptionFont?: string
-  descriptionColor?: string
-  descriptionSize?: string
-  buttonFont?: string
-  buttonColor?: string
-  buttonTextColor?: string
-  buttonSize?: string
-  buttonRadius?: string
-  backgroundColor?: string
-  imageObjectFit?: "cover" | "fill" | "contain"
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    image: string;
+    imageAlt: string;
+  }[];
+  autoPlay?: boolean;
+  autoplaySpeed?: number;
+  showArrows?: boolean;
+  titleFont?: string;
+  titleColor?: string;
+  titleSize?: string;
+  descriptionFont?: string;
+  descriptionColor?: string;
+  descriptionSize?: string;
+  buttonFont?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonSize?: string;
+  buttonRadius?: string;
+  backgroundColor?: string;
+  imageObjectFit?: "cover" | "fill" | "contain";
 }
 
-export function CenteredPromo({ 
+export function CenteredPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -37,7 +39,7 @@ export function CenteredPromo({
         "This is your website. Here, you have everything to tell your story. Add as many pages as necessary to your site and. Every section is fully customizable. Change images, colors, and text to suit your needs effortlessly.",
       buttonText: "Shop Now",
       buttonLink: "/shop",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.png?height=600&width=800",
       imageAlt: "Promotional image",
     },
     {
@@ -46,11 +48,12 @@ export function CenteredPromo({
         "Discover our latest summer collection with styles perfect for any occasion. Limited time offer with free shipping on all orders.",
       buttonText: "Shop Now",
       buttonLink: "/summer-collection",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.png?height=600&width=800",
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
+  autoplaySpeed = 5000,
   showArrows = true,
   titleFont,
   titleColor,
@@ -67,12 +70,21 @@ export function CenteredPromo({
   imageObjectFit,
 }: CenteredPromoProps) {
   return (
-    <section id={id} className={cn("w-full relative", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full relative"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="centered"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
+          autoplaySpeed={autoplaySpeed}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -87,8 +99,9 @@ export function CenteredPromo({
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
           backgroundColor={backgroundColor}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

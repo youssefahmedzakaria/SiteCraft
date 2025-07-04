@@ -1,0 +1,189 @@
+{
+  "template": "horizontal",
+  "products": [
+    {
+      "id": "product1",
+      "name": "product1",
+      "description": "description of product1",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":49.99,
+        "priceAfterDiscount":39.99
+      }
+    },
+    {
+      "id": "product2",
+      "name": "product2",
+      "description": "description of product2",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product3",
+      "name": "product3",
+      "description": "description of product3",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":39.99,
+        "priceAfterDiscount":29.99
+      }
+    },
+    {
+      "id": "product4",
+      "name": "product4",
+      "description": "description of product4",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product5",
+      "name": "product5",
+      "description": "description of product5",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product6",
+      "name": "product6",
+      "description": "description of product6",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product7",
+      "name": "product7",
+      "description": "description of product7",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product8",
+      "name": "product8",
+      "description": "description of product8",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product9",
+      "name": "product9",
+      "description": "description of product9",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    },
+    {
+      "id": "product10",
+      "name": "product10",
+      "description": "description of product10",
+      "media": {
+        "mainMedia": {
+          "image": {
+            "url": null
+          }
+        }
+      },
+      "price":{
+        "price":59.99,
+        "priceAfterDiscount":49.99
+      }
+    }
+
+  ],
+  "bgColor": "bg-[#ffffff]",
+  "textColor": "text-[#000000]",
+  "accentColor": "bg-[#0000ff]",
+  "borderColor": "border[#cccccc]",
+  "borderRadius": "rounded-lg",
+  "overlayColor": "bg-[#000000]/50",
+  "showTitle": true,
+  "showProductTitle": true,
+  "showDescription": false,
+  "showCta": true,
+  "ctaText": "View Product",
+  "fontFamily": "font-sans",
+  "cardVariant": "hover",
+  "showSubtitle": false,
+  "cornerRadius": "medium",
+  "titleColor": "text-[#000000]",
+  "titleFontSize": "text-3xl",
+  "title": "Featured Products",
+  "titleFont": "font-bold",
+  "showMoreButton": true,
+  "showMoreText": "Show More",
+  "showMorebuttonBgColor": "bg-[#1d4ed8]",
+  "showMorebuttonTextColor": "text-[#ffffff]"
+}

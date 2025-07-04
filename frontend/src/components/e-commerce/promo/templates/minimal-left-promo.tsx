@@ -1,36 +1,35 @@
-import { PromoSlider } from "../promo-slider"
-import { cn } from "@/lib/utils"
+import { PromoSlider } from "../promo-slider";
 
 export interface MinimalLeftPromoProps {
+  isClickable?: boolean;
   slides?: {
-    title: string
-    description: string
-    buttonText: string
-    buttonLink: string
-    image: string
-    imageAlt: string
-  }[]
-  autoplay?: boolean
-  showArrows?: boolean
-  titleFont?: string
-  titleColor?: string
-  titleSize?: string
-  descriptionFont?: string
-  descriptionColor?: string
-  descriptionSize?: string
-  buttonFont?: string
-  buttonColor?: string
-  buttonTextColor?: string
-  buttonSize?: string
-  buttonRadius?: string
-  backgroundColor?: string
-  imageObjectFit?: "cover" | "fill" | "contain"
-  id?: string
-  scrollEffect?: "zoom-out" | "sticky" | "parallax" | "none"
-  scrollSpeed?: number
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    image: string;
+    imageAlt: string;
+  }[];
+  autoPlay?: boolean;
+  showArrows?: boolean;
+  titleFont?: string;
+  titleColor?: string;
+  titleSize?: string;
+  descriptionFont?: string;
+  descriptionColor?: string;
+  descriptionSize?: string;
+  buttonFont?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonSize?: string;
+  buttonRadius?: string;
+  backgroundColor?: string;
+  imageObjectFit?: "cover" | "fill" | "contain";
+  id?: string;
 }
 
-export function MinimalLeftPromo({ 
+export function MinimalLeftPromo({
+  isClickable = true,
   id,
   slides = [
     {
@@ -39,7 +38,7 @@ export function MinimalLeftPromo({
         "This is your website. Here, you have everything to tell your story. Add as many pages as necessary to your site and. Every section is fully customizable. Change images, colors, and text to suit your needs effortlessly.",
       buttonText: "Shop Now",
       buttonLink: "/shop",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.png?height=500&width=500",
       imageAlt: "Promotional image",
     },
     {
@@ -48,11 +47,11 @@ export function MinimalLeftPromo({
         "Discover our latest summer collection with styles perfect for any occasion. Limited time offer with free shipping on all orders.",
       buttonText: "Shop Now",
       buttonLink: "/summer-collection",
-      image: "/placeholder.svg?height=500&width=500",
+      image: "/placeholder.png?height=500&width=500",
       imageAlt: "Summer collection promotional image",
     },
   ],
-  autoplay = false,
+  autoPlay = false,
   showArrows = true,
   titleFont,
   titleColor,
@@ -67,16 +66,22 @@ export function MinimalLeftPromo({
   buttonRadius,
   backgroundColor,
   imageObjectFit,
-  scrollEffect,
-  scrollSpeed,
 }: MinimalLeftPromoProps) {
   return (
-    <section className={cn("w-full", backgroundColor)}>
+    <section
+      id={id}
+      className="w-full"
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || undefined
+          : undefined,
+      }}
+    >
       <div className="promo-new">
         <PromoSlider
           slides={slides}
           variant="minimalLeft"
-          autoplay={autoplay}
+          autoPlay={autoPlay}
           showArrows={showArrows}
           titleFont={titleFont}
           titleColor={titleColor}
@@ -90,10 +95,9 @@ export function MinimalLeftPromo({
           buttonSize={buttonSize}
           buttonRadius={buttonRadius}
           imageObjectFit={imageObjectFit}
-          scrollEffect={scrollEffect}
-          scrollSpeed={scrollSpeed}
+          isClickable={isClickable}
         />
       </div>
     </section>
-  )
+  );
 }

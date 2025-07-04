@@ -13,7 +13,9 @@ export interface Product {
     attributes?: ProductAttribute[]
     reviews?: ProductReview[]
     categoryProducts?: CategoryProduct[]
-    categoryId?: number
+    categoryId?: number // Keep for backward compatibility
+    categoryIds?: number[] // New field for multiple categories
+    categories?: Category[] // New field for category objects
     categoryName?: string
 }
 
@@ -69,7 +71,8 @@ export interface ProductCreateDTO {
     description: string
     discountType?: string
     discountValue?: number
-    categoryId: number
+    categoryId?: number // Keep for backward compatibility
+    categoryIds?: number[] // New field for multiple categories
     attributes?: ProductAttributeDTO[]
     variants?: ProductVariantDTO[]
     imageUrls?: string[]
@@ -108,7 +111,9 @@ export interface SimplifiedProduct {
     status: string
     discountType?: string
     discountValue?: number
-    categoryId: number
+    categoryId?: number // Keep for backward compatibility
+    categoryIds?: number[] // New field for multiple categories
+    categories?: Category[] // New field for category objects
     storeId: number
     images?: SimplifiedProductImage[]
     category?: Category
@@ -477,8 +482,13 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         alt: img.alt
     })) || [];
 
-    // Get category ID from the new categoryId field
-    const categoryId = product.categoryId || 0;
+    // Handle multiple categories, mapping 'name' to 'title'
+    const categories = (product.categories || []).map((cat: any) => ({
+        ...cat,
+        title: cat.name
+    }));
+    const categoryIds = categories.map((cat: any) => cat.id) || [];
+    const categoryId = categoryIds.length > 0 ? categoryIds[0] : 0; // Keep first category for backward compatibility
 
     return {
         id: product.id,
@@ -490,9 +500,11 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         discountType: product.discountType,
         discountValue: product.discountValue,
         categoryId: categoryId,
+        categoryIds: categoryIds,
+        categories: categories,
         storeId: 0, // This will be set by the backend
         images: transformedImages,
-        category: product.categoryName ? { id: categoryId, title: product.categoryName, status: 'Active' } : undefined
+        category: categories.length > 0 ? categories[0] : undefined
     };
 };
 
@@ -523,5 +535,17 @@ export const getCategories = async (): Promise<any[]> => {
     } catch (error) {
         console.error('💥 Error fetching categories:', error);
         throw error;
+    }
+};
+
+export const removeProductFromCategory = async (categoryId: number, productId: number): Promise<void> => {
+    const response = await fetch(`http://localhost:8080/categories/${categoryId}/products/${productId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to remove product from category');
     }
 };

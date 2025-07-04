@@ -55,7 +55,8 @@ public interface AnalyticsRepo extends JpaRepository<Order, Long> {
       SELECT c.name, COALESCE(SUM(op.price * op.quantity), 0)
       FROM OrderProduct op
       JOIN op.product p
-      JOIN p.category c
+      JOIN p.categoryProducts cp
+      JOIN cp.category c
       JOIN op.order o
       WHERE o.store.id = :storeId
         AND CAST(o.issueDate AS java.time.LocalDate) BETWEEN :startDate AND :endDate

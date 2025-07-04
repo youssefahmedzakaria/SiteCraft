@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -604,5 +605,10 @@ public class CartServiceTest {
 
         // Assert
         assertNull(result);
+    }
+
+    @Test
+    void contextLoads() {
+        MockitoAnnotations.openMocks(this);
     }
 } 

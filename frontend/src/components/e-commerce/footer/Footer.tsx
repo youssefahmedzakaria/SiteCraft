@@ -1,9 +1,13 @@
+"use client";
+
 import { CompanyLogo } from "./footer-components/CompanyLogo";
-import { AboutLinks } from "./footer-components/AboutLinks";
 import { SocialMedia } from "./footer-components/SocialMedia";
 import { Copyright } from "./footer-components/Copyright";
+import { AboutLinks } from "./footer-components/AboutLinks";
 
 interface FooterProps {
+  isCustomize?: boolean;
+  selectedTab?: "desktop" | "tablet" | "mobile";
   backgroundColor?: string;
   textColor?: string;
   companyLogo?: {
@@ -20,6 +24,7 @@ interface FooterProps {
     fontSize?: string;
     fontWeight?: string;
     fontColor?: string;
+    isShown?: boolean;
   }[];
   socialMedia?: {
     facebook?: string;
@@ -45,40 +50,40 @@ interface FooterProps {
 }
 
 export const Footer = ({
+  isCustomize = false,
+  selectedTab,
   backgroundColor = "bg-white",
   textColor = "text-black",
-  companyLogo = {
-    src: "/logo.png",
-    alt: "Company Logo",
-    width: 50,
-    height: 50
-  },
+  companyLogo,
   companyName = "BRAND",
   aboutLinks = [
-    { 
-      label: "Contact Us", 
-      href: "/contact",
+    {
+      label: "Contact Us",
+      href: "/Home/#contact",
       font: "font-sans",
-      fontSize: "text-sm md:text-base",
+      fontSize: "text-sm",
       fontWeight: "font-normal",
-      fontColor: "text-gray-700"
+      fontColor: "text-gray-700",
+      isShown: true,
     },
-    { 
-      label: "About Us", 
-      href: "/about",
+    {
+      label: "About Us",
+      href: "/Home/#about",
       font: "font-sans",
-      fontSize: "text-sm md:text-base",
+      fontSize: "text-sm",
       fontWeight: "font-normal",
-      fontColor: "text-gray-700"
+      fontColor: "text-gray-700",
+      isShown: true,
     },
-    { 
-      label: "Policies", 
-      href: "/policies",
+    {
+      label: "Policies",
+      href: "/Home/#policies",
       font: "font-sans",
-      fontSize: "text-sm md:text-base",
+      fontSize: "text-sm",
       fontWeight: "font-normal",
-      fontColor: "text-gray-700"
-    }
+      fontColor: "text-gray-700",
+      isShown: true,
+    },
   ],
   socialMedia = {
     facebook: "https://facebook.com/yourpage",
@@ -86,59 +91,84 @@ export const Footer = ({
     youtube: "https://youtube.com/yourpage",
     pinterest: "https://pinterest.com/yourpage",
     twitter: "https://twitter.com/yourpage",
-    email: "yourpage@example.com"
+    email: "yourpage@example.com",
   },
   socialMediaStyles = {
     iconSize: 20,
     iconColor: "currentColor",
-    hoverColor: "opacity-70"
+    hoverColor: "text-primary-500",
   },
   copyrightStyles = {
     font: "font-sans",
-    fontSize: "text-xs md:text-sm",
+    fontSize: "text-xs",
     fontWeight: "font-normal",
-    fontColor: "text-gray-600"
+    fontColor: "text-gray-600",
   },
-  copyrightText = `© ${new Date().getFullYear()} ${companyName}`
+  copyrightText = `© ${new Date().getFullYear()} ${companyName}`,
 }: FooterProps) => {
   return (
-    <div className={`py-8 md:py-12 px-4 md:px-8 lg:px-16 ${backgroundColor} `}>
-      {/* Main content row */}
-      <div className="flex flex-col items-center md:flex-row justify-between w-full gap-6 md:gap-0">
-        {/* Left - Logo - Centered on mobile */}
-        <div className="w-full flex justify-center md:justify-start md:flex-1">
-          <CompanyLogo logo={companyLogo} name={companyName} textColor={textColor} />
+    <div
+      className={
+        "py-8 md:py-12 px-4 md:px-8 lg:px-16"
+      }
+      style={{
+        backgroundColor: backgroundColor?.includes("[")
+          ? backgroundColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+          : undefined,
+      }}
+    >
+      <div className="flex flex-col md:flex-row justify-between items-center w-full gap-6">
+        {/* Left - Logo */}
+        <div className="flex justify-center md:justify-start flex-1 mb-4 md:mb-0">
+          <CompanyLogo
+            logo={companyLogo}
+            name={companyName}
+            textColor={textColor}
+            isCustomize={isCustomize}
+            selectedTab={selectedTab}
+          />
         </div>
-        
-        {/* Center - Navigation Links - Stacked on mobile */}
-        <div className="w-full flex justify-center md:flex-1">
-          <AboutLinks links={aboutLinks} />
+
+        {/* Center - About Links (now using AboutLinks component) */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-8 mb-4 md:mb-0">
+          <AboutLinks
+            links={aboutLinks}
+            isCustomize={isCustomize}
+          />
         </div>
-        
-        {/* Right - Social Media - Centered on mobile */}
-        <div className="w-full flex justify-center md:justify-end md:flex-1">
-          <SocialMedia 
-            socialMedia={socialMedia} 
+
+        {/* Right - Social Media */}
+        <div className="flex justify-center md:justify-end flex-1">
+          <SocialMedia
+            socialMedia={socialMedia}
             styles={{
               iconSize: socialMediaStyles.iconSize || 20,
-              iconColor: socialMediaStyles.iconColor || "currentColor",
-              hoverColor: socialMediaStyles.hoverColor || "opacity-70"
+              iconColor:
+                socialMediaStyles.iconColor || textColor || "#374151",
+              hoverColor: socialMediaStyles.hoverColor || textColor || "#3b82f6",
             }}
             textColor={textColor}
+            isCustomize={isCustomize}
+            selectedTab={selectedTab}
           />
         </div>
       </div>
 
-      {/* Copyright - Adjusted for mobile */}
-      <Copyright 
-        text={copyrightText}
-        styles={{
-          font: copyrightStyles.font || "font-sans",
-          fontSize: copyrightStyles.fontSize || "text-xs md:text-sm",
-          fontWeight: copyrightStyles.fontWeight || "font-normal",
-          fontColor: copyrightStyles.fontColor || "text-gray-600"
-        }}
-      />
+      {/* Copyright */}
+      <div className="text-center mt-4">
+        <Copyright
+          text={copyrightText}
+          styles={{
+            font: copyrightStyles.font || "font-sans",
+            fontSize: copyrightStyles.fontSize || "text-xs",
+            fontWeight: copyrightStyles.fontWeight || "font-normal",
+            fontColor:
+              copyrightStyles.fontColor || textColor || "text-gray-600",
+          }}
+          isCustomize={isCustomize}
+          selectedTab={selectedTab}
+        />
+      </div>
     </div>
   );
 };

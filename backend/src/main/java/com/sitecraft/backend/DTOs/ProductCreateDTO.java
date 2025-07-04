@@ -10,7 +10,8 @@ public class ProductCreateDTO {
     private Double minCap;
     private Double percentageMax;
     private Double maxCap;
-    private Long categoryId;
+    private Long categoryId; // Keep for backward compatibility
+    private List<Long> categoryIds; // New field for multiple categories
     
     // Low stock notification settings
     private String lowStockType; // "number" or "percentage"
@@ -47,6 +48,20 @@ public class ProductCreateDTO {
 
     public Long getCategoryId() { return categoryId; }
     public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    public List<Long> getCategoryIds() { return categoryIds; }
+    public void setCategoryIds(List<Long> categoryIds) { this.categoryIds = categoryIds; }
+
+    // Helper method to get all category IDs (for backward compatibility)
+    public List<Long> getAllCategoryIds() {
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            return categoryIds;
+        }
+        if (categoryId != null) {
+            return List.of(categoryId);
+        }
+        return List.of();
+    }
 
     public List<ProductAttributeDTO> getAttributes() { return attributes; }
     public void setAttributes(List<ProductAttributeDTO> attributes) { this.attributes = attributes; }

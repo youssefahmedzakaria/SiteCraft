@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Link from "next/link"
 import { useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import FlexibleCard  from "@/components/card/card-templates"
+import FlexibleCard from "@/components/e-commerce/card/card-templates"
+import { usePathname } from "next/navigation"
 
 interface HorizontalScrollCategoryTemplateProps {
+  isClickable?: boolean
   categories: any[]
   bgColor?: string
   textColor?: string
@@ -21,7 +25,7 @@ interface HorizontalScrollCategoryTemplateProps {
   scrollBarBgColor?: string
   showScrollbar?: boolean
   // Card related props
-  cardVariant?: "default" | "compact" | "detailed" | "minimal" | "hover" | "overlay" | "featured"
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured"
   showCardTitle?: boolean
   showSubtitle?: boolean
   showCta?: boolean
@@ -38,16 +42,50 @@ interface HorizontalScrollCategoryTemplateProps {
   showMoreText?: string
   showMorebuttonBgColor?: string
   showMorebuttonTextColor?: string
+  categoryTitleFontSize?: string
 }
-
+const getFontSize = (fontSize: string) => {
+  const sizeMap: Record<string, string> = {
+    "text-xs": "0.75rem",
+    "text-sm": "0.875rem",
+    "text-base": "1rem",
+    "text-lg": "1.125rem",
+    "text-xl": "1.25rem",
+    "text-2xl": "1.5rem",
+    "text-3xl": "1.875rem",
+    "text-4xl": "2.25rem",
+    "text-5xl": "3rem",
+    "text-6xl": "3.75rem",
+  };
+  return sizeMap[fontSize] || "1rem";
+};
+const getFontFamily = (fontFamily: string) => {
+  switch (fontFamily) {
+    case "font-inter":
+      return "Inter, sans-serif";
+    case "font-roboto":
+      return "Roboto, sans-serif";
+    case "font-open-sans":
+      return "Open Sans, sans-serif";
+    case "font-poppins":
+      return "Poppins, sans-serif";
+    case "font-lato":
+      return "Lato, sans-serif";
+    case "font-serif":
+      return "serif";
+    default:
+      return "system-ui, sans-serif";
+  }
+};
 export function HorizontalScrollCategoryTemplate({
+  isClickable = true,
   categories,
   bgColor = "bg-white",
   textColor = "text-gray-800",
   accentColor = "bg-slate-100",
   borderRadius = "rounded-lg",
   showTitle = true,
-  showControls = true,
+  showControls = false,
   imageHeight = "h-80",
   cardWidth = "w-60",
   fontFamily = "",
@@ -69,14 +107,19 @@ export function HorizontalScrollCategoryTemplate({
   titleFontSize = "text-2xl",
   title = "Shop by Category",
   titleFont = "font-bold",
-  // Show more button props 
+  // Show more button props
   showMoreButton = true,
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
+  categoryTitleFontSize = "text-lg",
 }: HorizontalScrollCategoryTemplateProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [scroll, setScroll] = useState({ left: 0, width: 0, scrollWidth: 0 });
+  const path = usePathname()
+  const pathSegments = path.split("/")
+  const subdomain = pathSegments[2]
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [scroll, setScroll] = useState({ left: 0, width: 0, scrollWidth: 0 })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,36 +128,49 @@ export function HorizontalScrollCategoryTemplate({
           left: scrollRef.current.scrollLeft,
           width: scrollRef.current.clientWidth,
           scrollWidth: scrollRef.current.scrollWidth,
-        });
+        })
       }
-    };
-    const ref = scrollRef.current;
+    }
+    const ref = scrollRef.current
     if (ref) {
-      ref.addEventListener("scroll", handleScroll);
-      handleScroll();
+      ref.addEventListener("scroll", handleScroll)
+      handleScroll()
     }
     return () => {
-      if (ref) ref.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+      if (ref) ref.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
 
   const scrollBy = (amount: number) => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
+      scrollRef.current.scrollBy({ left: amount, behavior: "smooth" })
     }
-  };
+  }
 
   // Convert image height to proper ratio
-  const imageRatio = imageHeight.includes("h-") ? "portrait" : "square";
+  const imageRatio = imageHeight.includes("h-") ? "portrait" : "square"
 
   return (
-    <div className={cn("w-full px-4 py-8 relative", bgColor, textColor, fontFamily)}>
-      {showTitle && (
-        <div className="flex items-center mb-6">
-          <h2 className={cn("text-2xl font-bold", titleColor, titleFontSize, titleFont)}>{title}</h2>
-        </div>
-      )}
-      <div className="relative">
+    <div className={cn("w-full flex-shrink-0")}style={{backgroundColor: bgColor.includes("[")
+            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : bgColor,}}>
+      <div className={cn("mx-auto px-16 py-8 md:py-16")}style={{
+        color: textColor.includes("[")? textColor.split("-[")[1]?.slice(0, -1) || "#000000" : textColor,
+          fontFamily: getFontFamily(fontFamily),
+        }}>
+        {showTitle && (
+                  <h2
+                    className={cn(
+                      "text-4xl md:text-6xl font-bold text-center mb-6"
+                    )}style={{
+                      color: titleColor.includes("[")? titleColor.split("-[")[1]?.slice(0, -1) || "#000000" : titleColor,
+                      fontSize: getFontSize(titleFontSize),
+                      fontFamily: getFontFamily(fontFamily),
+                    }}
+                  >
+                    {title}
+                  </h2>
+                )}
         {/* Overlay Arrows */}
         {showControls && (
           <>
@@ -128,7 +184,9 @@ export function HorizontalScrollCategoryTemplate({
             </button>
             <button
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 shadow-md"
-              style={{ display: scroll.left + scroll.width < scroll.scrollWidth ? "block" : "none" }}
+              style={{
+                display: scroll.left + scroll.width < scroll.scrollWidth ? "block" : "none",
+              }}
               onClick={() => scrollBy(300)}
               aria-label="Scroll Right"
             >
@@ -139,7 +197,11 @@ export function HorizontalScrollCategoryTemplate({
         <div
           ref={scrollRef}
           className="overflow-x-auto"
-          style={{ scrollBehavior: "smooth", scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{
+            scrollBehavior: "smooth",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
         >
           <style jsx>{`
             div[ref]::-webkit-scrollbar {
@@ -148,8 +210,9 @@ export function HorizontalScrollCategoryTemplate({
           `}</style>
           <div className="flex gap-4 md:gap-6 pb-4">
             {categories.map((category) => (
-              <div key={category._id || category.slug} className={cn("flex-shrink-0", cardWidth)}>
+              <div key={category._id || category.id} className={cn("flex-shrink-0", cardWidth)}>
                 <FlexibleCard
+                  isClickable={isClickable}
                   item={category}
                   type="category"
                   variant={cardVariant}
@@ -167,7 +230,7 @@ export function HorizontalScrollCategoryTemplate({
                   fontFamily={fontFamily}
                   cardShadow={cardShadow}
                   hoverEffect={hoverEffect}
-                  linkPath={`/list?cat=${category.slug}`}
+                  linkPath={`/e-commerce/${subdomain}/products`}
                 />
               </div>
             ))}
@@ -185,24 +248,30 @@ export function HorizontalScrollCategoryTemplate({
             />
           </div>
         )}
+
+        {/* Show More Button */}
+        {showMoreButton && (
+          <div className="flex justify-end mt-6">
+            <Link
+              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
+              className={cn(
+                "inline-flex items-center px-6 py-2",
+                "hover:bg-opacity-80 transition-colors duration-300",
+                "rounded-lg text-sm font-medium",
+              )}style={{
+                backgroundColor: showMorebuttonBgColor.includes("[")
+                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  : showMorebuttonBgColor,
+                color: showMorebuttonTextColor.includes("[")
+                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) || "#000000"
+                  : showMorebuttonTextColor,
+              }}
+            >
+              {showMoreText}
+            </Link>
+          </div>
+        )}
       </div>
-            {/* Show More Button */}
-       {showMoreButton && ( 
-      <div className="flex justify-end mt-6">
-        <Link 
-          href="/categories" 
-          className={cn(
-            "inline-flex items-center px-6 py-2",
-            " hover:bg-opacity-80 transition-colors duration-300",
-            "rounded-lg text-sm font-medium",
-            showMorebuttonBgColor,
-            showMorebuttonTextColor
-          )}
-        >
-          {showMoreText}
-        </Link>
-      </div>
-      )}
     </div>
   )
 }

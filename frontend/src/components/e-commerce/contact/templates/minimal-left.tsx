@@ -1,4 +1,4 @@
-import Contact from "../contact"
+import {Contact} from "../contact"
 
 interface MinimalLeftContactProps {
   id?: string
@@ -24,6 +24,6 @@ interface MinimalLeftContactProps {
   titleSize?: string
 }
 
-export function MinimalLeftContact(props: MinimalLeftContactProps) {
-  return <Contact {...props} template="minimal-left" />
+export function MinimalLeftContact(props: MinimalLeftContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="minimal-left" />
 } 

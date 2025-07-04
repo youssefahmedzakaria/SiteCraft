@@ -1,0 +1,40 @@
+{
+    "template": "template2",
+    "brandName": "Brand Name",  
+    "backgroundColor": "#ffffff",
+    "textColor": "#000000",
+    "fontFamily": "sans-serif",
+    "logo": {
+        "url": "",
+        "altText": "Brand Logo",
+        "width": "50px",
+        "height": "50px"
+        
+    },
+    "menuItems": [
+        {
+            "label": "Home",
+            "href": "/"
+        },
+        {
+            "label": "products",
+            "href": "/products"
+        },
+        {
+            "label": "Categories",
+            "href": "/categories"
+        },
+        {
+            "label": "Contact",
+            "href": "/contact"
+        },
+        {
+            "label": "Policies",
+            "href": "/policies"
+        }
+    ],
+    "iconColor": "#000000",
+    "dividerColor": "#cccccc",
+    "searchIconColor": "#000000"
+
+}

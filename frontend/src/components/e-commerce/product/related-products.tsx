@@ -1,21 +1,26 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Star, ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import type { ThemeConfig } from "@/app/product/[slug]/product"
-import type { RelatedProduct } from "@/app/product/[slug]/product"
+import Image from "next/image";
+import Link from "next/link";
+import { Star, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/e-commerce/ui/button";
+import { Card, CardContent } from "@/components/e-commerce/ui/card";
+import { Badge } from "@/components/e-commerce/ui/badge";
+import { cn } from "@/lib/utils";
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type { RelatedProduct } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { usePathname } from "next/navigation";
 
 interface RelatedProductsProps {
-  products: RelatedProduct[]
-  theme: ThemeConfig
+  products: RelatedProduct[];
+  theme: ThemeConfig;
 }
 
 export function RelatedProducts({ products, theme }: RelatedProductsProps) {
+  const path = usePathname();
+  const pathSegments = path.split("/");
+  const subdomain = pathSegments[2];
+
   return (
     <section className="mt-20">
       <h2 className="text-2xl font-bold mb-8">Related Products</h2>
@@ -28,24 +33,33 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
           >
             <div className="relative aspect-square">
               <Image
-                src={product.image || "/placeholder.svg?height=300&width=300"}
+                src={product.image || "/placeholder.png?height=300&width=300"}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
               />
               <div
-                className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity", "bg-black/5")}
+                className={cn(
+                  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                  "bg-black/5"
+                )}
               />
             </div>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
-                <Link href={`/product/${product.id}`} className="font-medium hover:underline line-clamp-2 flex-1">
+                <Link
+                  href={`/e-commerce/${subdomain}/product/${product.id}`}
+                  className="font-medium hover:underline line-clamp-2 flex-1"
+                >
                   {product.name}
                 </Link>
                 <Badge
                   variant="outline"
                   className="ml-2"
-                  style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                  style={{
+                    borderColor: theme.secondaryColor,
+                    color: theme.secondaryColor,
+                  }}
                 >
                   {product.category}
                 </Badge>
@@ -54,31 +68,48 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-300")}
-                    style={{ color: i < Math.floor(product.rating) ? theme.secondaryColor : undefined }}
+                    className={cn(
+                      "w-4 h-4",
+                      i < Math.floor(product.rating)
+                        ? "fill-current"
+                        : "text-gray-300"
+                    )}
+                    style={{
+                      color:
+                        i < Math.floor(product.rating)
+                          ? theme.secondaryColor
+                          : undefined,
+                    }}
                   />
                 ))}
-                <span className="text-xs opacity-75 ml-1">({product.reviewCount})</span>
+                <span className="text-xs opacity-75 ml-1">
+                  ({product.reviewCount})
+                </span>
               </div>
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-baseline gap-2">
                   <span className="font-bold">${product.price}</span>
                   {product.compareAtPrice && (
-                    <span className="text-sm opacity-75 line-through">${product.compareAtPrice}</span>
+                    <span className="text-sm opacity-75 line-through">
+                      ${product.compareAtPrice}
+                    </span>
                   )}
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
                   className={cn("rounded-full w-8 h-8 p-0 group relative")}
-                  style={{ borderColor: theme.secondaryColor, color: theme.secondaryColor }}
+                  style={{
+                    borderColor: theme.secondaryColor,
+                    color: theme.secondaryColor,
+                  }}
                   aria-label={`Add ${product.name} to cart`}
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <div
                     className={cn(
                       "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-full",
-                      "bg-black/5",
+                      "bg-black/5"
                     )}
                   />
                 </Button>
@@ -88,5 +119,5 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
         ))}
       </div>
     </section>
-  )
+  );
 }
