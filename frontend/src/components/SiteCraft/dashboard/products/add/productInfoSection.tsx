@@ -1,32 +1,93 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import Image from "next/image";
-import { categories } from "@/lib/categories";
 import { ChevronDown, ChevronUp, Upload } from "lucide-react";
+import { deleteProductImage, getCategories } from '@/lib/products';
 
-export function ProductInfoSection() {
-  {
-    /* For images */
-  }
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+interface BasicFormData {
+  name: string;
+  description: string;
+  categoryId?: number; // Keep for backward compatibility
+  categoryIds?: number[]; // New field for multiple categories
+}
+
+interface ProductInfoSectionProps {
+  formData: BasicFormData;
+  updateFormData: (updates: Partial<BasicFormData>) => void;
+  imageFiles: File[];
+  updateImageFiles: (files: File[]) => void;
+  existingImages?: { id: number; imageUrl: string; alt?: string }[];
+  productId?: number;
+  setExistingImages?: (images: any[]) => void;
+}
+
+export function ProductInfoSection({ 
+  formData, 
+  updateFormData, 
+  imageFiles, 
+  updateImageFiles,
+  existingImages = [],
+  productId,
+  setExistingImages
+}: ProductInfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-
-  {
-    /* For categories */
-  }
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [openCategories, setOpenCategories] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  {
-    /* For images */
-  }
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        setCategoriesError(null);
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        setCategoriesError('Failed to fetch categories');
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Handle form field changes
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateFormData({ name: e.target.value });
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateFormData({ description: e.target.value });
+  };
+
+  const handleCategoryChange = (categoryId: number) => {
+    const currentCategoryIds = formData.categoryIds || [];
+    const isSelected = currentCategoryIds.includes(categoryId);
+    
+    let newCategoryIds: number[];
+    if (isSelected) {
+      // Remove category if already selected
+      newCategoryIds = currentCategoryIds.filter(id => id !== categoryId);
+    } else {
+      // Add category if not selected
+      newCategoryIds = [...currentCategoryIds, categoryId];
+    }
+    
+    updateFormData({ 
+      categoryIds: newCategoryIds,
+      categoryId: newCategoryIds.length > 0 ? newCategoryIds[0] : undefined // Keep first for backward compatibility
+    });
+  };
+
+  // Image handling
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -46,7 +107,7 @@ export function ProductInfoSection() {
     });
 
     // Add files to state
-    setImageFiles((prev) => [...prev, ...newFiles]);
+    updateImageFiles([...imageFiles, ...newFiles]);
   };
 
   const handleBrowseClick = () => {
@@ -66,8 +127,10 @@ export function ProductInfoSection() {
   };
 
   const removeImage = (index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    const newImageFiles = imageFiles.filter((_, i) => i !== index);
+    const newImagePreviews = imagePreviews.filter((_, i) => i !== index);
+    updateImageFiles(newImageFiles);
+    setImagePreviews(newImagePreviews);
   };
 
   const handleImageDragStart = (index: number) => {
@@ -97,7 +160,7 @@ export function ProductInfoSection() {
       newImagePreviews.splice(dragOverIndex, 0, movedPreview);
 
       // Update state
-      setImageFiles(newImageFiles);
+      updateImageFiles(newImageFiles);
       setImagePreviews(newImagePreviews);
     }
 
@@ -106,26 +169,65 @@ export function ProductInfoSection() {
     setDragOverIndex(null);
   };
 
-  {
-    /* For categories */
-  }
-  const toggleCategoriesOption = (option: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
+  // Get selected category names
+  const getSelectedCategoryNames = () => {
+    const categoryIds = formData.categoryIds || [];
+    if (categoryIds.length === 0) return "Select categories";
+    
+    const selectedCategories = categories.filter(c => categoryIds.includes(c.id));
+    if (selectedCategories.length === 0) return "Select categories";
+    
+    if (selectedCategories.length === 1) {
+      return selectedCategories[0].name || selectedCategories[0].title;
+    }
+    
+    return `${selectedCategories.length} categories selected`;
   };
 
-  {
-    /* Product Info */
-  }
+  // Check if a category is selected
+  const isCategorySelected = (categoryId: number) => {
+    return (formData.categoryIds || []).includes(categoryId);
+  };
+
   return (
     <div className="space-y-4">
       <div className="mb-2">
         <CardTitle className="font-bold">Product Info</CardTitle>
         <p className="text-gray-500">Enter the details of your new product</p>
       </div>
+
+      {/* Existing Images (from backend) */}
+      {existingImages.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {existingImages.map((img, idx) => (
+            <div key={img.id || idx} className="relative w-24 h-24 border rounded overflow-hidden bg-gray-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={img.imageUrl?.startsWith('http') ? img.imageUrl : `http://localhost:8080${img.imageUrl}`}
+                alt={img.alt || `Product image ${idx + 1}`}
+                className="object-cover w-full h-full"
+              />
+              {productId && setExistingImages && (
+                <button
+                  type="button"
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  title="Delete image"
+                  onClick={async () => {
+                    try {
+                      await deleteProductImage(productId, img.id);
+                      setExistingImages(existingImages.filter((image) => image.id !== img.id));
+                    } catch (err) {
+                      alert('Failed to delete image');
+                    }
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Product Name and Category */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -140,6 +242,8 @@ export function ProductInfoSection() {
           <Input
             id="name"
             name="name"
+            value={formData.name}
+            onChange={handleNameChange}
             placeholder="e.g. T-Shirt"
             className="w-full"
             required
@@ -149,18 +253,18 @@ export function ProductInfoSection() {
         {/* Product Category */}
         <div className="relative flex-1 space-y-2">
           <label
-            htmlFor="name"
+            htmlFor="category"
             className="block text-sm font-medium text-gray-700"
           >
-            Category
+            Categories <span className="text-red-500">*</span>
           </label>
           <div
-            className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between"
+            className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between cursor-pointer"
             onClick={() => setOpenCategories(!openCategories)}
           >
-            {selectedCategories.length > 0
-              ? selectedCategories.join(", ")
-              : "Select options"}
+            <span className={(formData.categoryIds || []).length === 0 ? "text-gray-500" : ""}>
+              {getSelectedCategoryNames()}
+            </span>
             {openCategories ? (
               <ChevronUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             ) : (
@@ -169,20 +273,21 @@ export function ProductInfoSection() {
           </div>
 
           {openCategories && (
-            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow">
-              {categories.map((option) => (
-                <label
-                  key={option.id}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10 max-h-60 overflow-y-auto">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                  onClick={() => handleCategoryChange(parseInt(category.id))}
                 >
                   <input
                     type="checkbox"
-                    className="mr-2"
-                    checked={selectedCategories.includes(option.title)}
-                    onChange={() => toggleCategoriesOption(option.title)}
+                    checked={isCategorySelected(parseInt(category.id))}
+                    onChange={() => {}} // Handle change in parent div
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  {option.title}
-                </label>
+                  <span>{category.name || category.title}</span>
+                </div>
               ))}
             </div>
           )}
@@ -195,19 +300,17 @@ export function ProductInfoSection() {
           htmlFor="description"
           className="block text-sm font-medium text-gray-700"
         >
-          Description
+          Description <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="description"
           name="description"
-          placeholder="Describe this product..."
-          rows={4}
-          className="w-full"
+          value={formData.description}
+          onChange={handleDescriptionChange}
+          placeholder="Describe your product..."
+          className="w-full min-h-[100px]"
+          required
         />
-        <p className="text-xs text-gray-400">
-          A brief description of this product to help customers understand what
-          products to expect.
-        </p>
       </div>
 
       {/* Product Gallery */}
@@ -220,7 +323,7 @@ export function ProductInfoSection() {
         <div className="p-4 border border-gray-200 rounded-lg">
           {/* Gallery Preview */}
           <div className="flex flex-wrap gap-4">
-            {imagePreviews.map((preview, index) => (
+            {imageFiles.map((file, index) => (
               <div
                 key={index}
                 className={`relative w-24 h-24 group cursor-move ${
@@ -233,7 +336,7 @@ export function ProductInfoSection() {
                 onDragEnd={handleImageDragEnd}
               >
                 <Image
-                  src={preview}
+                  src={imagePreviews[index] || URL.createObjectURL(file)}
                   alt={`Product image ${index + 1}`}
                   fill
                   className="object-cover rounded-md"
@@ -246,12 +349,12 @@ export function ProductInfoSection() {
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-logo-dark-button text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ✕
                 </button>
                 {index === 0 && (
-                  <div className="absolute -top-2 -left-2 bg-logo-dark-button text-white text-xs rounded-full px-2 py-1">
+                  <div className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
                     Main
                   </div>
                 )}
@@ -259,7 +362,7 @@ export function ProductInfoSection() {
             ))}
 
             {/* Add Image Button */}
-            {imagePreviews.length != 0 && (
+            {imageFiles.length !== 0 && (
               <div
                 className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
                 onClick={handleBrowseClick}
@@ -275,7 +378,7 @@ export function ProductInfoSection() {
           </div>
 
           {/* Drop Area (only shown when no images) */}
-          {imagePreviews.length === 0 && (
+          {imageFiles.length === 0 && (
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
               onDragOver={handleDragOver}
@@ -286,7 +389,7 @@ export function ProductInfoSection() {
                 <p className="text-sm text-gray-500">
                   Drag and drop your images here, or{" "}
                   <span
-                    className="text-logo-txt cursor-pointer hover:text-logo-txt-hover"
+                    className="text-blue-600 cursor-pointer hover:text-blue-800"
                     onClick={handleBrowseClick}
                   >
                     browse

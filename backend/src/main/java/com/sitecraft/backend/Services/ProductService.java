@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.io.File;
 import java.io.IOException;
 
@@ -54,7 +55,7 @@ public class ProductService {
     private VariantAttributeValueRepo variantAttributeValueRepo;
 
     public List<Product> getAllProducts(Long storeId) {
-        return productRepo.findByStoreId(storeId);
+        return productRepo.findByStoreIdWithCategory(storeId);
     }
 
     public Product getProductById(Long id, Long storeId) {
@@ -67,9 +68,6 @@ public class ProductService {
         Store store = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-        Category category = categoryRepo.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
@@ -77,13 +75,23 @@ public class ProductService {
         product.setDiscountValue(
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
-        product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
-        product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
-        product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
-        product.setCategory(category);
         product.setStore(store);
 
         Product savedProduct = productRepo.save(product);
+
+        // Create CategoryProduct entries for many-to-many relationship
+        List<Long> categoryIds = productDTO.getAllCategoryIds();
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            for (Long categoryId : categoryIds) {
+                Category category = categoryRepo.findById(categoryId)
+                        .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                
+                CategoryProduct categoryProduct = new CategoryProduct();
+                categoryProduct.setCategory(category);
+                categoryProduct.setProduct(savedProduct);
+                categoryProductRepo.save(categoryProduct);
+            }
+        }
 
         Map<String, Map<String, AttributeValue>> createdAttributes = new HashMap<>();
 
@@ -122,12 +130,21 @@ public class ProductService {
 
                 if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
                     for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
-                        AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
-                        VariantAttributeValue vav = new VariantAttributeValue();
-                        vav.setVariant(savedVariant);
-                        vav.setAttributeValue(av);
-                        variantAttributeValueRepo.save(vav);
-                        attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                        Map<String, AttributeValue> valueMap = createdAttributes.get(variantAttrDTO.getName());
+                        if (valueMap != null) {
+                            AttributeValue av = valueMap.get(variantAttrDTO.getValue());
+                            if (av != null) {
+                                VariantAttributeValue vav = new VariantAttributeValue();
+                                vav.setVariant(savedVariant);
+                                vav.setAttributeValue(av);
+                                variantAttributeValueRepo.save(vav);
+                                attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                            } else {
+                                System.err.println("Warning: Attribute value not found for variant: " + variantAttrDTO.getValue());
+                            }
+                        } else {
+                            System.err.println("Warning: Attribute name not found for variant: " + variantAttrDTO.getName());
+                        }
                     }
                 }
 
@@ -141,6 +158,9 @@ public class ProductService {
                 productVariantsRepo.save(variant);
             }
         }
+
+        // Handle low stock notification settings after variants are created
+        handleLowStockSettings(savedProduct, productDTO);
 
         if (productDTO.getImageUrls() != null && !productDTO.getImageUrls().isEmpty()) {
             for (String imageUrl : productDTO.getImageUrls()) {
@@ -166,14 +186,43 @@ public class ProductService {
         if (productDTO.getDiscountValue() != null) product.setDiscountValue(
             productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
         );
-        if (productDTO.getMinCap() != null) product.setMinCap(productDTO.getMinCap() == null ? null : BigDecimal.valueOf(productDTO.getMinCap()));
-        if (productDTO.getPercentageMax() != null) product.setPercentageMax(productDTO.getPercentageMax() == null ? null : BigDecimal.valueOf(productDTO.getPercentageMax()));
-        if (productDTO.getMaxCap() != null) product.setMaxCap(productDTO.getMaxCap() == null ? null : BigDecimal.valueOf(productDTO.getMaxCap()));
         
-        if (productDTO.getCategoryId() != null) {
-            Category category = categoryRepo.findById(productDTO.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            product.setCategory(category);
+        List<Long> categoryIds = productDTO.getAllCategoryIds();
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            // Update the many-to-many relationship through CategoryProduct table
+            // First, get existing CategoryProduct entries for this product
+            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findByProductId(id);
+            
+            // Create a set of existing category IDs for quick lookup
+            Set<Long> existingCategoryIds = existingCategoryProducts.stream()
+                    .map(cp -> cp.getCategory().getId())
+                    .collect(Collectors.toSet());
+            
+            // Create a set of new category IDs
+            Set<Long> newCategoryIds = new HashSet<>(categoryIds);
+            
+            // Remove categories that are no longer needed
+            List<CategoryProduct> toRemove = existingCategoryProducts.stream()
+                    .filter(cp -> !newCategoryIds.contains(cp.getCategory().getId()))
+                    .collect(Collectors.toList());
+            categoryProductRepo.deleteAll(toRemove);
+            
+            // Add new categories that don't already exist
+            for (Long categoryId : categoryIds) {
+                if (!existingCategoryIds.contains(categoryId)) {
+                    Category category = categoryRepo.findById(categoryId)
+                            .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                    
+                    CategoryProduct categoryProduct = new CategoryProduct();
+                    categoryProduct.setCategory(category);
+                    categoryProduct.setProduct(product);
+                    categoryProductRepo.save(categoryProduct);
+                }
+            }
+        } else if (productDTO.getCategoryId() == null && productDTO.getCategoryIds() == null) {
+            // If no categories are provided, remove all existing category relationships
+            List<CategoryProduct> existingCategoryProducts = categoryProductRepo.findByProductId(id);
+            categoryProductRepo.deleteAll(existingCategoryProducts);
         }
 
         // Only update variants and attributes if they are provided in the DTO
@@ -230,12 +279,21 @@ public class ProductService {
 
                     if (variantDTO.getAttributes() != null && !variantDTO.getAttributes().isEmpty()) {
                         for (VariantAttributeDTO variantAttrDTO : variantDTO.getAttributes()) {
-                            AttributeValue av = createdAttributes.get(variantAttrDTO.getName()).get(variantAttrDTO.getValue());
-                            VariantAttributeValue vav = new VariantAttributeValue();
-                            vav.setVariant(savedVariant);
-                            vav.setAttributeValue(av);
-                            variantAttributeValueRepo.save(vav);
-                            attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                            Map<String, AttributeValue> valueMap = createdAttributes.get(variantAttrDTO.getName());
+                            if (valueMap != null) {
+                                AttributeValue av = valueMap.get(variantAttrDTO.getValue());
+                                if (av != null) {
+                                    VariantAttributeValue vav = new VariantAttributeValue();
+                                    vav.setVariant(savedVariant);
+                                    vav.setAttributeValue(av);
+                                    variantAttributeValueRepo.save(vav);
+                                    attributePairsForSku.add(variantAttrDTO.getName().toLowerCase() + "-" + variantAttrDTO.getValue().toLowerCase());
+                                } else {
+                                    System.err.println("Warning: Attribute value not found for variant: " + variantAttrDTO.getValue());
+                                }
+                            } else {
+                                System.err.println("Warning: Attribute name not found for variant: " + variantAttrDTO.getName());
+                            }
                         }
                     }
 
@@ -249,6 +307,9 @@ public class ProductService {
                     productVariantsRepo.save(variant);
                 }
             }
+            
+            // Handle low stock notification settings after variants are updated
+            handleLowStockSettings(product, productDTO);
         }
 
         return productRepo.save(product);
@@ -365,8 +426,7 @@ public class ProductService {
 
     @Transactional
     public Map<String, Object> applyDiscountToProducts(List<Long> productIds, String discountType, 
-                                                      Double discountValue, Double minCap, 
-                                                      Double percentageMax, Double maxCap, Long storeId) {
+                                                      Double discountValue, Long storeId) {
         List<Product> products = productRepo.findAllById(productIds);
         products = products.stream()
                 .filter(p -> p.getStore().getId().equals(storeId))
@@ -377,9 +437,6 @@ public class ProductService {
             product.setDiscountValue(
                 discountValue == null ? null : BigDecimal.valueOf(discountValue)
             );
-            product.setMinCap(minCap == null ? null : BigDecimal.valueOf(minCap));
-            product.setPercentageMax(percentageMax == null ? null : BigDecimal.valueOf(percentageMax));
-            product.setMaxCap(maxCap == null ? null : BigDecimal.valueOf(maxCap));
         }
 
         productRepo.saveAll(products);
@@ -448,20 +505,31 @@ public class ProductService {
     @Transactional
     public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
         Product product = updateProduct(id, productDTO, storeId);
+        
+        // Only handle images if images parameter is not null (meaning the frontend sent image data)
         if (images != null) {
-            // Remove old images
-            List<ProductImage> oldImages = productImageRepo.findByProductId(id);
-            for (ProductImage img : oldImages) {
-                String path = System.getProperty("user.dir") + img.getImageUrl();
-                File file = new File(path);
-                if (file.exists()) file.delete();
-            }
-            productImageRepo.deleteAll(oldImages);
-            // Save new images
+            // Remove old images only if new images are provided
             if (!images.isEmpty()) {
+                List<ProductImage> oldImages = productImageRepo.findByProductId(id);
+                for (ProductImage img : oldImages) {
+                    try {
+                        String path = System.getProperty("user.dir") + img.getImageUrl();
+                        File file = new File(path);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    } catch (Exception e) {
+                        // Log the error but don't fail the update
+                        System.err.println("Warning: Could not delete old image file: " + e.getMessage());
+                    }
+                }
+                productImageRepo.deleteAll(oldImages);
+                
+                // Save new images
                 saveProductImages(product.getStore().getId(), product.getId(), images, product);
             }
         }
+        
         return getProductById(product.getId(), storeId);
     }
 
@@ -482,6 +550,76 @@ public class ProductService {
             productImage.setProduct(product);
             productImageRepo.save(productImage);
             count++;
+        }
+    }
+
+    @Transactional
+    public void deleteProductImage(Long productId, Long imageId, Long storeId) {
+        // 1. Fetch the product and check it belongs to the store
+        Product product = productRepo.findByIdAndStoreId(productId, storeId)
+            .orElseThrow(() -> new RuntimeException("Product not found or does not belong to store"));
+
+        // 2. Find the image
+        ProductImage image = productImageRepo.findById(imageId)
+            .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        // 3. Check the image belongs to the product
+        if (!image.getProduct().getId().equals(productId)) {
+            throw new RuntimeException("Image does not belong to this product");
+        }
+
+        // 4. Delete the file from disk
+        String path = System.getProperty("user.dir") + image.getImageUrl();
+        File file = new File(path);
+        if (file.exists()) file.delete();
+
+        // 5. Remove the image from the product and delete from DB
+        product.getImages().remove(image);
+        productImageRepo.delete(image);
+        productRepo.save(product);
+    }
+    
+    /**
+     * Handle low stock notification settings for a product
+     */
+    private void handleLowStockSettings(Product product, ProductCreateDTO productDTO) {
+        if (productDTO.getLowStockEnabled() != null && productDTO.getLowStockEnabled()) {
+            // Calculate total stock capacity from variants
+            BigDecimal totalStockCapacity = BigDecimal.ZERO;
+            if (productDTO.getVariants() != null) {
+                totalStockCapacity = productDTO.getVariants().stream()
+                        .mapToDouble(variant -> variant.getStock())
+                        .mapToObj(BigDecimal::valueOf)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+            }
+            
+            // Always set maxCap to total stock capacity (current stock)
+            product.setMaxCap(totalStockCapacity);
+            
+            if ("percentage".equals(productDTO.getLowStockType())) {
+                // Percentage-based: Store percentage and calculate minCap from it
+                if (productDTO.getLowStockThreshold() != null) {
+                    product.setPercentageMax(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
+                    // Calculate minCap = percentageMax * maxCap / 100
+                    if (totalStockCapacity.compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal minCapFromPercentage = BigDecimal.valueOf(productDTO.getLowStockThreshold())
+                                .multiply(totalStockCapacity)
+                                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                        product.setMinCap(minCapFromPercentage);
+                    }
+                }
+            } else if ("number".equals(productDTO.getLowStockType())) {
+                // Number-based: Set minCap directly to user's threshold
+                if (productDTO.getLowStockThreshold() != null) {
+                    product.setMinCap(BigDecimal.valueOf(productDTO.getLowStockThreshold()));
+                    product.setPercentageMax(null); // Clear percentage for number-based
+                }
+            }
+        } else {
+            // Disable low stock notification
+            product.setMinCap(null);
+            product.setPercentageMax(null);
+            product.setMaxCap(null);
         }
     }
 }

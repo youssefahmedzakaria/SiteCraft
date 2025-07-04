@@ -10,10 +10,10 @@ export function CustomerOrderRecord({ order }: { order: Order }) {
     <tr className="hover:bg-gray-50">
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">{order.id}</td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-        {format(order.issueDate, "MMM dd, yyyy")}
+        {format(new Date(order.issueDate), "MMM dd, yyyy")}
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-        {order.total.toFixed(2)}EGP
+        {(order.price || 0).toFixed(2)} EGP
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
         <span
@@ -33,7 +33,7 @@ export function CustomerOrderRecord({ order }: { order: Order }) {
         </span>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-        {order.paymentMethod}
+        {order.paymentLog?.method || 'N/A'}
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
         <Link href={`/dashboard/orders/${order.id}`}>

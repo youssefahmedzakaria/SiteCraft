@@ -32,6 +32,7 @@ export interface NavbarTemplate8Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
 }
 
 // Utility for font family (local, not imported)
@@ -63,6 +64,7 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
   MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -101,7 +103,6 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
               brandName={brandName}
               logo={logo}
               textColor={textColor}
-              isCustomize={isCustomize}
             />
             <button
               className="p-1 hover:opacity-80"
@@ -125,7 +126,6 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
                 brandName={brandName}
                 logo={logo}
                 textColor={textColor}
-                isCustomize={isCustomize}
               />
             </div>
 
@@ -141,13 +141,14 @@ export const NavbarTemplate8: React.FC<NavbarTemplate8Props> = ({
 
             {/* Right - Icons */}
             <div className="flex items-center space-x-6 justify-end min-w-0">
-              <IconsGroup iconColor={iconColor} />
+              <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
               <SearchBar
                 expanded={isSearchOpen}
                 setExpanded={setIsSearchOpen}
                 iconColor={iconColor}
                 backgroundColor="bg-white/20"
                 textColor={textColor}
+                onSearch={onSearch}
               />
               <button
                 onClick={isCustomize ? undefined : () => setIsMobileMenuOpen(true)}

@@ -1,5 +1,6 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Users;
+import com.sitecraft.backend.Models.UserRole;
 import com.sitecraft.backend.Services.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,11 @@ import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
 public class AuthController {
     @Autowired
     private UserService userService;
@@ -19,10 +22,11 @@ public class AuthController {
     @PostMapping(path = "/register")
     public ResponseEntity register(@RequestBody Users user) throws Exception {
         try {
-            boolean isExist = userService.isUserExists(user.getEmail());
-            if (isExist) {
+            // Check if user can register as owner (not already an owner)
+            boolean canRegister = userService.canRegisterAsOwner(user.getEmail());
+            if (!canRegister) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("User with this email exists.");
+                        .body(Map.of("success", false, "message", "User with this email is already an owner of another store."));
             }
 
             if (user.getPassword() == null || user.getPassword().length() < 8) {
@@ -30,9 +34,13 @@ public class AuthController {
                         .body(Map.of("success", false, "message", "Password must be at least 8 characters long."));
             }
 
-            userService.register(user);
+            Users registeredUser = userService.register(user);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body("User registered successfully.");
+                    .body(Map.of(
+                            "success", true,
+                            "message", "User registered successfully.",
+                            "userId", registeredUser.getId()
+                    ));
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
@@ -46,9 +54,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
-            boolean isExist = userService.isUserExists(loginRequest.getEmail());
-
-            if (!isExist) {
+            // Check if any user exists with this email
+            if (!userService.isAnyUserExists(loginRequest.getEmail())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("User with this email does not exist.");
             }
@@ -64,6 +71,7 @@ public class AuthController {
             session.setAttribute("storeId", user.getStoreId());
             session.setAttribute("userId", user.getId());
             session.setAttribute("role", user.getRole());
+            
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body("User logged in successfully.");
 
@@ -78,20 +86,32 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity logout(HttpSession session) {
+        System.out.println("🔐 Logout endpoint called");
+        System.out.println("📋 Session attributes before logout: " + session.getAttributeNames());
+        System.out.println("👤 User ID in session: " + session.getAttribute("userId"));
+        System.out.println("🏪 Store ID in session: " + session.getAttribute("storeId"));
+        
         session.invalidate(); // clears all attributes and invalidates the session
+        System.out.println("✅ Session invalidated successfully");
+        
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("User logged out successfully.");
     }
 
     @PostMapping("forgotPassword/sendOTP")
     public ResponseEntity forgotPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        System.out.println("📧 Forgot password sendOTP called for: " + email);
+        
         try {
-            String email = body.get("email");
-            if (!userService.isUserExists(email)) {
+            if (!userService.isAnyUserExists(email)) {
+                System.out.println("❌ User not found: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "No User with this email exists."));
             }
 
+            System.out.println("✅ User found, sending OTP...");
             userService.sendOTP(email);
+            System.out.println("✅ OTP sent successfully to: " + email);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -99,6 +119,8 @@ public class AuthController {
             ));
 
         } catch (Exception e) {
+            System.out.println("💥 Send OTP error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "message", e.getMessage()
@@ -108,15 +130,20 @@ public class AuthController {
 
     @PostMapping("forgotPassword/verifyOTP")
     public ResponseEntity<?> verifyOTP(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String code = body.get("otp");
+        System.out.println("🔐 Forgot password verifyOTP called for: " + email + " with code: " + code);
+        
         try {
-            String email = body.get("email");
-            String code = body.get("otp");
-            if (!userService.isUserExists(email)) {
+            if (!userService.isAnyUserExists(email)) {
+                System.out.println("❌ User not found: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "No User with this email exists."));
             }
 
+            System.out.println("✅ User found, verifying OTP...");
             userService.verifyOTP(email, code);
+            System.out.println("✅ OTP verified successfully for: " + email);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -124,34 +151,39 @@ public class AuthController {
             ));
 
         } catch (Exception e) {
+            System.out.println("💥 Verify OTP error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "message", e.getMessage()
             ));
         }
-
     }
 
     @PostMapping("forgotPassword/resetPassword")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String newPassword = body.get("newPassword");
+        System.out.println("🔐 Forgot password resetPassword called for: " + email);
+
         try {
-            String email = body.get("email");
-            String newPassword = body.get("newPassword");
-
-
-
             if (newPassword == null || newPassword.length() < 8) {
+                System.out.println("❌ Password validation failed for: " + email);
                 return ResponseEntity.badRequest()
                         .body(Map.of("success", false, "message", "Password must be at least 8 characters long."));
             }
 
+            System.out.println("✅ Password validation passed, resetting password...");
             userService.resetPassword(email, newPassword);
+            System.out.println("✅ Password reset successfully for: " + email);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Password reset successfully"
             ));
         } catch (Exception e) {
+            System.out.println("💥 Reset password error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "message", e.getMessage()
@@ -162,16 +194,28 @@ public class AuthController {
     @GetMapping("/getSession")
     public ResponseEntity getSession(HttpSession session) {
         Map<String, Object> sessionData = new HashMap<>();
-        sessionData.put("storeId", session.getAttribute("storeId"));
-        sessionData.put("userId", session.getAttribute("userId"));
-        sessionData.put("role", session.getAttribute("role"));
+        Long userId = (Long) session.getAttribute("userId");
+        Long storeId = (Long) session.getAttribute("storeId");
+        String role = (String) session.getAttribute("role");
+        
+        // Don't refresh session data from database for users with multiple roles
+        // This can cause issues when a user has roles in multiple stores
+        
+        sessionData.put("storeId", storeId);
+        sessionData.put("userId", userId);
+        sessionData.put("role", role);
+        
+        System.out.println("🔐 getSession returning: " + sessionData);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
 
     @PostMapping("/setSession")
-    public void setSession(@RequestBody Map<String, Long> in, HttpSession session) {
-        session.setAttribute("userId", in.get("userId"));
-        session.setAttribute("storeId", in.get("storeId"));
+    public void setSession(@RequestBody Map<String, Object> in, HttpSession session) {
+        System.out.println("🔐 setSession endpoint called with: " + in);
+        session.setAttribute("userId", Long.valueOf(in.get("userId").toString()));
+        session.setAttribute("storeId", in.get("storeId") != null ? Long.valueOf(in.get("storeId").toString()) : null);
+        session.setAttribute("role", in.get("role"));
+        System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId") + ", role: " + in.get("role"));
     }
 
     public static class LoginRequest {

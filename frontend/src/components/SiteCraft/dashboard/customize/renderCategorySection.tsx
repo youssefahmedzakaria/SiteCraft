@@ -66,6 +66,7 @@ export function RenderCategorySection({
     const templateNames = ["Grid", "FeaturedGrid", "HorizontalScroll"];
     const templateName = templateNames[layoutId - 1] || "Grid";
     updateCategoryAttributes({ template: templateName });
+    updateCategoryAttributes({ cardVariant: "default" });
   };
 
   return (
@@ -455,26 +456,6 @@ export function RenderCategorySection({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-
-              {/* show title */}
-              <div className="flex items-center justify-between">
-                <span>Show Title</span>
-                <Button
-                  variant={
-                    categoryAttributes.showCategoryTitle ? "default" : "outline"
-                  }
-                  size="sm"
-                  onClick={() =>
-                    updateCategoryAttributes({
-                      showCategoryTitle: !categoryAttributes.showCategoryTitle,
-                    })
-                  }
-                >
-                  {categoryAttributes.showCategoryTitle
-                    ? "Enabled"
-                    : "Disabled"}
-                </Button>
-              </div>
             </div>
           )}
 
@@ -495,297 +476,154 @@ export function RenderCategorySection({
           {expandedSections.categoryCard && (
             <div className="space-y-4">
               {/* Card Variant */}
-              <div>
-                <label className="block text-sm mb-2">Card Variant</label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
-                    >
-                      <span className="ml-2">
-                        {
-                          categoryAttributes.cardVariant === "default"
-                            ? "Default"
-                            : categoryAttributes.cardVariant === "overlay"
-                            ? "Overlay"
-                            : categoryAttributes.cardVariant === "minimal"
-                            ? "Minimal"
-                            : categoryAttributes.cardVariant === "hover"
-                            ? "Hover"
-                            : "Featured" // default
+              {categoryAttributes.template != "FeaturedGrid" && (
+                <div>
+                  <label className="block text-sm mb-2">Card Variant</label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {
+                            categoryAttributes.cardVariant === "default"
+                              ? "Default"
+                              : categoryAttributes.cardVariant === "overlay"
+                              ? "Overlay"
+                              : categoryAttributes.cardVariant === "minimal"
+                              ? "Minimal"
+                              : categoryAttributes.cardVariant === "hover"
+                              ? "Hover"
+                              : "Featured" // default
+                          }
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cardVariant: "default" })
                         }
-                      </span>
-                      <ChevronDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "default" })
-                      }
-                    >
-                      Default
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "overlay" })
-                      }
-                    >
-                      Overlay
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          cardVariant: "minimal",
-                        })
-                      }
-                    >
-                      Minimal
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "hover" })
-                      }
-                    >
-                      Hover
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cardVariant: "featured" })
-                      }
-                    >
-                      Featured
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              {/* Overlay color */}
-              {categoryAttributes.cardVariant === "overlay" && (
-                <div className="space-y-2">
-                  <label className="block text-sm mb-2">Overlay Color</label>
-                  <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                    <input
-                      type="color"
-                      value={categoryAttributes.overlayColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
-                      className="w-8 h-8 cursor-pointer bg-transparent"
-                      onChange={(e) => {
-                        updateCategoryAttributes({
-                          overlayColor: `bg-[${e.target.value}]`,
-                        });
-                      }}
-                    />
-                    <input
-                      type="text"
-                      value={categoryAttributes.overlayColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
-                      className="flex-1 border-none bg-transparent focus:outline-none"
-                      onChange={(e) => {
-                        updateCategoryAttributes({
-                          overlayColor: `bg-[${e.target.value}]`,
-                        });
-                      }}
-                    />
-                  </div>
+                      >
+                        Default
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cardVariant: "overlay" })
+                        }
+                      >
+                        Overlay
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({
+                            cardVariant: "minimal",
+                          })
+                        }
+                      >
+                        Minimal
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cardVariant: "hover" })
+                        }
+                      >
+                        Hover
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cardVariant: "featured" })
+                        }
+                      >
+                        Featured
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               )}
 
-              {/* Category title font size */}
-              <div>
-                <label className="block text-sm mb-2">Title Font Size</label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
-                    >
-                      <span className="ml-2">
-                        {categoryAttributes.categoryTitleFontSize === "text-sm"
-                          ? "Small"
-                          : categoryAttributes.categoryTitleFontSize ===
-                            "text-base"
-                          ? "Medium"
-                          : categoryAttributes.categoryTitleFontSize ===
-                            "text-lg"
-                          ? "Large"
-                          : categoryAttributes.categoryTitleFontSize ===
-                            "text-xl"
-                          ? "XL"
-                          : categoryAttributes.categoryTitleFontSize ===
-                            "text-2xl"
-                          ? "2XL"
-                          : categoryAttributes.categoryTitleFontSize ===
-                            "text-3xl"
-                          ? "3XL"
-                          : "4XL"}
-                      </span>
-                      <ChevronDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-sm",
-                        })
-                      }
-                    >
-                      Small
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-base",
-                        })
-                      }
-                    >
-                      Medium
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-lg",
-                        })
-                      }
-                    >
-                      Large
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-xl",
-                        })
-                      }
-                    >
-                      XL
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-2xl",
-                        })
-                      }
-                    >
-                      2XL
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ titleFontSize: "text-3xl" })
-                      }
-                    >
-                      3XL
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({
-                          categoryTitleFontSize: "text-4xl",
-                        })
-                      }
-                    >
-                      4XL
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              {/*Show Title */}
-              <div className="flex items-center justify-between">
-                <span>Category Title</span>
-                <Button
-                  variant={
-                    categoryAttributes.showCategoryTitle ? "default" : "outline"
-                  }
-                  size="sm"
-                  onClick={() =>
-                    updateCategoryAttributes({
-                      showCategoryTitle: !categoryAttributes.showCategoryTitle,
-                    })
-                  }
-                >
-                  {categoryAttributes.showCategoryTitle
-                    ? "Enabled"
-                    : "Disabled"}
-                </Button>
-              </div>
-
               {/*Show Description */}
-              <div className="flex items-center justify-between">
-                <span>Category Description</span>
-                <Button
-                  variant={
-                    categoryAttributes.showSubtitle ? "default" : "outline"
-                  }
-                  size="sm"
-                  onClick={() =>
-                    updateCategoryAttributes({
-                      showSubtitle: !categoryAttributes.showSubtitle,
-                    })
-                  }
-                >
-                  {categoryAttributes.showSubtitle ? "Enabled" : "Disabled"}
-                </Button>
-              </div>
+              {categoryAttributes.template != "FeaturedGrid" &&
+                categoryAttributes.cardVariant !== "overlay" &&
+                categoryAttributes.cardVariant !== "minimal" &&
+                categoryAttributes.cardVariant !== "featured" && (
+                  <div className="flex items-center justify-between">
+                    <span>Category Description</span>
+                    <Button
+                      variant={
+                        categoryAttributes.showSubtitle ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() =>
+                        updateCategoryAttributes({
+                          showSubtitle: !categoryAttributes.showSubtitle,
+                        })
+                      }
+                    >
+                      {categoryAttributes.showSubtitle ? "Enabled" : "Disabled"}
+                    </Button>
+                  </div>
+                )}
 
               {/*Card Radius*/}
-              <div>
-                <label className="block text-sm mb-2">Card Radius</label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
-                    >
-                      <span className="ml-2">
-                        {categoryAttributes.cornerRadius === "none"
-                          ? "None"
-                          : categoryAttributes.cornerRadius === "small"
-                          ? "Small"
-                          : categoryAttributes.cornerRadius === "medium"
-                          ? "Medium"
-                          : "Large"}
-                      </span>
-                      <ChevronDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "none" })
-                      }
-                    >
-                      None
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "small" })
-                      }
-                    >
-                      Small
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "medium" })
-                      }
-                    >
-                      Medium
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateCategoryAttributes({ cornerRadius: "large" })
-                      }
-                    >
-                      Large
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {categoryAttributes.template != "FeaturedGrid" && (
+                <div>
+                  <label className="block text-sm mb-2">Card Radius</label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
+                      >
+                        <span className="ml-2">
+                          {categoryAttributes.cornerRadius === "none"
+                            ? "None"
+                            : categoryAttributes.cornerRadius === "small"
+                            ? "Small"
+                            : categoryAttributes.cornerRadius === "medium"
+                            ? "Medium"
+                            : "Large"}
+                        </span>
+                        <ChevronDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cornerRadius: "none" })
+                        }
+                      >
+                        None
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cornerRadius: "small" })
+                        }
+                      >
+                        Small
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cornerRadius: "medium" })
+                        }
+                      >
+                        Medium
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateCategoryAttributes({ cornerRadius: "large" })
+                        }
+                      >
+                        Large
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
 
               {/*Text Color*/}
               <div className="space-y-2">
@@ -819,35 +657,42 @@ export function RenderCategorySection({
               </div>
 
               {/* Show cta*/}
-              <div className="flex items-center justify-between">
-                <span>Shop Now</span>
-                <Button
-                  variant={categoryAttributes.showCta ? "default" : "outline"}
-                  size="sm"
-                  onClick={() =>
-                    updateCategoryAttributes({
-                      showCta: !categoryAttributes.showCta,
-                    })
-                  }
-                >
-                  {categoryAttributes.showCta ? "Enabled" : "Disabled"}
-                </Button>
-              </div>
+              {categoryAttributes.cardVariant !== "minimal" &&
+                categoryAttributes.cardVariant !== "hover" && (
+                  <div className="flex items-center justify-between">
+                    <span>Shop Now</span>
+                    <Button
+                      variant={
+                        categoryAttributes.showCta ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() =>
+                        updateCategoryAttributes({
+                          showCta: !categoryAttributes.showCta,
+                        })
+                      }
+                    >
+                      {categoryAttributes.showCta ? "Enabled" : "Disabled"}
+                    </Button>
+                  </div>
+                )}
 
               {/* Cta Text*/}
-              {categoryAttributes.showCta && (
-                <div>
-                  <label className="block text-sm mb-2">Button Text</label>
-                  <Input
-                    value={categoryAttributes.ctaText}
-                    onChange={(e) =>
-                      updateCategoryAttributes({
-                        ctaText: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              )}
+              {categoryAttributes.showCta &&
+                categoryAttributes.cardVariant !== "minimal" &&
+                categoryAttributes.cardVariant !== "hover" && (
+                  <div>
+                    <label className="block text-sm mb-2">Button Text</label>
+                    <Input
+                      value={categoryAttributes.ctaText}
+                      onChange={(e) =>
+                        updateCategoryAttributes({
+                          ctaText: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                )}
             </div>
           )}
         </div>

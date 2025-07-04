@@ -59,7 +59,7 @@ export const Footer = ({
   aboutLinks = [
     {
       label: "Contact Us",
-      href: "/contact",
+      href: "/Home/#contact",
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-normal",
@@ -68,7 +68,7 @@ export const Footer = ({
     },
     {
       label: "About Us",
-      href: "/about",
+      href: "/Home/#about",
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-normal",
@@ -77,7 +77,7 @@ export const Footer = ({
     },
     {
       label: "Policies",
-      href: "/policies",
+      href: "/Home/#policies",
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-normal",

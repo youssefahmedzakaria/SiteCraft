@@ -4,19 +4,44 @@ import { useState } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/SiteCraft/ui/input";
+import { addShippingInfo } from "@/lib/shipping";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AddShippingPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
-    governorate: "",
-    price: "",
-    estimatedDeliveryDays: "",
+    governmentName: "",
+    shippingPrice: "",
+    estimatedDeliveryTime: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new shipping locations.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -31,13 +56,29 @@ export default function AddShippingPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
     try {
-      // API
-      console.log("Submitting shipping location:", formData);
+      // Validate form data
+      if (!formData.governmentName || !formData.shippingPrice || !formData.estimatedDeliveryTime) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      const shippingData = {
+        governmentName: formData.governmentName,
+        shippingPrice: parseFloat(formData.shippingPrice),
+        estimatedDeliveryTime: formData.estimatedDeliveryTime,
+      };
+
+      console.log("Submitting shipping location:", shippingData);
+      
+      await addShippingInfo(shippingData);
+      console.log("✅ Shipping location added successfully");
+      
       router.push("/dashboard/shipping");
     } catch (error) {
       console.error("Error adding shipping location:", error);
+      setError(error instanceof Error ? error.message : "Failed to add shipping location");
     } finally {
       setIsSubmitting(false);
     }
@@ -60,18 +101,24 @@ export default function AddShippingPage() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <label
-                htmlFor="governorate"
+                htmlFor="governmentName"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Governorate Name <span className="text-red-500">*</span>
               </label>
               <Input
-                id="governorate"
-                name="governorate"
-                value={formData.governorate}
+                id="governmentName"
+                name="governmentName"
+                value={formData.governmentName}
                 onChange={handleChange}
                 required
                 placeholder="Cairo, Alexandria, etc."
@@ -83,16 +130,19 @@ export default function AddShippingPage() {
 
             <div className="mb-6">
               <label
-                htmlFor="price"
+                htmlFor="shippingPrice"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Shipping Price <span className="text-red-500">*</span>
               </label>
               <div className="flex">
                 <Input
-                  id="price"
-                  name="price"
-                  value={formData.price}
+                  id="shippingPrice"
+                  name="shippingPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.shippingPrice}
                   onChange={handleChange}
                   required
                   placeholder="50"
@@ -108,16 +158,16 @@ export default function AddShippingPage() {
 
             <div className="mb-6">
               <label
-                htmlFor="estimatedDeliveryDays"
+                htmlFor="estimatedDeliveryTime"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Estimated Delivery Time <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <select
-                  id="estimatedDeliveryDays"
-                  name="estimatedDeliveryDays"
-                  value={formData.estimatedDeliveryDays}
+                  id="estimatedDeliveryTime"
+                  name="estimatedDeliveryTime"
+                  value={formData.estimatedDeliveryTime}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"

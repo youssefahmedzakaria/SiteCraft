@@ -1,6 +1,12 @@
 import { Input } from "./input";
 
-export function SearchBar({ placeholder }: { placeholder: string }) {
+interface SearchBarProps {
+  placeholder: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export function SearchBar({ placeholder, value, onChange }: SearchBarProps) {
     return (
         <div className="relative flex-1">
             <img
@@ -13,6 +19,8 @@ export function SearchBar({ placeholder }: { placeholder: string }) {
             name="search"
             type="search"
             placeholder={placeholder}
+            value={value}
+            onChange={(e) => onChange?.(e.target.value)}
             autoComplete="search"
             className="h-10 pl-10 pr-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />

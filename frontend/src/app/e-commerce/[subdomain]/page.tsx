@@ -146,78 +146,42 @@ export default function Home() {
         name: "Necklaces",
         Description: "Necklaces",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "7",
         name: "Rings",
         Description: "Rings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "8",
         name: "Earrings",
         Description: "Earrings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "9",
         name: "Bracelets",
         Description: "Bracelets",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "10",
         name: "Pendants",
         Description: "Pendants",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "11",
         name: "Bangles",
         Description: "Bangles",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
     ],
   };
@@ -266,48 +230,57 @@ export default function Home() {
     products: [
       {
         id: "1",
-        description: "Description",
-        link: "#",
-        price: "100.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 1",
-        title: "Product 1",
+        name: "product1",
+        description: "description of product1",
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.1,
+        price: 59.99,
       },
       {
         id: "2",
-        description: "Description",
-        link: "#",
-        price: "200.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 2",
-        title: "Product 2",
+        name: "product2",
+        description: "description of product2",
+        images: [],
+        discountType: "fixed",
+        discountValue: 10,
+        price: 59.99,
       },
       {
         id: "3",
-        description: "Description",
-        link: "#",
-        price: "300.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 3",
-        title: "Product 3",
+        name: "product3",
+        description: "description of product3",
+        images: [],
+        discountType: "fixed",
+        discountValue: 8,
+        price: 59.99,
       },
       {
         id: "4",
-        description: "Description",
-        link: "#",
-        price: "400.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 4",
-        title: "Product 4",
+        name: "product4",
+        description: "description of product4",
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.13,
+        price: 59.99,
       },
       {
         id: "5",
-        description: "Description",
-        link: "#",
-        price: "500.00",
-        image: "/placeholder.png",
-        imageAlt: "Product 5",
-        title: "Product 5",
+        name: "product5",
+        description: "description of product5",
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.21,
+        price: 59.99,
+      },
+      {
+        id: "6",
+        name: "product6",
+        description: "description of product6",
+        images: [],
+        discountType: "fixed",
+        discountValue: 30,
+        price: 59.99,
       },
     ],
   };
@@ -327,20 +300,28 @@ export default function Home() {
     id: "about",
     title: "About Us",
     titleColor: "text-[#000000]", // text-black
-    description:
-      "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
-    secondaryDescription:
-      "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
-    descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
-    // titleFontWeight: "font-bold",
-    descriptionFont: "font-sans",
-    descriptionSize: "text-lg",
+    sections: [
+      {
+        sectionTitle: "Who We Are",
+        description:
+          "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
+      },
+      {
+        sectionTitle: "Our Experience",
+        description:
+          "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
+      },
+    ],
+    sectionColor: "text-[#000000]",
+    sectionSize: "text-lg",
+    sectionFont: "font-sans",
+    sectionFontWeight: "normal",
   };
 
   // State for about customization
@@ -486,33 +467,43 @@ export default function Home() {
   const [isExist, setIsExist] = useState(false);
   const fetchTemplate = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8080/customize/getTemplateBySubdomain/" + subdomain,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const responseStore = await fetch(
-        "http://localhost:8080/api/store/getStoreSettings",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-      const dataStore = await responseStore.json();
-      console.log("fetched template", data);
-      console.log("fetched store", dataStore);
+      const [templateRes, storeRes, productsRes, categoriesRes] =
+        await Promise.all([
+          fetch("http://localhost:8080/customize/getTemplate", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/api/store/getStoreSettings", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getProducts", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getCategories", {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
+      const [templateData, storeData, productsData, categoriesData] =
+        await Promise.all([
+          templateRes.json(),
+          storeRes.json(),
+          productsRes.json(),
+          categoriesRes.json(),
+        ]);
+      console.log("fetched template", templateData);
+      console.log("fetched store", storeData);
       if (
-        data.success &&
-        data["Customized Template"] &&
-        dataStore.success &&
-        dataStore.store
+        templateData.success &&
+        templateData["Customized Template"] &&
+        storeData.success &&
+        storeData.store
       ) {
         setIsExist(true);
         // ---------------------Customize Template----------------------------------
-        const sortedTemplate = [...data["Customized Template"]].sort(
+        const sortedTemplate = [...templateData["Customized Template"]].sort(
           (a, b) => a.index - b.index
         );
         const loadedSections: Section[] = [];
@@ -543,15 +534,17 @@ export default function Home() {
         // ---------------------Store Settings----------------------------------
         setAboutAttributes((prev) => ({
           ...prev,
-          description: dataStore.store.aboutUs?.[0]?.title || prev.description,
-          secondaryDescription:
-            dataStore.store.aboutUs?.[0]?.content || prev.description,
+          sections:
+            storeData.aboutUs?.map((p: any) => ({
+              sectionTitle: p.title,
+              description: p.content,
+            })) || prev.sections,
         }));
         // Policies (only sections)
         setPoliciesAttributes((prev) => ({
           ...prev,
           sections:
-            dataStore.store.policies?.map((p: any) => ({
+            storeData.store.policies?.map((p: any) => ({
               title: p.title,
               content: p.description,
             })) || prev.sections,
@@ -559,28 +552,88 @@ export default function Home() {
         // Contact (only contactEmail and socialLinks)
         setContactAttributes((prev) => ({
           ...prev,
-          contactEmail: dataStore.store.emailAddress || prev.contactEmail,
+          contactEmail: storeData.store.emailAddress || prev.contactEmail,
           socialLinks: {
             facebook:
-              dataStore.store.socialMediaAccounts?.find(
+              storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
               )?.link ||
               prev.socialLinks?.facebook ||
               "",
             instagram:
-              dataStore.store.socialMediaAccounts?.find(
+              storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
               )?.link ||
               prev.socialLinks?.instagram ||
               "",
             twitter:
-              dataStore.store.socialMediaAccounts?.find(
+              storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link ||
               prev.socialLinks?.twitter ||
               "",
           },
         }));
+
+        //-------------------------------------------------------------------------------------------------------
+
+        // 👇 Now you can store products and categories:
+        if (productsData.success && productsData.products) {
+          const mappedProducts = productsData.products.map((product: any) => ({
+            id: String(product.id),
+            name: product.name,
+            description: product.description,
+            discountType: product.discountType,
+            discountValue: product.discountValue,
+            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            images: [
+              {
+                id:
+                  product.images && product.images.length > 0
+                    ? product.images[0].id
+                    : 1,
+                url:
+                  product.images && product.images.length > 0
+                    ? product.images[0].imageUrl
+                    : "/placeholder.png",
+                alt:
+                  product.images && product.images.length > 0
+                    ? product.images[0].alt
+                    : "Image alt text",
+              },
+            ],
+          }));
+
+          setProductAttributes((prev) => ({
+            ...prev,
+            products: mappedProducts,
+          }));
+          console.log("Mapped Products:", mappedProducts);
+        }
+
+        if (categoriesData.success && categoriesData.categories) {
+          const mappedCategories = categoriesData.categories.map(
+            (category: any) => ({
+              id: String(category.id),
+              name: category.name,
+              Description: category.description,
+              link: "#",
+              images: [
+                {
+                  id: category.id,
+                  url: category.image || "/placeholder.png",
+                  alt: `Image alt text for ${category.name}`,
+                },
+              ],
+            })
+          );
+
+          setCategoryAttributes((prev) => ({
+            ...prev,
+            categories: mappedCategories,
+          }));
+          console.log("Mapped Categories:", mappedCategories);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch template:", error);

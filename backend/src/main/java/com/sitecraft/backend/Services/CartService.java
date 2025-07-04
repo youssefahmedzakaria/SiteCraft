@@ -155,9 +155,6 @@ public class CartService {
 
         String discountType = product.getDiscountType().toLowerCase();
         BigDecimal discountValue = product.getDiscountValue();
-        BigDecimal minCap = product.getMinCap();
-        BigDecimal percentageMax = product.getPercentageMax();
-        BigDecimal maxCap = product.getMaxCap();
 
         BigDecimal discountedPrice = originalPrice;
 
@@ -165,31 +162,13 @@ public class CartService {
             case "percentage":
                 // Calculate percentage discount
                 BigDecimal percentageDiscount = originalPrice.multiply(discountValue).divide(BigDecimal.valueOf(100));
-                
-                // Apply percentage max if set
-                if (percentageMax != null && percentageDiscount.compareTo(percentageMax) > 0) {
-                    percentageDiscount = percentageMax;
-                }
-                
                 discountedPrice = originalPrice.subtract(percentageDiscount);
                 break;
 
             case "amount":
             case "fixed":
-                // Check if minimum purchase threshold is met
-                if (minCap != null && originalPrice.compareTo(minCap) < 0) {
-                    return originalPrice; // No discount applied if minimum threshold not met
-                }
-                
                 // Calculate fixed amount discount
-                BigDecimal amountDiscount = discountValue;
-                
-                // Apply max cap if set
-                if (maxCap != null && amountDiscount.compareTo(maxCap) > 0) {
-                    amountDiscount = maxCap;
-                }
-                
-                discountedPrice = originalPrice.subtract(amountDiscount);
+                discountedPrice = originalPrice.subtract(discountValue);
                 break;
 
             default:
@@ -267,29 +246,8 @@ public class CartService {
 
     private ProductDTO createSimplifiedProductDTO(Product product) {
         try {
-            // Create minimal ProductDTO to avoid lazy loading issues
-            List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
-            if (product.getImages() != null) {
-                for (ProductImage img : product.getImages()) {
-                    imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
-                }
-            }
-            
-            // Don't include variants in the product DTO to avoid circular references
-            List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
-            
-            return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getDiscountType(),
-                product.getDiscountValue(),
-                product.getMinCap(),
-                product.getPercentageMax(),
-                product.getMaxCap(),
-                imageDTOs,
-                variantDTOs
-            );
+            // Use the new ProductDTO constructor that takes a Product object
+            return new ProductDTO(product);
         } catch (Exception e) {
             System.err.println("Error creating simplified ProductDTO: " + e.getMessage());
             e.printStackTrace();
@@ -319,32 +277,8 @@ public class CartService {
 
     private ProductDTO mapProductToDTO(Product product) {
         if (product == null) return null;
-        List<ProductImageDTO> imageDTOs = new java.util.ArrayList<>();
-        if (product.getImages() != null) {
-            for (ProductImage img : product.getImages()) {
-                imageDTOs.add(new ProductImageDTO(img.getAlt(), img.getImageUrl()));
-            }
-        }
-        List<ProductVariantDTO> variantDTOs = new java.util.ArrayList<>();
-        if (product.getVariants() != null) {
-            for (ProductVariants v : product.getVariants()) {
-                if (v.getPrice() != null) {
-                    variantDTOs.add(mapVariantToDTO(v, product));
-                }
-            }
-        }
-        return new ProductDTO(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getDiscountType(),
-            product.getDiscountValue(),
-            product.getMinCap(),
-            product.getPercentageMax(),
-            product.getMaxCap(),
-            imageDTOs,
-            variantDTOs
-        );
+        // Use the new ProductDTO constructor that takes a Product object
+        return new ProductDTO(product);
     }
 
     private ProductVariantDTO mapVariantToDTO(ProductVariants variant, Product product) {

@@ -4,11 +4,15 @@ import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,6 +36,9 @@ public class OrderService {
     private ShippingInfoRepo shippingInfoRepo;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private JavaMailSender mailSender;
+    private LowStockNotificationService lowStockNotificationService;
 
 
     public List<Order> getAllOrders(Long storeId) {
@@ -58,7 +65,8 @@ public class OrderService {
         return order;
     }
 
-    public Order updateOrderStatus(Long orderId, String newStatus) {
+
+     public Order updateOrderStatus(Long orderId, String newStatus) {
         Optional<Order> orderOptional = orderRepo.findById(orderId);
         if (orderOptional.isEmpty()) {
             throw new RuntimeException("Order not found.");
@@ -66,7 +74,19 @@ public class OrderService {
 
         Order order = orderOptional.get();
         order.setStatus(newStatus);
-        return orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
+
+        // Send email to customer
+        Customer customer = order.getCustomer();
+        if (customer != null && customer.getEmail() != null) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(customer.getEmail());
+            message.setSubject("Order Status Updated");
+            message.setText("Dear " + customer.getName() + ",\n\nYour order (ID: " + order.getId() + ") status has been updated to: " + newStatus + ".\n\nThank you for shopping with us!");
+            mailSender.send(message);
+        }
+
+        return savedOrder;
     }
 
     //----------------------------------------Cancel Order------------------------------------
@@ -137,6 +157,7 @@ public class OrderService {
             // 3. Create Empty Order
             Order order = new Order();
             order.setStatus("Pending");
+            order.setIssueDate(LocalDateTime.now());
             order.setStore(store);
             order.setCustomer(customer);
 
@@ -148,8 +169,9 @@ public class OrderService {
                 throw new RuntimeException("Cart is empty.");
             }
 
-            // 5. Create Order Products
+            // 5. Create Order Products and store variants for later reuse
             List<OrderProduct> orderProducts = new ArrayList<>();
+            Map<String, ProductVariants> variantMap = new HashMap<>();
             for(CartProduct cartProduct : cart.getCartProducts()) {
                 OrderProduct orderProduct = new OrderProduct();
                 orderProduct.setOrder(order);
@@ -161,6 +183,9 @@ public class OrderService {
                 if (variant.getStock() < cartProduct.getQuantity()) {
                     throw new RuntimeException("Product stock is low.");
                 }
+
+                // Store variant for later reuse in stock deduction
+                variantMap.put(cartProduct.getSku(), variant);
 
                 orderProduct.setQuantity(cartProduct.getQuantity());
                 orderProduct.setPrice(variant.getPrice().doubleValue());
@@ -190,16 +215,39 @@ public class OrderService {
 
             // 8. Add Order Data
             order.setPrice(cart.getTotalPrice().doubleValue());
-            order.setIssueDate(LocalDateTime.now());
 //            order.setPaymentLog(paymentLog);
             order.setShipping(shipping);
             order.setOrderProducts(orderProducts);
 
             // 9. Save Order and Clear Shopping cart
             orderRepo.save(order);
+            
+            // 10. Deduct stock from variants after successful order creation (reuse variants from step 5)
+            for(CartProduct cartProduct : cart.getCartProducts()) {
+                ProductVariants variant = variantMap.get(cartProduct.getSku());
+                if (variant != null) {
+                    variant.setStock(variant.getStock() - cartProduct.getQuantity());
+                    productVariantsRepo.save(variant);
+                }
+            }
+            
+            // 11. Check for low stock notifications after stock update
+            for(CartProduct cartProduct : cart.getCartProducts()) {
+                lowStockNotificationService.checkAndSendLowStockNotification(cartProduct.getProduct());
+            }
+            
             cartService.clearCart(customerId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
+    }
+
+    public List<Order> getOrdersByStoreAndDateRange(Long storeId, java.time.LocalDate start, java.time.LocalDate end) {
+        List<Order> allOrders = getAllOrders(storeId);
+        return allOrders.stream()
+                .filter(order -> order.getIssueDate() != null &&
+                        !order.getIssueDate().toLocalDate().isBefore(start) &&
+                        !order.getIssueDate().toLocalDate().isAfter(end))
+                .collect(java.util.stream.Collectors.toList());
     }
 }

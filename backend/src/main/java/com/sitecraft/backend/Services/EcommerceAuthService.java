@@ -135,6 +135,9 @@ public class EcommerceAuthService {
             customer.setPassword(encodedPassword);
         }
 
+        // Set update timestamp
+        customer.setUpdatedAt(LocalDateTime.now());
+
         return customerRepo.save(customer);
     }
 
@@ -188,6 +191,7 @@ public class EcommerceAuthService {
             }
             String encodedPassword = passwordEncoder.encode(newPassword);
             customer.setPassword(encodedPassword);
+            customer.setUpdatedAt(LocalDateTime.now());
             customerRepo.save(customer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to reset password: " + e.getMessage(), e);

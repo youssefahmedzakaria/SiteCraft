@@ -32,6 +32,8 @@ export interface NavbarTemplate7Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
+  isRTL?: boolean
 }
 
 // Utility for font family (local, not imported)
@@ -63,6 +65,7 @@ export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
   MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
   isRTL = false,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -108,7 +111,7 @@ export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
           <div className="hidden md:flex items-center justify-between h-16 relative">
             {/* Left - Navigation - Fixed width */}
             <div className={`w-1/3 flex ${isRTL ? "justify-end order-3" : "justify-start order-1"}`}>
-              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
             </div>
 
             {/* Center - Logo - Absolute centered */}
@@ -125,8 +128,11 @@ export const NavbarTemplate7: React.FC<NavbarTemplate7Props> = ({
                   iconColor={iconColor}
                   backgroundColor="bg-white/20"
                   textColor={textColor}
+                  onSearch={onSearch}
                 />
-                <IconsGroup iconColor={iconColor} />
+                <div className="hidden md:flex">
+                  <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
+                </div>
               </div>
             </div>
           </div>

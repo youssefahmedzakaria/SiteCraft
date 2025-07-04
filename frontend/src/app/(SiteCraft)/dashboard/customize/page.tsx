@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
-import { Eye, X } from "lucide-react";
+import { Eye, AlertCircle, X } from "lucide-react";
 import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter";
 import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default";
 import { LeftPolicies } from "@/components/e-commerce/policies/templates/left";
@@ -43,7 +43,6 @@ import {
   SplitPromo,
 } from "@/components/e-commerce/promo";
 import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -61,6 +60,8 @@ import {
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { form } from "@heroui/theme";
 import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 interface Section {
   id: string;
@@ -76,6 +77,9 @@ export default function CustomizeTemplatePage() {
   const [aboutImage, setAboutImage] = useState<File | undefined>();
   const [contactImage, setContactImage] = useState<File | undefined>();
   const [promoImages, setPromoImages] = useState<File[] | undefined>();
+
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
@@ -193,78 +197,42 @@ export default function CustomizeTemplatePage() {
         name: "Necklaces",
         Description: "Necklaces",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "7",
         name: "Rings",
         Description: "Rings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "8",
         name: "Earrings",
         Description: "Earrings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "9",
         name: "Bracelets",
         Description: "Bracelets",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "10",
         name: "Pendants",
         Description: "Pendants",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "11",
         name: "Bangles",
         Description: "Bangles",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
     ],
   };
@@ -310,97 +278,55 @@ export default function CustomizeTemplatePage() {
         id: "1",
         name: "product1",
         description: "description of product1",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.1,
+        price: 59.99,
       },
       {
         id: "2",
         name: "product2",
         description: "description of product2",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 10,
+        price: 59.99,
       },
       {
         id: "3",
         name: "product3",
         description: "description of product3",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 8,
+        price: 59.99,
       },
       {
         id: "4",
         name: "product4",
         description: "description of product4",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.13,
+        price: 59.99,
       },
       {
         id: "5",
         name: "product5",
         description: "description of product5",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.21,
+        price: 59.99,
       },
       {
         id: "6",
         name: "product6",
         description: "description of product6",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 30,
+        price: 59.99,
       },
     ],
   };
@@ -421,11 +347,6 @@ export default function CustomizeTemplatePage() {
     id: "about",
     title: "About Us",
     titleColor: "text-[#000000]", // text-black
-    description:
-      "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
-    secondaryDescription:
-      "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
-    descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -433,8 +354,22 @@ export default function CustomizeTemplatePage() {
     titleFont: "font-sans",
     titleSize: "text-4xl",
     // titleFontWeight: "font-bold",
-    descriptionFont: "font-sans",
-    descriptionSize: "text-lg",
+    sections: [
+      {
+        sectionTitle: "Who We Are",
+        description:
+          "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
+      },
+      {
+        sectionTitle: "Our Experience",
+        description:
+          "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
+      },
+    ],
+    sectionColor: "text-#4B5563",
+    sectionSize: "text-lg",
+    sectionFont: "font-sans",
+    sectionFontWeight: "normal",
   };
 
   // State for about customization
@@ -651,7 +586,6 @@ export default function CustomizeTemplatePage() {
 
   const [sections, setSections] = useState<Section[]>(initialSections);
 
-  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -660,85 +594,6 @@ export default function CustomizeTemplatePage() {
   const [storeData, setStoreData] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-
-  // Add a useEffect to update header/footer logo and other attributes when storeData changes
-  React.useEffect(() => {
-    if (!storeData) return;
-    // Update header logo
-    setHeaderAttributes((prev) => ({
-      ...prev,
-      brandName: storeData.storeName || prev.brandName,
-      logo: {
-        ...prev.logo,
-        src:
-          storeData.logo && storeData.logo !== ""
-            ? storeData.logo
-            : "/placeholder.png",
-      },
-    }));
-    // Update about
-    setAboutAttributes((prev) => ({
-      ...prev,
-      description: storeData.aboutUs?.[0]?.title || prev.description,
-      secondaryDescription: storeData.aboutUs?.[0]?.content || prev.description,
-    }));
-    // Update policies
-    setPoliciesAttributes((prev) => ({
-      ...prev,
-      sections:
-        storeData.policies?.map((p: any) => ({
-          title: p.title,
-          content: p.description,
-        })) || prev.sections,
-    }));
-    // Update contact
-    setContactAttributes((prev) => ({
-      ...prev,
-      contactEmail: storeData.emailAddress || prev.contactEmail,
-      socialLinks: {
-        facebook:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "facebook"
-          )?.link ||
-          prev.socialLinks?.facebook ||
-          "",
-        instagram:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "instagram"
-          )?.link ||
-          prev.socialLinks?.instagram ||
-          "",
-        twitter:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "twitter"
-          )?.link ||
-          prev.socialLinks?.twitter ||
-          "",
-      },
-    }));
-    // Update footer logo and social media
-    setFooterAttributes((prev) => ({
-      ...prev,
-      brandName: storeData.storeName || prev.brandName,
-      logo: {
-        ...prev.logo,
-        src:
-          storeData.logo && storeData.logo !== ""
-            ? storeData.logo
-            : "/placeholder.png",
-      },
-      socialMedia: {
-        facebook:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "facebook"
-          )?.link || prev.socialMedia.facebook,
-        instagram:
-          storeData.socialMediaAccounts?.find(
-            (acc: any) => acc.name.toLowerCase() === "instagram"
-          )?.link || prev.socialMedia.instagram,
-      },
-    }));
-  }, [storeData]);
 
   const fetchTemplate = async () => {
     try {
@@ -821,11 +676,27 @@ export default function CustomizeTemplatePage() {
         // Store data
         setStoreData(storeData.store);
 
+        console.log("fetched store", storeData.store);
+
+        setHeaderAttributes((prev) => ({
+          ...prev,
+          brandName: storeData.store.storeName || prev.brandName,
+          logo: {
+            ...prev.logo,
+            src:
+              storeData.store.logo && storeData.store.logo !== ""
+                ? storeData.store.logo
+                : "/placeholder.png",
+          },
+        }));
+
         setAboutAttributes((prev) => ({
           ...prev,
-          description: storeData.store.aboutUs?.[0]?.title || prev.description,
-          secondaryDescription:
-            storeData.store.aboutUs?.[0]?.content || prev.secondaryDescription,
+          sections:
+            storeData.store.aboutUs?.map((p: any) => ({
+              sectionTitle: p.title,
+              description: p.content,
+            })) || prev.sections,
         }));
 
         setPoliciesAttributes((prev) => ({
@@ -839,7 +710,11 @@ export default function CustomizeTemplatePage() {
 
         setContactAttributes((prev) => ({
           ...prev,
-          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          address: storeData.store.address || "",
+          addressUrl: storeData.store.addressLink || "",
+          openHours: storeData.store.openingHours || "",
+          phone: storeData.store.phoneNumber || "",
+          contactEmail: storeData.store.emailAddress || "",
           socialLinks: {
             facebook:
               storeData.store.socialMediaAccounts?.find(
@@ -854,6 +729,29 @@ export default function CustomizeTemplatePage() {
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link || "",
           },
+
+        }));
+
+        setFooterAttributes((prev) => ({
+          ...prev,
+          brandName: storeData.store.storeName || prev.brandName,
+          logo: {
+            ...prev.logo,
+            src:
+              storeData.store.logo && storeData.store.logo !== ""
+                ? storeData.store.logo
+                : "/placeholder.png",
+          },
+          socialMedia: {
+            facebook:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "facebook"
+              )?.link || prev.socialMedia.facebook,
+            instagram:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "instagram"
+              )?.link || prev.socialMedia.instagram,
+          },
         }));
 
         // 👇 Now you can store products and categories:
@@ -862,26 +760,25 @@ export default function CustomizeTemplatePage() {
             id: String(product.id),
             name: product.name,
             description: product.description,
-            media: {
-              mainMedia: {
-                image: {
-                  url:
-                    product.images && product.images.length > 0
-                      ? product.images[0].imageUrl
-                      : "/placeholder.png",
-                },
+            discountType: product.discountType,
+            discountValue: product.discountValue,
+            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            images: [
+              {
+                id:
+                  product.images && product.images.length > 0
+                    ? product.images[0].id
+                    : 1,
+                url:
+                  product.images && product.images.length > 0
+                    ? product.images[0].imageUrl
+                    : "/placeholder.png",
+                alt:
+                  product.images && product.images.length > 0
+                    ? product.images[0].alt
+                    : "Image alt text",
               },
-            },
-                        price: {
-              price: product.variants[0].price ? product.variants[0].price : 0.00,
-              priceAfterDiscount: product.discountValue
-                ? 
-                    product.discountType === "percentage"
-                      ? parseFloat((product.variants[0].price * (1 - product.discountValue)).toFixed(2))
-                      : parseFloat((product.variants[0].price - product.discountValue).toFixed(2))
-                  
-                  : parseFloat(product.variants[0].price.toFixed(2)),
-            },
+            ],
           }));
 
           setProductAttributes((prev) => ({
@@ -898,14 +795,13 @@ export default function CustomizeTemplatePage() {
               name: category.name,
               Description: category.description,
               link: "#",
-              media: {
-                mainMedia: {
-                  image: {
-                    url:
-                      category.image || "/placeholder.png",
-                  },
+              images: [
+                {
+                  id: category.id,
+                  url: category.image || "/placeholder.png",
+                  alt: `Image alt text for ${category.name}`,
                 },
-              },
+              ],
             })
           );
 
@@ -915,9 +811,6 @@ export default function CustomizeTemplatePage() {
           }));
           console.log("Mapped Categories:", mappedCategories);
         }
-
-        console.log("Categories", categoriesData.categories);
-        console.log("Products", productsData.products);
       }
     } catch (error) {
       console.error(
@@ -970,7 +863,7 @@ export default function CustomizeTemplatePage() {
         return rest;
       }
       case "AboutUs": {
-        const { description, secondaryDescription, ...rest } = value;
+        const { sections, ...rest } = value;
         return rest;
       }
       case "Policies": {
@@ -1167,6 +1060,58 @@ export default function CustomizeTemplatePage() {
       setIsSaving(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Authentication Required
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Please log in to customize your template.
+            </p>
+            <Button
+              onClick={() => router.push("/login")}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (user?.role !== "owner") {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Access Denied
+            </h2>
+            <p className="text-gray-600">
+              You don't have permission to access this page.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Replace the main render logic to show loading until data is ready
   if (isLoading) {

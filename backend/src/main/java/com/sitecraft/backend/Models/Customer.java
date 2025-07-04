@@ -20,10 +20,13 @@ public class Customer {
     private String gender;
     private String phone;
     private String status;
-
+    
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wishlist_id")
     @JsonIgnore

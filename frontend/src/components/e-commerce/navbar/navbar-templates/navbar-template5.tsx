@@ -32,6 +32,7 @@ export interface NavbarTemplate5Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
 }
 
 // Utility for font family (local, not imported)
@@ -63,6 +64,7 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
   MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -88,6 +90,7 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
         textColor={textColor}
         iconColor={iconColor}
         dividerColor={dividerColor}
+        onSearch={onSearch}
       />
 
       <nav
@@ -109,11 +112,11 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
             {/* Center/Right - Search Bar & Icons */}
             <div className="flex items-center space-x-6">
               <div className="hidden md:block w-64">
-                <FullSearchBar iconColor={iconColor} backgroundColor="bg-white/20" textColor={textColor} />
+                <FullSearchBar iconColor={iconColor} backgroundColor="bg-white/20" textColor={textColor} onSearch={onSearch} />
               </div>
 
               <div className="hidden md:flex">
-                <IconsGroup iconColor={iconColor} />
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
               </div>
 
               <button
@@ -140,7 +143,7 @@ export const NavbarTemplate5: React.FC<NavbarTemplate5Props> = ({
                 : undefined,
             }}
           >
-            <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+            <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
           </div>
         </div>
       </nav>

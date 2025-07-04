@@ -10,7 +10,7 @@ export function StorePolicyTableHeader() {
         </th>
         <th
           scope="col"
-          className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
+          className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-4/12"
         >
           Title
         </th>
@@ -18,7 +18,7 @@ export function StorePolicyTableHeader() {
           scope="col"
           className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider hidden sm:table-cell w-3/12"
         >
-          Last Updated
+          Description
         </th>
         <th
           scope="col"
@@ -28,7 +28,7 @@ export function StorePolicyTableHeader() {
         </th>
         <th
           scope="col"
-          className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-3/12"
+          className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider w-2/12"
         >
           Actions
         </th>

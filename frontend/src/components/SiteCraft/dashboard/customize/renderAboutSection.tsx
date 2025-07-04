@@ -379,9 +379,11 @@ export function RenderAboutSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={aboutAttributes.titleColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.titleColor && aboutAttributes.titleColor.includes("-[")
+                        ? aboutAttributes.titleColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
                       updateAboutAttributes({
@@ -391,9 +393,11 @@ export function RenderAboutSection({
                   />
                   <input
                     type="text"
-                    value={aboutAttributes.titleColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.titleColor && aboutAttributes.titleColor.includes("-[")
+                        ? aboutAttributes.titleColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
                       updateAboutAttributes({
@@ -553,7 +557,7 @@ export function RenderAboutSection({
               className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("description")}
             >
-              <span className="font-medium">Description</span>
+              <span className="font-medium">Sections</span>
               {expandedSections.description ? (
                 <ChevronDown size={18} />
               ) : (
@@ -575,14 +579,14 @@ export function RenderAboutSection({
                     >
                       <span className="ml-2">
                         {
-                          aboutAttributes.descriptionFont === "font-inter"
+                          aboutAttributes.sectionFont === "font-inter"
                             ? "Inter"
-                            : aboutAttributes.descriptionFont === "font-roboto"
+                            : aboutAttributes.sectionFont === "font-roboto"
                             ? "Roboto"
-                            : aboutAttributes.descriptionFont ===
+                            : aboutAttributes.sectionFont ===
                               "font-open-sans"
                             ? "Open Sans"
-                            : aboutAttributes.descriptionFont === "font-poppins"
+                            : aboutAttributes.sectionFont === "font-poppins"
                             ? "Poppins"
                             : "Lato" // default
                         }
@@ -593,7 +597,7 @@ export function RenderAboutSection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionFont: "font-inter" })
+                        updateAboutAttributes({ sectionFont: "font-inter" })
                       }
                     >
                       Inter
@@ -601,7 +605,7 @@ export function RenderAboutSection({
                     <DropdownMenuItem
                       onClick={() =>
                         updateAboutAttributes({
-                          descriptionFont: "font-roboto",
+                          sectionFont: "font-roboto",
                         })
                       }
                     >
@@ -610,7 +614,7 @@ export function RenderAboutSection({
                     <DropdownMenuItem
                       onClick={() =>
                         updateAboutAttributes({
-                          descriptionFont: "font-open-sans",
+                          sectionFont: "font-open-sans",
                         })
                       }
                     >
@@ -619,7 +623,7 @@ export function RenderAboutSection({
                     <DropdownMenuItem
                       onClick={() =>
                         updateAboutAttributes({
-                          descriptionFont: "font-poppins",
+                          sectionFont: "font-poppins",
                         })
                       }
                     >
@@ -627,7 +631,7 @@ export function RenderAboutSection({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionFont: "font-lato" })
+                        updateAboutAttributes({ sectionFont: "font-lato" })
                       }
                     >
                       Lato
@@ -642,25 +646,29 @@ export function RenderAboutSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={aboutAttributes.descriptionColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.sectionColor && aboutAttributes.sectionColor.includes("-[")
+                        ? aboutAttributes.sectionColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
                       updateAboutAttributes({
-                        descriptionColor: `text-[${e.target.value}]`,
+                        sectionColor: `text-[${e.target.value}]`,
                       });
                     }}
                   />
                   <input
                     type="text"
-                    value={aboutAttributes.descriptionColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.sectionColor && aboutAttributes.sectionColor.includes("-[")
+                        ? aboutAttributes.sectionColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
                       updateAboutAttributes({
-                        descriptionColor: `text-[${e.target.value}]`,
+                        sectionColor: `text-[${e.target.value}]`,
                       });
                     }}
                   />
@@ -678,17 +686,17 @@ export function RenderAboutSection({
                       className="hover:bg-gray-100 border-gray-300 w-full flex items-center justify-between"
                     >
                       <span className="ml-2">
-                        {aboutAttributes.descriptionSize === "text-sm"
+                        {aboutAttributes.sectionSize === "text-sm"
                           ? "Small"
-                          : aboutAttributes.descriptionSize === "text-base"
+                          : aboutAttributes.sectionSize === "text-base"
                           ? "Medium"
-                          : aboutAttributes.descriptionSize === "text-lg"
+                          : aboutAttributes.sectionSize === "text-lg"
                           ? "Large"
-                          : aboutAttributes.descriptionSize === "text-xl"
+                          : aboutAttributes.sectionSize === "text-xl"
                           ? "XL"
-                          : aboutAttributes.descriptionSize === "text-2xl"
+                          : aboutAttributes.sectionSize === "text-2xl"
                           ? "2XL"
-                          : aboutAttributes.descriptionSize === "text-3xl"
+                          : aboutAttributes.sectionSize === "text-3xl"
                           ? "3XL"
                           : "4XL"}
                       </span>
@@ -698,49 +706,49 @@ export function RenderAboutSection({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-sm" })
+                        updateAboutAttributes({ sectionSize: "text-sm" })
                       }
                     >
                       Small
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-base" })
+                        updateAboutAttributes({ sectionSize: "text-base" })
                       }
                     >
                       Medium
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-lg" })
+                        updateAboutAttributes({ sectionSize: "text-lg" })
                       }
                     >
                       Large
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-xl" })
+                        updateAboutAttributes({ sectionSize: "text-xl" })
                       }
                     >
                       XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-2xl" })
+                        updateAboutAttributes({ sectionSize: "text-2xl" })
                       }
                     >
                       2XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-3xl" })
+                        updateAboutAttributes({ sectionSize: "text-3xl" })
                       }
                     >
                       3XL
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        updateAboutAttributes({ descriptionSize: "text-4xl" })
+                        updateAboutAttributes({ sectionSize: "text-4xl" })
                       }
                     >
                       4XL
@@ -772,9 +780,11 @@ export function RenderAboutSection({
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
                     type="color"
-                    value={aboutAttributes.backgroundColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.backgroundColor && aboutAttributes.backgroundColor.includes("-[")
+                        ? aboutAttributes.backgroundColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="w-8 h-8 cursor-pointer bg-transparent"
                     onChange={(e) => {
                       updateAboutAttributes({
@@ -784,9 +794,11 @@ export function RenderAboutSection({
                   />
                   <input
                     type="text"
-                    value={aboutAttributes.backgroundColor
-                      .split("-[")[1]
-                      .slice(0, -1)}
+                    value={
+                      aboutAttributes.backgroundColor && aboutAttributes.backgroundColor.includes("-[")
+                        ? aboutAttributes.backgroundColor.split("-[")[1].slice(0, -1)
+                        : "#000000"
+                    }
                     className="flex-1 border-none bg-transparent focus:outline-none"
                     onChange={(e) => {
                       updateAboutAttributes({

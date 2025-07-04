@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import { Button } from "@/components/SiteCraft/ui/button";
 import { AboutSection } from "@/lib/store-info";
@@ -6,12 +6,30 @@ import { DeleteConfirmationDialog } from "@/components/SiteCraft/ui/deleteConfir
 import Link from "next/link";
 import { useState } from "react";
 
-export function AboutRecord({ section }: { section: AboutSection }) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+interface AboutRecordProps {
+  section: AboutSection;
+  onDelete: (sectionId: number) => Promise<void>;
+}
 
-  const handleDelete = () => {
-    console.log(`Deleting section: ${section.title}`);
-    setShowDeleteDialog(false);
+export function AboutRecord({ section, onDelete }: AboutRecordProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      console.log('🗑️ Deleting about us section:', section);
+      
+      await onDelete(section.id!);
+      console.log('✅ About us section deleted successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to delete about us section:', error);
+      alert(`Failed to delete section: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
   };
 
   return (
@@ -24,8 +42,14 @@ export function AboutRecord({ section }: { section: AboutSection }) {
         <div className="text-sm text-gray-900">{section.title}</div>
       </td>
 
-      <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-3/12">
+      <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-2/12">
         <div className="text-sm text-gray-500">{section.type}</div>
+      </td>
+
+      <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center hidden sm:table-cell w-2/12">
+        <div className="text-sm text-gray-500 max-w-xs truncate">
+          {section.content}
+        </div>
       </td>
 
       <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-2/12">
@@ -40,7 +64,7 @@ export function AboutRecord({ section }: { section: AboutSection }) {
         </span>
       </td>
 
-      <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-3/12">
+      <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center w-2/12">
         <div className="flex items-center justify-center space-x-3">
           <Link href={`/dashboard/store-info/about-edit?id=${section.id}`}>
             <Button
@@ -56,16 +80,17 @@ export function AboutRecord({ section }: { section: AboutSection }) {
             size="sm"
             className="text-red-600 hover:text-red-900"
             onClick={() => setShowDeleteDialog(true)}
+            disabled={deleting}
           >
-            Delete
+            {deleting ? 'Deleting...' : 'Delete'}
           </Button>
 
           <DeleteConfirmationDialog
             isOpen={showDeleteDialog}
             onClose={() => setShowDeleteDialog(false)}
             onConfirm={handleDelete}
-            title="Delete Product"
-            description="Are you sure you want to delete this section?"
+            title="Delete About Us Section"
+            description="Are you sure you want to delete this section? This action cannot be undone."
             itemName={section.title}
           />
         </div>

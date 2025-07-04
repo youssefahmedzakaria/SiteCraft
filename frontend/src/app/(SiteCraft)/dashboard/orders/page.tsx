@@ -4,18 +4,33 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
 import { useState } from "react";
-import { mockOrders } from "@/lib/orders";
+import { useOrderManagement } from "@/hooks/useOrderManagement";
 import { OrderRecord } from "@/components/SiteCraft/dashboard/orders/orderRecord";
 import { OrderTableHeader } from "@/components/SiteCraft/dashboard/orders/orderTableHeader";
 import { FilterButton } from "@/components/SiteCraft/dashboard/orders/ordersFilter";
 import { format } from "date-fns";
-import { X } from "lucide-react";
+import { X, AlertCircle, RefreshCw } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
   const [dateRange, setDateRange] = useState<
     { from: Date; to: Date } | undefined
   >();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    orders,
+    isLoading,
+    error,
+    isUpdating,
+    clearError,
+    refetchOrders
+  } = useOrderManagement();
+
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const orderStatuses = [
     "All Statuses",
@@ -34,11 +49,29 @@ export default function OrdersPage() {
     setDateRange(filters.dateRange);
   };
 
-  // Filter orders based on selected filters
-  const filteredOrders = mockOrders.filter((order) => {
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  // Filter orders based on selected filters and search
+  const filteredOrders = orders.filter((order) => {
     // Filter by status
     if (statusFilter !== "All Statuses" && order.status !== statusFilter) {
       return false;
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const orderId = order.id.toString();
+      const customerName = order.customer?.name || '';
+      const customerEmail = order.customer?.email || '';
+      
+      if (!orderId.includes(searchLower) && 
+          !customerName.toLowerCase().includes(searchLower) &&
+          !customerEmail.toLowerCase().includes(searchLower)) {
+        return false;
+      }
     }
 
     // Filter by date range
@@ -51,6 +84,43 @@ export default function OrdersPage() {
 
     return true;
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading orders...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view and manage orders.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -66,29 +136,63 @@ export default function OrdersPage() {
           </h2>
         </div>
 
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="border-t border-logo-border mt-6 space-y-2 pt-3">
           {/* Search and filters */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Search Bar */}
-            <SearchBar placeholder="Search orders" />
-
-            {/* Filter Button */}
-            <FilterButton
-              onApplyFilters={handleFiltersApply}
-              statuses={orderStatuses}
-              initialStatus={statusFilter}
-              initialDateRange={dateRange}
-            />
-
-            {/* Export button */}
-            <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-              <span>Export Orders</span>
-            </Button>
+            <div className="flex-grow">
+              <SearchBar 
+                placeholder="Search orders by ID, customer name, or email" 
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <FilterButton
+                onApplyFilters={handleFiltersApply}
+                statuses={orderStatuses}
+                initialStatus={statusFilter}
+                initialDateRange={dateRange}
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <Button
+                onClick={refetchOrders}
+                variant="outline"
+                className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
+              </Button>
+            </div>
+            <div className="flex-shrink-0">
+              <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                <span>Export Orders</span>
+              </Button>
+            </div>
           </div>
 
           {/* Active filter indicators */}
-          {(statusFilter !== "All Statuses" || dateRange) && (
-            <div className="flex items-center gap-2">
+          {(statusFilter !== "All Statuses" || dateRange || searchQuery) && (
+            <div className="flex items-center gap-2 flex-wrap">
               {statusFilter !== "All Statuses" && (
                 <div
                   className={`flex px-3 py-1 rounded-full text-sm gap-1 items-center ${
@@ -115,6 +219,18 @@ export default function OrdersPage() {
 
                       // Apply the reset filters immediately
                       handleFiltersApply(resetFilters);
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+              {searchQuery && (
+                <div className="flex bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm gap-1 items-center">
+                  <span>Search: {searchQuery}</span>
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
                     }}
                   >
                     <X size={16} />
@@ -152,10 +268,23 @@ export default function OrdersPage() {
             <table className="min-w-full divide-y divide-logo-border">
               <OrderTableHeader />
               <tbody className="bg-white divide-y divide-logo-border">
-                {/* Sample order rows */}
-                {filteredOrders.map((order) => (
-                  <OrderRecord key={order.id} order={order} />
-                ))}
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order) => (
+                    <OrderRecord key={order.id} order={order} />
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-6 py-10 text-center text-gray-500"
+                    >
+                      {orders.length === 0 
+                        ? "No orders found. Try refreshing the page."
+                        : "No orders found matching your search criteria."
+                      }
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

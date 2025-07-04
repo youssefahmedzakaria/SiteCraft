@@ -26,7 +26,7 @@ export const PieChartCard: FC<PieChartCardProps> = ({
   nameKey,
   title,
   subtitle,
-  colors = ['#cc7860', '#5d8aa8', '#6b8e23', '#b8860b', '#8b4513']
+  colors = ['#4dbf38', '#ff6b35', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff']
 }) => {
   return (
     <div className="p-4 md:p-6 border rounded-lg border-logo-border bg-white">
@@ -41,7 +41,7 @@ export const PieChartCard: FC<PieChartCardProps> = ({
               cy="50%"
               labelLine={false}
               outerRadius={80}
-              fill="rgb(136, 132, 216)"
+              fill="#4dbf38"
               dataKey={dataKey}
               nameKey={nameKey}
             >

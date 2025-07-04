@@ -1,8 +1,12 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "category")
@@ -18,22 +22,29 @@ public class Category {
 
     private String image;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "store_id")
     @JsonIgnore
     private Store store;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Product> products;
+    @JsonIgnore
+    private List<CategoryProduct> categoryProducts;
 
     // Constructors
-    public Category() {}
+    public Category() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Category(String name, String description, String image, Store store) {
         this.name = name;
         this.description = description;
         this.image = image;
         this.store = store;
+        this.createdAt = LocalDateTime.now();
     }
 
     // Getters and setters
@@ -69,6 +80,14 @@ public class Category {
         this.image = image;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Store getStore() {
         return store;
     }
@@ -77,11 +96,32 @@ public class Category {
         this.store = store;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<CategoryProduct> getCategoryProducts() {
+        return categoryProducts;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setCategoryProducts(List<CategoryProduct> categoryProducts) {
+        this.categoryProducts = categoryProducts;
+    }
+
+    // Get products as a list
+    @JsonIgnore
+    public List<Product> getProducts() {
+        if (categoryProducts == null) return null;
+        return categoryProducts.stream()
+                .map(CategoryProduct::getProduct)
+                .collect(Collectors.toList());
+    }
+
+    // Helper methods for product management
+    public void addProduct(Product product) {
+        CategoryProduct categoryProduct = new CategoryProduct();
+        categoryProduct.setCategory(this);
+        categoryProduct.setProduct(product);
+        this.categoryProducts.add(categoryProduct);
+    }
+
+    public void removeProduct(Product product) {
+        this.categoryProducts.removeIf(cp -> cp.getProduct().equals(product));
     }
 }

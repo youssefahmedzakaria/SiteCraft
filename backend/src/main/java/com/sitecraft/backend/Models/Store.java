@@ -19,8 +19,6 @@ public class Store {
 
     private String logo;
 
-    private String subdomain;
-
     private String description;
 
     private String phoneNumber;
@@ -47,6 +45,11 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingInfo> shippingInfo = new ArrayList<>();
 
+    @Column(name = "subdomain", unique = true)
+    private String subdomain;
+
+    private String status;
+
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
@@ -60,7 +63,6 @@ public class Store {
         this.storeName = storeName;
         this.storeType = storeType;
         this.logo = logo;
-        this.subdomain = subdomain;
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
@@ -206,6 +208,14 @@ public class Store {
         this.shippingInfo = shippingInfo;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public List<CustomizedTemplateSection> getCustomizedTemplate() {
         return customizedTemplate;
     }
@@ -213,4 +223,5 @@ public class Store {
     public void setCustomizedTemplate(List<CustomizedTemplateSection> customizedTemplate) {
         this.customizedTemplate = customizedTemplate;
     }
+
 }

@@ -4,6 +4,7 @@ import com.sitecraft.backend.DTOs.ProductCreateDTO;
 import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.ProductImage;
 import com.sitecraft.backend.Services.ProductService;
+import com.sitecraft.backend.Services.LowStockNotificationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/products")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
 public class ProductController {
     
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private LowStockNotificationService lowStockNotificationService;
 
     @GetMapping
     public ResponseEntity<?> getAllProducts(HttpSession session) {
@@ -34,11 +40,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getAllProducts(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Products retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -60,11 +69,12 @@ public class ProductController {
             }
 
             Product product = productService.getProductById(id, storeId);
+            com.sitecraft.backend.DTOs.ProductDTO productDTO = new com.sitecraft.backend.DTOs.ProductDTO(product);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product retrieved successfully");
-            response.put("data", product);
+            response.put("data", productDTO);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -90,6 +100,10 @@ public class ProductController {
             ObjectMapper mapper = new ObjectMapper();
             ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
             Product product = productService.createProductWithImages(productDTO, storeId, images);
+            
+            // Check low stock level for the newly created product
+            lowStockNotificationService.checkAndSendLowStockNotification(product);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product created successfully");
@@ -118,10 +132,16 @@ public class ProductController {
             ObjectMapper mapper = new ObjectMapper();
             ProductCreateDTO productDTO = mapper.readValue(productJson, ProductCreateDTO.class);
             Product product = productService.updateProductWithImages(id, productDTO, storeId, images);
+            
+            // Check low stock level for the updated product
+            lowStockNotificationService.checkAndSendLowStockNotification(product);
+            
+            com.sitecraft.backend.DTOs.ProductDTO productResponseDTO = new com.sitecraft.backend.DTOs.ProductDTO(product);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Product updated successfully");
-            response.put("data", product);
+            response.put("data", productResponseDTO);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -170,8 +190,14 @@ public class ProductController {
     */
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getProductStatistics(@RequestParam Long storeId) {
+    public ResponseEntity<Map<String, Object>> getProductStatistics(HttpSession session) {
         try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
             Map<String, Object> stats = productService.getProductStatistics(storeId);
 
             Map<String, Object> response = new HashMap<>();
@@ -199,11 +225,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getLowStockItems(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Low stock items retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -225,11 +254,14 @@ public class ProductController {
             }
 
             List<Product> products = productService.getOutOfStockItems(storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> productDTOs = products.stream()
+                    .map(product -> new com.sitecraft.backend.DTOs.ProductDTO(product))
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Out of stock items retrieved successfully");
-            response.put("data", products);
+            response.put("data", productDTOs);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -253,13 +285,11 @@ public class ProductController {
             @SuppressWarnings("unchecked")
             List<Long> productIds = (List<Long>) discountData.get("productIds");
             String discountType = (String) discountData.get("discountType");
-            Double discountValue = (Double) discountData.get("discountValue");
-            Double minCap = (Double) discountData.get("minCap");
-            Double percentageMax = (Double) discountData.get("percentageMax");
-            Double maxCap = (Double) discountData.get("maxCap");
+            Number discountValueNum = (Number) discountData.get("discountValue");
+            Double discountValue = discountValueNum == null ? null : discountValueNum.doubleValue();
 
             Map<String, Object> result = productService.applyDiscountToProducts(
-                    productIds, discountType, discountValue, minCap, percentageMax, maxCap, storeId);
+                    productIds, discountType, discountValue, storeId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -339,4 +369,54 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    @DeleteMapping("/{productId}/images/{imageId}")
+    public ResponseEntity<?> deleteProductImage(
+        @PathVariable Long productId,
+        @PathVariable Long imageId,
+        HttpSession session
+    ) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+            productService.deleteProductImage(productId, imageId, storeId);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Image deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    // ==================== LOW STOCK NOTIFICATION ENDPOINTS ====================
+
+    @GetMapping("/low-stock-notifications")
+    public ResponseEntity<?> getLowStockNotifications(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            Map<String, Object> stats = lowStockNotificationService.getLowStockStatistics(storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Low stock notifications retrieved successfully");
+            response.put("data", stats);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
 }

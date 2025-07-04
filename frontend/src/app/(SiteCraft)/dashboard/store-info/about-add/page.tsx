@@ -1,211 +1,192 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/SiteCraft/ui/button";
-import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
-import Link from "next/link";
-import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/SiteCraft/ui/button";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/SiteCraft/ui/card";
+import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
+import { useStoreInfo } from "@/hooks/useStoreInfo";
+import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Alert, AlertDescription } from "@/components/SiteCraft/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
-export default function AddAboutSectionPage() {
+export default function AddAboutUsPage() {
   const router = useRouter();
+  const { addNewAboutUs, aboutLoading } = useStoreInfo();
+  const { isAuthenticated } = useAuth();
+  
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     type: "Text",
-    status: "Visible",
+    status: "Visible"
   });
+  const [error, setError] = useState<string | null>(null);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  console.log('📄 Add About Us Page - Current state:', { formData, aboutLoading, error });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new about us sections.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const handleSelectClick = (field: string) => {
-    if (field === "type") {
-      setTypeDropdownOpen((prev) => !prev);
-    } else if (field === "status") {
-      setStatusDropdownOpen((prev) => !prev);
-    }
-  };
-
-  const handleSelectBlur = (field: string) => {
-    setTimeout(() => {
-      if (field === "type") {
-        setTypeDropdownOpen(false);
-      } else if (field === "status") {
-        setStatusDropdownOpen(false);
-      }
-    }, 200);
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    
     try {
-      console.log("Submitting about section:", formData);
-      router.push("/dashboard/store-info");
-    } catch (error) {
-      console.error("Error adding about section:", error);
-    } finally {
-      setIsSubmitting(false);
+      setError(null);
+      console.log('🔄 Submitting new about us section...', formData);
+      
+      await addNewAboutUs(formData);
+      console.log('✅ About us section added successfully, redirecting...');
+      
+      router.push('/dashboard/store-info');
+    } catch (err) {
+      console.error('❌ Failed to add about us section:', err);
+      setError(err instanceof Error ? err.message : 'Failed to add about us section');
     }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-
+      
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        {/* Header section with title and subtitle */}
-        <div className="mb-6 space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Add About Section</h1>
-          <h2 className="text-lg md:text-xl text-gray-600">
-            Create a new about section for your store
-          </h2>
-        </div>
+        
+          {/* Header */}
+          <div className="mb-6">
+          
+            <h1 className="text-2xl md:text-3xl font-bold">Add New About Us Section</h1>
+            <p className="text-gray-600 mt-2">Create a new section for your about us page</p>
+          </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Title <span className="text-red-500">*</span>
-              </label>
-              <Input
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                placeholder="Section Title"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                The title will be displayed to your customers.
-              </p>
-            </div>
+          {/* Error Alert */}
+          {error && (
+            <Alert className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-            <div className="mb-6">
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Content <span className="text-red-500">*</span>
-              </label>
-              <Textarea
-                id="content"
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                required
-                rows={6}
-                placeholder="Section Content"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                A detailed description for this section that will appear on your
-                store.
-              </p>
-            </div>
+          {/* Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>About Us Section Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                    Section Title <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="title"
+                    name="title"
+                    required
+                    placeholder="e.g., Our Story, Mission Statement"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Section Type
-                </label>
-                <div className="relative">
+                <div>
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                    Section Type
+                  </label>
                   <select
                     id="type"
                     name="type"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-logo-dark-button focus:border-transparent"
                     value={formData.type}
-                    onChange={handleChange}
-                    onClick={() => handleSelectClick("type")}
-                    onBlur={() => handleSelectBlur("type")}
-                    required
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
+                    onChange={(e) => handleInputChange('type', e.target.value)}
                   >
                     <option value="Text">Text</option>
-                    <option value="Image">Image</option>
                     <option value="Mission">Mission</option>
                     <option value="Team">Team</option>
                     <option value="History">History</option>
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    {typeDropdownOpen ? (
-                      <ChevronUp className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-500" />
-                    )}
-                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Visibility Status
-                </label>
-                <div className="relative">
+                <div>
+                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                    Content <span className="text-red-500">*</span>
+                  </label>
+                  <Textarea
+                    id="content"
+                    name="content"
+                    required
+                    placeholder="Enter the content for this section..."
+                    rows={8}
+                    value={formData.content}
+                    onChange={(e) => handleInputChange('content', e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
                   <select
                     id="status"
                     name="status"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-logo-dark-button focus:border-transparent"
                     value={formData.status}
-                    onChange={handleChange}
-                    onClick={() => handleSelectClick("status")}
-                    onBlur={() => handleSelectBlur("status")}
-                    required
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-gray-300 appearance-none cursor-pointer"
+                    onChange={(e) => handleInputChange('status', e.target.value)}
                   >
                     <option value="Visible">Visible</option>
                     <option value="Hidden">Hidden</option>
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    {statusDropdownOpen ? (
-                      <ChevronUp className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-500" />
-                    )}
-                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex justify-start space-x-4">
-              <Button
-                type="submit"
-                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Save Section"}
-              </Button>
-              <Link href="/dashboard/store-info">
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </Link>
-            </div>
-          </form>
-        </div>
+                <div className="flex justify-end space-x-4">
+                  <Link href="/dashboard/store-info">
+                    <Button type="button" variant="outline">
+                      Cancel
+                    </Button>
+                  </Link>
+                  <Button type="submit" disabled={aboutLoading} className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+                    {aboutLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Add Section
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        
       </main>
     </div>
   );

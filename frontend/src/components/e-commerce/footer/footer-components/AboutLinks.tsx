@@ -91,24 +91,44 @@ export const AboutLinks = ({
       {links.map(
         (link, index) =>
           link.isShown && (
-            <Link
-              key={index}
-              href={link.href}
-              className="hover:underline text-center hover:opacity-80 transition-opacity"
-              style={{
-                fontFamily: link.font ? getFontFamily(link.font) : undefined,
-                fontSize: getFontSize(
-                  link.fontSize || "text-sm",
-                  shouldShowMobile
-                ),
-                fontWeight: link.fontWeight?.replace("font-", "") || "normal",
-                color: link.fontColor?.includes("[")
-                  ? link.fontColor.split("-[")[1]?.slice(0, -1) || "#374151"
-                  : "#374151",
-              }}
-            >
-              {link.label}
-            </Link>
+            isCustomize ? (
+              <span
+                key={index}
+                className="text-center opacity-60 cursor-not-allowed"
+                style={{
+                  fontFamily: link.font ? getFontFamily(link.font) : undefined,
+                  fontSize: getFontSize(
+                    link.fontSize || "text-sm",
+                    shouldShowMobile
+                  ),
+                  fontWeight: link.fontWeight?.replace("font-", "") || "normal",
+                  color: link.fontColor?.includes("[")
+                    ? link.fontColor.split("-[")[1]?.slice(0, -1) || "#374151"
+                    : "#374151",
+                }}
+              >
+                {link.label}
+              </span>
+            ) : (
+              <Link
+                key={index}
+                href={link.href}
+                className="hover:underline text-center hover:opacity-80 transition-opacity"
+                style={{
+                  fontFamily: link.font ? getFontFamily(link.font) : undefined,
+                  fontSize: getFontSize(
+                    link.fontSize || "text-sm",
+                    shouldShowMobile
+                  ),
+                  fontWeight: link.fontWeight?.replace("font-", "") || "normal",
+                  color: link.fontColor?.includes("[")
+                    ? link.fontColor.split("-[")[1]?.slice(0, -1) || "#374151"
+                    : "#374151",
+                }}
+              >
+                {link.label}
+              </Link>
+            )
           )
       )}
     </div>

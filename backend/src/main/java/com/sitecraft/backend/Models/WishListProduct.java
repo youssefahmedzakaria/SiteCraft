@@ -2,6 +2,7 @@ package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wishlistproduct")
@@ -12,6 +13,9 @@ public class WishListProduct {
     private Long id;
 
     private String sku;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wishlist_id")
@@ -24,6 +28,7 @@ public class WishListProduct {
     private Product product;
 
     public WishListProduct() {
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -40,6 +45,14 @@ public class WishListProduct {
 
     public void setSku(String sku) {
         this.sku = sku;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public WishList getWishList() {

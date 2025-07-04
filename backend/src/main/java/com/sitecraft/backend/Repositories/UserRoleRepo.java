@@ -10,4 +10,7 @@ public interface UserRoleRepo extends JpaRepository<UserRole, Long> {
     List<UserRole> findByRoleAndStoreId(String role, Long storeId);
     UserRole findByStoreIdAndUser(Long storeId, Users userId);
     void deleteByUserAndStoreId(Users userId, Long storeId);
+    List<UserRole> findByUserEmail(String email);
+    List<UserRole> findByRoleAndStoreIdIsNull(String role);
+    void deleteByUserAndRoleAndStoreIdIsNull(Users user, String role);
 }

@@ -7,15 +7,20 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { sidebarElements } from "@/lib/sidebarElements";
+import { getFilteredSidebarElements } from "@/lib/sidebarElements";
 import { SidebarElementComponent } from "./sidebarElementComponent";
 import { CornerDownRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const isReportsActive = pathname === "/dashboard/analytics/reports";
+  
+  // Filter sidebar elements based on user role
+  const filteredSidebarElements = getFilteredSidebarElements(user?.role || null);
 
   return (
     <div>
@@ -50,7 +55,7 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex justify-center mt-4 lg:mt-1">
           <Link
-            href="/dashboard"
+            href="http://localhost:3000/"
             className="transition-colors hover:opacity-90"
           >
             <div className="flex items-center">
@@ -73,17 +78,26 @@ export function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex flex-col space-y-2 mt-6">
-          {sidebarElements.map((element) => (
+        <nav className="flex flex-col space-y-1">
+          {filteredSidebarElements.map((element, index) => (
             <div key={element.id}>
-              {/* Add a divider before Account Settings */}
-              {element.id === "10" && (
+              {/* Add a divider before Logout button for all users */}
+              {element.title === 'Log Out' && (
                 <div className="border-t border-primary-foreground my-2 mx-4"></div>
               )}
 
-              <Link href={element.destination} onClick={() => setIsOpen(false)}>
-                <SidebarElementComponent element={element} />
-              </Link>
+              {/* Handle logout differently - don't wrap in Link */}
+              {element.title === 'Log Out' ? (
+                <div onClick={() => setIsOpen(false)}>
+                  <SidebarElementComponent element={element} />
+                </div>
+              ) : (
+                <Link href={element.destination} onClick={() => setIsOpen(false)}>
+                  <SidebarElementComponent element={element} />
+                </Link>
+              )}
+              
+              {/* Only show Reports submenu if Analytics is visible and user is on analytics page */}
               {element.destination === "/dashboard/analytics" &&
                 pathname.startsWith("/dashboard/analytics") && (
                   <Link

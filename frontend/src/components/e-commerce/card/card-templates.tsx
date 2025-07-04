@@ -72,6 +72,41 @@ interface FlexibleCardProps {
   contentClassName?: string;
 }
 
+const getFontFamily = (fontFamily: string) => {
+  switch (fontFamily) {
+    case "font-inter":
+      return "Inter, sans-serif";
+    case "font-roboto":
+      return "Roboto, sans-serif";
+    case "font-open-sans":
+      return "Open Sans, sans-serif";
+    case "font-poppins":
+      return "Poppins, sans-serif";
+    case "font-lato":
+      return "Lato, sans-serif";
+    case "font-serif":
+      return "serif";
+    default:
+      return "system-ui, sans-serif";
+  }
+};
+
+const getFontSize = (fontSize: string) => {
+  const sizeMap: Record<string, string> = {
+    "text-xs": "0.75rem",
+    "text-sm": "0.875rem",
+    "text-base": "1rem",
+    "text-lg": "1.125rem",
+    "text-xl": "1.25rem",
+    "text-2xl": "1.5rem",
+    "text-3xl": "1.875rem",
+    "text-4xl": "2.25rem",
+    "text-5xl": "3rem",
+    "text-6xl": "3.75rem",
+  };
+  return sizeMap[fontSize] || "1rem";
+};
+
 export default function FlexibleCard({
   isClickable,
   // Core data
@@ -180,23 +215,22 @@ export default function FlexibleCard({
     "/placeholder.png?height=300&width=300";
   const secondaryImageUrl = item.media?.items?.[1]?.image?.url;
 
-  // Get price value - handle multiple price structures
+  // Get price value - handle new price structure
   const getPrice = () => {
-    // Use priceAfterDiscount if present, otherwise fallback to value/price
-    if (item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount)) {
-      return item.price.priceAfterDiscount;
+    // Calculate discounted price if discountType and discountValue are present
+    if (item.discountType && typeof item.discountValue === 'number') {
+      if (item.discountType === 'percentage') {
+        return item.price - (item.price * item.discountValue) / 100;
+      } else if (item.discountType === 'fixed amount') {
+        return item.price - item.discountValue;
+      }
     }
-    return item.price?.value || item.price?.price || 0;
-  }
+    return item.price || 0;
+  };
 
   const getOriginalPrice = () => {
-    // If priceAfterDiscount is present, original is price/ value
-    if (item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount)) {
-      return item.price?.price || item.price?.value || null;
-    }
-    // Otherwise, check for originalPrice fields
-    return item.price?.originalPrice || item.originalPrice || null;
-  }
+    return item.price || null;
+  };
 
   const formatPrice = (price: number) => {
     return price.toFixed(2);
@@ -263,8 +297,7 @@ export default function FlexibleCard({
 
   // Wrap content in Link if needed
   const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
-    if (!href) return <>{children}</>;
-
+    if (!isClickable || !href || href === "#") return <>{children}</>;
     return (
       <Link
         href={href}
@@ -290,13 +323,17 @@ export default function FlexibleCard({
 
     const currentPrice = getPrice();
     const originalPrice = getOriginalPrice();
-    const isDiscounted = item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount);
-    const isOnSale = originalPrice && originalPrice > currentPrice;
-    const discountPercent = originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : null;
+    const isDiscounted = item.discountType && typeof item.discountValue === 'number' && currentPrice < originalPrice;
+    const discountPercent =
+      item.discountType === 'percentage' && typeof item.discountValue === 'number'
+        ? item.discountValue
+        : item.discountType === 'fixed amount' && typeof item.discountValue === 'number' && originalPrice
+        ? Math.round((item.discountValue / originalPrice) * 100)
+        : null;
 
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        {isDiscounted || isOnSale ? (
+        {isDiscounted ? (
           <>
             <span className={cn("font-semibold", textColor)}>${formatPrice(currentPrice)}</span>
             <span className="text-sm line-through text-gray-500">${formatPrice(originalPrice)}</span>
@@ -314,13 +351,29 @@ export default function FlexibleCard({
   const DiscountBadge = () => {
     const currentPrice = getPrice();
     const originalPrice = getOriginalPrice();
-    const isDiscounted = item.price?.priceAfterDiscount != null && !isNaN(item.price.priceAfterDiscount);
-    const isOnSale = originalPrice && originalPrice > currentPrice;
-    const discountPercent = originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : null;
-    if ((isDiscounted || isOnSale) && discountPercent && discountPercent > 0) {
+    const isDiscounted = item.discountType && typeof item.discountValue === 'number' && currentPrice < originalPrice;
+    const discountPercent =
+      item.discountType === 'percentage' && typeof item.discountValue === 'number'
+        ? item.discountValue
+        : item.discountType === 'fixed amount' && typeof item.discountValue === 'number' && originalPrice
+        ? Math.round((item.discountValue / originalPrice) * 100)
+        : null;
+    if (isDiscounted && discountPercent && discountPercent > 0) {
       return (
         <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
           {discountPercent}% OFF
+        </span>
+      );
+    }
+    return null;
+  };
+
+  // Helper to render out of stock badge
+  const OutOfStockBadge = () => {
+    if (type === "product" && item.currentTotalStock === 0) {
+      return (
+        <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700 rounded-md align-middle">
+          Out of Stock
         </span>
       );
     }
@@ -335,12 +388,18 @@ export default function FlexibleCard({
     case "overlay":
       return (
         <div
-          className={cn("group", bgColor, finalTitleFont, textColor, className)}
+          className={cn("group",className)}
+          style={{backgroundColor: bgColor.includes("[")
+            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : bgColor,
+            color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+            fontFamily: getFontFamily(fontFamily),
+          }}
         >
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden",
+                "relative overflow-hidden",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -348,8 +407,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={imageUrl || "/placeholder.png"}
-                alt={item.name || "Category image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className={cn(
@@ -365,23 +424,32 @@ export default function FlexibleCard({
                     overlayColor
                   )}
                 >
-                  <div className={cn("text-center p-4", contentClassName)}>
-                    <h3 className={cn(textColor, titleFontSize, "font-bold flex items-center justify-center gap-2")}>{item.name}<DiscountBadge /></h3>
+                  <div className={cn("text-center p-4", contentClassName)}
+                   style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>
+                    <h3 className={cn( "font-bold flex items-center justify-center gap-2")} style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>{item.name}<DiscountBadge /><OutOfStockBadge /></h3>
                     {showSubtitle && showDescription && (
-                      <p className={cn(textColor, "opacity-80 text-sm mt-1")}>
+                      <p className={cn( "opacity-80 text-sm mt-1")}style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}>
                         {description}
                       </p>
                     )}
                     <PriceDisplay
-                      className={cn("justify-center mt-2", textColor)}
+                      className={cn("justify-center mt-2" ,textColor) }
                     />
                     {showCta && (
                       <div
                         onClick={handleCtaClick}
                         className={cn(
                           "mt-3 text-sm font-medium border border-white/60 px-3 py-1 rounded-full inline-block cursor-pointer",
-                          textColor
                         )}
+                        style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                          fontFamily: getFontFamily(fontFamily),
+                        }}
                       >
                         {ctaText}
                       </div>
@@ -400,7 +468,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden",
+                "relative overflow-hidden",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -408,8 +476,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={imageUrl || "/placeholder.png"}
-                alt={item.name || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover"
@@ -417,7 +485,11 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("mt-2", contentClassName)}>
-            {showTitle && <h3 className={cn("text-sm", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
+            {showTitle && <h3 className={cn("text-sm","flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),
+                    }}
+            >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>}
             <PriceDisplay className="text-sm mt-1" />
           </div>
         </div>
@@ -425,11 +497,15 @@ export default function FlexibleCard({
 
     case "hover":
       return (
-        <div className={cn("group", finalTitleFont, textColor, className)}>
+        <div className={cn("group", className)}
+         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+          fontFamily: getFontFamily(fontFamily),       
+        }}
+        >
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden mb-3",
+                "relative overflow-hidden mb-3",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -437,8 +513,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={imageUrl || "/placeholder.png"}
-                alt={item.name || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className={cn(
@@ -450,8 +526,8 @@ export default function FlexibleCard({
               {secondaryImageUrl && hoverEffect && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Image
-                    src={secondaryImageUrl || "/placeholder.png"}
-                    alt={`${item.name} - alternate view`}
+                    src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     className="object-cover"
@@ -500,8 +576,14 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor, titleFontSize, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
-            {showSubtitle && <p className={cn("text-sm opacity-70", textColor)}>{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    fontFamily: getFontFamily(fontFamily),}}
+            >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>}
+            {showSubtitle && <p className={cn("text-sm opacity-70")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}
+            >{description}</p>}
             {showReviews && type === "product" && (
               <div className="flex items-center">
                 <div className="flex">
@@ -532,20 +614,24 @@ export default function FlexibleCard({
     case "featured":
       return (
         <div
-          className={cn("group", bgColor, textColor, finalTitleFont, className)}
+          className={cn("group", className)}
+           style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                  fontFamily: getFontFamily(fontFamily),
+                  backgroundColor: bgColor?.includes("[") ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : bgColor, 
+          }}
         >
           <ContentWrapper>
             <div
               className={cn(
-                "relative h-64 md:h-80 bg-slate-100 overflow-hidden",
+                "relative h-64 md:h-80 overflow-hidden",
                 radiusClass,
                 cardShadow,
                 imageClassName
               )}
             >
               <Image
-                src={imageUrl || "/placeholder.png"}
-                alt={item.name || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className={cn(
@@ -557,9 +643,15 @@ export default function FlexibleCard({
               {showTitle && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                   <div className={cn("p-6", contentClassName)}>
-                    <h3 className={cn(textColor, textColor, "font-bold flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>
+                    <h3 className={cn("font-bold flex items-center gap-2")}
+                       style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                        fontSize: getFontSize(fontFamily),
+                    }}
+                      >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>
                     {showSubtitle && showDescription && (
-                      <p className={cn(textColor, "opacity-80 mt-1")}>
+                      <p className={cn("opacity-80 mt-1")}
+                       style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}>
                         {description}
                       </p>
                     )}
@@ -585,11 +677,14 @@ export default function FlexibleCard({
 
     default: // default variant
       return (
-        <div className={cn("group", finalTitleFont, textColor, className)}>
+        <div className={cn("group" ,className)}
+         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                   fontFamily: getFontFamily(fontFamily),}}
+        >
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden mb-3",
+                "relative overflow-hidden mb-3",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -597,8 +692,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={imageUrl || "/placeholder.png"}
-                alt={item.name || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className={cn(
@@ -629,8 +724,14 @@ export default function FlexibleCard({
             </div>
           </ContentWrapper>
           <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", textColor, "flex items-center gap-2")}>{item.name}<DiscountBadge /></h3>}
-            {showSubtitle && <p className={cn("text-sm", textColor)}>{description}</p>}
+            {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    fontSize: getFontSize(fontFamily),
+                    }}
+            >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>}
+            {showSubtitle && <p className={cn("text-sm")}
+             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                    }}>{description}</p>}
             <div className="flex justify-between items-center">
               <PriceDisplay />
               {showCta && (
@@ -644,9 +745,7 @@ export default function FlexibleCard({
                     }
                   }}
                   className={cn(
-                    "text-xs text-white px-3 py-1 rounded-full",
-                    buttonBgClass,
-                    buttonHoverClass
+                    "text-xs text-white bg-blue-500 px-3 py-1 rounded-full hover:bg-blue-600 transition-colors duration-300 ",
                   )}
                 >
                   {ctaText}

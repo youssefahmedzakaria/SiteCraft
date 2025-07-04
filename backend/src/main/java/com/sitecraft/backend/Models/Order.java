@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,11 +17,12 @@ public class Order {
 
     private Double price;
     private String status;
+    @Column(name = "issue_date")
     private java.time.LocalDateTime issueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
+    @JsonIgnoreProperties({"orders", "wishList", "shoppingCart", "store", "reviews"})
     private Customer customer;
 
     @OneToOne

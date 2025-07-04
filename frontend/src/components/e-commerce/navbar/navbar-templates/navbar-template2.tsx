@@ -32,6 +32,7 @@ export interface NavbarTemplate2Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
 }
 
 // Utility for font family (local, not imported)
@@ -63,6 +64,7 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
   menuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -89,6 +91,7 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
         iconColor={iconColor}
         MobileMenuItems={MobileMenuItems || []}
         dividerColor={dividerColor}
+        onSearch={onSearch}
       />
 
       <nav
@@ -117,13 +120,16 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
                   iconColor={iconColor}
                   backgroundColor="bg-white/20"
                   textColor={textColor}
+                  onSearch={onSearch}
                 />
-                <IconsGroup iconColor={iconColor} />
+                <div className="hidden md:flex">
+                  <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
+                </div>
               </div>
             </div>
             {/* Menu items centered below logo */}
             <div className="flex justify-center h-10 mt-4">
-              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+              <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
             </div>
           </div>
 

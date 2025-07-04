@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { Card, CardContent, CardTitle } from "@/components/SiteCraft/ui/card";
@@ -9,6 +10,8 @@ import { PricingSection } from "@/components/SiteCraft/dashboard/products/add/pr
 import { LowStockSection } from "@/components/SiteCraft/dashboard/products/add/lowStockSection";
 import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
 import { CustomVariationSection } from "@/components/SiteCraft/dashboard/products/add/customVariationSection";
+import { useProductManagement } from "@/hooks/useProductManagement";
+import { ProductCreateDTO, ProductAttributeDTO, ProductVariantDTO, VariantAttributeDTO, getCategories } from "@/lib/products";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +20,14 @@ import {
 } from "@/components/SiteCraft/ui/dialog";
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AddProductPage() {
+  const router = useRouter();
+  const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
+  const { isAuthenticated } = useAuth();
+  
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
     | "Product's Options and Variations"
@@ -30,56 +39,173 @@ export default function AddProductPage() {
     "Stock Management",
   ];
 
-  // Initialize with default variations
-  const [customVariations, setCustomVariations] = useState<
-    { name: string; values: string[] }[]
-  >([]);
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to add new products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Add state for stock modal
+  // Form state for basic product info
+  const [basicFormData, setBasicFormData] = useState({
+    name: '',
+    description: '',
+    categoryId: undefined as number | undefined, // Remove default category
+    categoryIds: [] as number[], // Start with empty array
+  });
+
+  // Discount settings
+  const [discountSettings, setDiscountSettings] = useState({
+    discountType: undefined as string | undefined,
+    discountValue: undefined as number | undefined,
+  });
+
+  // Low stock notification settings
+  const [lowStockSettings, setLowStockSettings] = useState({
+    lowStockType: undefined as string | undefined,
+    lowStockThreshold: undefined as number | undefined,
+    lowStockEnabled: false,
+  });
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+  // Attributes and variants state
+  const [attributes, setAttributes] = useState<ProductAttributeDTO[]>([]);
+  const [variants, setVariants] = useState<ProductVariantDTO[]>([]);
+
+  // Add state for stock modal and attribute index
   const [showStockModal, setShowStockModal] = useState(false);
-  const [selectedVariationIndex, setSelectedVariationIndex] =
-    useState<number>(0);
-  const [stockValues, setStockValues] = useState<
-    { value: string; stock: number }[]
-  >([]);
+  const [stockAttributeIndex, setStockAttributeIndex] = useState<number | null>(null);
+  const [stockValues, setStockValues] = useState<{ value: string; stock: number }[]>([]);
 
   // Add drag states for variations
-  const [draggedVariationIndex, setDraggedVariationIndex] = useState<
-    number | null
-  >(null);
-  const [dragOverVariationIndex, setDragOverVariationIndex] = useState<
-    number | null
-  >(null);
+  const [draggedVariationIndex, setDraggedVariationIndex] = useState<number | null>(null);
+  const [dragOverVariationIndex, setDragOverVariationIndex] = useState<number | null>(null);
 
-  // Function to add a new variation type
-  const handleAddVariation = (e: React.MouseEvent) => {
+  // Add state for price and productionCost at the parent level
+  const [price, setPrice] = useState(0);
+  const [productionCost, setProductionCost] = useState(0);
+
+  // Function to add a new attribute
+  const handleAddAttribute = (e: React.MouseEvent) => {
     e.preventDefault();
-    setCustomVariations([
-      ...customVariations,
-      { name: "New Variation", values: [""] },
+    setAttributes([
+      ...attributes,
+      { name: "New Attribute", values: [""] },
     ]);
   };
 
-  // Function to delete a variation type
-  const handleDeleteVariation = (index: number) => {
-    const newVariations = [...customVariations];
-    newVariations.splice(index, 1);
-    setCustomVariations(newVariations);
+  // Function to delete an attribute
+  const handleDeleteAttribute = (index: number) => {
+    const newAttributes = [...attributes];
+    newAttributes.splice(index, 1);
+    setAttributes(newAttributes);
+    
+    // Regenerate variants when attributes change
+    generateVariants(newAttributes);
   };
 
-  // Function to update variation name
-  const handleVariationNameChange = (index: number, name: string) => {
-    const newVariations = [...customVariations];
-    newVariations[index].name = name;
-    setCustomVariations(newVariations);
+  // Function to update attribute name
+  const handleAttributeNameChange = (index: number, name: string) => {
+    const newAttributes = [...attributes];
+    newAttributes[index].name = name;
+    setAttributes(newAttributes);
+    
+    // Regenerate variants when attributes change
+    generateVariants(newAttributes);
+  };
+
+  // Function to update attribute values
+  const handleAttributeValuesChange = (index: number, values: string[]) => {
+    const newAttributes = [...attributes];
+    newAttributes[index].values = values;
+    setAttributes(newAttributes);
+    
+    // Regenerate variants when attributes change
+    generateVariants(newAttributes);
+  };
+
+  // Function to generate all possible variant combinations
+  const generateVariants = (attrs: ProductAttributeDTO[]) => {
+    if (attrs.length === 0) {
+      // Create a default variant when no attributes are provided
+      const defaultVariant: ProductVariantDTO = {
+        stock: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
+        attributes: [] // No attributes for default variant
+      };
+      setVariants([defaultVariant]);
+      return;
+    }
+
+    // Generate all combinations of attribute values
+    const combinations = generateCombinations(attrs);
+    
+    // Create variants from combinations
+    const newVariants: ProductVariantDTO[] = combinations.map((combination, index) => {
+      const variantAttributes: VariantAttributeDTO[] = combination.map((value, attrIndex) => ({
+        name: attrs[attrIndex].name,
+        value: value
+      }));
+
+      return {
+        stock: 0,
+        price: price, // Use current global price
+        productionCost: productionCost, // Use current global production cost
+        attributes: variantAttributes
+      };
+    });
+
+    console.log('🔄 Generated variants:', newVariants);
+    setVariants(newVariants);
+  };
+
+  // Helper function to generate all combinations of attribute values
+  const generateCombinations = (attrs: ProductAttributeDTO[]): string[][] => {
+    if (attrs.length === 0) return [];
+    if (attrs.length === 1) {
+      return attrs[0].values.map(value => [value]);
+    }
+
+    const [firstAttr, ...restAttrs] = attrs;
+    const restCombinations = generateCombinations(restAttrs);
+    
+    const combinations: string[][] = [];
+    firstAttr.values.forEach(value => {
+      if (restCombinations.length === 0) {
+        combinations.push([value]);
+      } else {
+        restCombinations.forEach(restCombo => {
+          combinations.push([value, ...restCombo]);
+        });
+      }
+    });
+
+    return combinations;
   };
 
   // Modified handleAddDefaults
   const handleAddDefaults = (index: number) => {
     // Always use first variation for stock management
-    const firstVariation = customVariations[0];
+    const firstVariation = attributes[0];
     if (!firstVariation || firstVariation.values.length === 0) {
-      alert("Please add values to the first variation first");
+      alert("Please add values to the first attribute first");
       return;
     }
 
@@ -94,18 +220,44 @@ export default function AddProductPage() {
     setStockValues(newStock);
   };
 
-  // Save stock values
+  // Handler to open stock modal for a specific attribute
+  const openStockModalForAttribute = (index: number) => {
+    setStockAttributeIndex(index);
+    const attr = attributes[index];
+    setStockValues(attr.values.map(value => ({ value, stock: 0 })));
+    setShowStockModal(true);
+  };
+
+  // Save stock values for the selected attribute
   const handleSaveStock = () => {
-    // Here you would typically update your stock management state
-    console.log("Stock values:", stockValues);
+    if (stockAttributeIndex === null) return;
+    // Sum all entered stock values
+    const totalStock = stockValues.reduce((sum, sv) => sum + (parseInt(sv.stock as any, 10) || 0), 0);
+    if (isNaN(totalStock) || totalStock < 0) {
+      alert('Please enter valid stock values.');
+      return;
+    }
+    // Distribute totalStock among all variants
+    if (variants.length > 0) {
+      const base = Math.floor(totalStock / variants.length);
+      const remainder = totalStock % variants.length;
+      const updatedVariants = variants.map((variant, idx) => ({
+        ...variant,
+        stock: base + (idx < remainder ? 1 : 0),
+      }));
+      setVariants(updatedVariants);
+    }
     setShowStockModal(false);
   };
 
-  // Update variation values handler
-  const handleValuesChange = (index: number, newValues: string[]) => {
-    const newVariations = [...customVariations];
-    newVariations[index].values = newValues;
-    setCustomVariations(newVariations);
+  // Update variant price and production cost
+  const handleVariantUpdate = (index: number, field: 'price' | 'productionCost' | 'stock', value: number) => {
+    const updatedVariants = [...variants];
+    updatedVariants[index] = {
+      ...updatedVariants[index],
+      [field]: value
+    };
+    setVariants(updatedVariants);
   };
 
   // Add these handlers
@@ -124,15 +276,125 @@ export default function AddProductPage() {
       dragOverVariationIndex !== null &&
       draggedVariationIndex !== dragOverVariationIndex
     ) {
-      const newVariations = [...customVariations];
-      const [movedVariation] = newVariations.splice(draggedVariationIndex, 1);
-      newVariations.splice(dragOverVariationIndex, 0, movedVariation);
-      setCustomVariations(newVariations);
+      const newVariants = [...variants];
+      const [movedVariant] = newVariants.splice(draggedVariationIndex, 1);
+      newVariants.splice(dragOverVariationIndex, 0, movedVariant);
+      setVariants(newVariants);
     }
 
     setDraggedVariationIndex(null);
     setDragOverVariationIndex(null);
   };
+
+  // Form submission handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      // Validate global price and production cost
+      if (price <= 0 || productionCost <= 0) {
+        alert('Please enter valid price and production cost');
+        return;
+      }
+
+      // Ensure we have at least one variant (create default if none exist)
+      let finalVariants = variants;
+      if (variants.length === 0) {
+        // Create a default variant if none exist
+        finalVariants = [{
+          stock: 0,
+          price: price,
+          productionCost: productionCost,
+          attributes: []
+        }];
+      } else {
+        // Update existing variants with current global price and production cost
+        finalVariants = variants.map(v => ({
+          ...v,
+          price,
+          productionCost,
+        }));
+      }
+
+      // Validate stock for each variant
+      if (finalVariants.some(v => v.stock == null || v.stock < 0)) {
+        alert('Please ensure all variants have valid stock levels');
+        return;
+      }
+
+      // Validate required fields
+      if (!basicFormData.name || !basicFormData.description || (basicFormData.categoryIds || []).length === 0) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Create the complete product data
+      const productData: ProductCreateDTO = {
+        name: basicFormData.name,
+        description: basicFormData.description,
+        categoryId: basicFormData.categoryId, // Keep for backward compatibility
+        categoryIds: basicFormData.categoryIds, // New field for multiple categories
+        discountType: discountSettings.discountType,
+        discountValue: discountSettings.discountValue,
+        attributes: attributes.length > 0 ? attributes : [],
+        variants: finalVariants,
+        // Low stock notification settings
+        lowStockType: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockType : undefined,
+        lowStockThreshold: lowStockSettings.lowStockEnabled ? lowStockSettings.lowStockThreshold : undefined,
+        lowStockEnabled: lowStockSettings.lowStockEnabled,
+      };
+
+      // Log the data being sent
+      console.log('📤 Sending product data to backend:', JSON.stringify(productData, null, 2));
+
+      // Create product
+      const newProduct = await handleCreateProduct(productData, imageFiles);
+      
+      // Show success dialog
+      setShowSuccessDialog(true);
+      
+      // Redirect to products page after a short delay
+      setTimeout(() => {
+        router.push('/dashboard/products');
+      }, 2000);
+      
+    } catch (err: any) {
+      console.error('Error creating product:', err);
+      alert(`Failed to create product: ${err.message}`);
+    }
+  };
+
+  // Update basic form data handler
+  const updateBasicFormData = (updates: Partial<typeof basicFormData>) => {
+    setBasicFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update discount settings handler
+  const updateDiscountSettings = (updates: Partial<typeof discountSettings>) => {
+    setDiscountSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update low stock settings handler
+  const updateLowStockSettings = (updates: Partial<typeof lowStockSettings>) => {
+    setLowStockSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  // Update image files handler
+  const updateImageFiles = (files: File[]) => {
+    setImageFiles(files);
+  };
+
+  // UseEffect to regenerate variants when attributes change
+  useEffect(() => {
+    generateVariants(attributes);
+  }, [attributes]);
+
+  // UseEffect to regenerate default variant when price or production cost changes
+  useEffect(() => {
+    if (attributes.length === 0) {
+      generateVariants(attributes);
+    }
+  }, [price, productionCost]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -147,6 +409,24 @@ export default function AddProductPage() {
             Create a new product for your store
           </h2>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="flex mb-1 ml-3">
           {tabs.map((tab) => (
@@ -166,17 +446,32 @@ export default function AddProductPage() {
 
         <Card className="flex flex-col gap-4 bg-white">
           <CardContent className="py-2">
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {activeTab === "Product's Overview" && (
                 <>
                   {/* Product Info */}
-                  <ProductInfoSection />
+                  <ProductInfoSection 
+                    formData={basicFormData}
+                    updateFormData={updateBasicFormData}
+                    imageFiles={imageFiles}
+                    updateImageFiles={updateImageFiles}
+                  />
 
                   {/* Pricing Section */}
-                  <PricingSection />
+                  <PricingSection 
+                    price={price} 
+                    setPrice={setPrice} 
+                    productionCost={productionCost} 
+                    setProductionCost={setProductionCost}
+                    discountSettings={discountSettings}
+                    updateDiscountSettings={updateDiscountSettings}
+                  />
 
                   {/* Low Stock Settings Section */}
-                  <LowStockSection />
+                  <LowStockSection 
+                    formData={lowStockSettings}
+                    updateFormData={updateLowStockSettings}
+                  />
                 </>
               )}
 
@@ -193,88 +488,62 @@ export default function AddProductPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {customVariations.map((variation, index) => (
+                    {attributes.map((attribute, index) => (
                       <div
                         key={index}
                         className={`mb-4 p-4 rounded-lg border transition-all ${
                           dragOverVariationIndex === index
-                            ? "border-blue-300 bg-blue-50"
-                            : "border-transparent hover:border-gray-200"
-                        } ${
-                          draggedVariationIndex === index ? "shadow-lg" : ""
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200"
                         }`}
-                        //   onDragStart={() => handleSizeDragStart(index)} <---------------
-                        //   onDragOver={(e) => e.preventDefault()} <------------
-                        //   onDragEnter={() => handleSizeDragEnter(index)}  <------------
-                        //   onDragEnd={handleSizeDragEnd}
                         draggable
                         onDragStart={() => handleVariationDragStart(index)}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          handleVariationDragOver(e, index);
-                        }}
+                        onDragOver={(e) => handleVariationDragOver(e, index)}
                         onDragEnd={handleVariationDragEnd}
                       >
                         <CustomVariationSection
-                          name={variation.name}
+                          name={attribute.name}
                           index={index}
-                          values={variation.values}
-                          onDelete={() => handleDeleteVariation(index)}
-                          onChange={(name) =>
-                            handleVariationNameChange(index, name)
-                          }
-                          onValuesChange={(values) =>
-                            handleValuesChange(index, values)
-                          }
-                          onAddDefaults={() => handleAddDefaults(index)}
-                          showDefaults={index === 0}
+                          values={attribute.values}
+                          onDelete={() => handleDeleteAttribute(index)}
+                          onChange={(name) => handleAttributeNameChange(index, name)}
+                          onValuesChange={(values) => handleAttributeValuesChange(index, values)}
+                          onSetStock={() => openStockModalForAttribute(index)}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>
                     ))}
 
-                    <button
-                      onClick={handleAddVariation}
-                      className="flex items-center gap-1 text-logo-dark-button hover:underline text-md"
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddAttribute}
+                      className="w-full"
                     >
-                      + Add Variation Type
-                    </button>
+                      + Add Attribute
+                    </Button>
                   </div>
                 </>
               )}
 
               {activeTab === "Stock Management" && (
-                <>
-                  <div className="mb-2">
-                    <CardTitle className="font-bold text-2xl">
-                      Handle Stock Levels
-                    </CardTitle>
-                    <p className="text-gray-500">
-                      Management of stock levels of different options and
-                      variation.
-                    </p>
-                  </div>
-
-                  <StockManagementSection />
-                </>
+                <StockManagementSection variants={variants} setVariants={setVariants} />
               )}
 
-              {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  type="submit"
-                  className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
-                >
-                  Save Product
-                </Button>
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-4 pt-6 border-t">
                 <Link href="/dashboard/products">
-                  <Button
-                    variant="outline"
-                    className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  >
+                  <Button type="button" variant="outline">
                     Cancel
                   </Button>
                 </Link>
+                <Button 
+                  type="submit" 
+                  disabled={isCreating}
+                  className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+                >
+                  {isCreating ? 'Creating Product...' : 'Create Product'}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -284,22 +553,50 @@ export default function AddProductPage() {
         <Dialog open={showStockModal} onOpenChange={setShowStockModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Set Stock Levels</DialogTitle>
+              <DialogTitle>Set Stock for Variations</DialogTitle>
             </DialogHeader>
-
             <div className="space-y-4">
-              {stockValues.map((item, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <Label className="w-24">{item.value}</Label>
+              {stockValues.map((item, idx) => (
+                <div key={idx} className="flex items-center space-x-4">
+                  <Label className="flex-1">{item.value}</Label>
                   <Input
                     type="number"
                     value={item.stock}
-                    onChange={(e) => handleStockChange(index, e.target.value)}
-                    min="0"
+                    onChange={e => {
+                      const newStock = [...stockValues];
+                      newStock[idx].stock = Number(e.target.value);
+                      setStockValues(newStock);
+                    }}
+                    className="w-24"
                   />
                 </div>
               ))}
-              <Button onClick={handleSaveStock}>Save Stock Values</Button>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowStockModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveStock}>Save</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Success Dialog */}
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Product Created Successfully!</span>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="text-center py-4">
+              <p className="text-gray-600">
+                Your product has been created and is now available in your store.
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Redirecting to products page...
+              </p>
             </div>
           </DialogContent>
         </Dialog>

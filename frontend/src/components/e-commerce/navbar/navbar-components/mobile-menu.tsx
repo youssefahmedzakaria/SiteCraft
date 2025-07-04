@@ -114,50 +114,93 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         )}
 
         <div className="px-4 py-3">
-          <Navigation menuItems={NavMenuItems} textColor={textColor} orientation="vertical" onClick={onClose} />
+          <Navigation menuItems={NavMenuItems} textColor={textColor} orientation="vertical" onClick={onClose} isCustomize={isCustomize} />
           <div className="py-1 overflow-y-auto"></div>
-          <Link
-            href={`/e-commerce/${subdomain}/profile`}
-            className="block py-2 text-sm hover:underline"
-            style={{
-              color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
-            }}
-          >
-            Profile
-          </Link>
-          <Link
-            href={`/e-commerce/${subdomain}/cart`}
-            className="block py-2 text-sm hover:underline"
-            style={{
-              color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
-            }}
-          >
-            Cart
-          </Link>
-          <Link
-            href={`/e-commerce/${subdomain}/favorites`}
-            className="block py-2 text-sm hover:underline"
-            style={{
-              color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
-            }}
-          >
-            Favorites
-          </Link>
+          {isCustomize ? (
+            <>
+              <span
+                className="block py-2 text-sm opacity-60 cursor-not-allowed"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Profile
+              </span>
+              <span
+                className="block py-2 text-sm opacity-60 cursor-not-allowed"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Cart
+              </span>
+              <span
+                className="block py-2 text-sm opacity-60 cursor-not-allowed"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Favorites
+              </span>
+            </>
+          ) : (
+            <>
+              <Link
+                href={`/e-commerce/${subdomain}/profile`}
+                className="block py-2 text-sm hover:underline"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Profile
+              </Link>
+              <Link
+                href={`/e-commerce/${subdomain}/cart`}
+                className="block py-2 text-sm hover:underline"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Cart
+              </Link>
+              <Link
+                href={`/e-commerce/${subdomain}/favorites`}
+                className="block py-2 text-sm hover:underline"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                Favorites
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="py-2 overflow-y-auto">
           {MobileMenuItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="block px-4 py-3 text-sm hover:bg-white/10 transition-colors"
-              style={{
-                color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
-              }}
-              onClick={onClose}
-            >
-              {item.label}
-            </Link>
+            isCustomize ? (
+              <span
+                key={item.label}
+                className="block px-4 py-3 text-sm opacity-60 cursor-not-allowed"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+              >
+                {item.label}
+              </span>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="block px-4 py-3 text-sm hover:bg-white/10 transition-colors"
+                style={{
+                  color: textColor.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : "#ffffff",
+                }}
+                onClick={onClose}
+              >
+                {item.label}
+              </Link>
+            )
           ))}
         </div>
       </div>

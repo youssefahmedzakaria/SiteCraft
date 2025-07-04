@@ -30,20 +30,38 @@ public class StoreService {
     @Autowired
     private AboutUsRepo aboutUsRepository;
 
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private ProductRepo productRepo;
+
+    @Autowired
+    private SiteCraftSubscriptionService subscriptionService;
+
     public Store createStore(Store store, Long userId) {
+        System.out.println("🏪 StoreService.createStore called for user ID: " + userId);
         try {
             store.setCreationDate(LocalDateTime.now());
+            store.setStatus("active");
+            System.out.println("📅 Store creation date set");
+            System.out.println("✅ Store status set to active");
 
             Store savedStore = storeRepo.save(store);
+            System.out.println("✅ Store saved with ID: " + savedStore.getId());
+            
             Users tempUser = new Users();
             tempUser.setId(userId);
 
             UserRole ownerRole = new UserRole("owner", tempUser, savedStore.getId());
             userRoleRepo.save(ownerRole);
+            System.out.println("👑 Owner role created for user ID: " + userId + " and store ID: " + savedStore.getId());
 
             return storeRepo.save(savedStore);
 
         } catch (Exception e) {
+            System.out.println("💥 Error creating store: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to create store: " + e.getMessage());
         }
     }
@@ -251,6 +269,81 @@ public class StoreService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete About Us entry: " + e.getMessage());
         }
+    }
+
+    public List<Store> getAllStores() {
+        return storeRepo.findAll();
+    }
+
+    public String getOwnerEmail(Long storeId) {
+        // Find the first user with 'owner' role for this store
+        List<UserRole> ownerRoles = userRoleRepo.findByRoleAndStoreId("owner", storeId);
+        if (ownerRoles != null && !ownerRoles.isEmpty() && ownerRoles.get(0).getUser() != null) {
+            return ownerRoles.get(0).getUser().getEmail();
+        }
+        return null;
+    }
+
+    @Transactional
+    public void updateStoreStatus(Long storeId, String status) {
+        Store store = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+        store.setStatus(status);
+        storeRepo.save(store);
+    }
+
+    public com.sitecraft.backend.DTOs.StoreStatsDTO getStoreStats(Long storeId) {
+        // Total staff
+        int totalStaff = userRoleRepo.findByRoleAndStoreId("staff", storeId).size();
+
+        // Get all orders for this store
+        List<com.sitecraft.backend.Models.Order> allOrders = orderService.getAllOrders(storeId);
+        int totalOrders = allOrders.size();
+        double totalSales = allOrders.stream().mapToDouble(o -> o.getPrice() != null ? o.getPrice() : 0.0).sum();
+
+        // Last month orders and sales
+        java.time.LocalDate now = java.time.LocalDate.now(java.time.ZoneId.systemDefault());
+        java.time.LocalDate firstDayOfLastMonth = now.minusMonths(1).withDayOfMonth(1);
+        java.time.LocalDate lastDayOfLastMonth = now.withDayOfMonth(1).minusDays(1);
+        List<com.sitecraft.backend.Models.Order> lastMonthOrdersList = orderService.getOrdersByStoreAndDateRange(storeId, firstDayOfLastMonth, lastDayOfLastMonth);
+        int lastMonthOrders = lastMonthOrdersList.size();
+        double lastMonthSales = lastMonthOrdersList.stream().mapToDouble(o -> o.getPrice() != null ? o.getPrice() : 0.0).sum();
+
+        // Product count
+        int productCount = productRepo.findByStoreId(storeId).size();
+
+        // Current plan
+        String currentPlan = "None";
+        try {
+            var sub = subscriptionService.getCurrentSubscription(storeId);
+            if (sub.isPresent()) {
+                currentPlan = sub.get().getPlan();
+            }
+        } catch (Exception ignored) {}
+
+        // Plan recommendation
+        String planRecommendation = null;
+        if (productCount > 100) planRecommendation = "Recommend: Pro Plan (for large catalogs)";
+        else if (productCount < 10) planRecommendation = "Recommend: Starter Plan (for small stores)";
+        else planRecommendation = "Current plan is suitable.";
+
+        // Offer recommendation
+        String offerRecommendation = null;
+        if (lastMonthSales < 1000) {
+            offerRecommendation = "You are eligible for a 20% discount on your next subscription renewal!";
+        } else {
+            offerRecommendation = "Unlock advanced analytics or premium support for your growing business!";
+        }
+
+        // Advice for low sales
+        String advice = null;
+        if (lastMonthSales < 1000) advice = "Sales are low. Try social media marketing, bundle offers, or free shipping.";
+        else advice = "Keep up the good work!";
+
+        return new com.sitecraft.backend.DTOs.StoreStatsDTO(
+            totalStaff, totalOrders, totalSales, lastMonthOrders, lastMonthSales,
+            productCount, currentPlan, planRecommendation, offerRecommendation, advice
+        );
     }
 
 }

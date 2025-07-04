@@ -22,7 +22,7 @@ interface BarChartCardProps {
   title: string
   subtitle?: string
   colors?: string[]
-  /** When true, skip this card’s own border/padding wrapper */
+  /** When true, skip this card's own border/padding wrapper */
   hideContainerBorder?: boolean
 }
 
@@ -32,7 +32,7 @@ export const BarChartCard: FC<BarChartCardProps> = ({
   nameKey,
   title,
   subtitle,
-  colors = ['#cc7860', '#5d8aa8', '#6b8e23', '#b8860b', '#8b4513'],
+  colors = ['#4dbf38', '#3da32e', '#2d8724', '#1d6b1a', '#0d4f10'],
   hideContainerBorder = false,
 }) => {
   const [windowWidth, setWindowWidth] = useState<number>(
@@ -47,12 +47,17 @@ export const BarChartCard: FC<BarChartCardProps> = ({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Only abbreviate month names on narrow screens
+  // Only abbreviate month names on narrow screens, or format date as MM-DD
   const tickFormatter = (value: string) => {
-    if (nameKey === 'month' && windowWidth < 640) {
-      return value.substring(0, 3)
+    // If it's a date string (YYYY-MM-DD or ISO), format as MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+      const [, month, day] = value.split('-');
+      return `${month}-${day}`;
     }
-    return value
+    if (nameKey === 'month' && windowWidth < 640) {
+      return value.substring(0, 3);
+    }
+    return value;
   }
 
   // Tilt labels on smaller/tablet sizes

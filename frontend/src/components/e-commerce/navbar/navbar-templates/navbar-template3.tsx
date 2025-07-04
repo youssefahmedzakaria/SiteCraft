@@ -32,6 +32,7 @@ export interface NavbarTemplate3Props {
   }>
   iconColor?: string
   dividerColor?: string
+  onSearch?: (query: string) => void
 }
 
 export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
@@ -45,6 +46,7 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
   MobileMenuItems = [],
   iconColor = "text-black",
   dividerColor = "border-gray-200",
+  onSearch,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -89,6 +91,7 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
         iconColor={iconColor}
         MobileMenuItems={MobileMenuItems}
         dividerColor={dividerColor}
+        onSearch={onSearch}
       />
 
       <nav
@@ -133,8 +136,11 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
                 iconColor={iconColor}
                 backgroundColor="bg-white/20"
                 textColor={textColor}
+                onSearch={onSearch}
               />
-              <IconsGroup iconColor={iconColor} />
+              <div className="hidden md:flex">
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
+              </div>
             </div>
           </div>
 
@@ -154,6 +160,8 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
               <Menu className="h-6 w-6" />
             </button>
           </div>
+
+          <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
 
         </div>
       </nav>

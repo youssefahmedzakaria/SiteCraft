@@ -6,6 +6,7 @@ import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.CategoryService;
 import com.sitecraft.backend.DTOs.CategoryCreateDTO;
+import com.sitecraft.backend.DTOs.CategoryResponseDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/categories")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
 public class CategoryController {
 
     @Autowired
@@ -33,7 +35,7 @@ public class CategoryController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            List<Category> categories = categoryService.getAllCategories(storeId);
+            List<CategoryResponseDTO> categories = categoryService.getAllCategories(storeId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -203,7 +205,7 @@ public class CategoryController {
                         .body(Map.of("success", false, "message", "Store ID not found in session."));
             }
 
-            List<Product> products = categoryService.getCategoryProducts(id, storeId);
+            List<com.sitecraft.backend.DTOs.ProductDTO> products = categoryService.getCategoryProducts(id, storeId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

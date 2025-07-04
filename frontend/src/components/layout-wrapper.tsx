@@ -2,7 +2,7 @@
 
 import { SiteCraftNavbar } from "@/components/SiteCraft/siteCraftNavbar";
 import { SiteCraftFooter } from "@/components/SiteCraft/siteCraftFooter";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Navbar from "./e-commerce/navbar/Navbar";
 import { Footer } from "./e-commerce/footer/Footer";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import React from "react";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const pathSegments = pathname.split("/");
   const subdomain = pathSegments[2];
 
@@ -106,6 +107,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isExist, setIsExist] = useState(false);
 
+  // Handle search from navbar
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      // Navigate to products page with search query
+      router.push(`/e-commerce/${subdomain}/products?search=${encodeURIComponent(query.trim())}`);
+    }
+  };
+
   if (isEcommercePage) {
     const fetchTemplate = async () => {
       try {
@@ -116,6 +125,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             credentials: "include",
           }
         );
+        const responseSubdomain = await fetch(
+          "http://localhost:8080/api/store/getStoreId/" + subdomain,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        console.log("fetched subdomain", responseSubdomain);
         const responseStore = await fetch(
           "http://localhost:8080/api/store/getStoreSettings",
           {
@@ -172,14 +189,19 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
                   : "/placeholder.png",
             },
             socialMedia: {
+              ...(prev.socialMedia || {}),
               facebook:
                 dataStore.store.socialMediaAccounts?.find(
                   (acc: any) => acc.name.toLowerCase() === "facebook"
-                )?.link || prev.socialMedia.facebook,
+                )?.link ||
+                prev.socialMedia?.facebook ||
+                "",
               instagram:
                 dataStore.store.socialMediaAccounts?.find(
                   (acc: any) => acc.name.toLowerCase() === "instagram"
-                )?.link || prev.socialMedia.instagram,
+                )?.link ||
+                prev.socialMedia?.instagram ||
+                "",
             },
           }));
         }
@@ -223,20 +245,45 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           backgroundColor={headerAttributes?.backgroundColor}
           textColor={headerAttributes?.textColor}
           logo={headerAttributes.logo}
-          menuItems={headerAttributes.menuItems.map((item) => ({
-            label: item.label,
-            href: "#",
-            isShown: item.isShown,
-          }))}
+          menuItems={headerAttributes.menuItems.map((item) => {
+            // Map menu items to their correct URLs
+            let href = "#";
+            switch (item.label.toLowerCase()) {
+              case "home":
+                href = `/e-commerce/${subdomain}`;
+                break;
+              case "products":
+                href = `/e-commerce/${subdomain}/products`;
+                break;
+              case "categories":
+                href = `/e-commerce/${subdomain}/categories`;
+                break;
+              case "about us":
+                href = `/e-commerce/${subdomain}/#about`;
+                break;
+              case "contact us":
+                href = `/e-commerce/${subdomain}/#contact`;
+                break;
+              default:
+                href = `/e-commerce/${subdomain}`;
+            }
+            return {
+              label: item.label,
+              href: href,
+              isShown: item.isShown,
+            };
+          })}
           iconColor={headerAttributes.iconColor}
           dividerColor={headerAttributes.dividerColor}
           fontFamily={headerAttributes.fontFamily}
+          onSearch={handleSearch}
         />
       )}
       <main className="flex-1">{children}</main>
       {!isAuthPage && <SiteCraftFooter />}
       {isEcommercePage && (
         <Footer
+          isCustomize={false}
           companyName={footerAttributes.brandName}
           textColor={footerAttributes.textColor}
           companyLogo={{
@@ -245,7 +292,30 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             width: parseInt(footerAttributes.logo.size) || 50,
             height: parseInt(footerAttributes.logo.size) || 50,
           }}
-          aboutLinks={footerAttributes.aboutLinks}
+          aboutLinks={footerAttributes.aboutLinks.map((link) => {
+            // Ensure footer links have the correct URLs with subdomain
+            let href = link.href;
+            if (!href.startsWith('http') && !href.startsWith('mailto:')) {
+              // Map specific footer links to their correct URLs
+              switch (link.label.toLowerCase()) {
+                case "contact us":
+                  href = `/e-commerce/${subdomain}/#contact`;
+                  break;
+                case "about us":
+                  href = `/e-commerce/${subdomain}/#about`;
+                  break;
+                case "policies":
+                  href = `/e-commerce/${subdomain}/#policies`;
+                  break;
+                default:
+                  href = `/e-commerce/${subdomain}`;
+              }
+            }
+            return {
+              ...link,
+              href: href,
+            };
+          })}
           socialMedia={footerAttributes.socialMedia}
           socialMediaStyles={footerAttributes.socialMediaStyles}
           copyrightStyles={footerAttributes.copyrightStyles}

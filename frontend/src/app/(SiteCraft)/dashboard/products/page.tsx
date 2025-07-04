@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import Image from "next/image";
-import { products } from "@/lib/products";
-import { productAnalytics } from "@/lib/generalAnalytics";
+import { useProductManagement } from "@/hooks/useProductManagement";
+import { useProductStatistics } from "@/hooks/useProductStatistics";
+import { getProductAnalyticsFromStats } from "@/lib/generalAnalytics";
 import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics/generalAnalyticsCard";
 import { ProductRecord } from "@/components/SiteCraft/dashboard/products/productRecord";
 import { SearchBar } from "@/components/SiteCraft/ui/searchBar";
@@ -20,20 +21,61 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
 } from "@/components/SiteCraft/ui/dropdown-menu";
-import { useState } from "react";
-import { categories } from "@/lib/categories";
+import { useState, useEffect } from "react";
+import { getCategories } from "@/lib/products";
 import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/dicountDialog";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
+import { SimplifiedProduct } from "@/lib/products";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function ProductPage() {
-  const [categoryFilter, setCategoryFilter] =
-    useState<string>("All Categories");
-  const [StockFilter, setStockFilter] = useState<string>("All Stock");
+  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
+  const [stockFilter, setStockFilter] = useState<string>("All Stock");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
   const [file, setFile] = useState<File | null>(null);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
+  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const {
+    products,
+    isLoading,
+    error,
+    clearError,
+    fetchProducts
+  } = useProductManagement();
+
+  const {
+    stats,
+    isLoading: statsLoading,
+    error: statsError,
+    refetch: refetchStats
+  } = useProductStatistics();
+
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleCategorySelect = (title: string) => {
     setCategoryFilter(title);
@@ -43,19 +85,40 @@ export default function ProductPage() {
     setStockFilter(title);
   };
 
-  const filteredProducts = products.filter((product) => {
-    if (categoryFilter === "All Categories" && StockFilter === "All Stock") {
-      return true;
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  const filteredProducts = products.filter((product: SimplifiedProduct) => {
+    // Filter by category
+    if (categoryFilter !== "All Categories") {
+      if (!product.categoryId) return false;
+      const category = categories.find(c => c.id === product.categoryId);
+      if (!category || category.name !== categoryFilter) {
+        return false;
+      }
     }
-    if (categoryFilter !== "All Categories" && StockFilter === "All Stock") {
-      return product.category === categoryFilter;
+
+    // Filter by stock status
+    if (stockFilter !== "All Stock") {
+      const productStatus = product.stock > 0 ? "In Stock" : "Out of Stock";
+      if (productStatus !== stockFilter) {
+        return false;
+      }
     }
-    if (StockFilter !== "All Stock" && categoryFilter === "All Categories") {
-      return product.status === StockFilter;
+
+    // Filter by search query
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const productName = product.name.toLowerCase();
+      const productDescription = product.description.toLowerCase();
+      
+      if (!productName.includes(searchLower) && !productDescription.includes(searchLower)) {
+        return false;
+      }
     }
-    return (
-      product.category === categoryFilter && product.status === StockFilter
-    );
+
+    return true;
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,18 +126,10 @@ export default function ProductPage() {
     if (selectedFile) {
       setFile(selectedFile);
       console.log("File selected:", selectedFile.name);
-
-      // Optional: You could add file reading logic here
-      // const reader = new FileReader();
-      // reader.onload = (e) => {
-      //   const content = e.target?.result;
-      //   // Process the file content
-      // };
-      // reader.readAsText(selectedFile);
     }
   };
 
-  const handleSelectProduct = (productId: string) => {
+  const handleSelectProduct = (productId: number) => {
     setSelectedProducts((prevSelected) =>
       prevSelected.includes(productId)
         ? prevSelected.filter((id) => id !== productId)
@@ -93,7 +148,11 @@ export default function ProductPage() {
 
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(
-      (product) => product.category === category
+      (product: SimplifiedProduct) => {
+        if (!product.categoryId) return false;
+        const categoryObj = categories.find(c => c.id === product.categoryId);
+        return categoryObj && categoryObj.name === category;
+      }
     );
     const newSelection = [...selectedProducts];
 
@@ -122,6 +181,73 @@ export default function ProductPage() {
 
     setSelectedProducts(newSelection);
   };
+
+  const allSelected = selectedProducts.length === products.length && products.length > 0;
+  const toggleSelectAll = () => {
+    setSelectedProducts(allSelected ? [] : products.map(p => p.id));
+  };
+  const toggleSelect = (id: number) => {
+    setSelectedProducts(sel =>
+      sel.includes(id) ? sel.filter(pid => pid !== id) : [...sel, id]
+    );
+  };
+
+  const handleApplyDiscount = async (discountType: string, discountValue: number) => {
+    await fetch("http://localhost:8080/products/apply-discount", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productIds: selectedProducts,
+        discountType: discountType.toLowerCase(),
+        discountValue: parseFloat(discountValue as any), 
+      }),
+      credentials: 'include',
+    });
+    setShowDiscountDialog(false);
+    // Optionally: refresh products list
+  };
+
+  const handleRefreshAll = () => {
+    refetchStats();
+    fetchProducts();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="text-lg text-gray-600">Loading products...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view product statistics and manage products.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -176,18 +302,81 @@ export default function ProductPage() {
           </div>
         </div>
 
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearError}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Statistics Error Alert */}
+        {statsError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{statsError}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefreshAll}
+                className="text-red-600 hover:text-red-800"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Stats cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-          {productAnalytics.map((product) => (
-            <GeneralAnalyticsCard key={product.id} analytic={product} />
-          ))}
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-end items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshAll}
+              disabled={statsLoading}
+              className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${statsLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {stats ? getProductAnalyticsFromStats(stats).map((product) => (
+              <GeneralAnalyticsCard key={product.id} analytic={product} />
+            )) : (
+              // Show loading state for stats
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg border border-logo-border p-6 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Search and filters */}
         <div className="border-t border-logo-border mt-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
             {/* Search Bar */}
-            <SearchBar placeholder="Search: e.g. Watch"></SearchBar>
+            <SearchBar 
+              placeholder="Search products by name or description" 
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
 
             {/* Category Filter */}
             <DropdownMenu>
@@ -198,68 +387,26 @@ export default function ProductPage() {
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">
-                    {categoryFilter === "All Categories"
-                      ? "All Categories"
-                      : ""}
-                    {categories.map((category) =>
-                      categoryFilter === category.title ? category.title : ""
-                    )}
+                    {categoryFilter}
                   </span>
                   <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() => handleCategorySelect("All Categories")}
-                >
+                <DropdownMenuItem onClick={() => handleCategorySelect("All Categories")}>
                   All Categories
                 </DropdownMenuItem>
-                {categories.map((category) => {
-                  const categoryProducts = filteredProducts.filter(
-                    (p) => p.category === category.title
-                  );
-                  const hasProducts = categoryProducts.length > 0;
-                  const allSelected =
-                    hasProducts &&
-                    categoryProducts.every((p) =>
-                      selectedProducts.includes(p.id)
-                    );
-
-                  return (
-                    <DropdownMenuItem
-                      key={category.id}
-                      onSelect={() =>
-                        hasProducts && handleSelectByCategory(category.title)
-                      }
-                      className={
-                        !hasProducts ? "opacity-50 cursor-not-allowed" : ""
-                      }
-                    >
-                      {allSelected && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-2"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                      {category.title}
-                      {!hasProducts && (
-                        <span className="ml-2 text-xs text-gray-500">
-                          (no products)
-                        </span>
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
+                {categories.map((category) => (
+                  <DropdownMenuItem
+                    key={category.id}
+                    onClick={() => handleCategorySelect(category.name)}
+                  >
+                    {category.name}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
             {/* Stock Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -269,9 +416,7 @@ export default function ProductPage() {
                   className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                 >
                   <span className="ml-2">
-                    {stockStatuses.map((status) =>
-                      StockFilter === status ? status : ""
-                    )}
+                    {stockFilter}
                   </span>
                   <ChevronDown size={16} />
                 </Button>
@@ -288,118 +433,71 @@ export default function ProductPage() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+        </div>
 
-          {/* Selection and Applying Discount */}
-          <div className="flex items-center  pt-1 mt-4 gap-6">
-            <DropdownMenu
-              open={selectionDropdownOpen}
-              onOpenChange={setSelectionDropdownOpen}
+        {/* Left-aligned selection controls */}
+        <div className="flex justify-start items-center gap-4 my-4">
+          <span>{selectedProducts.length} Selected</span>
+          {selectedProducts.length > 0 && (
+            <Button
+              onClick={() => setShowDiscountDialog(true)}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              size="lg"
             >
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-logo-txt hover:bg-logo-light-button-hover border-logo-border"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-blue-600 mr-2"
-                    checked={selectedProducts.length > 0}
-                    readOnly
-                  />
-                  {selectedProducts.length > 0
-                    ? `${selectedProducts.length} Selected`
-                    : null}
-                  <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={handleSelectAll}>
-                  Select All ({filteredProducts.length})
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedProducts([])}>
-                  Select None
-                </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <span>Select by Category</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      {categories.map((category) => {
-                        const categoryProducts = filteredProducts.filter(
-                          (p) => p.category === category.title
-                        );
-                        const hasProducts = categoryProducts.length > 0;
-                        const allSelected =
-                          hasProducts &&
-                          categoryProducts.every((p) =>
-                            selectedProducts.includes(p.id)
-                          );
+              Apply Discount
+            </Button>
+          )}
+        </div>
 
-                        return (
-                          <DropdownMenuItem
-                            key={category.id}
-                            onSelect={() =>
-                              hasProducts &&
-                              handleSelectByCategory(category.title)
-                            }
-                            className={
-                              !hasProducts
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }
-                          >
-                            {allSelected && (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                            {category.title}
-                            {!hasProducts && (
-                              <span className="ml-2 text-xs text-gray-500">
-                                (no products)
-                              </span>
-                            )}
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Discount Dialog */}
+        {showDiscountDialog && (
+          <ApplyDiscountDialog
+            open={showDiscountDialog}
+            onOpenChange={setShowDiscountDialog}
+            products={selectedProducts}
+            onApply={handleApplyDiscount}
+          />
+        )}
 
-            {selectedProducts.length > 0 && (
-              <ApplyDiscountDialog products={selectedProducts} />
-            )}
-          </div>
-
-          {/* Product listing table (responsive) */}
-          <div className="mt-6 border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">
-            <table className="min-w-full divide-y divide-logo-border">
-              <ProductTableHeader />
-              <tbody className="bg-white divide-y divide-logo-border">
-                {/* Sample product rows */}
-                {filteredProducts.map((product) => (
-                  <ProductRecord
-                    key={product.id}
+        {/* Product listing table */}
+        <div className="border rounded-lg border-logo-border overflow-hidden mt-6">
+          <table className="min-w-full divide-y divide-logo-border">
+            <ProductTableHeader
+              selectAll={selectAll}
+              onSelectAll={handleSelectAll}
+              selectedProducts={selectedProducts}
+              categories={categories}
+              filteredProducts={filteredProducts}
+              setSelectedProducts={setSelectedProducts}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+            />
+            <tbody className="bg-white divide-y divide-logo-border">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product: SimplifiedProduct) => (
+                  <ProductRecord 
+                    key={product.id} 
                     product={product}
+                    categories={categories}
                     isSelected={selectedProducts.includes(product.id)}
-                    onSelect={handleSelectProduct}
+                    onSelect={() => handleSelectProduct(product.id)}
+                    fetchProducts={fetchProducts}
                   />
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    {products.length === 0
+                      ? "No products found. Try adding your first product."
+                      : "No products match your filters."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>

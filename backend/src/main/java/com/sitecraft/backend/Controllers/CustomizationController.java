@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Controllers;
+import com.sitecraft.backend.DTOs.CategoryResponseDTO;
 import com.sitecraft.backend.DTOs.CustomizedTemplateDTO;
 import com.sitecraft.backend.Models.Category;
 import com.sitecraft.backend.Models.CustomizedTemplateSection;
@@ -38,13 +39,13 @@ public class CustomizationController {
     @GetMapping("/getTemplate")
     public ResponseEntity<?> getCustomizedTemplate(HttpSession session) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
 
-            Long storeId = 1L;
+//            Long storeId = 1L;
 
             List<CustomizedTemplateSection> customizedTemplate = customizationService.getCustomizedTemplate(storeId);
 
@@ -134,13 +135,13 @@ public class CustomizationController {
     @PutMapping("/editTemplate")
     public ResponseEntity<?> editCustomizedTemplate(HttpSession session, @RequestBody List<CustomizedTemplateDTO> dtoList) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
 
-            Long storeId = 1L;
+//            Long storeId = 1L;
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
@@ -174,13 +175,13 @@ public class CustomizationController {
     @PostMapping("/saveImage")
     public ResponseEntity<?> saveImage(HttpSession session, @RequestPart(value = "image") MultipartFile image) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
 
-            Long storeId = 1L;
+//            Long storeId = 1L;
 
             String filename = "customize" + storeId + "_" + image.getOriginalFilename();
             String relativePath = "/uploads/stores/" + storeId + "/customize/";
@@ -205,12 +206,12 @@ public class CustomizationController {
     @GetMapping("/getProducts")
     public ResponseEntity<?> getAllProducts(HttpSession session) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
-            Long storeId = 1L;
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+//            Long storeId = 1L;
             List<Product> products = productService.getAllProducts(storeId).stream().limit(6).collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
@@ -231,14 +232,14 @@ public class CustomizationController {
     @GetMapping("/getCategories")
     public ResponseEntity<?> getAllCategories(HttpSession session) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
-            Long storeId = 1L;
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+//            Long storeId = 1L;
 
-            List<Category> categories = categoryService.getAllCategories(storeId).stream().limit(6).collect(Collectors.toList());
+            List<CategoryResponseDTO> categories = categoryService.getAllCategories(storeId).stream().limit(6).collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

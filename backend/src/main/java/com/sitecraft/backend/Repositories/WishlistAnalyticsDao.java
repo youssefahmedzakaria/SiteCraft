@@ -31,7 +31,7 @@ public class WishlistAnalyticsDao {
               JOIN Customer c    ON c.wishlist_id = w.id
               JOIN Product p     ON wp.product_id = p.id
              WHERE c.store_id = :storeId
-               AND wp.created_at BETWEEN :startDate AND :endDate
+               AND CAST(wp.created_at AS date) BETWEEN :startDate AND :endDate
              GROUP BY p.name
              ORDER BY saveCount DESC
             """;

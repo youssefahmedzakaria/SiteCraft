@@ -1,9 +1,11 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "product")
@@ -27,11 +29,6 @@ public class Product {
     private BigDecimal maxCap;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    @JsonIgnore
-    private Category category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     @JsonIgnore
     private Store store;
@@ -49,12 +46,13 @@ public class Product {
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<CategoryProduct> categoryProducts;
 
     public Product() {}
 
     public Product(String name, String description, String discountType, BigDecimal discountValue,
-                  BigDecimal minCap, BigDecimal percentageMax, BigDecimal maxCap, Category category, Store store) {
+                  BigDecimal minCap, BigDecimal percentageMax, BigDecimal maxCap, Store store) {
         this.name = name;
         this.description = description;
         this.discountType = discountType;
@@ -62,7 +60,6 @@ public class Product {
         this.minCap = minCap;
         this.percentageMax = percentageMax;
         this.maxCap = maxCap;
-        this.category = category;
         this.store = store;
     }
 
@@ -91,9 +88,6 @@ public class Product {
     public BigDecimal getMaxCap() { return maxCap; }
     public void setMaxCap(BigDecimal maxCap) { this.maxCap = maxCap; }
 
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
-
     public Store getStore() { return store; }
     public void setStore(Store store) { this.store = store; }
 
@@ -111,4 +105,66 @@ public class Product {
 
     public List<CategoryProduct> getCategoryProducts() { return categoryProducts; }
     public void setCategoryProducts(List<CategoryProduct> categoryProducts) { this.categoryProducts = categoryProducts; }
+
+    // Helper methods for category management
+    public void addCategory(Category category) {
+        CategoryProduct categoryProduct = new CategoryProduct();
+        categoryProduct.setProduct(this);
+        categoryProduct.setCategory(category);
+        this.categoryProducts.add(categoryProduct);
+    }
+
+    public void removeCategory(Category category) {
+        this.categoryProducts.removeIf(cp -> cp.getCategory().equals(category));
+    }
+
+    // Get categories as a list
+    @JsonProperty("categories")
+    public List<com.sitecraft.backend.DTOs.CategoryDTO> getCategories() {
+        if (categoryProducts == null) return null;
+        return categoryProducts.stream()
+                .map(cp -> new com.sitecraft.backend.DTOs.CategoryDTO(cp.getCategory()))
+                .collect(Collectors.toList());
+    }
+
+    // Get category IDs for JSON serialization
+    @JsonProperty("categoryIds")
+    public List<Long> getCategoryIds() {
+        if (categoryProducts == null) return null;
+        return categoryProducts.stream()
+                .map(cp -> cp.getCategory().getId())
+                .collect(Collectors.toList());
+    }
+
+    // Get category names for JSON serialization
+    @JsonProperty("categoryNames")
+    public List<String> getCategoryNames() {
+        if (categoryProducts == null) return null;
+        return categoryProducts.stream()
+                .map(cp -> cp.getCategory().getName())
+                .collect(Collectors.toList());
+    }
+    
+    public boolean isLowStockNotificationEnabled() {
+        return minCap != null && maxCap != null;
+    }
+    /**
+     * Check if the product is currently at low stock level
+     */
+    public boolean isAtLowStockLevel() {
+        if (!isLowStockNotificationEnabled()) return false;
+        // Only update maxCap if it seems stale (variants exist but maxCap doesn't match)
+        // This avoids overwriting maxCap that was just set by handleLowStockSettings
+        if (variants != null && !variants.isEmpty()) {
+            int currentTotalStock = variants.stream()
+                    .mapToInt(variant -> variant.getStock())
+                    .sum();
+            // Only update if maxCap is significantly different from actual stock
+            // This handles cases where stock changed after maxCap was set
+            if (maxCap.intValue() != currentTotalStock) {
+                this.maxCap = BigDecimal.valueOf(currentTotalStock);
+            }
+        }
+        return maxCap.intValue() <= minCap.intValue();
+    }
 }
