@@ -9,15 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/SiteCraft
 import { Sidebar } from "@/components/SiteCraft/sidebar/sidebar";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
 import { getStorePolicyById } from "@/lib/store-info";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/SiteCraft/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditPolicyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const policyId = searchParams.get('id');
   const { updateExistingPolicy, policiesLoading } = useStoreInfo();
+  const { isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -28,6 +30,27 @@ export default function EditPolicyPage() {
   const [error, setError] = useState<string | null>(null);
 
   console.log('📋 Edit Policy Page - Policy ID:', policyId);
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to edit policies.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load policy data on mount
   useEffect(() => {
@@ -108,13 +131,10 @@ export default function EditPolicyPage() {
       <Sidebar />
       
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        <div className="max-w-2xl mx-auto">
+        
           {/* Header */}
           <div className="mb-6">
-            <Link href="/dashboard/store-info" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Store Info
-            </Link>
+          
             <h1 className="text-2xl md:text-3xl font-bold">Edit Policy</h1>
             <p className="text-gray-600 mt-2">Update your policy information</p>
           </div>
@@ -201,7 +221,7 @@ export default function EditPolicyPage() {
               </form>
             </CardContent>
           </Card>
-        </div>
+        
       </main>
     </div>
   );

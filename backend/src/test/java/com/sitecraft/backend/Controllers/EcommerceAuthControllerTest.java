@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,9 @@ public class EcommerceAuthControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @InjectMocks
+    private EcommerceAuthController ecommerceAuthController;
 
     private Customer customer;
     private Store store;
@@ -60,6 +65,11 @@ public class EcommerceAuthControllerTest {
 
         // Setup Session
         session = new MockHttpSession();
+    }
+
+    @Test
+    void contextLoads() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

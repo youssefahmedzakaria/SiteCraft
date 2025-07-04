@@ -36,7 +36,16 @@ export const StaffManagementSection: FC = () => {
       setErrorMessage(null)
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Failed to add staff member'
-      setErrorMessage(errorMsg)
+      
+      // Provide more specific error messages for better UX
+      let displayMessage = errorMsg
+      if (errorMsg.includes('already staff in this store')) {
+        displayMessage = 'This user is already a staff member in this store.'
+      } else if (errorMsg.includes('Email already exists')) {
+        displayMessage = 'A user with this email already exists in the system.'
+      }
+      
+      setErrorMessage(displayMessage)
       setSuccessMessage(null)
     }
   }

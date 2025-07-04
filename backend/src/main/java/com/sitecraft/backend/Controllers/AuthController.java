@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,10 +22,11 @@ public class AuthController {
     @PostMapping(path = "/register")
     public ResponseEntity register(@RequestBody Users user) throws Exception {
         try {
-            boolean isExist = userService.isUserExists(user.getEmail());
-            if (isExist) {
+            // Check if user can register as owner (not already an owner)
+            boolean canRegister = userService.canRegisterAsOwner(user.getEmail());
+            if (!canRegister) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("User with this email exists.");
+                        .body("User with this email is already an owner of another store.");
             }
 
             if (user.getPassword() == null || user.getPassword().length() < 8) {
@@ -52,9 +54,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
-            boolean isExist = userService.isUserExists(loginRequest.getEmail());
-
-            if (!isExist) {
+            // Check if any user exists with this email
+            if (!userService.isAnyUserExists(loginRequest.getEmail())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("User with this email does not exist.");
             }
@@ -70,6 +71,7 @@ public class AuthController {
             session.setAttribute("storeId", user.getStoreId());
             session.setAttribute("userId", user.getId());
             session.setAttribute("role", user.getRole());
+            
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body("User logged in successfully.");
 
@@ -101,7 +103,7 @@ public class AuthController {
         System.out.println("📧 Forgot password sendOTP called for: " + email);
         
         try {
-            if (!userService.isUserExists(email)) {
+            if (!userService.isAnyUserExists(email)) {
                 System.out.println("❌ User not found: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "No User with this email exists."));
@@ -133,7 +135,7 @@ public class AuthController {
         System.out.println("🔐 Forgot password verifyOTP called for: " + email + " with code: " + code);
         
         try {
-            if (!userService.isUserExists(email)) {
+            if (!userService.isAnyUserExists(email)) {
                 System.out.println("❌ User not found: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "No User with this email exists."));
@@ -196,22 +198,8 @@ public class AuthController {
         Long storeId = (Long) session.getAttribute("storeId");
         String role = (String) session.getAttribute("role");
         
-        // If we have a userId, try to get the latest role from database
-        if (userId != null) {
-            try {
-                UserRole userRole = userService.getUserRole(userId);
-                if (userRole != null) {
-                    role = userRole.getRole();
-                    storeId = userRole.getStoreId();
-                    // Update session with latest data
-                    session.setAttribute("role", role);
-                    session.setAttribute("storeId", storeId);
-                }
-            } catch (Exception e) {
-                System.out.println("⚠️ Error retrieving user role from database: " + e.getMessage());
-                // Continue with session data if database lookup fails
-            }
-        }
+        // Don't refresh session data from database for users with multiple roles
+        // This can cause issues when a user has roles in multiple stores
         
         sessionData.put("storeId", storeId);
         sessionData.put("userId", userId);

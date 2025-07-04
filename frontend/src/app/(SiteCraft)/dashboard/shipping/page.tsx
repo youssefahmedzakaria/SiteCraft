@@ -15,6 +15,8 @@ import {
 import { useState, useEffect } from "react";
 import { ChevronDown, Plus, Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/SiteCraft/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function ShippingPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -26,6 +28,9 @@ export default function ShippingPage() {
     forceUpdate,
     removeShippingInfo
   } = useShippingInfo();
+
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   console.log('🚚 Shipping Page - Current state:', {
     shippingCount: shippingInfo.length,
@@ -59,6 +64,27 @@ export default function ShippingPage() {
             </div>
           </div>
         </main>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to view and manage shipping information.</p>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+            >
+              Login
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -100,19 +126,12 @@ export default function ShippingPage() {
                 Manage shipping rates and delivery locations
               </h2>
             </div>
-            <Button 
-              onClick={refreshShippingInfo} 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
           </div>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <div></div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+            <h3 className="text-lg font-semibold">
+              Shipping Locations: {shippingInfo.length}
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:justify-end">
               <Link href="/dashboard/shipping/add" className="w-full sm:w-auto">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover w-full">
                   <Plus size={16} />
@@ -156,21 +175,10 @@ export default function ShippingPage() {
 
         {/* Shipping Table */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              Shipping Locations ({shippingInfo.length})
-            </h3>
-          </div>
-          
           {shippingInfo.length === 0 ? (
             <div className="border rounded-lg border-logo-border p-8 text-center">
-              <p className="text-gray-500 mb-4">No shipping locations found</p>
-              <Link href="/dashboard/shipping/add">
-                <Button variant="outline">
-                  <Plus size={16} className="mr-2" />
-                  Add Your First Location
-                </Button>
-              </Link>
+              <p className="text-gray-500 mb-2">No shipping locations found</p>
+              <p className="text-xs text-gray-400">Add your first location to get started.</p>
             </div>
           ) : (
             <div className="border rounded-lg border-logo-border overflow-y-auto overflow-x-auto">

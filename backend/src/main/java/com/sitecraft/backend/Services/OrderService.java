@@ -4,6 +4,8 @@ import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,8 @@ public class OrderService {
     private ShippingInfoRepo shippingInfoRepo;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private JavaMailSender mailSender;
 
 
     public List<Order> getAllOrders(Long storeId) {
@@ -58,7 +62,8 @@ public class OrderService {
         return order;
     }
 
-    public Order updateOrderStatus(Long orderId, String newStatus) {
+
+     public Order updateOrderStatus(Long orderId, String newStatus) {
         Optional<Order> orderOptional = orderRepo.findById(orderId);
         if (orderOptional.isEmpty()) {
             throw new RuntimeException("Order not found.");
@@ -66,7 +71,19 @@ public class OrderService {
 
         Order order = orderOptional.get();
         order.setStatus(newStatus);
-        return orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
+
+        // Send email to customer
+        Customer customer = order.getCustomer();
+        if (customer != null && customer.getEmail() != null) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(customer.getEmail());
+            message.setSubject("Order Status Updated");
+            message.setText("Dear " + customer.getName() + ",\n\nYour order (ID: " + order.getId() + ") status has been updated to: " + newStatus + ".\n\nThank you for shopping with us!");
+            mailSender.send(message);
+        }
+
+        return savedOrder;
     }
 
     //----------------------------------------Cancel Order------------------------------------
@@ -201,5 +218,14 @@ public class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
+    }
+
+    public List<Order> getOrdersByStoreAndDateRange(Long storeId, java.time.LocalDate start, java.time.LocalDate end) {
+        List<Order> allOrders = getAllOrders(storeId);
+        return allOrders.stream()
+                .filter(order -> order.getIssueDate() != null &&
+                        !order.getIssueDate().toLocalDate().isBefore(start) &&
+                        !order.getIssueDate().toLocalDate().isAfter(end))
+                .collect(java.util.stream.Collectors.toList());
     }
 }
