@@ -1,4 +1,5 @@
 package com.sitecraft.backend.Controllers;
+import com.sitecraft.backend.DTOs.CategoryResponseDTO;
 import com.sitecraft.backend.DTOs.CustomizedTemplateDTO;
 import com.sitecraft.backend.Models.Category;
 import com.sitecraft.backend.Models.CustomizedTemplateSection;
@@ -238,7 +239,7 @@ public class CustomizationController {
 //            }
             Long storeId = 1L;
 
-            List<Category> categories = categoryService.getAllCategories(storeId).stream().limit(6).collect(Collectors.toList());
+            List<CategoryResponseDTO> categories = categoryService.getAllCategories(storeId).stream().limit(6).collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

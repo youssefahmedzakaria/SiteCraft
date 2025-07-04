@@ -73,11 +73,6 @@ public class EcommerceAuthService {
             customer.setGender("N/A");
         }
 
-        // Set creation and update timestamps
-        LocalDateTime now = LocalDateTime.now();
-        customer.setCreatedAt(now);
-        customer.setUpdatedAt(now);
-
         // Create wishlist and shopping cart for the customer
         WishList wishList = new WishList();
         wishList.setNumberOfProducts(0);
