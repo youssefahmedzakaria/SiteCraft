@@ -148,6 +148,19 @@ public class Product {
     public boolean isLowStockNotificationEnabled() {
         return minCap != null && maxCap != null;
     }
+    
+    /**
+     * Get current total stock from all variants
+     */
+    public int getCurrentTotalStock() {
+        if (variants == null || variants.isEmpty()) {
+            return 0;
+        }
+        return variants.stream()
+                .mapToInt(variant -> variant.getStock())
+                .sum();
+    }
+    
     /**
      * Check if the product is currently at low stock level
      */
@@ -156,9 +169,7 @@ public class Product {
         // Only update maxCap if it seems stale (variants exist but maxCap doesn't match)
         // This avoids overwriting maxCap that was just set by handleLowStockSettings
         if (variants != null && !variants.isEmpty()) {
-            int currentTotalStock = variants.stream()
-                    .mapToInt(variant -> variant.getStock())
-                    .sum();
+            int currentTotalStock = getCurrentTotalStock();
             // Only update if maxCap is significantly different from actual stock
             // This handles cases where stock changed after maxCap was set
             if (maxCap.intValue() != currentTotalStock) {

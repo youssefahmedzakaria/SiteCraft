@@ -203,7 +203,7 @@ export function ProductInfoSection({
             <div key={img.id || idx} className="relative w-24 h-24 border rounded overflow-hidden bg-gray-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={img.imageUrl?.startsWith('http') ? img.imageUrl : `http://localhost:8080${img.imageUrl}`}
+                src={img.imageUrl}
                 alt={img.alt || `Product image ${idx + 1}`}
                 className="object-cover w-full h-full"
               />

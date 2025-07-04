@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { createStore } from "@/lib/auth";
 import { getStoreSettings, updateStoreInfo } from "@/lib/store-info";
+import { saveStoreColors, updateStoreColors } from "@/lib/store-colors";
 import { useRouter } from "next/navigation";
 import { RefreshCw, AlertCircle } from "lucide-react";
 
@@ -727,6 +728,19 @@ export default function BrandingPage() {
         const result = await updateStoreInfo(storeData, logoFile || undefined);
         console.log('✅ Store updated successfully:', result);
         
+        // Update store colors in database
+        try {
+          await updateStoreColors({
+            primary: validPrimaryColor,
+            secondary: validSecondaryColor,
+            accent: validAccentColor
+          });
+          console.log('✅ Store colors updated in database');
+        } catch (colorError) {
+          console.error('⚠️ Failed to update colors in database:', colorError);
+          // Continue anyway, don't block the flow
+        }
+        
         // Show success message and redirect to color palette
         alert('Store updated successfully!');
         router.push('/branding/color-palette');
@@ -752,6 +766,19 @@ export default function BrandingPage() {
         if (result.store && result.store.id) {
           await updateSessionAfterStoreCreation(result.store.id, 'owner');
           console.log('✅ Session updated with store information');
+          
+          // Save store colors to database
+          try {
+            await saveStoreColors({
+              primary: validPrimaryColor,
+              secondary: validSecondaryColor,
+              accent: validAccentColor
+            });
+            console.log('✅ Store colors saved to database');
+          } catch (colorError) {
+            console.error('⚠️ Failed to save colors to database:', colorError);
+            // Continue anyway, don't block the flow
+          }
         }
       }
 
