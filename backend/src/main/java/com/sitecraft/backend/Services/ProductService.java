@@ -54,6 +54,7 @@ public class ProductService {
     @Autowired
     private VariantAttributeValueRepo variantAttributeValueRepo;
 
+
     public List<Product> getAllProducts(Long storeId) {
         return productRepo.findByStoreIdWithCategory(storeId);
     }
@@ -475,7 +476,7 @@ public class ProductService {
                 String filename = "product_" + productId + "_" + System.currentTimeMillis() + extension;
                 
                 // For now, simulate file storage (replace with actual file upload logic)
-                String imageUrl = "/uploads/products/" + "product" + productId + "/" + filename;
+                String imageUrl = "http://localhost:8080/uploads/products/" + "product" + productId + "/" + filename;
                 
                 // Save to database
                 ProductImage productImage = new ProductImage();
@@ -513,7 +514,14 @@ public class ProductService {
                 List<ProductImage> oldImages = productImageRepo.findByProductId(id);
                 for (ProductImage img : oldImages) {
                     try {
-                        String path = System.getProperty("user.dir") + img.getImageUrl();
+                        String imageUrl = img.getImageUrl();
+                        String relativePath;
+                        if (imageUrl.startsWith("http://localhost:8080")) {
+                            relativePath = imageUrl.substring("http://localhost:8080".length());
+                        } else {
+                            relativePath = imageUrl;
+                        }
+                        String path = System.getProperty("user.dir") + relativePath;
                         File file = new File(path);
                         if (file.exists()) {
                             file.delete();
@@ -545,7 +553,8 @@ public class ProductService {
             File destFile = new File(dir, filename);
             image.transferTo(destFile);
             ProductImage productImage = new ProductImage();
-            productImage.setImageUrl("/uploads/stores/" + storeId + "/products/" + filename);
+            // Store complete URL including server address
+            productImage.setImageUrl("http://localhost:8080/uploads/stores/" + storeId + "/products/" + filename);
             productImage.setAlt(product.getName() + " image " + count);
             productImage.setProduct(product);
             productImageRepo.save(productImage);
@@ -569,7 +578,14 @@ public class ProductService {
         }
 
         // 4. Delete the file from disk
-        String path = System.getProperty("user.dir") + image.getImageUrl();
+        String imageUrl = image.getImageUrl();
+        String relativePath;
+        if (imageUrl.startsWith("http://localhost:8080")) {
+            relativePath = imageUrl.substring("http://localhost:8080".length());
+        } else {
+            relativePath = imageUrl;
+        }
+        String path = System.getProperty("user.dir") + relativePath;
         File file = new File(path);
         if (file.exists()) file.delete();
 

@@ -44,11 +44,38 @@ public class StoreService {
         try {
             store.setCreationDate(LocalDateTime.now());
             store.setStatus("active");
+            
+            // Set default colors if not provided
+            String colors = store.getColors();
+            if (colors == null || colors.isEmpty()) {
+                colors = "{\"primary\": \"#000000\", \"secondary\": \"#ffffff\", \"accent\": \"#ff6b6b\"}";
+            }
+            
             System.out.println("📅 Store creation date set");
             System.out.println("✅ Store status set to active");
+            System.out.println("🎨 Store colors to be set: " + colors);
 
+            // Save the store without colors first to get the ID
             Store savedStore = storeRepo.save(store);
             System.out.println("✅ Store saved with ID: " + savedStore.getId());
+            
+            // Generate and set unique subdomain after getting the store ID
+            try {
+                String subdomain = generateSubdomain(savedStore.getStoreName(), savedStore.getId());
+                savedStore.setSubdomain(subdomain);
+                savedStore = storeRepo.save(savedStore);
+                System.out.println("🌐 Subdomain generated and set: " + subdomain);
+            } catch (Exception e) {
+                System.out.println("⚠️ Error setting subdomain: " + e.getMessage());
+                throw new RuntimeException("Failed to generate unique subdomain. Please try again with a different store name.");
+            }
+            
+            // Now update the colors using native query
+            storeRepo.updateStoreColors(savedStore.getId(), colors);
+            System.out.println("🎨 Store colors updated using native query");
+            
+            // Refresh the store to get the updated colors
+            savedStore = storeRepo.findById(savedStore.getId()).orElse(savedStore);
             
             Users tempUser = new Users();
             tempUser.setId(userId);
@@ -57,12 +84,20 @@ public class StoreService {
             userRoleRepo.save(ownerRole);
             System.out.println("👑 Owner role created for user ID: " + userId + " and store ID: " + savedStore.getId());
 
-            return storeRepo.save(savedStore);
+            return savedStore;
 
         } catch (Exception e) {
             System.out.println("💥 Error creating store: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Failed to create store: " + e.getMessage());
+            
+            // Provide more specific error messages
+            if (e.getMessage().contains("duplicate key") || e.getMessage().contains("unique constraint")) {
+                throw new RuntimeException("A store with this name or subdomain already exists. Please choose a different name.");
+            } else if (e.getMessage().contains("subdomain")) {
+                throw new RuntimeException("Failed to create unique subdomain. Please try again with a different store name.");
+            } else {
+                throw new RuntimeException("Failed to create store: " + e.getMessage());
+            }
         }
     }
 
@@ -73,31 +108,53 @@ public class StoreService {
         Store existingStore = storeRepo.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
-        if (updatedData.getStoreName() != null) existingStore.setStoreName(updatedData.getStoreName());
-        if (updatedData.getStoreType() != null) existingStore.setStoreType(updatedData.getStoreType());
-        if (updatedData.getLogo() != null) existingStore.setLogo(updatedData.getLogo());
-        if (updatedData.getSubdomain() != null) existingStore.setSubdomain(updatedData.getSubdomain());
-        if (updatedData.getDescription() != null) existingStore.setDescription(updatedData.getDescription());
-        if (updatedData.getPhoneNumber() != null) existingStore.setPhoneNumber(updatedData.getPhoneNumber());
-        if (updatedData.getEmailAddress() != null) existingStore.setEmailAddress(updatedData.getEmailAddress());
-        if (updatedData.getAddress() != null) existingStore.setAddress(updatedData.getAddress());
-        if (updatedData.getAddressLink() != null) existingStore.setAddressLink(updatedData.getAddressLink());
-        if (updatedData.getOpeningHours() != null) existingStore.setOpeningHours(updatedData.getOpeningHours());
+        try {
+            if (updatedData.getStoreName() != null) existingStore.setStoreName(updatedData.getStoreName());
+            if (updatedData.getStoreType() != null) existingStore.setStoreType(updatedData.getStoreType());
+            if (updatedData.getLogo() != null) existingStore.setLogo(updatedData.getLogo());
+            
+            // Handle subdomain updates with conflict checking
+            if (updatedData.getSubdomain() != null) {
+                String newSubdomain = updatedData.getSubdomain().trim().toLowerCase();
+                if (!newSubdomain.equals(existingStore.getSubdomain())) {
+                    if (storeRepo.existsBySubdomain(newSubdomain)) {
+                        throw new RuntimeException("This subdomain is already taken. Please choose a different one.");
+                    }
+                    existingStore.setSubdomain(newSubdomain);
+                }
+            }
+            
+            if (updatedData.getDescription() != null) existingStore.setDescription(updatedData.getDescription());
+            if (updatedData.getPhoneNumber() != null) existingStore.setPhoneNumber(updatedData.getPhoneNumber());
+            if (updatedData.getEmailAddress() != null) existingStore.setEmailAddress(updatedData.getEmailAddress());
+            if (updatedData.getAddress() != null) existingStore.setAddress(updatedData.getAddress());
+            if (updatedData.getAddressLink() != null) existingStore.setAddressLink(updatedData.getAddressLink());
+            if (updatedData.getOpeningHours() != null) existingStore.setOpeningHours(updatedData.getOpeningHours());
 
-        Map<String, SocialMedia> existingMap = existingStore.getSocialMediaAccounts().stream()
-                .collect(Collectors.toMap(SocialMedia::getName, Function.identity()));
+            Map<String, SocialMedia> existingMap = existingStore.getSocialMediaAccounts().stream()
+                    .collect(Collectors.toMap(SocialMedia::getName, Function.identity()));
 
-        for (SocialMedia updatedAccount : updatedData.getSocialMediaAccounts()) {
-            SocialMedia existing = existingMap.get(updatedAccount.getName());
-            if (existing != null) {
-                existing.setLink(updatedAccount.getLink());
+            for (SocialMedia updatedAccount : updatedData.getSocialMediaAccounts()) {
+                SocialMedia existing = existingMap.get(updatedAccount.getName());
+                if (existing != null) {
+                    existing.setLink(updatedAccount.getLink());
+                } else {
+                    updatedAccount.setStore(existingStore);
+                    existingStore.getSocialMediaAccounts().add(updatedAccount);
+                }
+            }
+
+            return storeRepo.save(existingStore);
+            
+        } catch (Exception e) {
+            if (e.getMessage().contains("duplicate key") || e.getMessage().contains("unique constraint")) {
+                throw new RuntimeException("The subdomain you chose is already taken. Please choose a different one.");
+            } else if (e.getMessage().contains("subdomain")) {
+                throw new RuntimeException(e.getMessage());
             } else {
-                updatedAccount.setStore(existingStore);
-                existingStore.getSocialMediaAccounts().add(updatedAccount);
+                throw new RuntimeException("Failed to update store: " + e.getMessage());
             }
         }
-
-        return storeRepo.save(existingStore);
     }
 
     public Store getStore(Long storeId) {
@@ -344,6 +401,61 @@ public class StoreService {
             totalStaff, totalOrders, totalSales, lastMonthOrders, lastMonthSales,
             productCount, currentPlan, planRecommendation, offerRecommendation, advice
         );
+    }
+
+    // --------------------------------- Store Colors Management -----------------------------------------------
+
+    @Transactional
+    public Store updateStoreColors(Long storeId, String primary, String secondary, String accent) {
+        // Create JSON string for colors
+        String colorsJson = String.format(
+            "{\"primary\": \"%s\", \"secondary\": \"%s\", \"accent\": \"%s\"}", 
+            primary, secondary, accent
+        );
+        
+        // Use native query to handle JSONB casting
+        storeRepo.updateStoreColors(storeId, colorsJson);
+        
+        // Return the updated store
+        return storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+    }
+
+    public String getStoreColors(Long storeId) {
+        String colors = storeRepo.getStoreColors(storeId);
+        
+        // Return default colors if not set
+        if (colors == null || colors.isEmpty()) {
+            return "{\"primary\": \"#000000\", \"secondary\": \"#ffffff\", \"accent\": \"#ff6b6b\"}";
+        }
+        
+        return colors;
+    }
+
+    // --------------------------------- Helper Methods -----------------------------------------------
+
+    private String generateSubdomain(String storeName, Long storeId) {
+        // Clean the store name: remove spaces, special characters, and convert to lowercase
+        String cleanStoreName = storeName.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        
+        // Ensure the clean store name is not empty
+        if (cleanStoreName.isEmpty()) {
+            cleanStoreName = "store";
+        }
+        
+        // Generate base subdomain: storename + storeid
+        String baseSubdomain = cleanStoreName + storeId;
+        
+        // Check if this subdomain already exists
+        int counter = 1;
+        String finalSubdomain = baseSubdomain;
+        
+        while (storeRepo.existsBySubdomain(finalSubdomain)) {
+            finalSubdomain = baseSubdomain + counter;
+            counter++;
+        }
+        
+        return finalSubdomain;
     }
 
 }

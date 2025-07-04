@@ -433,7 +433,7 @@ export const createAnalyticsMetrics = (
   dateRange?: { from: Date; to: Date }
 ): GeneralAnalytic[] => {
   const totalCustomers = newCustomers + returningCustomers;
-  const conversionRate = orderCount > 0 ? ((totalCustomers / orderCount) * 100).toFixed(1) : '0';
+  const conversionRate = orderCount > 0 ? ((orderCount /totalCustomers ) * 100).toFixed(1) : '0';
   const avgOrderValue = orderCount > 0 ? (totalSales / orderCount).toFixed(2) : '0';
   const returningRate = totalCustomers > 0 ? ((returningCustomers / totalCustomers) * 100).toFixed(1) : '0';
 
@@ -456,7 +456,7 @@ export const createAnalyticsMetrics = (
     },
     {
       id: '3',
-      title: 'Total Visitors',
+      title: 'Total Customers',
       value: totalCustomers.toString(),
       subtitle: dateRangeText,
     },
