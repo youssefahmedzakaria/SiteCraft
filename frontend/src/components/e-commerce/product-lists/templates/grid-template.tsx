@@ -28,8 +28,6 @@ interface GridProductTemplateProps {
   // Card related props
   cardVariant?:
     | "default"
-    | "compact"
-    | "detailed"
     | "minimal"
     | "hover"
     | "overlay"
@@ -60,7 +58,7 @@ interface GridProductTemplateProps {
 export function GridProductTemplate({
   isClickable,
   products,
-  columns = { sm: 2, md: 3, lg: 4, xl: 6 },
+  columns = { sm: 1, md: 3, lg: 4, xl: 4 },
   gap = "gap-4",
   bgColor = "bg-white",
   textColor = "text-gray-800",

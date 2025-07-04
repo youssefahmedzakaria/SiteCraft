@@ -51,12 +51,14 @@ interface RenderPoliciesSectionProps {
   updatePoliciesAttributes: (
     updates: Partial<PoliciesCustomizationAttributes>
   ) => void;
+  onDeleteSection?: () => void;
 }
 
 export function RenderPoliciesSection({
   detailedSectionTab,
   policiesAttributes,
   updatePoliciesAttributes,
+  onDeleteSection,
 }: RenderPoliciesSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -90,10 +92,10 @@ export function RenderPoliciesSection({
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = [
+      "CenteredPolicies",
+      "LeftPolicies",
       "TitleLeftContentCenterPolicies",
       "DefaultPolicies",
-      "LeftPolicies",
-      "CenteredPolicies",
     ];
     const templateName =
       templateNames[layoutId - 1] || "TitleLeftContentCenterPolicies";
@@ -105,29 +107,43 @@ export function RenderPoliciesSection({
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
-        <div className="p-4 space-y-6">
+        <div className="flex flex-col flex-1 min-h-0 p-4">
           {/* Title */}
-          <div className="space-y-3">
-            <h1 className="text-lg font-semibold tracking-tight">Title</h1>
-            <Input
-              value={policiesAttributes.title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Enter section title"
-            />
+          <div className="space-y-8 flex-1 min-h-0 overflow-y-auto">
+            <div className="space-y-1">
+              <h1 className="text-lg font-semibold tracking-tight">Title</h1>
+              <Input
+                value={policiesAttributes.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Enter section title"
+              />
+            </div>
+          </div>
+
+          <div className="pt-8 flex justify-start">
+            {onDeleteSection && (
+              <button
+                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
+                onClick={onDeleteSection}
+              >
+                <Trash2 size={16} />
+                Delete Section
+              </button>
+            )}
           </div>
         </div>
       ) : (
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
           {/* Layout Selection */}
           <PoliciesLayoutItems
             selectedLayout={
               [
+                "CenteredPolicies",
+                "LeftPolicies",
                 "TitleLeftContentCenterPolicies",
                 "DefaultPolicies",
-                "LeftPolicies",
-                "CenteredPolicies",
               ].indexOf(policiesAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}

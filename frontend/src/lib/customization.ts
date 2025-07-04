@@ -23,7 +23,6 @@ export interface HeaderCustomizationAttributes {
   }[];
   iconColor: string;
   dividerColor: string;
-  searchIconColor: string;
   fontFamily: string;
 }
 
@@ -55,6 +54,89 @@ export interface PromoCustomizationAttributes {
   imageObjectFit: "cover" | "fill" | "contain";
 }
 
+export interface CategoryCustomizationAttributes {
+  id : string;
+  template: string; //
+  isClickable: boolean; //
+  title: string; //
+  bgColor: string; //
+  textColor: string; //
+  fontFamily: string; //
+  titleFont: string; //
+  showTitle: boolean; //
+  showMoreButton: boolean; //
+  showMoreText: string; //
+  showMorebuttonBgColor: string; //
+  showMorebuttonTextColor: string; //
+  ctaText: string; //
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined; //
+  showCta: boolean; //
+  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; //
+  showSubtitle: boolean; //
+  overlayColor: string;
+  showCategoryTitle: boolean;
+  titleColor: string;
+  titleFontSize: string;
+  categoryTitleFontSize: string;
+  categories: {
+  name: string;
+  media: {
+      mainMedia: {
+          image: {
+              url: string;
+          }
+      }
+  };
+  id: string;
+  Description: string;
+  link: string; 
+  }[];
+
+}
+
+export interface ProductCustomizationAttributes {
+  id : string;
+  template: string; 
+  isClickable: boolean; 
+  title: string; 
+  bgColor: string; 
+  textColor: string; 
+  fontFamily: string; 
+  titleFont: string; 
+  showTitle: boolean; 
+  showMoreButton: boolean; 
+  showMoreText: string; 
+  showMorebuttonBgColor: string; 
+  showMorebuttonTextColor: string; 
+  ctaText: string;
+  cornerRadius: "small" | "medium" | "none" | "large" | undefined; 
+  showCta: boolean; 
+  cardVariant: "overlay" | "default" | "minimal" | "hover" | "featured" | undefined; 
+  showSubtitle: boolean; 
+  overlayColor: string;
+  showProductTitle: boolean;
+  titleColor: string;
+  titleFontSize: string;
+  productTitleFontSize: string;
+  products: {
+    id: string;
+    name: string;
+    description: string;
+      media: {
+        mainMedia: {
+          image: {
+            url: string
+          }
+        }
+      },
+      price:{
+        price: number,
+        priceAfterDiscount: number
+      }
+
+  }[];
+}
+
 export interface AboutCustomizationAttributes {
   template: string;
   id: string;
@@ -69,7 +151,6 @@ export interface AboutCustomizationAttributes {
   imageObjectFit: "cover" | "fill" | "contain";
   titleFont: string;
   titleSize: string;
-  titleFontWeight: string;
   descriptionFont: string;
   descriptionSize: string;
 }
@@ -111,7 +192,7 @@ export interface ContactCustomizationAttributes {
     instagram?: string;
     twitter?: string;
   };
-  imageUrl: string;
+  image: string;
   showMap: boolean;
   backgroundColor: string;
   titleFont: string;
@@ -137,6 +218,7 @@ export interface FooterCustomizationAttributes {
     font: string;
     fontSize: string;
     fontColor: string;
+    isShown: boolean;
   }[];
   socialMedia: {
     facebook?: string;

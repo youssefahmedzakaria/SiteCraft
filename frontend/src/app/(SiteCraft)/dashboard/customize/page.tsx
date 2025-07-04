@@ -1,8 +1,11 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Sidebar } from "@/components/SiteCraft/dashboard/customize/sidebar";
-import { Eye, AlertCircle } from "lucide-react";
+import { Eye, AlertCircle, X } from "lucide-react";
 import { TitleLeftContentCenterPolicies } from "@/components/e-commerce/policies/templates/titleLeftContentCenter";
 import { DefaultPolicies } from "@/components/e-commerce/policies/templates/default";
 import { LeftPolicies } from "@/components/e-commerce/policies/templates/left";
@@ -21,10 +24,12 @@ import ProductList from "@/components/e-commerce/product-lists/product-list";
 import { CenteredPromo } from "@/components/e-commerce/promo/templates/centered-promo";
 import {
   AboutCustomizationAttributes,
+  CategoryCustomizationAttributes,
   ContactCustomizationAttributes,
   FooterCustomizationAttributes,
   HeaderCustomizationAttributes,
   PoliciesCustomizationAttributes,
+  ProductCustomizationAttributes,
   PromoCustomizationAttributes,
 } from "@/lib/customization";
 import Navbar from "@/components/e-commerce/navbar/Navbar";
@@ -37,24 +42,52 @@ import {
   RightAlignedPromo,
   SplitPromo,
 } from "@/components/e-commerce/promo";
+import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/SiteCraft/ui/dialog";
+import { categories } from "@/lib/categories";
+import {
+  FeaturedGridProductTemplate,
+  GridProductTemplate,
+  HorizontalScrollProductTemplate,
+} from "@/components/e-commerce/product-lists";
+import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
+import { form } from "@heroui/theme";
+import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
+interface Section {
+  id: string;
+  title: string;
+  expanded: boolean;
+}
+
+const initialSections: Section[] = [];
+
 export default function CustomizeTemplatePage() {
-  const [selectedTab, setSelectedTab] = useState<
-    "desktop" | "tablet" | "mobile"
-  >("desktop");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const [aboutImage, setAboutImage] = useState<File | undefined>();
+  const [contactImage, setContactImage] = useState<File | undefined>();
+  const [promoImages, setPromoImages] = useState<File[] | undefined>();
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
-    brandName: "Jewelry",
+    brandName: "Brand Name",
     backgroundColor: "bg-[#00000080]", // bg-black/50
     textColor: "text-[#FFFFFF]", // text-white
     logo: {
-      src: "/logo.png",
+      src: "/placeholder.png",
       alt: "Custom Logo",
       width: 50,
       height: 50,
@@ -68,7 +101,6 @@ export default function CustomizeTemplatePage() {
     ],
     iconColor: "text-[#FFFFFF]", // text-white
     dividerColor: "border-[#E5E7EB]", // border-gray-200
-    searchIconColor: "text-[#FFFFFF]", // text-white
     fontFamily: "font-sans",
   };
 
@@ -95,7 +127,7 @@ export default function CustomizeTemplatePage() {
           "Discover amazing products at great prices. Shop our latest collection and enjoy exclusive deals.",
         buttonText: "Shop Now",
         buttonLink: "#new-collection",
-        image: "/girl.jpg",
+        image: "/placeholder.png",
         imageAlt: "Welcome to our store",
       },
       {
@@ -104,7 +136,7 @@ export default function CustomizeTemplatePage() {
           "Check out our newest products. Limited time offers with free shipping on all orders.",
         buttonText: "View Collection",
         buttonLink: "#new-collection",
-        image: "/hand.jpg",
+        image: "/placeholder.png",
         imageAlt: "New arrivals collection",
       },
     ],
@@ -134,6 +166,260 @@ export default function CustomizeTemplatePage() {
     setPromoAttributes((prev) => ({ ...prev, ...updates }));
   };
 
+  const initialCategory: CategoryCustomizationAttributes = {
+    id: "categories",
+    template: "FeaturedGrid", // You can adjust this if needed
+    isClickable: false,
+    title: "categories",
+    bgColor: "bg-[#FFFFFF]",
+    textColor: "text-[#000000]",
+    fontFamily: "font-mono",
+    titleFont: "font-bold",
+    showTitle: true,
+    showMoreButton: true,
+    showMoreText: "Show More",
+    showMorebuttonBgColor: "bg-[#000000]",
+    showMorebuttonTextColor: "text-[#EF4444]",
+    ctaText: "Shop Now",
+    cornerRadius: "small",
+    showCta: true,
+    cardVariant: "overlay",
+    showSubtitle: true,
+    overlayColor: "bg-[#00000080]",
+    showCategoryTitle: true,
+    titleColor: "text-[#000000]",
+    titleFontSize: "text-2xl",
+    categoryTitleFontSize: "text-lg",
+    // cardTextColor: "text-[#000000]", // Added a reasonable default value
+    categories: [
+      {
+        id: "6",
+        name: "Necklaces",
+        Description: "Necklaces",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "7",
+        name: "Rings",
+        Description: "Rings",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "8",
+        name: "Earrings",
+        Description: "Earrings",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "9",
+        name: "Bracelets",
+        Description: "Bracelets",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "10",
+        name: "Pendants",
+        Description: "Pendants",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+      {
+        id: "11",
+        name: "Bangles",
+        Description: "Bangles",
+        link: `/#`,
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+      },
+    ],
+  };
+
+  // State for category customization
+  const [categoryAttributes, setCategoryAttributes] =
+    useState<CategoryCustomizationAttributes>(initialCategory);
+
+  // Function to update category attributes
+  const updateCategoryAttributes = (
+    updates: Partial<CategoryCustomizationAttributes>
+  ) => {
+    setCategoryAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
+  const initialProduct: ProductCustomizationAttributes = {
+    id: "products",
+    template: "HorizontalScroll", // You can adjust this if needed
+    isClickable: false,
+    title: "products",
+    bgColor: "bg-[#FFFFFF]",
+    textColor: "text-[#000000]",
+    fontFamily: "font-mono",
+    titleFont: "font-bold",
+    showTitle: true,
+    showMoreButton: true,
+    showMoreText: "Show More",
+    showMorebuttonBgColor: "bg-[#000000]",
+    showMorebuttonTextColor: "text-[#EF4444]",
+    ctaText: "Shop Now",
+    cornerRadius: "small",
+    showCta: true,
+    cardVariant: "default",
+    showSubtitle: true,
+    overlayColor: "bg-[#00000080]",
+    showProductTitle: true,
+    titleColor: "text-[#000000]",
+    titleFontSize: "text-2xl",
+    productTitleFontSize: "text-lg",
+    // cardTextColor: "text-[#000000]", // Added a reasonable default value
+    products: [
+      {
+        id: "1",
+        name: "product1",
+        description: "description of product1",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "2",
+        name: "product2",
+        description: "description of product2",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "3",
+        name: "product3",
+        description: "description of product3",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "4",
+        name: "product4",
+        description: "description of product4",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "5",
+        name: "product5",
+        description: "description of product5",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+      {
+        id: "6",
+        name: "product6",
+        description: "description of product6",
+        media: {
+          mainMedia: {
+            image: {
+              url: "/placeholder.png",
+            },
+          },
+        },
+        price: {
+          price: 59.99,
+          priceAfterDiscount: 39.99,
+        },
+      },
+    ],
+  };
+
+  // State for product customization
+  const [productAttributes, setProductAttributes] =
+    useState<ProductCustomizationAttributes>(initialProduct);
+
+  // Function to update product attributes
+  const updateProductAttributes = (
+    updates: Partial<ProductCustomizationAttributes>
+  ) => {
+    setProductAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
     id: "about",
@@ -145,12 +431,12 @@ export default function CustomizeTemplatePage() {
       "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
     descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    image: "/about.jpg",
+    image: "/placeholder.png",
     imageAlt: "About our company",
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
-    titleFontWeight: "font-bold",
+    // titleFontWeight: "font-bold",
     descriptionFont: "font-sans",
     descriptionSize: "text-lg",
   };
@@ -227,7 +513,7 @@ export default function CustomizeTemplatePage() {
       instagram: "https://www.instagram.com",
       twitter: "https://www.x.com",
     },
-    imageUrl: "/ring.jpg",
+    image: "/placeholder.png",
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
@@ -250,12 +536,12 @@ export default function CustomizeTemplatePage() {
   };
 
   const initialFooter: FooterCustomizationAttributes = {
-    brandName: "BRAND",
+    brandName: "Brand Name",
     backgroundColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
     logo: {
-      src: "/logo.png",
-      alt: "Company Logo",
+      src: "/placeholder.png",
+      alt: "Brand Logo",
       size: "24",
     },
     aboutLinks: [
@@ -265,6 +551,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
       {
         label: "About Us",
@@ -272,6 +559,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
       {
         label: "Policies",
@@ -279,6 +567,7 @@ export default function CustomizeTemplatePage() {
         font: "font-serif",
         fontSize: "text-lg",
         fontColor: "text-[#000000]",
+        isShown: true,
       },
     ],
     socialMedia: {
@@ -307,6 +596,579 @@ export default function CustomizeTemplatePage() {
     updates: Partial<FooterCustomizationAttributes>
   ) => {
     setFooterAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
+  const sectionComponents = {
+    PromoSlider: {
+      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
+      LeftAlignedPromo: (
+        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      RightAlignedPromo: (
+        <RightAlignedPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalLeftPromo: (
+        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
+      ),
+      MinimalRightPromo: (
+        <MinimalRightPromo {...promoAttributes} isClickable={false} />
+      ),
+      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
+      SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
+    },
+    Products: {
+      FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollProductTemplate {...productAttributes} />
+      ),
+      Grid: <GridProductTemplate {...productAttributes} />,
+    },
+    Categories: {
+      FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollCategoryTemplate {...categoryAttributes} />
+      ),
+      Grid: <GridCategoryTemplate {...categoryAttributes} />,
+    },
+    AboutUs: {
+      TopImageAbout: <TopImageAbout {...aboutAttributes} />,
+      CenteredAbout: <CenteredAbout {...aboutAttributes} />,
+      LeftAlignedAbout: <LeftAlignedAbout {...aboutAttributes} />,
+      RightAlignedAbout: <RightAlignedAbout {...aboutAttributes} />,
+    },
+    ContactUs: {
+      MinimalRightContact: <MinimalRightContact {...contactAttributes} />,
+      CenteredContact: <CenteredContact {...contactAttributes} />,
+      LeftAlignedContact: <LeftAlignedContact {...contactAttributes} />,
+      RightAlignedContact: <RightAlignedContact {...contactAttributes} />,
+      MinimalLeftContact: <MinimalLeftContact {...contactAttributes} />,
+    },
+    Policies: {
+      TitleLeftContentCenterPolicies: (
+        <TitleLeftContentCenterPolicies {...policiesAttributes} />
+      ),
+      DefaultPolicies: <DefaultPolicies {...policiesAttributes} />,
+      LeftPolicies: <LeftPolicies {...policiesAttributes} />,
+      CenteredPolicies: <CenteredPolicies {...policiesAttributes} />,
+    },
+  };
+
+  const [sections, setSections] = useState<Section[]>(initialSections);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // Store data state
+  const [storeData, setStoreData] = useState<any>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Add a useEffect to update header/footer logo and other attributes when storeData changes
+  React.useEffect(() => {
+    if (!storeData) return;
+    // Update header logo
+    setHeaderAttributes((prev) => ({
+      ...prev,
+      brandName: storeData.storeName || prev.brandName,
+      logo: {
+        ...prev.logo,
+        src:
+          storeData.logo && storeData.logo !== ""
+            ? storeData.logo
+            : "/placeholder.png",
+      },
+    }));
+    // Update about
+    setAboutAttributes((prev) => ({
+      ...prev,
+      description: storeData.aboutUs?.[0]?.title || prev.description,
+      secondaryDescription: storeData.aboutUs?.[0]?.content || prev.description,
+    }));
+    // Update policies
+    setPoliciesAttributes((prev) => ({
+      ...prev,
+      sections:
+        storeData.policies?.map((p: any) => ({
+          title: p.title,
+          content: p.description,
+        })) || prev.sections,
+    }));
+    // Update contact
+    setContactAttributes((prev) => ({
+      ...prev,
+      contactEmail: storeData.emailAddress || prev.contactEmail,
+      socialLinks: {
+        facebook:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "facebook"
+          )?.link ||
+          prev.socialLinks?.facebook ||
+          "",
+        instagram:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "instagram"
+          )?.link ||
+          prev.socialLinks?.instagram ||
+          "",
+        twitter:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "twitter"
+          )?.link ||
+          prev.socialLinks?.twitter ||
+          "",
+      },
+    }));
+    // Update footer logo and social media
+    setFooterAttributes((prev) => ({
+      ...prev,
+      brandName: storeData.storeName || prev.brandName,
+      logo: {
+        ...prev.logo,
+        src:
+          storeData.logo && storeData.logo !== ""
+            ? storeData.logo
+            : "/placeholder.png",
+      },
+      socialMedia: {
+        facebook:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "facebook"
+          )?.link || prev.socialMedia.facebook,
+        instagram:
+          storeData.socialMediaAccounts?.find(
+            (acc: any) => acc.name.toLowerCase() === "instagram"
+          )?.link || prev.socialMedia.instagram,
+      },
+    }));
+  }, [storeData]);
+
+  const fetchTemplate = async () => {
+    try {
+      const [templateRes, storeRes, productsRes, categoriesRes] =
+        await Promise.all([
+          fetch("http://localhost:8080/customize/getTemplate", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/api/store/getStoreSettings", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getProducts", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/customize/getCategories", {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
+
+      const [templateData, storeData, productsData, categoriesData] =
+        await Promise.all([
+          templateRes.json(),
+          storeRes.json(),
+          productsRes.json(),
+          categoriesRes.json(),
+        ]);
+
+      if (
+        templateData.success &&
+        templateData["Customized Template"] &&
+        storeData.success &&
+        storeData.store
+      ) {
+        const sortedTemplate = [...templateData["Customized Template"]].sort(
+          (a, b) => a.index - b.index
+        );
+        const loadedSections: Section[] = [];
+
+        sortedTemplate.forEach((section: any) => {
+          loadedSections.push({
+            id: section.title,
+            title: section.title.replace("&", " & "),
+            expanded: false,
+          });
+
+          switch (section.title) {
+            case "Header&Menu":
+              updateHeaderAttributes(section.value);
+              break;
+            case "PromoSlider":
+              updatePromoAttributes(section.value);
+              break;
+            case "AboutUs":
+              updateAboutAttributes(section.value);
+              break;
+            case "Footer":
+              updateFooterAttributes(section.value);
+              break;
+            case "Policies":
+              updatePoliciesAttributes(section.value);
+              break;
+            case "ContactUs":
+              updateContactAttributes(section.value);
+              break;
+            case "Categories":
+              updateCategoryAttributes(section.value);
+              break;
+            case "Products":
+              updateProductAttributes(section.value);
+              break;
+          }
+        });
+
+        setSections(loadedSections);
+
+        // Store data
+        setStoreData(storeData.store);
+
+        setAboutAttributes((prev) => ({
+          ...prev,
+          description: storeData.store.aboutUs?.[0]?.title || prev.description,
+          secondaryDescription:
+            storeData.store.aboutUs?.[0]?.content || prev.secondaryDescription,
+        }));
+
+        setPoliciesAttributes((prev) => ({
+          ...prev,
+          sections:
+            storeData.store.policies?.map((p: any) => ({
+              title: p.title,
+              content: p.description,
+            })) || prev.sections,
+        }));
+
+        setContactAttributes((prev) => ({
+          ...prev,
+          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          socialLinks: {
+            facebook:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "facebook"
+              )?.link || "",
+            instagram:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "instagram"
+              )?.link || "",
+            twitter:
+              storeData.store.socialMediaAccounts?.find(
+                (acc: any) => acc.name.toLowerCase() === "twitter"
+              )?.link || "",
+          },
+        }));
+
+        // 👇 Now you can store products and categories:
+        if (productsData.success && productsData.products) {
+          const mappedProducts = productsData.products.map((product: any) => ({
+            id: String(product.id),
+            name: product.name,
+            description: product.description,
+            media: {
+              mainMedia: {
+                image: {
+                  url:
+                    product.images && product.images.length > 0
+                      ? product.images[0].imageUrl
+                      : "/placeholder.png",
+                },
+              },
+            },
+                        price: {
+              price: product.variants[0].price ? product.variants[0].price : 0.00,
+              priceAfterDiscount: product.discountValue
+                ? 
+                    product.discountType === "percentage"
+                      ? parseFloat((product.variants[0].price * (1 - product.discountValue)).toFixed(2))
+                      : parseFloat((product.variants[0].price - product.discountValue).toFixed(2))
+                  
+                  : parseFloat(product.variants[0].price.toFixed(2)),
+            },
+          }));
+
+          setProductAttributes((prev) => ({
+            ...prev,
+            products: mappedProducts,
+          }));
+          console.log("Mapped Products:", mappedProducts);
+        }
+
+        if (categoriesData.success && categoriesData.categories) {
+          const mappedCategories = categoriesData.categories.map(
+            (category: any) => ({
+              id: String(category.id),
+              name: category.name,
+              Description: category.description,
+              link: "#",
+              media: {
+                mainMedia: {
+                  image: {
+                    url:
+                      category.image || "/placeholder.png",
+                  },
+                },
+              },
+            })
+          );
+
+          setCategoryAttributes((prev) => ({
+            ...prev,
+            categories: mappedCategories,
+          }));
+          console.log("Mapped Categories:", mappedCategories);
+        }
+
+        console.log("Categories", categoriesData.categories);
+        console.log("Products", productsData.products);
+      }
+    } catch (error) {
+      console.error(
+        "Failed to fetch template, store data, products, or categories:",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      await Promise.all([fetchTemplate()]);
+      setIsLoading(false);
+    };
+    fetchAll();
+  }, []);
+
+  // Warn user before leaving the page if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue =
+        "You have unsaved changes. Are you sure you want to leave? Changes will not be saved.";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  // Helper to remove backend fields from each section's value
+  const stripBackendFields = (sectionId: string, value: any) => {
+    switch (sectionId) {
+      case "Header&Menu": {
+        const { brandName, logo, ...rest } = value;
+        return {
+          ...rest,
+          logo: logo ? { ...logo, src: undefined } : undefined,
+        };
+      }
+      case "PromoSlider":
+        return value;
+      case "Categories": {
+        const { categories, ...rest } = value;
+        return rest;
+      }
+      case "Products": {
+        const { products, ...rest } = value;
+        return rest;
+      }
+      case "AboutUs": {
+        const { description, secondaryDescription, ...rest } = value;
+        return rest;
+      }
+      case "Policies": {
+        const { sections, ...rest } = value;
+        return rest;
+      }
+      case "ContactUs": {
+        const { contactEmail, socialLinks, ...rest } = value;
+        return rest;
+      }
+      case "Footer": {
+        const { brandName, logo, socialMedia, ...rest } = value;
+        return {
+          ...rest,
+          logo: logo ? { ...logo, src: undefined } : undefined,
+        };
+      }
+      default:
+        return value;
+    }
+  };
+
+  // API call for editing customization
+  const handleSaveClick = () => {
+    setShowSaveDialog(true);
+  };
+
+  const handleCustomizedImages = async () => {
+    let updatedSlides = [...promoAttributes.slides];
+    let updatedAboutImage = aboutAttributes.image;
+    let updatedContactImage = contactAttributes.image;
+
+    try {
+      if (promoImages && promoImages.length > 0) {
+        for (let i = 0; i < promoImages.length; i++) {
+          const formData = new FormData();
+          formData.append("image", promoImages[i]);
+          const response = await fetch(
+            "http://localhost:8080/customize/saveImage",
+            {
+              method: "POST",
+              credentials: "include",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+          if (!data.success) {
+            alert(data.message || "Failed to save customization Image.");
+            return null;
+          } else {
+            const url = data.url;
+            updatedSlides[i] = { ...updatedSlides[i], image: url };
+          }
+        }
+      }
+      if (aboutImage !== undefined) {
+        const formData = new FormData();
+        formData.append("image", aboutImage);
+        const response = await fetch(
+          "http://localhost:8080/customize/saveImage",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          alert(data.message || "Failed to save customization Image.");
+          return null;
+        } else {
+          updatedAboutImage = data.url;
+        }
+      }
+      if (contactImage !== undefined) {
+        const formData = new FormData();
+        formData.append("image", contactImage);
+        const response = await fetch(
+          "http://localhost:8080/customize/saveImage",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          alert(data.message || "Failed to save customization Image.");
+          return null;
+        } else {
+          updatedContactImage = data.url;
+        }
+      }
+
+      // Update state ONCE after all uploads
+      updatePromoAttributes({ slides: updatedSlides });
+      updateAboutAttributes({ image: updatedAboutImage });
+      updateContactAttributes({ image: updatedContactImage });
+
+      // Return the new values for use in DTOs
+      return {
+        updatedSlides,
+        updatedAboutImage,
+        updatedContactImage,
+      };
+    } catch (error) {
+      alert("An error occurred while saving customization Images.");
+      return null;
+    }
+  };
+
+  const editCustomizedTemplate = async () => {
+    setIsSaving(true);
+    setSaveMessage("");
+    setShowSaveDialog(true);
+    try {
+      // 1. Upload images and get new values
+      const imagesResult = await handleCustomizedImages();
+      if (!imagesResult) {
+        setIsSaving(false);
+        return;
+      }
+
+      // 2. Use the new values to build DTOs
+      const { updatedSlides, updatedAboutImage, updatedContactImage } =
+        imagesResult;
+
+      // Build DTOs using the latest values
+      // const storeId = 1;
+      const dtoList = sections.map((section, idx) => {
+        let value = {};
+        switch (section.id) {
+          case "Header&Menu":
+            value = headerAttributes;
+            break;
+          case "PromoSlider":
+            value = { ...promoAttributes, slides: updatedSlides };
+            break;
+          case "Categories":
+            value = categoryAttributes;
+            break;
+          case "Products":
+            value = productAttributes;
+            break;
+          case "AboutUs":
+            value = { ...aboutAttributes, image: updatedAboutImage };
+            break;
+          case "Policies":
+            value = policiesAttributes;
+            break;
+          case "ContactUs":
+            value = { ...contactAttributes, image: updatedContactImage };
+            break;
+          case "Footer":
+            value = footerAttributes;
+            break;
+          default:
+            value = {};
+        }
+        return {
+          title: section.id,
+          value: stripBackendFields(section.id, value),
+          index: idx,
+          // storeId,
+        };
+      });
+
+      // 3. Send to backend
+      const response = await fetch(
+        "http://localhost:8080/customize/editTemplate",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(dtoList),
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        localStorage.setItem(
+          "customizeSuccessMessage",
+          "Changes saved successfully!"
+        );
+        window.removeEventListener("beforeunload", () => {});
+        router.push("/dashboard");
+      } else {
+        alert(data.message || "Failed to save customization.");
+      }
+    } catch (error) {
+      alert(`An error occurred while saving customization. ${error}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Show loading while checking authentication
@@ -361,729 +1223,248 @@ export default function CustomizeTemplatePage() {
     );
   }
 
+  // Replace the main render logic to show loading until data is ready
+  if (isLoading) {
+    return (
+      <div className="h-screen flex-1 flex items-center justify-center">
+        <span>Loading customization...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <Sidebar
-        headerAttributes={headerAttributes}
-        updateHeaderAttributes={updateHeaderAttributes}
-        promoAttributes={promoAttributes}
-        updatePromoAttributes={updatePromoAttributes}
-        aboutAttributes={aboutAttributes}
-        updateAboutAttributes={updateAboutAttributes}
-        policiesAttributes={policiesAttributes}
-        updatePoliciesAttributes={updatePoliciesAttributes}
-        contactAttributes={contactAttributes}
-        updateContactAttributes={updateContactAttributes}
-        footerAttributes={footerAttributes}
-        updateFooterAttributes={updateFooterAttributes}
-      />
-      {/* Content preview area */}
-      <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
-        <Navbar
-          isCustomize={true}
-          template={headerAttributes.template}
-          brandName={headerAttributes.brandName}
-          backgroundColor={headerAttributes.backgroundColor}
-          textColor={headerAttributes.textColor}
-          logo={headerAttributes.logo}
-          menuItems={headerAttributes.menuItems.map((item) => ({
-            label: item.label,
-            href: "#",
-            isShown: item.isShown,
-          }))}
-          iconColor={headerAttributes.iconColor}
-          dividerColor={headerAttributes.dividerColor}
-          searchIconColor={headerAttributes.searchIconColor}
-          fontFamily={headerAttributes.fontFamily}
-        />
-        {promoAttributes.template === "CenteredPromo" && (
-          <CenteredPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            backgroundColor={promoAttributes.backgroundColor}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
-        )}
 
-        {promoAttributes.template === "LeftAlignedPromo" && (
-          <LeftAlignedPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
-        )}
+      <div
+        className={`
+        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
+        w-80 lg:w-80 bg-white border-r border-gray-200
+        transform transition-transform duration-300 ease-in-out
+        ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }
+        flex flex-col
+      `}
+      >
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex justify-between items-center p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold">Customize Template</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-        {promoAttributes.template === "RightAlignedPromo" && (
-          <RightAlignedPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
+        {/* Sidebar Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <Sidebar
+            headerAttributes={headerAttributes}
+            updateHeaderAttributes={updateHeaderAttributes}
+            promoAttributes={promoAttributes}
+            updatePromoAttributes={updatePromoAttributes}
+            categoryAttributes={categoryAttributes}
+            updateCategoryAttributes={updateCategoryAttributes}
+            productAttributes={productAttributes}
+            updateProductAttributes={updateProductAttributes}
+            aboutAttributes={aboutAttributes}
+            updateAboutAttributes={updateAboutAttributes}
+            policiesAttributes={policiesAttributes}
+            updatePoliciesAttributes={updatePoliciesAttributes}
+            contactAttributes={contactAttributes}
+            updateContactAttributes={updateContactAttributes}
+            footerAttributes={footerAttributes}
+            updateFooterAttributes={updateFooterAttributes}
+            sections={sections}
+            setSections={setSections}
+            aboutImage={aboutImage}
+            setAboutImage={setAboutImage}
+            contactImage={contactImage}
+            setContactImage={setContactImage}
+            promoImages={promoImages}
+            setPromoImages={setPromoImages}
           />
-        )}
+        </div>
+      </div>
 
-        {promoAttributes.template === "MinimalLeftPromo" && (
-          <MinimalLeftPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
-        )}
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Toolbar */}
+        <div className="bg-white border-b border-gray-200 p-3 flex flex-col sm:flex-row justify-between items-center min-h-[64px] relative z-30">
+          <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+            {/* Mobile Menu Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="lg:hidden bg-transparent"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </Button>
 
-        {promoAttributes.template === "MinimalRightPromo" && (
-          <MinimalRightPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
-        )}
+            {/* Preview Button */}
+            <Button
+              variant="outline"
+              className="bg-white"
+              onClick={() =>
+                window.open(`/e-commerce/${storeData.subdomain}`, "_blank")
+              }
+            >
+              <span className="flex items-center gap-2">
+                <Eye size={20} />
+                Preview
+              </span>
+            </Button>
+          </div>
 
-        {promoAttributes.template === "OverlayPromo" && (
-          <OverlayPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            descriptionFont={promoAttributes.descriptionFont}
-            descriptionColor={promoAttributes.descriptionColor}
-            descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
-          />
-        )}
+          {/* go to dashboard on saving  */}
+          <Button
+            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
+            onClick={handleSaveClick}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+          {saveMessage && (
+            <span className="ml-4 text-green-600 font-semibold">
+              {saveMessage}
+            </span>
+          )}
+          <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Save</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to save your changes?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSaveDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-black text-white"
+                  onClick={editCustomizedTemplate}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Confirm"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-        {promoAttributes.template === "SplitPromo" && (
-          <SplitPromo
-            isClickable={false}
-            id={promoAttributes.id}
-            slides={promoAttributes.slides}
-            autoplay={promoAttributes.autoPlay}
-            showArrows={promoAttributes.showArrows}
-            titleFont={promoAttributes.titleFont}
-            titleColor={promoAttributes.titleColor}
-            titleSize={promoAttributes.titleSize}
-            // descriptionFont={promoAttributes.descriptionFont}
-            // descriptionColor={promoAttributes.descriptionColor}
-            // descriptionSize={promoAttributes.descriptionSize}
-            buttonFont={promoAttributes.buttonFont}
-            buttonColor={promoAttributes.buttonColor}
-            buttonTextColor={promoAttributes.buttonTextColor}
-            buttonSize={promoAttributes.buttonSize}
-            buttonRadius={promoAttributes.buttonRadius}
-            backgroundColor={promoAttributes.backgroundColor}
-            imageObjectFit={promoAttributes.imageObjectFit}
-            // className={promoAttributes.className}
-          />
-        )}
+        {/* Content preview area */}
+        <div className="flex-1 p-4 bg-gray-100 rounded-lg overflow-y-auto">
+          <div
+            className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4`}
+          >
+            <Navbar
+              isCustomize={true}
+              template={headerAttributes.template}
+              brandName={headerAttributes.brandName}
+              backgroundColor={headerAttributes.backgroundColor}
+              textColor={headerAttributes.textColor}
+              logo={headerAttributes.logo}
+              menuItems={headerAttributes.menuItems.map((item) => ({
+                label: item.label,
+                href: "#",
+                isShown: item.isShown,
+              }))}
+              iconColor={headerAttributes.iconColor}
+              dividerColor={headerAttributes.dividerColor}
+              fontFamily={headerAttributes.fontFamily}
+            />
 
-        <ProductList
-          isClickable={false}
-          products={[
-            {
-              name: "Product 1",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-1",
-            },
-            {
-              name: "Product 2",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-2",
-            },
-            {
-              name: "Product 3",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-3",
-            },
-            {
-              name: "Product 4",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-4",
-            },
-            {
-              name: "Product 5",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-5",
-            },
-            {
-              name: "Product 6",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-6",
-            },
-            {
-              name: "Product 7",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-7",
-            },
-            {
-              name: "Product 8",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              price: {
-                price: 100,
-              },
-              description: "This is a description of the product",
-              id: "product-8",
-            },
-          ]}
-          template="featured"
-          title="Featured Products"
-          titleColor="text-black"
-          titlePosition="top"
-          titleFontSize="text-2xl"
-          titleFont="font-bold"
-          columns={{ sm: 2, md: 3, lg: 4 }}
-          bgColor="bg-white"
-          textColor="text-black"
-          borderRadius="rounded-lg"
-          showTitle={true}
-          fontFamily="font-sans"
-          hoverEffect={true}
-          cardVariant="hover"
-          showSubtitle={true}
-          showCta={true}
-          showMoreButton={true}
-          ctaText="Shop Now"
-          cornerRadius="medium"
-          cardShadow="shadow-lg"
-          showMoreText="All Products"
-          showMorebuttonBgColor="bg-black"
-          showMorebuttonTextColor="text-white"
-        />
-        <FeaturedGridCategoryTemplate
-          isClickable={false}
-          categories={[
-            {
-              name: "Rings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              id: "1",
-            },
-            {
-              name: "Earrings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/earing.jpg",
-                  },
-                },
-              },
-              id: "2",
-            },
-            {
-              name: "Necklaces",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/neckless.jpg",
-                  },
-                },
-              },
-              id: "3",
-            },
-            {
-              name: "Rings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/ring2.jpg",
-                  },
-                },
-              },
-              id: "4",
-            },
-            {
-              name: "Earrings",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/earing.jpg",
-                  },
-                },
-              },
-              id: "5",
-            },
-            {
-              name: "Necklaces",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: "/neckless.jpg",
-                  },
-                },
-              },
-              id: "6",
-            },
-          ]}
-          bgColor="bg-white"
-          textColor="text-black"
-          borderRadius="rounded-lg"
-          showTitle={true}
-          fontFamily="font-sans"
-          hoverEffect={true}
-          cardVariant="featured"
-          showCta={true}
-          ctaText="Shop Now"
-          overlayColor="bg-black/30"
-          showMoreButton={true}
-          showMoreText="Show More"
-          showMorebuttonBgColor="bg-black"
-          showMorebuttonTextColor="text-white"
-        />
-        {aboutAttributes.template === "TopImageAbout" && (
-          <TopImageAbout
-            id={aboutAttributes.id}
-            backgroundColor={aboutAttributes.backgroundColor}
-            title={aboutAttributes.title}
-            titleColor={aboutAttributes.titleColor}
-            titleFont={aboutAttributes.titleFont}
-            titleSize={aboutAttributes.titleSize}
-            descriptionColor={aboutAttributes.descriptionColor}
-            description={aboutAttributes.description}
-            descriptionFont={aboutAttributes.descriptionFont}
-            descriptionSize={aboutAttributes.descriptionSize}
-            secondaryDescription={aboutAttributes.secondaryDescription}
-            image={aboutAttributes.image}
-            imageAlt={aboutAttributes.imageAlt}
-            imageObjectFit={aboutAttributes.imageObjectFit}
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          />
-        )}
-        {aboutAttributes.template === "CenteredAbout" && (
-          <CenteredAbout
-            id={aboutAttributes.id}
-            backgroundColor={aboutAttributes.backgroundColor}
-            title={aboutAttributes.title}
-            titleColor={aboutAttributes.titleColor}
-            titleFont={aboutAttributes.titleFont}
-            titleSize={aboutAttributes.titleSize}
-            descriptionColor={aboutAttributes.descriptionColor}
-            description={aboutAttributes.description}
-            descriptionFont={aboutAttributes.descriptionFont}
-            descriptionSize={aboutAttributes.descriptionSize}
-            secondaryDescription={aboutAttributes.secondaryDescription}
-            image={aboutAttributes.image}
-            imageAlt={aboutAttributes.imageAlt}
-            imageObjectFit={aboutAttributes.imageObjectFit}
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          />
-        )}
-        {aboutAttributes.template === "LeftAlignedAbout" && (
-          <LeftAlignedAbout
-            id={aboutAttributes.id}
-            backgroundColor={aboutAttributes.backgroundColor}
-            title={aboutAttributes.title}
-            titleColor={aboutAttributes.titleColor}
-            titleFont={aboutAttributes.titleFont}
-            titleSize={aboutAttributes.titleSize}
-            descriptionColor={aboutAttributes.descriptionColor}
-            description={aboutAttributes.description}
-            descriptionFont={aboutAttributes.descriptionFont}
-            descriptionSize={aboutAttributes.descriptionSize}
-            secondaryDescription={aboutAttributes.secondaryDescription}
-            image={aboutAttributes.image}
-            imageAlt={aboutAttributes.imageAlt}
-            imageObjectFit={aboutAttributes.imageObjectFit}
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          />
-        )}
-        {aboutAttributes.template === "RightAlignedAbout" && (
-          <RightAlignedAbout
-            id={aboutAttributes.id}
-            backgroundColor={aboutAttributes.backgroundColor}
-            title={aboutAttributes.title}
-            titleColor={aboutAttributes.titleColor}
-            titleFont={aboutAttributes.titleFont}
-            titleSize={aboutAttributes.titleSize}
-            descriptionColor={aboutAttributes.descriptionColor}
-            description={aboutAttributes.description}
-            descriptionFont={aboutAttributes.descriptionFont}
-            descriptionSize={aboutAttributes.descriptionSize}
-            secondaryDescription={aboutAttributes.secondaryDescription}
-            image={aboutAttributes.image}
-            imageAlt={aboutAttributes.imageAlt}
-            imageObjectFit={aboutAttributes.imageObjectFit}
-            // variant={aboutAttributes.variant}
-            // className={aboutAttributes.className}
-          />
-        )}
-        {contactAttributes.template === "MinimalRightContact" && (
-          <MinimalRightContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-        )}
-        {contactAttributes.template === "CenteredContact" && (
-          <CenteredContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-        )}
-        {contactAttributes.template === "LeftAlignedContact" && (
-          <LeftAlignedContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-        )}
-        {contactAttributes.template === "RightAlignedContact" && (
-          <RightAlignedContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-        )}
-        {contactAttributes.template === "MinimalLeftContact" && (
-          <MinimalLeftContact
-            id={contactAttributes.id}
-            imageUrl={contactAttributes.imageUrl}
-            backgroundColor={contactAttributes.backgroundColor}
-            titleColor={contactAttributes.titleColor}
-            contentFont={contactAttributes.contentFont}
-            contentSize={contactAttributes.contentSize}
-            titleFont={contactAttributes.titleFont}
-            titleSize={contactAttributes.titleSize}
-            contentColor={contactAttributes.contentColor}
-            showMap={contactAttributes.showMap}
-            title={contactAttributes.title}
-            address={contactAttributes.address}
-            addressUrl={contactAttributes.addressUrl}
-            openHours={contactAttributes.openHours}
-            phone={contactAttributes.phone}
-            contactEmail={contactAttributes.contactEmail}
-            socialLinks={contactAttributes.socialLinks}
-          />
-        )}
-        {policiesAttributes.template === "TitleLeftContentCenterPolicies" && (
-          <TitleLeftContentCenterPolicies
-            id={policiesAttributes.id}
-            backgroundColor={policiesAttributes.backgroundColor}
-            title={policiesAttributes.title}
-            titleFont={policiesAttributes.titleFont}
-            titleFontWeight={policiesAttributes.titleFontWeight}
-            titleSize={policiesAttributes.titleSize}
-            titleColor={policiesAttributes.titleColor}
-            sectionTitleColor={policiesAttributes.sectionTitleColor}
-            sectionTitleSize={policiesAttributes.sectionTitleSize}
-            sectionTitleFont={policiesAttributes.sectionTitleFont}
-            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-            sectionContentColor={policiesAttributes.sectionContentColor}
-            sectionContentSize={policiesAttributes.sectionContentSize}
-            sectionContentFont={policiesAttributes.sectionContentFont}
-            sectionContentFontWeight={
-              policiesAttributes.sectionContentFontWeight
-            }
-            sections={policiesAttributes.sections}
-            // variant={policiesAttributes.variant}
-          />
-        )}
-        {policiesAttributes.template === "DefaultPolicies" && (
-          <DefaultPolicies
-            id={policiesAttributes.id}
-            backgroundColor={policiesAttributes.backgroundColor}
-            title={policiesAttributes.title}
-            titleFont={policiesAttributes.titleFont}
-            titleFontWeight={policiesAttributes.titleFontWeight}
-            titleSize={policiesAttributes.titleSize}
-            titleColor={policiesAttributes.titleColor}
-            sectionTitleColor={policiesAttributes.sectionTitleColor}
-            sectionTitleSize={policiesAttributes.sectionTitleSize}
-            sectionTitleFont={policiesAttributes.sectionTitleFont}
-            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-            sectionContentColor={policiesAttributes.sectionContentColor}
-            sectionContentSize={policiesAttributes.sectionContentSize}
-            sectionContentFont={policiesAttributes.sectionContentFont}
-            sectionContentFontWeight={
-              policiesAttributes.sectionContentFontWeight
-            }
-            sections={policiesAttributes.sections}
-            // variant={policiesAttributes.variant}
-          />
-        )}
-        {policiesAttributes.template === "LeftPolicies" && (
-          <LeftPolicies
-            id={policiesAttributes.id}
-            backgroundColor={policiesAttributes.backgroundColor}
-            title={policiesAttributes.title}
-            titleFont={policiesAttributes.titleFont}
-            titleFontWeight={policiesAttributes.titleFontWeight}
-            titleSize={policiesAttributes.titleSize}
-            titleColor={policiesAttributes.titleColor}
-            sectionTitleColor={policiesAttributes.sectionTitleColor}
-            sectionTitleSize={policiesAttributes.sectionTitleSize}
-            sectionTitleFont={policiesAttributes.sectionTitleFont}
-            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-            sectionContentColor={policiesAttributes.sectionContentColor}
-            sectionContentSize={policiesAttributes.sectionContentSize}
-            sectionContentFont={policiesAttributes.sectionContentFont}
-            sectionContentFontWeight={
-              policiesAttributes.sectionContentFontWeight
-            }
-            sections={policiesAttributes.sections}
-            // variant={policiesAttributes.variant}
-          />
-        )}
-        {policiesAttributes.template === "CenteredPolicies" && (
-          <CenteredPolicies
-            id={policiesAttributes.id}
-            backgroundColor={policiesAttributes.backgroundColor}
-            title={policiesAttributes.title}
-            titleFont={policiesAttributes.titleFont}
-            titleFontWeight={policiesAttributes.titleFontWeight}
-            titleSize={policiesAttributes.titleSize}
-            titleColor={policiesAttributes.titleColor}
-            sectionTitleColor={policiesAttributes.sectionTitleColor}
-            sectionTitleSize={policiesAttributes.sectionTitleSize}
-            sectionTitleFont={policiesAttributes.sectionTitleFont}
-            sectionTitleFontWeight={policiesAttributes.sectionTitleFontWeight}
-            sectionContentColor={policiesAttributes.sectionContentColor}
-            sectionContentSize={policiesAttributes.sectionContentSize}
-            sectionContentFont={policiesAttributes.sectionContentFont}
-            sectionContentFontWeight={
-              policiesAttributes.sectionContentFontWeight
-            }
-            sections={policiesAttributes.sections}
-            // variant={policiesAttributes.variant}
-          />
-        )}
-        <Footer
-          companyName={footerAttributes.brandName}
-          textColor={footerAttributes.textColor}
-          companyLogo={{
-            src: footerAttributes.logo.src || "/logo.png",
-            alt: footerAttributes.logo.alt,
-            width: parseInt(footerAttributes.logo.size) || 50,
-            height: parseInt(footerAttributes.logo.size) || 50,
-          }}
-          aboutLinks={footerAttributes.aboutLinks}
-          socialMedia={footerAttributes.socialMedia}
-          socialMediaStyles={footerAttributes.socialMediaStyles}
-          copyrightStyles={footerAttributes.copyrightStyles}
-          backgroundColor={footerAttributes.backgroundColor}
-        />
+            {/* Render middle sections dynamically */}
+            {sections.slice(1, sections.length - 1).map((section, index) => {
+              const sectionId = section.id as keyof typeof sectionComponents;
+              const sectionComponent = sectionComponents[sectionId];
+
+              if (!sectionComponent) {
+                return null;
+              }
+
+              // Get the template for this section
+              let template: string;
+              switch (sectionId) {
+                case "PromoSlider":
+                  template = promoAttributes.template;
+                  break;
+                case "Products":
+                  template = productAttributes.template;
+                  break;
+                case "Categories":
+                  template = categoryAttributes.template;
+                  break;
+                case "AboutUs":
+                  template = aboutAttributes.template;
+                  break;
+                case "Policies":
+                  template = policiesAttributes.template;
+                  break;
+                case "ContactUs":
+                  template = contactAttributes.template;
+                  break;
+                default:
+                  return null;
+              }
+
+              // Get the component for this template
+              const Component =
+                sectionComponent[template as keyof typeof sectionComponent];
+
+              if (!Component) {
+                return null;
+              }
+
+              return <div key={section.id}>{Component}</div>;
+            })}
+
+            <Footer
+              isCustomize={true}
+              companyName={footerAttributes.brandName}
+              textColor={footerAttributes.textColor}
+              companyLogo={{
+                src: footerAttributes.logo.src || "/placeholder.png",
+                alt: footerAttributes.logo.alt,
+                width: parseInt(footerAttributes.logo.size) || 50,
+                height: parseInt(footerAttributes.logo.size) || 50,
+              }}
+              aboutLinks={footerAttributes.aboutLinks}
+              socialMedia={footerAttributes.socialMedia}
+              socialMediaStyles={footerAttributes.socialMediaStyles}
+              copyrightStyles={footerAttributes.copyrightStyles}
+              backgroundColor={footerAttributes.backgroundColor}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

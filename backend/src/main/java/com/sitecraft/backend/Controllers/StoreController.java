@@ -2,6 +2,7 @@ package com.sitecraft.backend.Controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitecraft.backend.DTOs.StoreInfoDTO;
 import com.sitecraft.backend.Models.*;
+import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.Services.StoreService;
 import com.sitecraft.backend.Services.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +27,8 @@ public class StoreController {
     private StoreService storeService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private StoreRepo storeRepo;
 
     @PostMapping("/{userId}")
     public ResponseEntity<?> createStore(
@@ -71,6 +74,32 @@ public class StoreController {
                     "success", false,
                     "message", "An unexpected error occurred: " + e.getMessage()
             ));
+        }
+    }
+
+    @GetMapping("/getStoreId/{subdomain}")
+    public ResponseEntity<?> getStoreIdBySubDomain(@PathVariable String subdomain, HttpSession session) {
+        try {
+            Store store = storeRepo.findBySubdomain(subdomain);
+            Map<String, Object> response = new HashMap<>();
+
+            if (store != null) {
+                response.put("success", true);
+                response.put("message", "Customized Template retrieved successfully");
+                response.put("storeId",store.getId());
+                session.setAttribute("storeId", store.getId());
+            } else {
+                response.put("success", false);
+                response.put("message", "Subdomain doesn't exists");
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -141,11 +170,13 @@ public class StoreController {
     @GetMapping("/getStoreSettings")
     public ResponseEntity<?> getStoreSettings(HttpSession session) {
         try {
-            Long storeId = (Long) session.getAttribute("storeId");
-            if (storeId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-            }
+//            Long storeId = (Long) session.getAttribute("storeId");
+//            if (storeId == null) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+//            }
+
+            Long storeId = 1L;
 
             Store store = storeService.getStore(storeId);
 

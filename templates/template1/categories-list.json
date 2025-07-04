@@ -1,7 +1,7 @@
 {
-  
-    "backgroundColor": "bg-white",
-    "textColor": "text-black",
+    "template": "FeaturedGridCategoryTemplate",
+    "backgroundColor": "bg-[#ffffff]",
+    "textColor": "text-[#000000]",
     "categories": [
         {
             "name": "category1",
@@ -12,7 +12,9 @@
                     }
                 }
             },
-            "id": "1"
+            "id": "1",
+            "Description": "description of category1",
+            "link":"/e-commerce/${subdomain}/products" 
         },
         {
             "name": "category2",
@@ -23,7 +25,9 @@
                     }
                 }
             },
-            "id": "2"
+            "id": "2",
+            "Description": "description of category",
+            "link":"/e-commerce/${subdomain}/products" 
         },
         {
             "name": "category3",
@@ -34,7 +38,9 @@
                     }
                 }
             },
-            "id": "3"
+            "id": "3",
+            "Description": "description of category3",
+            "link":"/e-commerce/${subdomain}/products" 
         },
         {
             "name": "category4",
@@ -45,7 +51,9 @@
                     }
                 }
             },
-            "id": "4"
+            "id": "4",
+            "Description": "description of category4",
+            "link":"/e-commerce/${subdomain}/products" 
         },
         {
             "name": "category5",
@@ -56,38 +64,18 @@
                     }
                 }
             },
-            "id": "5"
-        },
-        {
-            "name": "Brooches",
-            "media": {
-                "mainMedia": {
-                    "image": {
-                        "url": "/brooch1.jpg"
-                    }
-                }
-            },
-            "id": "6"
+            "id": "5",
+            "Description": "description of category5",
+            "link":"/e-commerce/${subdomain}/products" 
         }
-       
     ],
-    "columns": {
-        "sm": 1,
-        "md": 4,
-        "lg": 4,
-        "xl": 4
-    },
-    "gap": "gap-6",
     "showCategoryTitle": "true",
     "borderRadius": "rounded-lg",
     "fontFamily": "font-sans",
-    "hoverEffect": true,
     "cardVariant": "featured",
     "showSubtitle": true,
     "cornerRadius": "medium",
-    "cardShadow": "shadow-lg",
     "accentColor": "bg-blue-500",
-    "borderColor": "border-blue-500",
     "title": "Featured Categories",
     "showTitle": true,
     "titleFont": "font-serif",
@@ -95,18 +83,10 @@
     "titleFontSize": "text-lg",
     "showCta": true,
     "ctaText": "Shop Now",
-    "overlayColor": "bg-black/30",
-    "showScrollbar": false,
-    "scrollBarSliderColor": "bg-gray-400",
-    "scrollBarBgColor": "bg-gray-200",
+    "overlayColor": "bg-[#ffffff]/30",
     "showDescription": true,
-    "showControls": true,
-    "showIcon": true,
-    "imageHeight": "aspect-square",
-    "cardWidth": "w-full",
     "showMoreButton": true,
     "showMoreText": "Show More",
-    "showMorebuttonBgColor": "bg-blue-500",
-    "showMorebuttonTextColor": "text-white"
-   
+    "showMorebuttonBgColor": "bg-[#1d4ed8]",
+    "showMorebuttonTextColor": "text-[#ffffff]"
 }

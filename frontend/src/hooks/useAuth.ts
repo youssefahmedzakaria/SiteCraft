@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand'
 import { login as loginAPI, logout as logoutAPI, getSession, register as registerAPI, setSession } from '../lib/auth'
 

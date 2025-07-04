@@ -9,6 +9,7 @@ import {
   GripVertical,
   ImageIcon,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
@@ -30,12 +31,18 @@ interface RenderAboutSectionProps {
   updateAboutAttributes: (
     updates: Partial<AboutCustomizationAttributes>
   ) => void;
+  onDeleteSection?: () => void;
+  aboutImage: File | undefined;
+  setAboutImage: React.Dispatch<React.SetStateAction<File | undefined>>;
 }
 
 export function RenderAboutSection({
   detailedSectionTab,
   aboutAttributes,
   updateAboutAttributes,
+  onDeleteSection,
+  aboutImage,
+  setAboutImage,
 }: RenderAboutSectionProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<DesignSectionName, boolean>
@@ -74,8 +81,8 @@ export function RenderAboutSection({
     const templateNames = [
       "TopImageAbout",
       "CenteredAbout",
-      "LeftAlignedAbout",
       "RightAlignedAbout",
+      "LeftAlignedAbout",
     ];
     const templateName = templateNames[layoutId - 1] || "TopImageAbout";
     updateAboutAttributes({ template: templateName });
@@ -89,11 +96,8 @@ export function RenderAboutSection({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateAboutAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setAboutImage(file);
+      updateAboutAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
@@ -109,18 +113,15 @@ export function RenderAboutSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateAboutAttributes({ image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setAboutImage(file);
+      updateAboutAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
-        <div className="p-4 space-y-5">
+        <div className="flex flex-col flex-1 min-h-0 p-4 space-y-5">
           {/* About Us Image Section */}
           <div>
             <h3 className="font-medium mb-2">About Us Image</h3>
@@ -200,16 +201,27 @@ export function RenderAboutSection({
               }
             />
           </div>
+          <div className="pt-8 flex justify-start">
+            {onDeleteSection && (
+              <button
+                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
+                onClick={onDeleteSection}
+              >
+                <Trash2 size={16} />
+                Delete Section
+              </button>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
           <AboutLayoutItems
             selectedLayout={
               [
                 "TopImageAbout",
                 "CenteredAbout",
-                "LeftAlignedAbout",
                 "RightAlignedAbout",
+                "LeftAlignedAbout",
               ].indexOf(aboutAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}
@@ -473,7 +485,7 @@ export function RenderAboutSection({
                 </DropdownMenu>
               </div>
               {/* font weight */}
-              <div>
+              {/* <div>
                 <label className="block text-sm mb-2">Font Weight</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -531,7 +543,7 @@ export function RenderAboutSection({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </div> */}
             </div>
           )}
 

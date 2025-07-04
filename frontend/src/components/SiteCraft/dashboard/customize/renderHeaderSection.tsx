@@ -4,13 +4,10 @@ import {
   ChevronDown,
   ChevronRight,
   GripVertical,
-  Image as ImageIcon,
-  SearchIcon,
   Eye,
   EyeOff,
 } from "lucide-react";
-import React, { useState, useRef, DragEvent, useEffect } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import { HeaderLayoutItems } from "./headerLayoutItems";
 import {
   DropdownMenu,
@@ -49,13 +46,6 @@ export function RenderHeaderSection({
   headerAttributes,
   updateHeaderAttributes,
 }: RenderHeaderSectionProps) {
-  {
-    /* For image selection in content */
-  }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   {
     /* For expandable sections in design */
   }
@@ -381,9 +371,10 @@ export function RenderHeaderSection({
                     />
                     <input
                       type="text"
-                      value={headerAttributes.backgroundColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.backgroundColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
                         // Update header attributes
@@ -414,9 +405,10 @@ export function RenderHeaderSection({
                     />
                     <input
                       type="text"
-                      value={headerAttributes.dividerColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.dividerColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
                         // Update header attributes
@@ -522,9 +514,10 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
-                      value={headerAttributes.textColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.textColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
                         // Update header attributes
@@ -535,9 +528,10 @@ export function RenderHeaderSection({
                     />
                     <input
                       type="text"
-                      value={headerAttributes.textColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.textColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
                         // Update header attributes
@@ -554,9 +548,10 @@ export function RenderHeaderSection({
                   <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                     <input
                       type="color"
-                      value={headerAttributes.iconColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.iconColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="w-8 h-8 cursor-pointer bg-transparent"
                       onChange={(e) => {
                         // Update header attributes
@@ -567,48 +562,15 @@ export function RenderHeaderSection({
                     />
                     <input
                       type="text"
-                      value={headerAttributes.iconColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
+                      value={(() => {
+                        const match = headerAttributes.iconColor?.match(/-\[(#[0-9a-fA-F]{6,8})\]/);
+                        return match ? match[1] : "#000000";
+                      })()}
                       className="flex-1 border-none bg-transparent focus:outline-none"
                       onChange={(e) => {
                         // Update header attributes
                         updateHeaderAttributes({
                           iconColor: `text-[${e.target.value}]`,
-                        });
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="color-picker-container">
-                  <label className="block text-sm mb-2">
-                    Search Icon Color
-                  </label>
-                  <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
-                    <input
-                      type="color"
-                      value={headerAttributes.searchIconColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
-                      className="w-8 h-8 cursor-pointer bg-transparent"
-                      onChange={(e) => {
-                        // Update header attributes
-                        updateHeaderAttributes({
-                          searchIconColor: `text-[${e.target.value}]`,
-                        });
-                      }}
-                    />
-                    <input
-                      type="text"
-                      value={headerAttributes.searchIconColor
-                        .split("-[")[1]
-                        .slice(0, -1)}
-                      className="flex-1 border-none bg-transparent focus:outline-none"
-                      onChange={(e) => {
-                        // Update header attributes
-                        updateHeaderAttributes({
-                          searchIconColor: `text-[${e.target.value}]`,
                         });
                       }}
                     />

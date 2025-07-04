@@ -1,4 +1,4 @@
-import Contact from "../contact"
+import {Contact} from "../contact"
 
 interface RightAlignedContactProps {
   id?: string
@@ -24,6 +24,6 @@ interface RightAlignedContactProps {
   titleSize?: string
 }
 
-export function RightAlignedContact(props: RightAlignedContactProps) {
-  return <Contact {...props} template="right-aligned" />
+export function RightAlignedContact(props: RightAlignedContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="right-aligned" />
 }

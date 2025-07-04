@@ -1,6 +1,8 @@
 package com.sitecraft.backend.Controllers;
 
 import com.sitecraft.backend.Models.Customer;
+import com.sitecraft.backend.Models.CustomizedTemplateSection;
+import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.EcommerceAuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,8 +30,10 @@ public class EcommerceAuthController {
                         .body("Customer with this email already exists in this store.");
             }
             Customer registeredCustomer = ecommerceAuthService.register(customer, storeId);
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body("Customer registered successfully.");
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Customer registered successfully"
+            ));
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
@@ -39,8 +44,9 @@ public class EcommerceAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session, @RequestParam Long storeId) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
+            Long storeId = loginRequest.getStoreId();
             boolean isExist = ecommerceAuthService.isCustomerExists(loginRequest.getEmail(), storeId);
 
             if (!isExist) {
@@ -226,6 +232,7 @@ public class EcommerceAuthController {
     public static class LoginRequest {
         private String email;
         private String password;
+        private Long storeId;
 
         public String getEmail() {
             return email;
@@ -241,6 +248,14 @@ public class EcommerceAuthController {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        public Long getStoreId() {
+            return storeId;
+        }
+
+        public void setStoreId(Long storeId) {
+            this.storeId = storeId;
         }
     }
 } 

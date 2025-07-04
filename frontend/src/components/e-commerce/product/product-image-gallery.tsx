@@ -32,7 +32,7 @@ export function ProductImageGallery({
         )}
       >
         <Image
-          src={images[selectedImage] || "/placeholder.svg?height=600&width=600"}
+          src={images[selectedImage] || "/placeholder.png?height=600&width=600"}
           alt={productName}
           fill
           className="object-cover"
@@ -57,7 +57,7 @@ export function ProductImageGallery({
             }}
           >
             <Image
-              src={image || "/placeholder.svg?height=150&width=150"}
+              src={image || "/placeholder.png?height=150&width=150"}
               alt={`${productName} - Image ${index + 1}`}
               fill
               className="object-cover"

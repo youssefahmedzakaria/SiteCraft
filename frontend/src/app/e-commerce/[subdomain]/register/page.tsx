@@ -1,13 +1,15 @@
 "use client";
 
 import type React from "react";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/e-commerce/ui/button";
 import { Input } from "@/components/e-commerce/ui/input";
 import { Label } from "@/components/e-commerce/ui/label";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { Icons } from "@/components/SiteCraft/icons";
+import { useSignupForm } from "@/hooks/e-commerce/ecommerceUseSignUpForm";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -19,80 +21,25 @@ const defaultTheme = {
   fontFamily: "font-sans",
 };
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-}
 
 export default function RegisterPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    // Validation
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password
-    ) {
-      setError("Please fill in all required fields");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setIsLoading(false);
-      return;
-    }
-
-    // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mock registration success
-    localStorage.setItem("token", "mock-token-" + Date.now());
-    router.push(`/e-commerce/${subdomain}/profile`);
-
-    setIsLoading(false);
-  };
+  const {
+    formData,
+    handleInputChange,
+    errors,
+    signupError,
+    isLoading,
+    onSubmit,
+    clearError,
+  } = useSignupForm();
 
   return (
     <div
@@ -115,53 +62,37 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form onSubmit={handleRegister} className="mt-8 space-y-6">
-          {error && (
+        <form onSubmit={onSubmit} className="mt-8 space-y-6">
+          {signupError && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-sm">{signupError}</p>
             </div>
           )}
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label
-                  htmlFor="firstName"
-                  style={{ color: defaultTheme.textColor }}
-                >
-                  First Name *
-                </Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                  style={{ borderColor: defaultTheme.secondaryColor }}
-                  required
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="lastName"
-                  style={{ color: defaultTheme.textColor }}
-                >
-                  Last Name *
-                </Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                  style={{ borderColor: defaultTheme.secondaryColor }}
-                  required
-                />
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name" style={{ color: defaultTheme.textColor }}>
+                Name *
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => {
+                  handleInputChange("name", e.target.value);
+                  if (errors.name) clearError();
+                }}
+                placeholder="Full Name"
+                className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
+                style={{ borderColor: defaultTheme.secondaryColor }}
+                required
+                autoComplete="name"
+                disabled={isLoading}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-600">{errors.name}</p>
+              )}
             </div>
 
             <div>
@@ -172,13 +103,21 @@ export default function RegisterPage() {
                 id="email"
                 name="email"
                 type="email"
+                placeholder="name@example.com"
+                autoComplete="email"
+                required
+                disabled={isLoading}
                 value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
+                onChange={(e) => {
+                  handleInputChange("email", e.target.value);
+                  if (errors.email) clearError();
+                }}
                 className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
                 style={{ borderColor: defaultTheme.secondaryColor }}
-                required
               />
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -189,12 +128,21 @@ export default function RegisterPage() {
                 id="phone"
                 name="phone"
                 type="tel"
+                placeholder="+20 1XXXXXXXXX"
+                autoComplete="tel"
+                required
+                disabled={isLoading}
                 value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter your phone number"
+                onChange={(e) => {
+                  handleInputChange("phone", e.target.value);
+                  if (errors.phone) clearError();
+                }}
                 className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
                 style={{ borderColor: defaultTheme.secondaryColor }}
               />
+              {errors.phone && (
+                <p className="text-sm text-red-600">{errors.phone}</p>
+              )}
             </div>
 
             <div>
@@ -208,14 +156,20 @@ export default function RegisterPage() {
                 <Input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  required
+                  disabled={isLoading}
                   value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Create a password"
+                  onChange={(e) => {
+                    handleInputChange("password", e.target.value);
+                    if (errors.password) clearError();
+                  }}
                   className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
                   style={{ borderColor: defaultTheme.secondaryColor }}
-                  required
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -234,6 +188,10 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+
+              {errors.password && (
+                <p className="text-sm text-red-600">{errors.password}</p>
+              )}
             </div>
 
             <div>
@@ -243,17 +201,23 @@ export default function RegisterPage() {
               >
                 Confirm Password *
               </Label>
+
               <div className="relative mt-1">
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  required
+                  disabled={isLoading}
                   value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
+                  onChange={(e) => {
+                    handleInputChange("confirmPassword", e.target.value);
+                    if (errors.confirmPassword) clearError();
+                  }}
                   className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
                   style={{ borderColor: defaultTheme.secondaryColor }}
-                  required
                 />
                 <button
                   type="button"
@@ -273,6 +237,10 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-600">{errors.confirmPassword}</p>
+              )}
             </div>
           </div>
 
@@ -282,7 +250,14 @@ export default function RegisterPage() {
             style={{ backgroundColor: defaultTheme.secondaryColor }}
             disabled={isLoading}
           >
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? (
+              <>
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              "Create account"
+            )}
           </Button>
 
           <div className="text-center">
@@ -305,3 +280,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import FlexibleCard from "@/components/e-commerce/card/card-templates";
 import { usePathname } from "next/navigation";
+import FlexibleCard from "../../card/card-templates";
+
 interface FeaturedGridCategoryTemplateProps {
   isClickable?: boolean;
   categories: any[];
@@ -14,21 +14,14 @@ interface FeaturedGridCategoryTemplateProps {
   overlayColor?: string;
   borderRadius?: string;
   showTitle?: boolean;
-  showCategoryTitle?: boolean;
+  showCardTitle?: boolean;
   showCta?: boolean;
   ctaText?: string;
   gap?: string;
   fontFamily?: string;
   hoverEffect?: boolean;
   // Card related props
-  cardVariant?:
-    | "default"
-    | "compact"
-    | "detailed"
-    | "minimal"
-    | "hover"
-    | "overlay"
-    | "featured";
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured";
   showSubtitle?: boolean;
   cornerRadius?: "none" | "small" | "medium" | "large";
   cardShadow?: string;
@@ -42,6 +35,7 @@ interface FeaturedGridCategoryTemplateProps {
   showMoreText?: string;
   showMorebuttonBgColor?: string;
   showMorebuttonTextColor?: string;
+  categoryTitleFontSize?: string;
 }
 
 export default function FeaturedGridCategoryTemplate({
@@ -49,30 +43,31 @@ export default function FeaturedGridCategoryTemplate({
   categories,
   bgColor = "bg-white",
   textColor = "text-gray-800",
-  overlayColor = "from-black/60",
+  overlayColor = "bg-black/30",
   borderRadius = "rounded-lg",
   showTitle = true,
-  showCategoryTitle = true,
+  showCardTitle: showCategoryTitle = true,
   showCta = true,
   ctaText = "Shop Now",
   gap = "gap-6",
   fontFamily = "",
   hoverEffect = true,
   // Card related props
-  cardVariant = "default",
+  cardVariant = "featured",
   showSubtitle = false,
   cornerRadius = "medium",
-  cardShadow,
-  accentColor,
-  borderColor,
-  titleColor,
-  titleFontSize,
-  title,
-  titleFont,
+  cardShadow = "shadow-lg",
+  accentColor = "bg-blue-600",
+  borderColor = "border-gray-200",
+  titleColor = "text-white",
+  titleFontSize = "text-2xl",
+  title = "Shop Our Collections",
+  titleFont = "",
   showMoreButton = true,
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
+  categoryTitleFontSize = "text-lg",
 }: FeaturedGridCategoryTemplateProps) {
   const path = usePathname();
   const pathSegments = path.split("/");
@@ -82,122 +77,103 @@ export default function FeaturedGridCategoryTemplate({
   const featuredCategory = categories[0];
   const remainingCategories = categories.slice(1);
 
-  // Generate overlay gradient class
-  const overlayGradientClass = overlayColor.startsWith("from-")
-    ? `bg-gradient-to-t ${overlayColor} to-transparent`
-    : "bg-gradient-to-t from-black/60 to-transparent";
+  if (!categories || categories.length === 0) {
+    return null;
+  }
 
   return (
-    <div className={cn("w-full flex-shrink-0", bgColor)}>
-      <div
-        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
-      >
+    <div className={cn("w-full", bgColor)}>
+      <div className={cn("mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}>
         {showTitle && (
-          <h2 className={cn("text-4xl md:text-4xl font-bold text-center mb-6")}>
-            {title || "Shop Our Collections"}
+          <h2
+            className={cn(
+              "text-4xl md:text-4xl font-bold text-center mb-6",
+              titleColor,
+              titleFontSize,
+              titleFont
+            )}
+          >
+            {title}
           </h2>
         )}
-        <div className={cn("grid grid-cols-1 md:grid-cols-3 w-full", gap)}>
-          {/* Featured large category */}
+
+        <div
+          className={cn("grid grid-cols-1 md:grid-cols-3 w-full h-full", gap)}
+        >
+          {/* Featured large category using FlexibleCard */}
           {featuredCategory && (
-            <Link
-              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
-              className="md:col-span-2 md:row-span-2 group w-full"
-              key={featuredCategory._id}
-            >
-              <div
-                className={cn(
-                  "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
-              >
-                <Image
-                  src={
-                    featuredCategory.media?.mainMedia?.image?.url ||
-                    "/placeholder.svg?height=600&width=800"
-                  }
-                  alt={featuredCategory.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 66vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
-                {showCategoryTitle && (
-                  <div
-                    className={cn(
-                      "absolute inset-0 flex items-end",
-                      overlayGradientClass
-                    )}
-                  >
-                    <div className="p-6">
-                      <h3 className="text-white text-2xl font-bold">
-                        {featuredCategory.name}
-                      </h3>
-                      {showCta && (
-                        <p className="text-white/80 mt-2">{ctaText}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Link>
+            <div className="md:col-span-2 md:row-span-2 w-full h-full">
+              <FlexibleCard
+                isClickable={isClickable}
+                item={featuredCategory}
+                type="category"
+                variant={cardVariant}
+                imageRatio="landscape"
+                cornerRadius={cornerRadius}
+                showTitle={showCategoryTitle}
+                showSubtitle={showSubtitle}
+                showDescription={showSubtitle}
+                showCta={showCta}
+                ctaText={ctaText}
+                bgColor={bgColor}
+                textColor={textColor}
+                titleColor={titleColor}
+                titleFontSize={titleFontSize}
+                titleFont={titleFont}
+                accentColor={accentColor}
+                borderColor={borderColor}
+                overlayColor={overlayColor}
+                fontFamily={fontFamily}
+                cardShadow={cardShadow}
+                hoverEffect={hoverEffect}
+                linkPath={
+                  isClickable ? `/e-commerce/${subdomain}/products` : undefined
+                }
+                className="w-full h-96 md:h-full"
+                imageClassName="w-full h-96 md:h-full"
+              />
+            </div>
           )}
 
-          {/* All remaining categories */}
+          {/* Remaining categories using FlexibleCard */}
           {remainingCategories.map((category) => (
-            <Link
-              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
-              className="group w-full"
-              key={category.id}
-            >
-              <div
-                className={cn(
-                  "relative h-64 bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
-              >
-                <Image
-                  src={
-                    category.media?.mainMedia?.image?.url ||
-                    "/placeholder.svg?height=256&width=256"
-                  }
-                  alt={category.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
-                {showCategoryTitle && (
-                  <div
-                    className={cn(
-                      "absolute inset-0 flex items-end",
-                      overlayGradientClass
-                    )}
-                  >
-                    <div className="p-4">
-                      <h3 className="text-white text-lg font-medium">
-                        {category.name}
-                      </h3>
-                      {showCta && (
-                        <p className="text-white/80 text-sm mt-1">{ctaText}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Link>
+            <div key={category.id || category._id} className="w-full h-full">
+              <FlexibleCard
+                isClickable={isClickable}
+                item={category}
+                type="category"
+                variant={cardVariant}
+                imageRatio="square"
+                cornerRadius={cornerRadius}
+                showTitle={showCategoryTitle}
+                showSubtitle={showSubtitle}
+                showDescription={showSubtitle}
+                showCta={showCta}
+                ctaText={ctaText}
+                bgColor={bgColor}
+                textColor={textColor}
+                titleColor={titleColor}
+                titleFontSize="text-lg"
+                titleFont={titleFont}
+                accentColor={accentColor}
+                borderColor={borderColor}
+                overlayColor={overlayColor}
+                fontFamily={fontFamily}
+                cardShadow={cardShadow}
+                hoverEffect={hoverEffect}
+                linkPath={
+                  isClickable ? `/e-commerce/${subdomain}/products` : undefined
+                }
+                className="w-full h-64"
+                imageClassName="w-full h-64"
+              />
+            </div>
           ))}
         </div>
 
         {/* Show More Button */}
         {showMoreButton && (
-          <div className="flex justify-end mt-6">
+          <div className="flex justify-end mt-10">
             <Link
               href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
               className={cn(

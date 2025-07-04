@@ -26,8 +26,6 @@ interface GridCategoryTemplateProps {
   hoverEffect?: boolean;
   cardVariant?:
     | "default"
-    | "compact"
-    | "detailed"
     | "minimal"
     | "hover"
     | "overlay"
@@ -49,12 +47,13 @@ interface GridCategoryTemplateProps {
   showMoreText?: string;
   showMorebuttonBgColor?: string;
   showMorebuttonTextColor?: string;
+  categoryTitleFontSize?: string;
 }
 
 export function GridCategoryTemplate({
   isClickable = true,
   categories,
-  columns = { sm: 2, md: 3, lg: 4, xl: 6 },
+  columns = { sm: 1, md: 3, lg: 4, xl: 5 },
   gap = "gap-4",
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -82,6 +81,7 @@ export function GridCategoryTemplate({
   showMoreText = "Show More",
   showMorebuttonBgColor = "bg-slate-100",
   showMorebuttonTextColor = "text-gray-800",
+  categoryTitleFontSize = "text-lg",
 }: GridCategoryTemplateProps) {
   const path = usePathname();
   const pathSegments = path.split("/");
@@ -100,7 +100,7 @@ export function GridCategoryTemplate({
       <div
         className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
       >
-        {showTitle && titlePosition === "top" && (
+        {showTitle && (
           <h2
             className={cn(
               "text-4xl md:text-6xl font-bold text-center mb-6",
@@ -116,7 +116,7 @@ export function GridCategoryTemplate({
           {categories.map((category) => (
             <FlexibleCard
               isClickable={isClickable}
-              key={category._id}
+              key={category._id || category.id  }
               item={category}
               type="category"
               variant={cardVariant}

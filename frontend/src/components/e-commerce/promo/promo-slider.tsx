@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { PromoSlide } from "./promo-slide"
@@ -16,8 +16,8 @@ export interface PromoSliderProps {
     image: string
     imageAlt: string
   }[]
-  variant?: "left" | "centered" | "right" | "overlay" | "minimalRight" | "minimalLeft"| "split"
-  autoplay?: boolean
+  variant?: "left" | "centered" | "right" | "overlay" | "minimalRight" | "minimalLeft" | "split"
+  autoPlay?: boolean
   autoplaySpeed?: number
   showArrows?: boolean
   className?: string
@@ -40,8 +40,8 @@ export function PromoSlider({
   isClickable,
   slides,
   variant = "left",
-  autoplay = false,
-  autoplaySpeed = 5000,
+  autoPlay = false,
+  autoplaySpeed = 3000,
   showArrows = true,
   className,
   titleFont,
@@ -62,17 +62,17 @@ export function PromoSlider({
   const sliderRef = useRef<HTMLDivElement>(null)
   const totalSlides = slides.length
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1))
-  }
+  }, [totalSlides])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1))
-  }
+  }, [totalSlides])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
-    if (autoplay) {
+    if (autoPlay && totalSlides > 1) {
       interval = setInterval(() => {
         nextSlide()
       }, autoplaySpeed)
@@ -80,7 +80,7 @@ export function PromoSlider({
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [autoplay, autoplaySpeed])
+  }, [autoPlay, autoplaySpeed, nextSlide, totalSlides])
 
   return (
     <div className={cn("relative overflow-hidden", className)} ref={sliderRef}>
@@ -117,32 +117,30 @@ export function PromoSlider({
       </div>
 
       {showArrows && totalSlides > 1 && (
-  <>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent"
-      onClick={prevSlide}
-      aria-label="Previous slide"
-    >
-      <ChevronLeft className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
-    </Button>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent"
-      onClick={nextSlide}
-      aria-label="Next slide"
-    >
-      <ChevronRight className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
-    </Button>
-  </>
-)}
-
-
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent z-30"
+            onClick={prevSlide}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 shadow-none bg-transparent rounded-none p-0 hover:bg-transparent z-30"
+            onClick={nextSlide}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5 md:h-8 md:w-8 text-white/80" />
+          </Button>
+        </>
+      )}
 
       {totalSlides > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2">
+        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2 z-30">
           {slides.map((_, index) => (
             <button
               key={index}

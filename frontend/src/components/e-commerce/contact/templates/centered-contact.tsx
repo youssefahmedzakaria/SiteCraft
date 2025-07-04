@@ -1,4 +1,4 @@
-import Contact from "../contact"
+import {Contact} from "../contact"
 
 interface CenteredContactProps {
   id?: string
@@ -24,6 +24,6 @@ interface CenteredContactProps {
   titleSize?: string
 }
 
-export function CenteredContact(props: CenteredContactProps) {
-  return <Contact {...props} template="centered" />
+export function CenteredContact(props: CenteredContactProps & { image?: string }) {
+  return <Contact {...props} imageUrl={props.image || props.imageUrl} variant="centered" />
 }

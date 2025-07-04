@@ -33,7 +33,7 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
           >
             <div className="relative aspect-square">
               <Image
-                src={product.image || "/placeholder.svg?height=300&width=300"}
+                src={product.image || "/placeholder.png?height=300&width=300"}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform group-hover:scale-105"

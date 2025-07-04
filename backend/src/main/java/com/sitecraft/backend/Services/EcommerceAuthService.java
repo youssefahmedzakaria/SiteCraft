@@ -65,6 +65,13 @@ public class EcommerceAuthService {
 
         // Set default status
         customer.setStatus("active");
+        // Set creation and update timestamps
+        LocalDateTime now = LocalDateTime.now();
+        customer.setCreatedAt(now);
+        customer.setUpdatedAt(now);
+        if (customer.getGender() == null) {
+            customer.setGender("N/A");
+        }
 
         // Set creation and update timestamps
         LocalDateTime now = LocalDateTime.now();

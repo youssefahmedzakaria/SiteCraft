@@ -541,7 +541,7 @@ export default function CheckoutPage() {
                     style={{ backgroundColor: theme.backgroundColor }}
                   >
                     <Image
-                      src={item.image || "/placeholder.svg"}
+                      src={item.image || "/placeholder.png"}
                       alt={item.name}
                       fill
                       className="object-cover"

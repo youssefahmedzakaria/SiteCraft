@@ -2,8 +2,16 @@
 "use client";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
-import { ChevronDown, ChevronRight, ImageIcon, Plus } from "lucide-react";
-import { useState, useRef, DragEvent } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  GripVertical,
+  ImageIcon,
+  Plus,
+} from "lucide-react";
+import { useState, useRef, DragEvent, useEffect } from "react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -14,9 +22,12 @@ import {
 import { Button } from "@/components/SiteCraft/ui/button";
 import { FooterCustomizationAttributes } from "@/lib/customization";
 import { form } from "@heroui/theme";
-
-// content sections
-type ContentSectionName = "logo" | "copyright" | "socialMedia" | "aboutLinks";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 // design sections
 type DesignSectionName =
@@ -29,8 +40,9 @@ type DesignSectionName =
 // about link data
 interface AboutLink {
   id: string;
-  title?: string;
-  link?: string;
+  title: string;
+  selected: boolean;
+  visible: boolean;
 }
 
 interface RenderFooterSectionProps {
@@ -51,193 +63,6 @@ export function RenderFooterSection({
   {
     /* content sections */
   }
-  const [expandedContentSections, setExpandedContentSections] = useState<
-    Record<ContentSectionName, boolean>
-  >({
-    logo: false,
-    copyright: false,
-    socialMedia: false,
-    aboutLinks: false,
-  });
-
-  const toggleContentSection = (section: ContentSectionName) => {
-    setExpandedContentSections((prev) => {
-      const isCurrentlyOpen = prev[section];
-
-      if (isCurrentlyOpen) {
-        return {
-          logo: false,
-          copyright: false,
-          socialMedia: false,
-          aboutLinks: false,
-        };
-      }
-
-      return {
-        logo: false,
-        copyright: false,
-        socialMedia: false,
-        aboutLinks: false,
-        [section]: true,
-      };
-    });
-  };
-
-  {
-    /* For image selection in content */
-  }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        updateFooterAttributes({
-          logo: {
-            ...footerAttributes.logo,
-            src: reader.result as string,
-          },
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleDragOverImage = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDropImage = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0] || null;
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        updateFooterAttributes({
-          logo: {
-            ...footerAttributes.logo,
-            src: reader.result as string,
-          },
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  {
-    /* For About Links in content */
-  }
-  const [contentLinks, setContentLink] = useState<AboutLink[]>(
-    footerAttributes.aboutLinks?.map((link, index) => ({
-      id: (index + 1).toString(),
-      title: link.label,
-      link: link.href,
-    })) || [
-      {
-        id: "1",
-        title: undefined,
-        link: undefined,
-      },
-    ]
-  );
-
-  const handleTitleChange = (linkId: string, newTitle: string) => {
-    setContentLink((prevLinks) =>
-      prevLinks.map((link) =>
-        link.id === linkId ? { ...link, title: newTitle } : link
-      )
-    );
-
-    // Update footer attributes
-    const updatedLinks = contentLinks.map((link) =>
-      link.id === linkId ? { ...link, title: newTitle } : link
-    );
-    updateFooterAttributes({
-      aboutLinks: updatedLinks.map((link) => ({
-        label: link.title || "",
-        href: link.link || "",
-        font: "font-serif",
-        fontSize: "text-lg",
-        fontColor: "text-black",
-      })),
-    });
-  };
-
-  const handleLinkChange = (linkId: string, newLink: string) => {
-    setContentLink((prevLinks) =>
-      prevLinks.map((link) =>
-        link.id === linkId ? { ...link, link: newLink } : link
-      )
-    );
-
-    // Update footer attributes
-    const updatedLinks = contentLinks.map((link) =>
-      link.id === linkId ? { ...link, link: newLink } : link
-    );
-    updateFooterAttributes({
-      aboutLinks: updatedLinks.map((link) => ({
-        label: link.title || "",
-        href: link.link || "",
-        font: "font-serif",
-        fontSize: "text-lg",
-        fontColor: "text-black",
-      })),
-    });
-  };
-
-  {
-    /* add and delete links */
-  }
-  const handleAddContentLink = () => {
-    const newLinkId = parseInt(contentLinks[contentLinks.length - 1].id) + 1;
-    const newLink: AboutLink = {
-      id: newLinkId.toString(),
-      title: undefined,
-      link: undefined,
-    };
-    setContentLink((prevLinks) => [...prevLinks, newLink]);
-
-    // Update footer attributes
-    const updatedLinks = [...contentLinks, newLink];
-    updateFooterAttributes({
-      aboutLinks: updatedLinks.map((link) => ({
-        label: link.title || "",
-        href: link.link || "",
-        font: "font-serif",
-        fontSize: "text-lg",
-        fontColor: "text-black",
-      })),
-    });
-  };
-
-  const handleDeleteContentLink = (linkId: string) => {
-    setContentLink((prevLinks) =>
-      prevLinks.filter((link) => link.id !== linkId)
-    );
-
-    // Update footer attributes
-    const updatedLinks = contentLinks.filter((link) => link.id !== linkId);
-    updateFooterAttributes({
-      aboutLinks: updatedLinks.map((link) => ({
-        label: link.title || "",
-        href: link.link || "",
-        font: "font-serif",
-        fontSize: "text-lg",
-        fontColor: "text-black",
-      })),
-    });
-  };
 
   // -----------------------------------------------------------------------------------------------------------------------------
 
@@ -279,161 +104,148 @@ export function RenderFooterSection({
     });
   };
 
-  {
-    /* For design settings */
-  }
-  const [footerSettings, setFooterSettings] = useState({
-    background: "#ffffff",
-    generalText: "#000000",
-    logoWidth: "50px",
-    logoHeight: "50px",
-    aboutLinkFontFamily: "Arial",
-    aboutLinkFontSize: "14px",
-    aboutLinkFontWeight: "normal",
-    aboutLinkColor: "#000000",
-    socialMediaIconColor: "#000000",
-    socialMediaIconHoverColor: "#000000",
-    socialMediaIconSize: "20px",
-    copyrightFontFamily: "Arial",
-    copyrightFontSize: "14px",
-    copyrightFontWeight: "normal",
-    copyrightColor: "#000000",
-  });
+  // -----------------------------------------------------------------------------------------------------------------------------
 
-  const [aboutLinksFontFamily, setAboutLinksFontFamily] = useState<
-    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  >("inter");
+  const [sections, setSections] = useState<AboutLink[]>([]);
 
-  const handleAboutLinksFontFamilyChange = (
-    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  ) => {
-    setAboutLinksFontFamily(type);
-    setFooterSettings((s) => ({
-      ...s,
-      aboutLinkFontFamily: type ? `${type}px` : "0px",
+  // Initialize sections from headerAttributes only once
+    useEffect(() => {
+      const menuSections =
+        footerAttributes.aboutLinks?.map((item, index) => ({
+          id: item.label.toLowerCase().replace(/\s+/g, "-"),
+          title: item.label,
+          selected: true,
+          visible: item.isShown,
+        })) || [];
+      setSections(menuSections);
+    }, []); // Empty dependency array to run only once
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(sections);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setSections(items);
+
+    // Update header attributes with reordered menu items
+    const updatedMenuItems = items.map((section, idx) => ({
+      label: section.title,
+      href: footerAttributes.aboutLinks[idx]?.href || "#",
+      font: footerAttributes.aboutLinks[idx]?.font || "font-inter",
+      fontSize: footerAttributes.aboutLinks[idx]?.fontSize || "text-base",
+      fontColor:
+        footerAttributes.aboutLinks[idx]?.fontColor || "text-[#000000]",
+      isShown: section.visible,
     }));
+    updateFooterAttributes({ aboutLinks: updatedMenuItems });
   };
 
-  const [copyrightFontFamily, setCopyrightFontFamily] = useState<
-    "inter" | "roboto" | "open-sans" | "poppins" | "lato"
-  >("inter");
-
-  const handleCopyrightFontFamilyChange = (
-    type: "inter" | "roboto" | "open-sans" | "poppins" | "lato"
+  const updateSection = (
+    id: string,
+    field: keyof AboutLink,
+    value: string | boolean
   ) => {
-    setCopyrightFontFamily(type);
-    setFooterSettings((s) => ({
-      ...s,
-      copyrightFontFamily: type ? `${type}px` : "0px",
+    const updatedSections = sections.map((section) =>
+      section.id === id ? { ...section, [field]: value } : section
+    );
+    setSections(updatedSections);
+
+    // Update header attributes when section changes
+    const updatedMenuItems = updatedSections.map((section, idx) => ({
+      label: section.title,
+      href: footerAttributes.aboutLinks[idx]?.href || "#",
+      font: footerAttributes.aboutLinks[idx]?.font || "font-inter",
+      fontSize: footerAttributes.aboutLinks[idx]?.fontSize || "text-base",
+      fontColor:
+        footerAttributes.aboutLinks[idx]?.fontColor || "text-[#000000]",
+      isShown: section.visible,
     }));
+    console.log("updated footer",updatedMenuItems);
+    updateFooterAttributes({ aboutLinks: updatedMenuItems });
+  };
+
+  const toggleSectionVisibility = (id: string) => {
+    updateSection(id, "visible", !sections.find((s) => s.id === id)?.visible);
   };
 
   return (
     <div>
       {detailedSectionTab === "content" ? (
         <div className="p-4 space-y-5">
-          {/* Copyright Section */}
-          <div className="flex items-center">
-            <button
-              className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleContentSection("copyright")}
-            >
-              <span className="font-medium">Copyright</span>
-              {expandedContentSections.copyright ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
-            </button>
-          </div>
-          {expandedContentSections.copyright && (
-            <div className="space-y-4">
-              <Textarea
-                id="copyright"
-                name="copyright"
-                placeholder="Write what is your copyright..."
-                rows={4}
-                className="w-full"
-              />
-            </div>
-          )}
-
           {/* About Links Section */}
-          <div className="flex items-center">
-            <button
-              className="flex-1 flex items-center justify-between text-left"
-              onClick={() => toggleContentSection("aboutLinks")}
-            >
-              <span className="font-medium">About Links</span>
-              {expandedContentSections.aboutLinks ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
-            </button>
+          <h3 className="font-medium mb-4">Menu Items</h3>
+          <div className="space-y-2">
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="sections">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2"
+                  >
+                    {sections.map((section, index) => (
+                      <Draggable
+                        key={section.id}
+                        draggableId={section.id}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`flex items-center p-2 border border-gray-200 rounded relative ${
+                              !section.visible ? "opacity-50 bg-gray-50" : ""
+                            } ${snapshot.isDragging ? "shadow-lg" : ""}`}
+                          >
+                            <div
+                              {...provided.dragHandleProps}
+                              className="cursor-grab flex items-center text-gray-400 hover:text-gray-600"
+                              title="Drag to reorder"
+                            >
+                              <GripVertical size={18} />
+                            </div>
+                            <div className="flex-1 relative pl-2">
+                              <input
+                                type="text"
+                                value={section.title}
+                                className="w-full border-none bg-transparent focus:outline-none pr-8"
+                                onChange={(e) =>
+                                  updateSection(
+                                    section.id,
+                                    "title",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <button
+                                onClick={() =>
+                                  toggleSectionVisibility(section.id)
+                                }
+                                className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                                title={
+                                  section.visible ? "Hide item" : "Show item"
+                                }
+                              >
+                                {section.visible ? (
+                                  <Eye size={16} className="text-gray-600" />
+                                ) : (
+                                  <EyeOff size={16} className="text-gray-400" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
-          {expandedContentSections.aboutLinks && (
-            <div className="space-y-4">
-              {contentLinks.map((link, index) => (
-                <div key={link.id} className="space-y-2">
-                  <div className="space-y-1">
-                    <label
-                      htmlFor={`linkText-${link.id}`}
-                      className="block text-sm font-medium text-gray-700"
-                      id={`linkText-${link.id}`}
-                    >
-                      Link Text
-                    </label>
-                    <Input
-                      id={`linkText-${link.id}`}
-                      name={`linkText-${link.id}`}
-                      placeholder="Your link text..."
-                      defaultValue={link.title}
-                      className="w-full bg-background"
-                      onChange={(e) =>
-                        handleTitleChange(link.id, e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label
-                      htmlFor={`link-${link.id}`}
-                      className="block text-sm font-medium text-gray-700"
-                      id={`link-${link.id}`}
-                    >
-                      Link
-                    </label>
-                    <Input
-                      id={`link-${link.id}`}
-                      name={`link-${link.id}`}
-                      placeholder="Your link..."
-                      defaultValue={link.link}
-                      className="w-full bg-background"
-                      onChange={(e) =>
-                        handleLinkChange(link.id, e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="flex justify-end mt-1">
-                    <button
-                      onClick={() => handleDeleteContentLink(link.id)}
-                      className="pr-2 text-[0.6rem] text-red-500 hover:text-red-700 focus:outline-none underline"
-                      title="Delete Promo"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button
-                onClick={handleAddContentLink}
-                className="flex items-center justify-center gap-2 bg-gray-100 border border-gray-400 rounded-md w-full h-10"
-              >
-                <Plus size={18} />
-                Add Link
-              </button>
-            </div>
-          )}
+          {/* )} */}
         </div>
       ) : (
         <div className="p-4 space-y-6">
@@ -482,7 +294,7 @@ export function RenderFooterSection({
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="block text-sm mb-2">Text Color</label>
                 <div className="flex items-center gap-2 rounded w-full border border-gray-200 p-1">
                   <input
@@ -510,7 +322,7 @@ export function RenderFooterSection({
                     }}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
@@ -1016,7 +828,7 @@ export function RenderFooterSection({
             </div>
           )}
 
-          {/* About Link */}
+          {/* About Link Design */}
           {footerAttributes.aboutLinks.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center">

@@ -3,7 +3,13 @@
 "use client";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
-import { ChevronDown, ChevronRight, ImageIcon, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ImageIcon,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState, useRef, DragEvent } from "react";
 import Image from "next/image";
 import {
@@ -25,12 +31,18 @@ interface RenderContactSectionProps {
   updateContactAttributes: (
     updates: Partial<ContactCustomizationAttributes>
   ) => void;
+  onDeleteSection?: () => void;
+  contactImage: File | undefined;
+  setContactImage: React.Dispatch<React.SetStateAction<File | undefined>>;
 }
 
 export function RenderContactSection({
   detailedSectionTab,
   contactAttributes,
   updateContactAttributes,
+  onDeleteSection,
+  contactImage,
+  setContactImage,
 }: RenderContactSectionProps) {
   {
     /* For image selection in content */
@@ -40,11 +52,8 @@ export function RenderContactSection({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateContactAttributes({ imageUrl: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setContactImage(file);
+      updateContactAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
@@ -60,24 +69,21 @@ export function RenderContactSection({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateContactAttributes({ imageUrl: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setContactImage(file);
+      updateContactAttributes({ image: URL.createObjectURL(file) });
     }
   };
 
   // Handle layout selection and update template
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = [
-      "MinimalRightContact",
-      "MinimalLeftContact",
-      "CenteredContact",
-      "LeftAlignedContact",
       "RightAlignedContact",
+      "LeftAlignedContact",
+      "MinimalLeftContact",
+      "MinimalRightContact",
+      "CenteredContact",
     ];
-    const templateName = templateNames[layoutId - 1] || "MinimalRightContact";
+    const templateName = templateNames[layoutId - 1] || "RightAlignedContact";
     updateContactAttributes({ template: templateName });
   };
 
@@ -114,138 +120,152 @@ export function RenderContactSection({
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
-        <div className="p-4 space-y-5">
+        <div className="flex flex-col flex-1 min-h-0 p-4">
           {/* Image or Map */}
-          <div className="space-y-3">
-            <h1 className="text-lg font-semibold tracking-tight">
-              Image or Map
-            </h1>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Button
-                  variant={contactAttributes.showMap ? "default" : "outline"}
-                  onClick={() =>
-                    updateContactAttributes({
-                      showMap: true,
-                    })
-                  }
-                  className="flex-1"
-                >
-                  Map View
-                </Button>
-                <Button
-                  variant={!contactAttributes.showMap ? "default" : "outline"}
-                  onClick={() =>
-                    updateContactAttributes({
-                      showMap: false,
-                    })
-                  }
-                  className="flex-1"
-                >
-                  Image View
-                </Button>
-              </div>
-
-              {contactAttributes.showMap ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Address
-                    </label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={contactAttributes.address}
-                      onChange={(e) =>
-                        updateContactAttributes({
-                          address: e.target.value,
-                        })
-                      }
-                      placeholder="Enter address"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Address Link
-                    </label>
-                    <Input
-                      id="addressLink"
-                      name="addressLink"
-                      value={contactAttributes.addressUrl}
-                      onChange={(e) =>
-                        updateContactAttributes({
-                          addressUrl: e.target.value,
-                        })
-                      }
-                      placeholder="Enter Google Maps link"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Opening Hours
-                    </label>
-                    <Input
-                      id="openHours"
-                      name="openHours"
-                      value={contactAttributes.openHours}
-                      onChange={(e) =>
-                        updateContactAttributes({
-                          openHours: e.target.value,
-                        })
-                      }
-                      placeholder="Enter opening hours"
-                    />
-                  </div>
+          <div className="space-y-8 flex-1 min-h-0 overflow-y-auto">
+            <div className="space-y-1">
+              <h1 className="text-lg font-semibold tracking-tight">
+                Image or Map
+              </h1>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant={contactAttributes.showMap ? "default" : "outline"}
+                    onClick={() =>
+                      updateContactAttributes({
+                        showMap: true,
+                      })
+                    }
+                    className="flex-1"
+                  >
+                    Map View
+                  </Button>
+                  <Button
+                    variant={!contactAttributes.showMap ? "default" : "outline"}
+                    onClick={() =>
+                      updateContactAttributes({
+                        showMap: false,
+                      })
+                    }
+                    className="flex-1"
+                  >
+                    Image View
+                  </Button>
                 </div>
-              ) : (
-                <div
-                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                  onDragOver={handleDragOverImage}
-                  onDrop={handleDropImage}
-                  onClick={handleBrowseClick}
-                >
-                  {contactAttributes.imageUrl ? (
-                    <div className="relative w-full h-48">
-                      <Image
-                        src={contactAttributes.imageUrl}
-                        alt="Preview"
-                        fill
-                        className="object-contain"
+
+                {contactAttributes.showMap ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Address
+                      </label>
+                      <Input
+                        id="address"
+                        name="address"
+                        value={contactAttributes.address}
+                        onChange={(e) =>
+                          updateContactAttributes({
+                            address: e.target.value,
+                          })
+                        }
+                        placeholder="Enter address"
                       />
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <ImageIcon className="h-8 w-8 text-gray-400" />
-                      <p className="text-sm text-gray-500">
-                        Drag and drop an image here, or click to browse
-                      </p>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Address Link
+                      </label>
+                      <Input
+                        id="addressLink"
+                        name="addressLink"
+                        value={contactAttributes.addressUrl}
+                        onChange={(e) =>
+                          updateContactAttributes({
+                            addressUrl: e.target.value,
+                          })
+                        }
+                        placeholder="Enter Google Maps link"
+                      />
                     </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-              )}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Opening Hours
+                      </label>
+                      <Input
+                        id="openHours"
+                        name="openHours"
+                        value={contactAttributes.openHours}
+                        onChange={(e) =>
+                          updateContactAttributes({
+                            openHours: e.target.value,
+                          })
+                        }
+                        placeholder="Enter opening hours"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                    onDragOver={handleDragOverImage}
+                    onDrop={handleDropImage}
+                    onClick={handleBrowseClick}
+                  >
+                    {contactAttributes.image ? (
+                      <div className="relative w-full h-48">
+                        <Image
+                          src={contactAttributes.image}
+                          alt="Preview"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <ImageIcon className="h-8 w-8 text-gray-400" />
+                        <p className="text-sm text-gray-500">
+                          Drag and drop an image here, or click to browse
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className="pt-8 flex justify-start">
+            {onDeleteSection && (
+              <button
+                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
+                onClick={onDeleteSection}
+              >
+                <Trash2 size={16} />
+                Delete Section
+              </button>
+            )}
           </div>
         </div>
       ) : (
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
           {/* Layout */}
           <ContactLayoutItems
             selectedLayout={
               [
-                "MinimalRightContact",
-                "MinimalLeftContact",
-                "CenteredContact",
-                "LeftAlignedContact",
                 "RightAlignedContact",
+                "LeftAlignedContact",
+                "MinimalLeftContact",
+                "MinimalRightContact",
+                "CenteredContact",
               ].indexOf(contactAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}
