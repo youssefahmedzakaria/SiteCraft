@@ -170,13 +170,13 @@ public class StoreController {
     @GetMapping("/getStoreSettings")
     public ResponseEntity<?> getStoreSettings(HttpSession session) {
         try {
-//            Long storeId = (Long) session.getAttribute("storeId");
-//            if (storeId == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(Map.of("success", false, "message", "Store ID not found in session."));
-//            }
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
 
-            Long storeId = 1L;
+//            Long storeId = 1L;
 
             Store store = storeService.getStore(storeId);
 

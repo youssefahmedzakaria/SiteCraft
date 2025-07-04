@@ -116,6 +116,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             credentials: "include",
           }
         );
+        const responseSubdomain = await fetch(
+          "http://localhost:8080/api/store/getStoreId/" + subdomain,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        console.log("fetched subdomain", responseSubdomain);
         const responseStore = await fetch(
           "http://localhost:8080/api/store/getStoreSettings",
           {
