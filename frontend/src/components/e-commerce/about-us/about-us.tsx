@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 export interface AboutUsProps {
   id?: string;
   title: string;
-  description: string;
   image: string;
   imageAlt: string;
   variant?: "centered" | "top-image" | "left-aligned" | "right-aligned";
@@ -16,10 +15,11 @@ export interface AboutUsProps {
   titleFont?: string;
   titleColor?: string;
   titleSize?: string;
-  descriptionFont?: string;
-  descriptionColor?: string;
-  descriptionSize?: string;
-  secondaryDescription?: string;
+  sections: { sectionTitle: string; description: string }[];
+  sectionColor?: string;
+  sectionSize?: string;
+  sectionFont?: string;
+  sectionFontWeight?: string;
 }
 
 const getFontFamily = (fontFamily: string) => {
@@ -62,7 +62,6 @@ const getFontSize = (fontSize: string) => {
 export function AboutUs({
   id,
   title,
-  description,
   image,
   imageAlt,
   variant = "centered",
@@ -72,10 +71,11 @@ export function AboutUs({
   titleFont,
   titleColor,
   titleSize,
-  descriptionFont,
-  descriptionColor,
-  descriptionSize,
-  secondaryDescription,
+  sections,
+  sectionColor,
+  sectionSize,
+  sectionFont,
+  sectionFontWeight,
 }: AboutUsProps) {
   const variants = {
     centered: {
@@ -83,14 +83,14 @@ export function AboutUs({
       content: "container mx-auto px-4",
       title:
         "text-2xl md:text-4xl lg:text-6xl font-light text-center mb-6 md:mb-12",
-      description: "max-w-3xl mx-auto text-center",
+      section: "max-w-3xl mx-auto text-center",
       image: "relative h-[200px] md:h-[300px] lg:h-[400px] mb-6 md:mb-12",
     },
     "top-image": {
       container: "py-8 md:py-16",
       content: "container mx-auto px-4",
       title: "text-2xl md:text-4xl lg:text-5xl font-light mb-4 md:mb-0",
-      description: "md:col-span-8 space-y-4",
+      section: "md:col-span-8 space-y-4",
       image:
         "relative h-[200px] md:h-[300px] lg:h-[400px] mb-6 md:mb-12 w-full",
     },
@@ -99,7 +99,7 @@ export function AboutUs({
       content: "container mx-auto px-4",
       title:
         "text-2xl md:text-4xl lg:text-6xl font-light text-left mb-6 md:mb-12",
-      description: "space-y-4 md:space-y-6",
+      section: "space-y-4 md:space-y-6",
       image: "relative h-[250px] md:h-[350px] lg:h-[450px]",
     },
     "right-aligned": {
@@ -107,7 +107,7 @@ export function AboutUs({
       content: "container mx-auto px-4",
       title:
         "text-2xl md:text-4xl lg:text-6xl font-light text-left mb-6 md:mb-12",
-      description: "space-y-4 md:space-y-6",
+      section: "space-y-4 md:space-y-6",
       image: "relative h-[250px] md:h-[350px] lg:h-[450px]",
     },
   };
@@ -160,42 +160,23 @@ export function AboutUs({
                   {title}
                 </h2>
               </div>
-              <div className={style.description}>
-                <p
-                  className="mb-4"
-                  style={{
-                    fontFamily: descriptionFont
-                      ? getFontFamily(descriptionFont)
-                      : undefined,
-                    color: descriptionColor?.includes("[")
-                      ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                        "#4B5563"
-                      : "#4B5563",
-                    fontSize: descriptionSize
-                      ? getFontSize(descriptionSize)
-                      : undefined,
-                  }}
-                >
-                  {description}
-                </p>
-                {secondaryDescription && (
-                  <p
-                    style={{
-                      fontFamily: descriptionFont
-                        ? getFontFamily(descriptionFont)
-                        : undefined,
-                      color: descriptionColor?.includes("[")
-                        ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                          "#4B5563"
-                        : "#4B5563",
-                      fontSize: descriptionSize
-                        ? getFontSize(descriptionSize)
-                        : undefined,
-                    }}
-                  >
-                    {secondaryDescription}
-                  </p>
-                )}
+              <div className={style.section}>
+                {sections.map((section, idx) => (
+                  <div key={idx} className="mb-6">
+                    <div
+                      style={{
+                        fontFamily: sectionFont ? getFontFamily(sectionFont) : undefined,
+                        color: sectionColor?.includes("[")
+                          ? sectionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
+                          : sectionColor || "#4B5563",
+                        fontSize: sectionSize ? getFontSize(sectionSize) : undefined,
+                        fontWeight: sectionFontWeight || undefined,
+                      }}
+                    >
+                      <span className="font-semibold">{section.sectionTitle}</span>: {section.description}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </>
@@ -214,42 +195,23 @@ export function AboutUs({
               >
                 {title}
               </h2>
-              <div className={style.description}>
-                <p
-                  className="mb-4"
-                  style={{
-                    fontFamily: descriptionFont
-                      ? getFontFamily(descriptionFont)
-                      : undefined,
-                    color: descriptionColor?.includes("[")
-                      ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                        "#4B5563"
-                      : "#4B5563",
-                    fontSize: descriptionSize
-                      ? getFontSize(descriptionSize)
-                      : undefined,
-                  }}
-                >
-                  {description}
-                </p>
-                {secondaryDescription && (
-                  <p
-                    style={{
-                      fontFamily: descriptionFont
-                        ? getFontFamily(descriptionFont)
-                        : undefined,
-                      color: descriptionColor?.includes("[")
-                        ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                          "#4B5563"
-                        : "#4B5563",
-                      fontSize: descriptionSize
-                        ? getFontSize(descriptionSize)
-                        : undefined,
-                    }}
-                  >
-                    {secondaryDescription}
-                  </p>
-                )}
+              <div className={style.section}>
+                {sections.map((section, idx) => (
+                  <div key={idx} className="mb-6">
+                    <div
+                      style={{
+                        fontFamily: sectionFont ? getFontFamily(sectionFont) : undefined,
+                        color: sectionColor?.includes("[")
+                          ? sectionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
+                          : sectionColor || "#4B5563",
+                        fontSize: sectionSize ? getFontSize(sectionSize) : undefined,
+                        fontWeight: sectionFontWeight || undefined,
+                      }}
+                    >
+                      <span className="font-semibold">{section.sectionTitle}</span>: {section.description}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
             <div className={style.image}>
@@ -300,47 +262,28 @@ export function AboutUs({
               >
                 {title}
               </h2>
-              <div className={style.description}>
-                <p
-                  className="mb-4"
-                  style={{
-                    fontFamily: descriptionFont
-                      ? getFontFamily(descriptionFont)
-                      : undefined,
-                    color: descriptionColor?.includes("[")
-                      ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                        "#4B5563"
-                      : "#4B5563",
-                    fontSize: descriptionSize
-                      ? getFontSize(descriptionSize)
-                      : undefined,
-                  }}
-                >
-                  {description}
-                </p>
-                {secondaryDescription && (
-                  <p
-                    style={{
-                      fontFamily: descriptionFont
-                        ? getFontFamily(descriptionFont)
-                        : undefined,
-                      color: descriptionColor?.includes("[")
-                        ? descriptionColor.split("-[")[1]?.slice(0, -1) ||
-                          "#4B5563"
-                        : "#4B5563",
-                      fontSize: descriptionSize
-                        ? getFontSize(descriptionSize)
-                        : undefined,
-                    }}
-                  >
-                    {secondaryDescription}
-                  </p>
-                )}
+              <div className={style.section}>
+                {sections.map((section, idx) => (
+                  <div key={idx} className="mb-6">
+                    <div
+                      style={{
+                        fontFamily: sectionFont ? getFontFamily(sectionFont) : undefined,
+                        color: sectionColor?.includes("[")
+                          ? sectionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
+                          : sectionColor || "#4B5563",
+                        fontSize: sectionSize ? getFontSize(sectionSize) : undefined,
+                        fontWeight: sectionFontWeight || undefined,
+                      }}
+                    >
+                      <span className="font-semibold">{section.sectionTitle}</span>: {section.description}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         ) : (
-          <div className={style.description}>
+          <div className={style.section}>
             <div className={style.image}>
               <Image
                 src={image || "/placeholder.png?height=400&width=800"}
@@ -369,39 +312,22 @@ export function AboutUs({
             >
               {title}
             </h2>
-            <p
-              className="mb-4 md:mb-8"
-              style={{
-                fontFamily: descriptionFont
-                  ? getFontFamily(descriptionFont)
-                  : undefined,
-                color: descriptionColor?.includes("[")
-                  ? descriptionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
-                  : "#4B5563",
-                fontSize: descriptionSize
-                  ? getFontSize(descriptionSize)
-                  : undefined,
-              }}
-            >
-              {description}
-            </p>
-            {secondaryDescription && (
-              <p
-                style={{
-                  fontFamily: descriptionFont
-                    ? getFontFamily(descriptionFont)
-                    : undefined,
-                  color: descriptionColor?.includes("[")
-                    ? descriptionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
-                    : "#4B5563",
-                  fontSize: descriptionSize
-                    ? getFontSize(descriptionSize)
-                    : undefined,
-                }}
-              >
-                {secondaryDescription}
-              </p>
-            )}
+            {sections.map((section, idx) => (
+              <div key={idx} className="mb-6">
+                <div
+                  style={{
+                    fontFamily: sectionFont ? getFontFamily(sectionFont) : undefined,
+                    color: sectionColor?.includes("[")
+                      ? sectionColor.split("-[")[1]?.slice(0, -1) || "#4B5563"
+                      : sectionColor || "#4B5563",
+                    fontSize: sectionSize ? getFontSize(sectionSize) : undefined,
+                    fontWeight: sectionFontWeight || undefined,
+                  }}
+                >
+                  <span className="font-semibold">{section.sectionTitle}</span>: {section.description}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

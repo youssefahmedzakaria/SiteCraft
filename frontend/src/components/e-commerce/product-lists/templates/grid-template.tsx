@@ -54,6 +54,39 @@ interface GridProductTemplateProps {
   onAddToCart?: (product: any) => void;
   onAddToFavorite?: (product: any) => void;
 }
+const getFontSize = (fontSize: string) => {
+  const sizeMap: Record<string, string> = {
+    "text-xs": "0.75rem",
+    "text-sm": "0.875rem",
+    "text-base": "1rem",
+    "text-lg": "1.125rem",
+    "text-xl": "1.25rem",
+    "text-2xl": "1.5rem",
+    "text-3xl": "1.875rem",
+    "text-4xl": "2.25rem",
+    "text-5xl": "3rem",
+    "text-6xl": "3.75rem",
+  };
+  return sizeMap[fontSize] || "1rem";
+};
+const getFontFamily = (fontFamily: string) => {
+  switch (fontFamily) {
+    case "font-inter":
+      return "Inter, sans-serif";
+    case "font-roboto":
+      return "Roboto, sans-serif";
+    case "font-open-sans":
+      return "Open Sans, sans-serif";
+    case "font-poppins":
+      return "Poppins, sans-serif";
+    case "font-lato":
+      return "Lato, sans-serif";
+    case "font-serif":
+      return "serif";
+    default:
+      return "system-ui, sans-serif";
+  }
+};
 
 export function GridProductTemplate({
   isClickable,
@@ -104,18 +137,29 @@ export function GridProductTemplate({
   );
 
   return (
-    <div className={cn("w-full flex-shrink-0", bgColor)}>
+    <div className={cn("w-full flex-shrink-0")}
+    style={{backgroundColor: bgColor.includes("[")
+            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : bgColor,}}
+    >
       <div
-        className={cn(" mx-auto px-16 py-8 md:py-16", textColor, fontFamily)}
+        className={cn(" mx-auto px-16 py-8 md:py-16",)}
+         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+          fontFamily: getFontFamily(fontFamily),
+                    }}
       >
         {showTitle && (
           <h2
             className={cn(
               "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
-              titleColor,
-              titleFontSize,
-              titleFont
             )}
+            style={{
+              color: titleColor?.includes("[")
+                ? titleColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                : titleColor,
+              fontSize: getFontSize(titleFontSize ?? ""),
+              fontFamily: getFontFamily(fontFamily),
+            }}
           >
             {title}
           </h2>
@@ -162,9 +206,15 @@ export function GridProductTemplate({
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",
                 "rounded-lg text-sm font-medium",
-                showMorebuttonBgColor,
-                showMorebuttonTextColor
               )}
+              style={{
+                backgroundColor: showMorebuttonBgColor.includes("[")
+                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  : showMorebuttonBgColor,
+                color: showMorebuttonTextColor.includes("[")
+                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) || "#000000"
+                  : showMorebuttonTextColor,
+              }}
             >
               {showMoreText}
             </Link>

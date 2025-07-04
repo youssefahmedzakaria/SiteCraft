@@ -71,6 +71,13 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
   const handleSearch = (query: string) => {
     if (onSearch) {
       onSearch(query)
+    } else {
+      // Default behavior - navigate to products page with search
+      const pathSegments = window.location.pathname.split("/")
+      const subdomain = pathSegments[2]
+      if (subdomain) {
+        window.location.href = `/e-commerce/${subdomain}/products?search=${encodeURIComponent(query.trim())}`
+      }
     }
   }
 
@@ -127,7 +134,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
             {/* Right - Icons on desktop / Menu button on mobile */}
             <div className="flex items-center gap-2">
               <div className="hidden md:flex">
-                <IconsGroup iconColor={iconColor} />
+                <IconsGroup iconColor={iconColor} isCustomize={isCustomize} />
               </div>
               <button
                 className="md:hidden p-1 hover:opacity-80"
@@ -167,7 +174,7 @@ export const NavbarTemplate1: React.FC<NavbarTemplate1Props> = ({
                 : undefined,
             }}
           >
-            <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} />
+            <Navigation menuItems={visibleMenuItems} textColor={textColor} fontFamily={fontFamily} isCustomize={isCustomize} />
           </div>
         </div>
       </nav>

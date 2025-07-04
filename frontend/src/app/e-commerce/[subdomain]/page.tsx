@@ -378,20 +378,28 @@ export default function Home() {
     id: "about",
     title: "About Us",
     titleColor: "text-[#000000]", // text-black
-    description:
-      "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
-    secondaryDescription:
-      "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
-    descriptionColor: "text-[#4B5563]", // text-gray-600
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
     imageObjectFit: "cover",
     titleFont: "font-sans",
     titleSize: "text-4xl",
-    // titleFontWeight: "font-bold",
-    descriptionFont: "font-sans",
-    descriptionSize: "text-lg",
+    sections: [
+      {
+        sectionTitle: "Who We Are",
+        description:
+          "We are a passionate team dedicated to bringing you the best products and services. Our mission is to make your shopping experience exceptional.",
+      },
+      {
+        sectionTitle: "Our Experience",
+        description:
+          "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
+      },
+    ],
+    sectionColor: "text-[#000000]",
+    sectionSize: "text-lg",
+    sectionFont: "font-sans",
+    sectionFontWeight: "normal",
   };
 
   // State for about customization
@@ -604,9 +612,11 @@ export default function Home() {
         // ---------------------Store Settings----------------------------------
         setAboutAttributes((prev) => ({
           ...prev,
-          description: storeData.store.aboutUs?.[0]?.title || prev.description,
-          secondaryDescription:
-            storeData.store.aboutUs?.[0]?.content || prev.description,
+         sections:
+            dataStore.store.aboutUs?.map((a: any) => ({
+              sectionTitle: a.title,
+              description: a.description,
+         }))|| prev.sections,
         }));
         // Policies (only sections)
         setPoliciesAttributes((prev) => ({

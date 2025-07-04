@@ -54,12 +54,7 @@ export default function ProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as
-    | "overlay"
-    | "default"
-    | "minimal"
-    | "hover"
-    | "featured",
+  cardVariant = "hover" as "default" | "minimal" | "hover" | "overlay" | "featured",
   titleFontSize = "text-3xl",
   showMoreButton = false,
 
@@ -612,6 +607,34 @@ export default function ProductsPage({
                 )}
               </div>
             </div>
+
+            {/* Search Results Display */}
+            {searchQuery.trim() && (
+              <div className="mb-6 p-4 rounded-lg border" style={{ 
+                backgroundColor: theme.backgroundColor + '20', 
+                borderColor: theme.textColor + '30',
+                color: theme.textColor 
+              }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Search results for:</span>
+                    <span className="text-sm font-semibold">"{searchQuery}"</span>
+                    <span className="text-sm opacity-70">({totalItems} products found)</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      
+                    }}
+                    className="text-xs"
+                    style={{ color: theme.textColor, borderColor: theme.textColor }}
+                  >
+                    Clear Search
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Products Display */}
             {currentProducts.length === 0 ? (

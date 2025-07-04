@@ -129,7 +129,7 @@ export default function CategoryList({
             hoverEffect={hoverEffect}
             // Card related props
             cardVariant={cardVariant}
-            showSubtitle={showSubtitle}
+            showSubtitle={true}
             cornerRadius={cornerRadius}
             cardShadow={cardShadow}
             accentColor={accentColor}
