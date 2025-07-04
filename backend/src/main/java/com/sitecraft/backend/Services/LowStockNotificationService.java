@@ -4,7 +4,6 @@ import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,9 +15,6 @@ public class LowStockNotificationService {
     
     @Autowired
     private ProductRepo productRepo;
-    
-    @Autowired
-    private ProductVariantsRepo productVariantsRepo;
     
     @Autowired
     private UserRoleRepo userRoleRepo;
@@ -108,7 +104,7 @@ public class LowStockNotificationService {
      * Build email content for low stock notification
      */
     private String buildLowStockEmailContent(Product product) {
-        int currentStock = product.getCurrentTotalStock();
+        int currentStock = product.getMaxCap().intValue();
         BigDecimal threshold = product.getMinCap();
         
         StringBuilder content = new StringBuilder();
@@ -118,7 +114,7 @@ public class LowStockNotificationService {
         content.append("- Name: ").append(product.getName()).append("\n");
         content.append("- Description: ").append(product.getDescription()).append("\n");
         content.append("- Current Stock: ").append(currentStock).append(" units\n");
-        content.append("- Low Stock Threshold: ").append(threshold).append(" units\n");
+        content.append("- Low Stock Threshold: ").append(threshold.intValue()).append(" units\n");
         
         if (product.getPercentageMax() != null) {
             content.append("- Threshold Type: Percentage-based (").append(product.getPercentageMax()).append("%)\n");

@@ -55,7 +55,7 @@ public class OverviewService {    @Autowired
     public List<Order> getTodayOrders(Long storeId) {
         LocalDate today = LocalDate.now();
         return orderService.getAllOrders(storeId).stream()
-            .filter(o -> o.getIssueDate().toLocalDate().equals(today))
+            .filter(o -> o.getIssueDate() != null && o.getIssueDate().toLocalDate().equals(today))
             .collect(Collectors.toList());
     }    /**
      * Get daily sales for the last 7 days (including today) for the specified store.

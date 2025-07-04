@@ -5,7 +5,6 @@ import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.ProductImage;
 import com.sitecraft.backend.Services.ProductService;
 import com.sitecraft.backend.Services.LowStockNotificationService;
-import com.sitecraft.backend.Services.ScheduledStockCheckService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +28,6 @@ public class ProductController {
     
     @Autowired
     private LowStockNotificationService lowStockNotificationService;
-    
-    @Autowired
-    private ScheduledStockCheckService scheduledStockCheckService;
 
     @GetMapping
     public ResponseEntity<?> getAllProducts(HttpSession session) {
