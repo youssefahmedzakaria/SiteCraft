@@ -26,7 +26,7 @@ public class AuthController {
             boolean canRegister = userService.canRegisterAsOwner(user.getEmail());
             if (!canRegister) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("User with this email is already an owner of another store.");
+                        .body(Map.of("success", false, "message", "User with this email is already an owner of another store."));
             }
 
             if (user.getPassword() == null || user.getPassword().length() < 8) {
