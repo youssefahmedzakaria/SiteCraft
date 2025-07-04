@@ -146,78 +146,42 @@ export default function Home() {
         name: "Necklaces",
         Description: "Necklaces",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "7",
         name: "Rings",
         Description: "Rings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "8",
         name: "Earrings",
         Description: "Earrings",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "9",
         name: "Bracelets",
         Description: "Bracelets",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "10",
         name: "Pendants",
         Description: "Pendants",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
       {
         id: "11",
         name: "Bangles",
         Description: "Bangles",
         link: `/#`,
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
+        images: [],
       },
     ],
   };
@@ -268,97 +232,55 @@ export default function Home() {
         id: "1",
         name: "product1",
         description: "description of product1",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.1,
+        price: 59.99,
       },
       {
         id: "2",
         name: "product2",
         description: "description of product2",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 10,
+        price: 59.99,
       },
       {
         id: "3",
         name: "product3",
         description: "description of product3",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 8,
+        price: 59.99,
       },
       {
         id: "4",
         name: "product4",
         description: "description of product4",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.13,
+        price: 59.99,
       },
       {
         id: "5",
         name: "product5",
         description: "description of product5",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "percentage",
+        discountValue: 0.21,
+        price: 59.99,
       },
       {
         id: "6",
         name: "product6",
         description: "description of product6",
-        media: {
-          mainMedia: {
-            image: {
-              url: "/placeholder.png",
-            },
-          },
-        },
-        price: {
-          price: 59.99,
-          priceAfterDiscount: 39.99,
-        },
+        images: [],
+        discountType: "fixed",
+        discountValue: 30,
+        price: 59.99,
       },
     ],
   };
@@ -612,11 +534,11 @@ export default function Home() {
         // ---------------------Store Settings----------------------------------
         setAboutAttributes((prev) => ({
           ...prev,
-         sections:
-            dataStore.store.aboutUs?.map((a: any) => ({
-              sectionTitle: a.title,
-              description: a.description,
-         }))|| prev.sections,
+          section:
+            storeData.aboutUs?.map((p: any) => ({
+              sectionTitle: p.title,
+              description: p.content,
+            })) || prev.sections,
         }));
         // Policies (only sections)
         setPoliciesAttributes((prev) => ({
@@ -661,35 +583,25 @@ export default function Home() {
             id: String(product.id),
             name: product.name,
             description: product.description,
-            media: {
-              mainMedia: {
-                image: {
-                  url:
-                    product.images && product.images.length > 0
-                      ? product.images[0].imageUrl
-                      : "/placeholder.png",
-                },
+            discountType: product.discountType,
+            discountValue: product.discountValue,
+            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            images: [
+              {
+                id:
+                  product.images && product.images.length > 0
+                    ? product.images[0].id
+                    : 1,
+                url:
+                  product.images && product.images.length > 0
+                    ? product.images[0].imageUrl
+                    : "/placeholder.png",
+                alt:
+                  product.images && product.images.length > 0
+                    ? product.images[0].alt
+                    : "Image alt text",
               },
-            },
-            price: {
-              price: product.variants[0].price
-                ? product.variants[0].price
-                : 0.0,
-              priceAfterDiscount: product.discountValue
-                ? product.discountType === "percentage"
-                  ? parseFloat(
-                      (
-                        product.variants[0].price *
-                        (1 - product.discountValue)
-                      ).toFixed(2)
-                    )
-                  : parseFloat(
-                      (
-                        product.variants[0].price - product.discountValue
-                      ).toFixed(2)
-                    )
-                : parseFloat(product.variants[0].price.toFixed(2)),
-            },
+            ],
           }));
 
           setProductAttributes((prev) => ({
@@ -706,13 +618,13 @@ export default function Home() {
               name: category.name,
               Description: category.description,
               link: "#",
-              media: {
-                mainMedia: {
-                  image: {
-                    url: category.image || "/placeholder.png",
-                  },
+              images: [
+                {
+                  id: category.id,
+                  url: category.image || "/placeholder.png",
+                  alt: `Image alt text for ${category.name}`,
                 },
-              },
+              ],
             })
           );
 

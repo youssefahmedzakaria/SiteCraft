@@ -557,7 +557,7 @@ export function RenderAboutSection({
               className="flex-1 flex items-center justify-between text-left"
               onClick={() => toggleSection("description")}
             >
-              <span className="font-medium">Description</span>
+              <span className="font-medium">Sections</span>
               {expandedSections.description ? (
                 <ChevronDown size={18} />
               ) : (

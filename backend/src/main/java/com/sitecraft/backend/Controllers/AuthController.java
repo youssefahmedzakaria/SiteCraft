@@ -213,7 +213,7 @@ public class AuthController {
     public void setSession(@RequestBody Map<String, Object> in, HttpSession session) {
         System.out.println("🔐 setSession endpoint called with: " + in);
         session.setAttribute("userId", Long.valueOf(in.get("userId").toString()));
-        session.setAttribute("storeId", Long.valueOf(in.get("storeId").toString()));
+        session.setAttribute("storeId", in.get("storeId") != null ? Long.valueOf(in.get("storeId").toString()) : null);
         session.setAttribute("role", in.get("role"));
         System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId") + ", role: " + in.get("role"));
     }

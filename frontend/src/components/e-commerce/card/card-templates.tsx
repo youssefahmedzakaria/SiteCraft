@@ -407,8 +407,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className={cn(
@@ -476,8 +476,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover"
@@ -513,8 +513,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className={cn(
@@ -526,8 +526,8 @@ export default function FlexibleCard({
               {secondaryImageUrl && hoverEffect && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Image
-                    src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                    src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     className="object-cover"
@@ -630,8 +630,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className={cn(
@@ -692,8 +692,8 @@ export default function FlexibleCard({
               )}
             >
               <Image
-                src={item.image[0]?.url || "/placeholder.png"}
-                alt={item.image[0]?.alt || "Item image"}
+                src={item.images[0]?.url || "/placeholder.png"}
+                alt={item.images[0]?.alt || "Item image"}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className={cn(
