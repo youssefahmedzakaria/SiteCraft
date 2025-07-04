@@ -76,6 +76,18 @@ const getFontFamily = (fontFamily: string) => {
   }
 };
 
+// Helper to render out of stock badge
+const OutOfStockBadge = (product: any) => {
+  if (product.currentTotalStock === 0) {
+    return (
+      <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700 rounded-md align-middle">
+        Out of Stock
+      </span>
+    );
+  }
+  return null;
+};
+
 export function FeaturedGridProductTemplate({
   isClickable,
   products,
@@ -157,10 +169,10 @@ export function FeaturedGridProductTemplate({
               >
                 <Image
                   src={
-                    featuredProduct.media?.mainMedia?.image?.url ||
+                    featuredProduct.image[0]?.url ||
                     "/placeholder.png?height=600&width=800"
                   }
-                  alt={featuredProduct.name}
+                  alt={featuredProduct.image[0]?.alt || ""}
                   fill
                   sizes="(max-width: 768px) 100vw, 66vw"
                   className={cn(
@@ -178,17 +190,26 @@ export function FeaturedGridProductTemplate({
                     <h3 className={cn(cardTextColor, "text-2xl font-bold flex items-center gap-2")}>{featuredProduct.name}
                       {/* Discount badge */}
                       {(() => {
-                        const hasPriceObj = featuredProduct.price && typeof featuredProduct.price === 'object';
-                        const isDiscounted = hasPriceObj && typeof featuredProduct.price.priceAfterDiscount === 'number' && typeof featuredProduct.price.price === 'number' && featuredProduct.price.priceAfterDiscount < featuredProduct.price.price;
-                        const discountPercent = isDiscounted
-                          ? Math.round(((featuredProduct.price.price - featuredProduct.price.priceAfterDiscount) / featuredProduct.price.price) * 100)
-                          : null;
+                        const originalPrice = featuredProduct.price;
+                        let currentPrice = originalPrice;
+                        let discountPercent = null;
+                        if (featuredProduct.discountType && typeof featuredProduct.discountValue === 'number') {
+                          if (featuredProduct.discountType === 'percentage') {
+                            currentPrice = originalPrice - (originalPrice * featuredProduct.discountValue) / 100;
+                            discountPercent = featuredProduct.discountValue;
+                          } else if (featuredProduct.discountType === 'fixed amount') {
+                            currentPrice = originalPrice - featuredProduct.discountValue;
+                            discountPercent = Math.round((featuredProduct.discountValue / originalPrice) * 100);
+                          }
+                        }
+                        const isDiscounted = currentPrice < originalPrice;
                         return isDiscounted && discountPercent ? (
                           <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
                             {discountPercent}% OFF
                           </span>
                         ) : null;
                       })()}
+                      {OutOfStockBadge(featuredProduct)}
                     </h3>
                     {/* Subtitle */}
                     {showSubtitle && featuredProduct.description && (
@@ -196,30 +217,26 @@ export function FeaturedGridProductTemplate({
                     )}
                     {/* Price display */}
                     {(() => {
-                      const hasPriceObj = featuredProduct.price && typeof featuredProduct.price === 'object';
-                      const currentPrice = hasPriceObj && typeof featuredProduct.price.priceAfterDiscount === 'number'
-                        ? featuredProduct.price.priceAfterDiscount
-                        : hasPriceObj && typeof featuredProduct.price.price === 'number'
-                        ? featuredProduct.price.price
-                        : null;
-                      const originalPrice = hasPriceObj && typeof featuredProduct.price.price === 'number'
-                        ? featuredProduct.price.price
-                        : null;
-                      const isDiscounted = hasPriceObj && typeof featuredProduct.price.priceAfterDiscount === 'number' && typeof featuredProduct.price.price === 'number' && featuredProduct.price.priceAfterDiscount < featuredProduct.price.price;
+                      const originalPrice = featuredProduct.price;
+                      let currentPrice = originalPrice;
+                      if (featuredProduct.discountType && typeof featuredProduct.discountValue === 'number') {
+                        if (featuredProduct.discountType === 'percentage') {
+                          currentPrice = originalPrice - (originalPrice * featuredProduct.discountValue) / 100;
+                        } else if (featuredProduct.discountType === 'fixed amount') {
+                          currentPrice = originalPrice - featuredProduct.discountValue;
+                        }
+                      }
+                      const isDiscounted = currentPrice < originalPrice;
                       return (
                         <>
-                          {currentPrice !== null ? (
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className={cn("font-semibold", cardTextColor)}>
-                                ${currentPrice.toFixed(2)}
-                              </span>
-                              {isDiscounted && (
-                                <span className="text-sm line-through text-gray-200">${originalPrice.toFixed(2)}</span>
-                              )}
-                            </div>
-                          ) : (
-                            <div className={cn("font-semibold", cardTextColor, "mt-2")}>N/A</div>
-                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className={cn("font-semibold", cardTextColor)}>
+                              ${currentPrice.toFixed(2)}
+                            </span>
+                            {isDiscounted && (
+                              <span className="text-sm line-through text-gray-200">${originalPrice.toFixed(2)}</span>
+                            )}
+                          </div>
                         </>
                       );
                     })()}
@@ -242,10 +259,10 @@ export function FeaturedGridProductTemplate({
               >
                 <Image
                   src={
-                    product.media?.mainMedia?.image?.url ||
+                    product.image[0]?.url ||
                     "/placeholder.png"
                   }
-                  alt={product.name}
+                  alt={product.image[0]?.alt || ""}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className={cn(
@@ -262,11 +279,24 @@ export function FeaturedGridProductTemplate({
                   <div className="p-4">
                     <h3 className={cn(cardTextColor, "text-lg font-medium flex items-center gap-2")}>{product.name}
                       {/* Discount badge */}
-                      {product.price && product.price.originalPrice && product.price.value && product.price.originalPrice > product.price.value && (
-                        <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
-                          {Math.round(((product.price.originalPrice - product.price.value) / product.price.originalPrice) * 100)}% OFF
-                        </span>
-                      )}
+                      {product.discountType && typeof product.discountValue === 'number' && (() => {
+                        let currentPrice = product.price;
+                        let discountPercent = null;
+                        if (product.discountType === 'percentage') {
+                          currentPrice = product.price - (product.price * product.discountValue) / 100;
+                          discountPercent = product.discountValue;
+                        } else if (product.discountType === 'fixed amount') {
+                          currentPrice = product.price - product.discountValue;
+                          discountPercent = Math.round((product.discountValue / product.price) * 100);
+                        }
+                        const isDiscounted = currentPrice < product.price;
+                        return isDiscounted && discountPercent ? (
+                          <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+                            {discountPercent}% OFF
+                          </span>
+                        ) : null;
+                      })()}
+                      {OutOfStockBadge(product)}
                     </h3>
                     {/* Subtitle */}
                     {showSubtitle && product.description && (
@@ -274,38 +304,31 @@ export function FeaturedGridProductTemplate({
                     )}
                     {/* Price display */}
                     {(() => {
-                      const hasPriceObj = product.price && typeof product.price === 'object';
-                      const currentPrice = hasPriceObj && typeof product.price.priceAfterDiscount === 'number'
-                        ? product.price.priceAfterDiscount
-                        : hasPriceObj && typeof product.price.price === 'number'
-                        ? product.price.price
-                        : null;
-                      const originalPrice = hasPriceObj && typeof product.price.price === 'number'
-                        ? product.price.price
-                        : null;
-                      const isDiscounted = hasPriceObj && typeof product.price.priceAfterDiscount === 'number' && typeof product.price.price === 'number' && product.price.priceAfterDiscount < product.price.price;
-                      const discountPercent = isDiscounted
-                        ? Math.round(((product.price.price - product.price.priceAfterDiscount) / product.price.price) * 100)
-                        : null;
+                      const originalPrice = product.price;
+                      let currentPrice = originalPrice;
+                      if (product.discountType && typeof product.discountValue === 'number') {
+                        if (product.discountType === 'percentage') {
+                          currentPrice = originalPrice - (originalPrice * product.discountValue) / 100;
+                        } else if (product.discountType === 'fixed amount') {
+                          currentPrice = originalPrice - product.discountValue;
+                        }
+                      }
+                      const isDiscounted = currentPrice < originalPrice;
                       return (
                         <>
-                          {currentPrice !== null ? (
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className={cn("font-semibold", cardTextColor)}>
-                                ${currentPrice.toFixed(2)}
-                              </span>
-                              {isDiscounted && (
-                                <>
-                                  <span className="text-xs line-through text-gray-200">${originalPrice.toFixed(2)}</span>
-                                  <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
-                                    {discountPercent}% OFF
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          ) : (
-                            <div className={cn("font-semibold", cardTextColor, "mt-1")}>N/A</div>
-                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={cn("font-semibold", cardTextColor)}>
+                              ${currentPrice.toFixed(2)}
+                            </span>
+                            {isDiscounted && (
+                              <>
+                                <span className="text-xs line-through text-gray-200">${originalPrice.toFixed(2)}</span>
+                                <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+                                  {product.discountType === 'percentage' ? product.discountValue : Math.round((product.discountValue / product.price) * 100)}% OFF
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </>
                       );
                     })()}

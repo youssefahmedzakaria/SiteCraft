@@ -148,10 +148,10 @@ export default function FeaturedGridCategoryTemplate({
               >
                 <Image
                   src={
-                    featuredCategory.media?.mainMedia?.image?.url ||
+                    featuredCategory.image[0]?.url ||
                     "/placeholder.png?height=600&width=800"
                   }
-                  alt={featuredCategory.name}
+                  alt={featuredCategory.image[0]?.alt || ""}
                   fill
                   sizes="(max-width: 768px) 100vw, 66vw"
                   className={cn(
@@ -193,10 +193,10 @@ export default function FeaturedGridCategoryTemplate({
               >
                 <Image
                   src={
-                    category.media?.mainMedia?.image?.url ||
+                    category.image[0]?.url ||
                     "/placeholder.png"
                   }
-                  alt={category.name}
+                  alt={category.image[0]?.alt || ""}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className={cn(
