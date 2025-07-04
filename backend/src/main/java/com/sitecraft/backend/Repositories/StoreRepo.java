@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface StoreRepo extends JpaRepository<Store, Long> {
     Store findBySubdomain(String subdomain);
     
+    boolean existsBySubdomain(String subdomain);
+    
     @Modifying
     @Transactional
     @Query(value = "UPDATE store SET colors = CAST(:colors AS jsonb) WHERE id = :storeId", nativeQuery = true)

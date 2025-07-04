@@ -205,7 +205,7 @@ export function StoreInformationSection() {
               htmlFor="subdomain"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Web Address <span className="text-red-500">*</span>
+              Subdomain <span className="text-red-500">*</span>
             </label>
             <div className="flex">
               <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -222,7 +222,7 @@ export function StoreInformationSection() {
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">
-              This is your store's unique web address
+              This is your store's web address.
             </p>
           </div>
 
