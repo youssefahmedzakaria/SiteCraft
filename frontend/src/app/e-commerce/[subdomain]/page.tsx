@@ -118,7 +118,7 @@ export default function Home() {
   const initialCategory: CategoryCustomizationAttributes = {
     id: "categories",
     template: "FeaturedGrid", // You can adjust this if needed
-    isClickable: false,
+    isClickable: true,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
@@ -205,7 +205,7 @@ export default function Home() {
   const initialProduct: ProductCustomizationAttributes = {
     id: "products",
     template: "FeaturedGrid", // You can adjust this if needed
-    isClickable: false,
+    isClickable: true,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
     textColor: "text-[#000000]",
@@ -411,21 +411,21 @@ export default function Home() {
 
   const sectionComponents = {
     PromoSlider: {
-      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
+      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={true} />,
       LeftAlignedPromo: (
-        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
+        <LeftAlignedPromo {...promoAttributes} isClickable={true} />
       ),
       RightAlignedPromo: (
-        <RightAlignedPromo {...promoAttributes} isClickable={false} />
+        <RightAlignedPromo {...promoAttributes} isClickable={true} />
       ),
       MinimalLeftPromo: (
-        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
+        <MinimalLeftPromo {...promoAttributes} isClickable={true} />
       ),
       MinimalRightPromo: (
-        <MinimalRightPromo {...promoAttributes} isClickable={false} />
+        <MinimalRightPromo {...promoAttributes} isClickable={true} />
       ),
-      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
-      SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
+      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={true} />,
+      SplitPromo: <SplitPromo {...promoAttributes} isClickable={true} />,
     },
     Products: {
       FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,

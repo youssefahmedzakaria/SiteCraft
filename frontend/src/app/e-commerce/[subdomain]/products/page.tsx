@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/e-commerce/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useProductManagement } from "@/hooks/useProductManagement";
 import { getCategories, SimplifiedProduct } from "@/lib/products";
+import { useSearchParams, useRouter } from "next/navigation";
 
 // Theme configuration (matching product page structure)
 const defaultTheme = {
@@ -28,6 +29,15 @@ const defaultTheme = {
 
 // Optionally, import ThemeConfig type from product page for type safety
 // import type { ThemeConfig } from "../product/[slug]/product"
+
+// Utility to normalize strings for search (remove special chars, trim, lowercase)
+function normalize(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/gi, "") // remove special characters
+    .replace(/\s+/g, " ") // collapse multiple spaces
+    .trim();
+}
 
 export default function ProductsPage({
   theme = defaultTheme,
@@ -66,22 +76,58 @@ export default function ProductsPage({
   enableSorting = true,
   maxPriceLimit = 1500,
 }) {
-  const [categoryFilter, setCategoryFilter] =
-    useState<string>("All Categories");
-  const [stockFilter, setStockFilter] = useState<string>("All Stock");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // State synced with URL
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [maxPrice, setMaxPrice] = useState<number>(maxPriceLimit);
+  const [stockFilter, setStockFilter] = useState<string>("All Stock");
+  const [sortBy, setSortBy] = useState("featured");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [showInStockOnly, setShowInStockOnly] = useState(false);
   const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
   const [file, setFile] = useState<File | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  const { products, isLoading, error, clearError, fetchProducts } =
-    useProductManagement();
+  const { products, isLoading, error, clearError, fetchProducts } = useProductManagement();
+
+  // Helper to update URL query params
+  const updateQueryParam = (key: string, value: string | number) => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    if (
+      value === "" ||
+      value === "All Categories" ||
+      value === "All Stock" ||
+      (key === "maxPrice" && Number(value) === maxPriceLimit)
+    ) {
+      params.delete(key);
+    } else {
+      params.set(key, String(value));
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  // Sync state from URL
+  useEffect(() => {
+    setSearchQuery(searchParams.get("search") || "");
+    setSelectedCategories(
+      searchParams.get("category")
+        ? searchParams.get("category")!.split(",")
+        : []
+    );
+    setMaxPrice(Number(searchParams.get("maxPrice")) || maxPriceLimit);
+    setStockFilter(searchParams.get("stock") || "All Stock");
+    setSortBy(searchParams.get("sort") || "featured");
+  }, [searchParams]);
 
   // Fetch categories from backend
   useEffect(() => {
@@ -99,17 +145,60 @@ export default function ProductsPage({
     fetchCategories();
   }, []);
 
-  // Apply filters
+  // Helper to update category param in URL
+  const updateCategoryParam = (categories: string[]) => {
+    updateQueryParam("category", categories.length ? categories.join(",") : "");
+  };
+
+  // Handlers that update both state and URL
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    let updated;
+    if (checked) {
+      updated = [...selectedCategories, category];
+    } else {
+      updated = selectedCategories.filter((c) => c !== category);
+    }
+    setSelectedCategories(updated);
+    updateCategoryParam(updated);
+    setCurrentPage(1);
+  };
+
+  const handleMaxPriceChange = (price: number) => {
+    setMaxPrice(price);
+    updateQueryParam("maxPrice", price);
+  };
+
+  const handleStockChange = (stock: string) => {
+    setStockFilter(stock);
+    updateQueryParam("stock", stock);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    updateQueryParam("search", query);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    updateQueryParam("search", "");
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    updateQueryParam("sort", sort);
+  };
+
+  // Filtering logic: multi-category
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
-    // Filter by category
-    if (categoryFilter !== "All Categories") {
+    // Multi-category filter
+    if (selectedCategories.length > 0) {
       if (!product.categoryId) return false;
       const category = categories.find((c) => c.id === product.categoryId);
-      if (!category || category.name !== categoryFilter) {
+      if (!category || !selectedCategories.includes(category.name)) {
         return false;
       }
     }
-
     // Filter by stock status
     if (stockFilter !== "All Stock") {
       const productStatus = product.stock > 0 ? "In Stock" : "Out of Stock";
@@ -117,41 +206,52 @@ export default function ProductsPage({
         return false;
       }
     }
-
+    // Filter by max price
+    if (product.price > maxPrice) {
+      return false;
+    }
     // Filter by search query
     if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      const productName = product.name.toLowerCase();
-      const productDescription = product.description.toLowerCase();
-
+      const searchNorm = normalize(searchQuery);
+      const productName = normalize(product.name || (product as any).title || "");
+      const productDescription = normalize(product.description || "");
       if (
-        !productName.includes(searchLower) &&
-        !productDescription.includes(searchLower)
+        !productName.includes(searchNorm) &&
+        !productDescription.includes(searchNorm)
       ) {
         return false;
       }
     }
-
     return true;
   });
 
+  // After filtering, apply sorting before pagination
+  let sortedProducts = [...filteredProducts];
+  switch (sortBy) {
+    case "price-asc":
+      sortedProducts.sort((a, b) => a.price - b.price);
+      break;
+    case "price-desc":
+      sortedProducts.sort((a, b) => b.price - a.price);
+      break;
+    case "name-asc":
+      sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "name-desc":
+      sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+      break;
+    default:
+      // 'featured' or unknown: no sorting or custom logic
+      break;
+  }
+
   //---------------------------------------------------------------------------------------------------------------
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItemsPerPage, setSelectedItemsPerPage] =
-    useState(itemsPerPage);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  // Filter states
-  const [maxPrice, setMaxPrice] = useState(maxPriceLimit);
-  const [sortBy, setSortBy] = useState("featured");
-  const [showInStockOnly, setShowInStockOnly] = useState(false);
-
-  const totalItems = filteredProducts.length;
+  const totalItems = sortedProducts.length;
   const totalPages = Math.ceil(totalItems / selectedItemsPerPage);
   const startIndex = (currentPage - 1) * selectedItemsPerPage;
   const endIndex = startIndex + selectedItemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const currentProducts = sortedProducts.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -161,15 +261,6 @@ export default function ProductsPage({
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setSelectedItemsPerPage(newItemsPerPage);
     setCurrentPage(1); // Reset to first page
-  };
-
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, category]);
-    } else {
-      setSelectedCategories(selectedCategories.filter((c) => c !== category));
-    }
-    setCurrentPage(1);
   };
 
   const clearAllFilters = () => {
@@ -289,7 +380,7 @@ export default function ProductsPage({
                         max={maxPriceLimit}
                         step={10}
                         value={[maxPrice]}
-                        onValueChange={(value) => setMaxPrice(value[0])}
+                        onValueChange={(value) => handleMaxPriceChange(value[0])}
                         className="my-6"
                       />
                       <div
@@ -371,7 +462,7 @@ export default function ProductsPage({
                       >
                         Sort By
                       </h3>
-                      <Select value={sortBy} onValueChange={setSortBy}>
+                      <Select value={sortBy} onValueChange={handleSortChange}>
                         <SelectTrigger className="w-full border-2 border-current rounded-xl">
                           <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
@@ -450,7 +541,7 @@ export default function ProductsPage({
                         max={maxPriceLimit}
                         step={10}
                         value={[maxPrice]}
-                        onValueChange={(value) => setMaxPrice(value[0])}
+                        onValueChange={(value) => handleMaxPriceChange(value[0])}
                         className="my-6"
                       />
                       <div
@@ -532,7 +623,7 @@ export default function ProductsPage({
                       >
                         Sort By
                       </h3>
-                      <Select value={sortBy} onValueChange={setSortBy}>
+                      <Select value={sortBy} onValueChange={handleSortChange}>
                         <SelectTrigger className="w-full border-2 border-current rounded-xl">
                           <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
@@ -624,9 +715,7 @@ export default function ProductsPage({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      
-                    }}
+                    onClick={handleClearSearch}
                     className="text-xs"
                     style={{ color: theme.textColor, borderColor: theme.textColor }}
                   >
