@@ -311,99 +311,66 @@ export default function ColorPalettePage() {
   const [primaryColor, setPrimaryColor] = useState("#000000");
   const [secondaryColor, setSecondaryColor] = useState("#ffffff");
   const [accentColor, setAccentColor] = useState("#ff6b6b");
-  const [presetPalettes, setPresetPalettes] = useState<ColorPalette[]>([]);
+  const [suggestedPalettes, setSuggestedPalettes] = useState<ColorPalette[]>([]);
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
+  const [brandingPalette, setBrandingPalette] = useState<ColorPalette | null>(null);
 
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Load colors from cache or localStorage
+  // Load colors from cache/branding first, then localStorage, then defaults
   useEffect(() => {
     if (!isClient) return;
-    
-    const loadColors = async () => {
-      try {
-        // First try to get colors from cache
-        const cachedData = siteCraftCache.getData();
-        if (cachedData.store?.colors) {
-          console.log('🎨 Colors loaded from cache:', cachedData.store.colors);
-          
-          setPrimaryColor(cachedData.store.colors.primary);
-          setSecondaryColor(cachedData.store.colors.secondary);
-          setAccentColor(cachedData.store.colors.accent);
-          
-          // Also save to localStorage for backward compatibility
-          localStorage.setItem("primaryColor", cachedData.store.colors.primary);
-          localStorage.setItem("secondaryColor", cachedData.store.colors.secondary);
-          localStorage.setItem("accentColor", cachedData.store.colors.accent);
-          
-          return;
-        }
-        
-        // Fallback to localStorage (set by branding page)
-        const storedPrimaryColor = localStorage.getItem("primaryColor") || "#000000";
-        const storedSecondaryColor = localStorage.getItem("secondaryColor") || "#ffffff";
-        const storedAccentColor = localStorage.getItem("accentColor") || "#ff6b6b";
-
-        // Validate and clean the colors
-        const primaryColor = validateHexColor(storedPrimaryColor) ? storedPrimaryColor : "#000000";
-        const secondaryColor = validateHexColor(storedSecondaryColor) ? storedSecondaryColor : "#ffffff";
-        const accentColor = validateHexColor(storedAccentColor) ? storedAccentColor : "#ff6b6b";
-
-        setPrimaryColor(primaryColor);
-        setSecondaryColor(secondaryColor);
-        setAccentColor(accentColor);
-
-        // Only generate accent color if it wasn't already set from branding page
-        if (!localStorage.getItem("accentColor")) {
-          const rgb = hexToRgb(primaryColor);
-          if (rgb) {
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            const complementaryHue = (hsl.h + 0.5) % 1;
-            const complementaryRgb = hslToRgb(complementaryHue, hsl.s, hsl.l);
-            setAccentColor(
-              rgbToHex(complementaryRgb.r, complementaryRgb.g, complementaryRgb.b)
-            );
-          }
-        }
-
-        console.log('🎨 Colors loaded from localStorage:', { primaryColor, secondaryColor, accentColor });
-      } catch (error) {
-        console.error('Failed to load colors:', error);
-        
-        // Set default colors
-        setPrimaryColor("#000000");
-        setSecondaryColor("#ffffff");
-        setAccentColor("#ff6b6b");
-      }
-    };
-    
-    loadColors();
-  }, [isClient]);
-
-  // Load pre-generated palettes from localStorage
-  useEffect(() => {
-    if (!isClient) return;
-    
-    const storedPalettes = localStorage.getItem("colorPalettes");
-    if (storedPalettes) {
-      try {
-        const palettes = JSON.parse(storedPalettes);
-        setPresetPalettes(palettes);
-        console.log('🎨 Pre-generated palettes loaded:', palettes);
-      } catch (err) {
-        console.error('Failed to parse stored palettes:', err);
-        setPresetPalettes([]);
-      }
-    } else {
-      console.log('No pre-generated palettes found in localStorage');
-      setPresetPalettes([]);
+    const cachedData = siteCraftCache.getData();
+    if (cachedData.store?.colors) {
+      setPrimaryColor(cachedData.store.colors.primary);
+      setSecondaryColor(cachedData.store.colors.secondary);
+      setAccentColor(cachedData.store.colors.accent);
+      setBrandingPalette({
+        name: "Logo Inspired",
+        colors: [
+          cachedData.store.colors.primary,
+          cachedData.store.colors.secondary,
+          cachedData.store.colors.accent,
+        ],
+      });
+      return;
     }
+    // Fallback to localStorage (set by branding page)
+    const storedPrimaryColor = localStorage.getItem("primaryColor") || "#000000";
+    const storedSecondaryColor = localStorage.getItem("secondaryColor") || "#ffffff";
+    const storedAccentColor = localStorage.getItem("accentColor") || "#ff6b6b";
+    setPrimaryColor(storedPrimaryColor);
+    setSecondaryColor(storedSecondaryColor);
+    setAccentColor(storedAccentColor);
+    setBrandingPalette({
+      name: "Branding Colors",
+      colors: [storedPrimaryColor, storedSecondaryColor, storedAccentColor],
+    });
   }, [isClient]);
+
+  // Generate suggested palettes based on the current primary color
+  useEffect(() => {
+    if (!isClient) return;
+    const palettes: ColorPalette[] = [
+      { name: "Analogous Harmony", colors: generateAnalogousPalette(primaryColor) },
+      { name: "Complementary Contrast", colors: generateComplementaryPalette(primaryColor) },
+      { name: "Triadic Balance", colors: generateTriadicPalette(primaryColor) },
+      { name: "Monochromatic Shades", colors: generateMonochromaticPalette(primaryColor) },
+      { name: "Split Complementary", colors: generateSplitComplementaryPalette(primaryColor) },
+      { name: "Tetradic Harmony", colors: generateTetradicPalette(primaryColor) },
+      { name: "Warm Variations", colors: generateWarmPalette(primaryColor) },
+      { name: "Cool Variations", colors: generateCoolPalette(primaryColor) },
+      { name: "High Contrast", colors: generateHighContrastPalette(primaryColor) },
+      { name: "Soft Pastels", colors: generateSoftPastelPalette(primaryColor) },
+      { name: "Deep & Rich", colors: generateDeepRichPalette(primaryColor) },
+    ];
+    setSuggestedPalettes(palettes);
+  }, [primaryColor, isClient]);
 
   // Validate hex color format
   const validateHexColor = (color: string): boolean => {
@@ -574,8 +541,43 @@ export default function ColorPalettePage() {
                   Choose from our professionally designed color schemes
                 </p>{" "}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                  {" "}
-                  {presetPalettes.map((palette, index) => (
+                  {brandingPalette && (
+                    <div
+                      className={`border rounded-lg p-3 cursor-pointer transition-all transform hover:scale-105 ${
+                        brandingPalette.name === selectedPaletteName
+                          ? "border-black bg-gray-50"
+                          : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                      }`}
+                      onClick={() => handleSelectPalette(brandingPalette)}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="font-medium">{brandingPalette.name}</p>
+                        {brandingPalette.name === selectedPaletteName && (
+                          <svg
+                            className="w-5 h-5 text-black"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            ></path>
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex justify-center space-x-2">
+                        {brandingPalette.colors.slice(0, 3).map((color, colorIndex) => (
+                          <div
+                            key={colorIndex}
+                            className="w-8 h-8 rounded-full border border-gray-200"
+                            style={{ backgroundColor: color }}
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {suggestedPalettes.map((palette, index) => (
                     <div
                       key={index}
                       className={`border rounded-lg p-3 cursor-pointer transition-all transform hover:scale-105 ${

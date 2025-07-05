@@ -50,7 +50,7 @@ public class StoreService {
         System.out.println("🏪 StoreService.createStore called for user ID: " + userId);
         try {
             store.setCreationDate(LocalDateTime.now());
-            store.setStatus("active");
+            store.setStatus("inactive");
             
             // Set colors from the store data
             if (store.getColors() != null) {
@@ -62,7 +62,7 @@ public class StoreService {
             }
             
             System.out.println("📅 Store creation date set");
-            System.out.println("✅ Store status set to active");
+            System.out.println("✅ Store status set to inactive");
 
             // Generate subdomain before saving
             String subdomain = generateSubdomain(store.getStoreName(), null);
