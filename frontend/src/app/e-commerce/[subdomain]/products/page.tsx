@@ -64,7 +64,12 @@ export default function ProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as "default" | "minimal" | "hover" | "overlay" | "featured",
+  cardVariant = "hover" as
+    | "default"
+    | "minimal"
+    | "hover"
+    | "overlay"
+    | "featured",
   titleFontSize = "text-3xl",
   showMoreButton = false,
 
@@ -86,19 +91,14 @@ export default function ProductsPage({
   const [stockFilter, setStockFilter] = useState<string>("All Stock");
   const [sortBy, setSortBy] = useState("featured");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage);
+  const [selectedItemsPerPage, setSelectedItemsPerPage] =
+    useState(itemsPerPage);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [showInStockOnly, setShowInStockOnly] = useState(false);
-  const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
-  const [file, setFile] = useState<File | null>(null);
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const [selectAll, setSelectAll] = useState<boolean>(false);
-  const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
-  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
 
-  const { products, isLoading, error, clearError, fetchProducts } = useProductManagement();
+  const { products } = useProductManagement();
 
   // Helper to update URL query params
   const updateQueryParam = (key: string, value: string | number) => {
@@ -213,7 +213,9 @@ export default function ProductsPage({
     // Filter by search query
     if (searchQuery) {
       const searchNorm = normalize(searchQuery);
-      const productName = normalize(product.name || (product as any).title || "");
+      const productName = normalize(
+        product.name || (product as any).title || ""
+      );
       const productDescription = normalize(product.description || "");
       if (
         !productName.includes(searchNorm) &&
@@ -380,7 +382,9 @@ export default function ProductsPage({
                         max={maxPriceLimit}
                         step={10}
                         value={[maxPrice]}
-                        onValueChange={(value) => handleMaxPriceChange(value[0])}
+                        onValueChange={(value) =>
+                          handleMaxPriceChange(value[0])
+                        }
                         className="my-6"
                       />
                       <div
@@ -541,7 +545,9 @@ export default function ProductsPage({
                         max={maxPriceLimit}
                         step={10}
                         value={[maxPrice]}
-                        onValueChange={(value) => handleMaxPriceChange(value[0])}
+                        onValueChange={(value) =>
+                          handleMaxPriceChange(value[0])
+                        }
                         className="my-6"
                       />
                       <div
@@ -701,23 +707,35 @@ export default function ProductsPage({
 
             {/* Search Results Display */}
             {searchQuery.trim() && (
-              <div className="mb-6 p-4 rounded-lg border" style={{ 
-                backgroundColor: theme.backgroundColor + '20', 
-                borderColor: theme.textColor + '30',
-                color: theme.textColor 
-              }}>
+              <div
+                className="mb-6 p-4 rounded-lg border"
+                style={{
+                  backgroundColor: theme.backgroundColor + "20",
+                  borderColor: theme.textColor + "30",
+                  color: theme.textColor,
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Search results for:</span>
-                    <span className="text-sm font-semibold">"{searchQuery}"</span>
-                    <span className="text-sm opacity-70">({totalItems} products found)</span>
+                    <span className="text-sm font-medium">
+                      Search results for:
+                    </span>
+                    <span className="text-sm font-semibold">
+                      "{searchQuery}"
+                    </span>
+                    <span className="text-sm opacity-70">
+                      ({totalItems} products found)
+                    </span>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleClearSearch}
                     className="text-xs"
-                    style={{ color: theme.textColor, borderColor: theme.textColor }}
+                    style={{
+                      color: theme.textColor,
+                      borderColor: theme.textColor,
+                    }}
                   >
                     Clear Search
                   </Button>
@@ -776,6 +794,7 @@ export default function ProductsPage({
                 onAddToCart={handleAddToCart}
                 onAddToFavorite={handleAddToFavorite}
                 showMoreButton={showMoreButton}
+                isClickable={true}
               />
             )}
 

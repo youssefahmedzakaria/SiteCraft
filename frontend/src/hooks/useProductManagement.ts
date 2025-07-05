@@ -22,6 +22,7 @@ export const useProductManagement = () => {
   const [isUpdating, setIsUpdating] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState<number | null>(null)
   const [statistics, setStatistics] = useState<ProductStatistics | null>(null)
+  const [backendProduct, setBackendProduct] = useState<Product | null>(null)
 
   const fetchProducts = async () => {
     try {
@@ -46,6 +47,7 @@ export const useProductManagement = () => {
       setError('')
       
       const product = await getProduct(productId)
+      setBackendProduct(product)
       return product
     } catch (err: any) {
       console.error('💥 Error fetching product:', err);
@@ -168,6 +170,7 @@ export const useProductManagement = () => {
   }, [])
 
   return {
+    backendProduct,
     products,
     isLoading,
     error,

@@ -17,14 +17,8 @@ import {
 } from "@/components/e-commerce/ui/tabs";
 import { ProductVariants } from "@/components/e-commerce/product/product-variants";
 import { cn } from "@/lib/utils";
-import type {
-  ThemeConfig,
-  VariantGroup,
-} from "@/app/e-commerce/[subdomain]/product/[id]/product";
-import type {
-  Product,
-  ProductVariant,
-} from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import { Product, ProductVariant } from "@/lib/products";
 
 interface ProductInfoProps {
   product: Product;
