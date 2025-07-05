@@ -237,7 +237,7 @@ export interface FooterCustomizationAttributes {
   };
 }
 
-export interface Template {
+export interface CustomizedTemplate {
   id: string;
   header: HeaderCustomizationAttributes;
   promo?: PromoCustomizationAttributes;
@@ -247,4 +247,10 @@ export interface Template {
   policies?: PoliciesCustomizationAttributes;
   contact?: ContactCustomizationAttributes;
   footer: FooterCustomizationAttributes;
+}
+
+export interface ColorTheme {
+  primary: string;
+  secondary: string;
+  accent: string;
 }
