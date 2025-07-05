@@ -1,3 +1,5 @@
+import { siteCraftCache } from './cache';
+
 // Authentication API utilities for SiteCraft admin/store owner
 
 export async function login(email: string, password: string) {
@@ -297,7 +299,7 @@ export async function createStore(storeData: {
 
 export async function commitCachedRegistration(cachedData: {
   user: { email: string; password: string; name: string; phone: string; gender: string };
-  store: { storeName: string; storeType: string; description?: string; phoneNumber?: string; emailAddress?: string; address?: string; addressLink?: string; openingHours?: string; logo?: File; colors?: { primary: string; secondary: string; accent: string } };
+  store: { storeName: string; storeType: string; description?: string; phoneNumber?: string; emailAddress?: string; address?: string; addressLink?: string; openingHours?: string; colors?: { primary: string; secondary: string; accent: string } };
   template: { id: string; title: string };
 }) {
   console.log('🚀 Committing cached registration data...', cachedData);
@@ -322,9 +324,13 @@ export async function commitCachedRegistration(cachedData: {
   
   formData.append('registrationData', JSON.stringify(registrationData));
   
-  // Add logo file if present
-  if (cachedData.store.logo) {
-    formData.append('logo', cachedData.store.logo);
+  // Get the cached logo file from the cache
+  const cachedLogoFile = siteCraftCache.getCachedLogoFile();
+  if (cachedLogoFile) {
+    console.log('🖼️ Adding cached logo file to commit:', cachedLogoFile.name);
+    formData.append('logo', cachedLogoFile);
+  } else {
+    console.log('ℹ️ No logo file found in cache');
   }
   
   try {
@@ -342,6 +348,10 @@ export async function commitCachedRegistration(cachedData: {
     
     const result = await response.json();
     console.log('✅ Registration committed successfully:', result);
+    
+    // Clear the cache after successful commit
+    siteCraftCache.clearCache();
+    
     return result;
     
   } catch (error) {

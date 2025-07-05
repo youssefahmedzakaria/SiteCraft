@@ -9,17 +9,16 @@ export interface SiteCraftCacheData {
     gender: string;
   };
   
-  // Store data from branding
+  // Store data from branding (without File objects)
   store?: {
-    storeName: string;
-    storeType: string;
+    storeName?: string;
+    storeType?: string;
     description?: string;
     phoneNumber?: string;
     emailAddress?: string;
     address?: string;
     addressLink?: string;
     openingHours?: string;
-    logo?: File;
     colors?: {
       primary: string;
       secondary: string;
@@ -27,6 +26,9 @@ export interface SiteCraftCacheData {
     };
   };
 }
+
+// Global variable to store File objects (since they can't be serialized)
+let cachedLogoFile: File | null = null;
 
 class SiteCraftCache {
   private readonly CACHE_KEY = 'sitecraft_registration_cache';
@@ -54,20 +56,20 @@ class SiteCraftCache {
   getData(): SiteCraftCacheData {
     try {
       const cached = localStorage.getItem(this.CACHE_KEY);
-      if (!cached) return {};
+      if (!cached) return {} as SiteCraftCacheData;
 
       const cacheData = JSON.parse(cached);
       
       // Check if cache is expired
       if (Date.now() - cacheData.timestamp > this.CACHE_EXPIRY) {
         this.clearCache();
-        return {};
+        return {} as SiteCraftCacheData;
       }
 
-      return cacheData.data || {};
+      return cacheData.data || {} as SiteCraftCacheData;
     } catch (error) {
       console.error('❌ Failed to read from cache:', error);
-      return {};
+      return {} as SiteCraftCacheData;
     }
   }
 
@@ -75,6 +77,7 @@ class SiteCraftCache {
   clearCache(): void {
     try {
       localStorage.removeItem(this.CACHE_KEY);
+      cachedLogoFile = null; // Clear the File object too
       console.log('🗑️ Cache cleared');
     } catch (error) {
       console.error('❌ Failed to clear cache:', error);
@@ -93,7 +96,7 @@ class SiteCraftCache {
   }
 
   getStoreData() {
-    return this.getData().store;
+    return this.getData().store || undefined;
   }
 
   // Save user data
@@ -101,9 +104,27 @@ class SiteCraftCache {
     this.setData({ user: userData });
   }
 
-  // Save store data
-  saveStoreData(storeData: SiteCraftCacheData['store']) {
-    this.setData({ store: storeData });
+  // Save store data (without File objects)
+  saveStoreData(storeData: Omit<SiteCraftCacheData['store'], 'logo'> & { logo?: File }) {
+    // Store the File object separately
+    if (storeData.logo) {
+      cachedLogoFile = storeData.logo;
+      console.log('💾 Logo file cached in memory:', storeData.logo.name);
+    }
+    
+    // Remove File object before saving to cache
+    const { logo, ...storeDataWithoutLogo } = storeData;
+    this.setData({ store: storeDataWithoutLogo });
+  }
+
+  // Get the cached logo file
+  getCachedLogoFile(): File | null {
+    return cachedLogoFile;
+  }
+
+  // Set the cached logo file
+  setCachedLogoFile(file: File | null): void {
+    cachedLogoFile = file;
   }
 }
 

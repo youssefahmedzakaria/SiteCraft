@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.io.File;
 
 @RestController
 @RequestMapping("/auth")
@@ -283,14 +284,30 @@ public class AuthController {
                 store.setColors(colorsData);
             }
             
-            // Handle logo upload if present
-            if (logo != null && !logo.isEmpty()) {
-                String logoPath = storeService.uploadLogo(logo);
-                store.setLogo(logoPath);
-            }
-            
             Store savedStore = storeService.createStore(store, registeredUser.getId());
             System.out.println("✅ Store created with ID: " + savedStore.getId());
+            
+            // Handle logo upload if present (using same logic as StoreController)
+            if (logo != null && !logo.isEmpty()) {
+                System.out.println("🖼️ Uploading logo...");
+                String originalFilename = logo.getOriginalFilename();
+                String extension = originalFilename != null ?
+                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                String filename = "Store_Logo" + savedStore.getId() + "_" + logo.getOriginalFilename();
+
+                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + savedStore.getId();
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                File destFile = new File(dir, filename);
+                logo.transferTo(destFile);
+
+                // Update store with complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + savedStore.getId() + "/" + filename;
+                savedStore.setLogo(logoUrl);
+                savedStore = storeService.updateStorePartial(savedStore.getId(), savedStore);
+                System.out.println("✅ Logo uploaded successfully: " + logoUrl);
+            }
             
             // 4. Set session data
             session.setAttribute("userId", registeredUser.getId());
