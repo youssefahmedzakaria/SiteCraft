@@ -294,3 +294,58 @@ export async function createStore(storeData: {
   
   return res.json();
 }
+
+export async function commitCachedRegistration(cachedData: {
+  user: { email: string; password: string; name: string; phone: string; gender: string };
+  store: { storeName: string; storeType: string; description?: string; phoneNumber?: string; emailAddress?: string; address?: string; addressLink?: string; openingHours?: string; logo?: File; colors?: { primary: string; secondary: string; accent: string } };
+  template: { id: string; title: string };
+}) {
+  console.log('🚀 Committing cached registration data...', cachedData);
+  
+  const formData = new FormData();
+  
+  // Add all data as JSON
+  const registrationData = {
+    user: cachedData.user,
+    store: {
+      storeName: cachedData.store.storeName,
+      storeType: cachedData.store.storeType,
+      description: cachedData.store.description || '',
+      phoneNumber: cachedData.store.phoneNumber || '',
+      emailAddress: cachedData.store.emailAddress || '',
+      address: cachedData.store.address || '',
+      addressLink: cachedData.store.addressLink || '',
+      openingHours: cachedData.store.openingHours || '',
+      colors: cachedData.store.colors || { primary: '#000000', secondary: '#ffffff', accent: '#ff6b6b' }
+    }
+  };
+  
+  formData.append('registrationData', JSON.stringify(registrationData));
+  
+  // Add logo file if present
+  if (cachedData.store.logo) {
+    formData.append('logo', cachedData.store.logo);
+  }
+  
+  try {
+    const response = await fetch('http://localhost:8080/auth/commitRegistration', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Commit registration error response:', errorData);
+      throw new Error(errorData.message || 'Failed to commit registration');
+    }
+    
+    const result = await response.json();
+    console.log('✅ Registration committed successfully:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error committing registration:', error);
+    throw error;
+  }
+}

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
-import { updateStoreColors, getStoreColors } from "@/lib/store-colors";
+import { siteCraftCache } from '@/lib/cache'
 
 // Color theory utility functions
 const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
@@ -321,27 +321,28 @@ export default function ColorPalettePage() {
     setIsClient(true);
   }, []);
 
-  // Load colors from previous page
+  // Load colors from cache or localStorage
   useEffect(() => {
     if (!isClient) return;
     
     const loadColors = async () => {
       try {
-        // Try to load colors from database first
-        const storeColors = await getStoreColors();
-        console.log('🎨 Colors loaded from database:', storeColors);
-        
-        setPrimaryColor(storeColors.primary);
-        setSecondaryColor(storeColors.secondary);
-        setAccentColor(storeColors.accent);
-        
-        // Also save to localStorage for backward compatibility
-        localStorage.setItem("primaryColor", storeColors.primary);
-        localStorage.setItem("secondaryColor", storeColors.secondary);
-        localStorage.setItem("accentColor", storeColors.accent);
-        
-      } catch (error) {
-        console.error('Failed to load colors from database, falling back to localStorage:', error);
+        // First try to get colors from cache
+        const cachedData = siteCraftCache.getData();
+        if (cachedData.store?.colors) {
+          console.log('🎨 Colors loaded from cache:', cachedData.store.colors);
+          
+          setPrimaryColor(cachedData.store.colors.primary);
+          setSecondaryColor(cachedData.store.colors.secondary);
+          setAccentColor(cachedData.store.colors.accent);
+          
+          // Also save to localStorage for backward compatibility
+          localStorage.setItem("primaryColor", cachedData.store.colors.primary);
+          localStorage.setItem("secondaryColor", cachedData.store.colors.secondary);
+          localStorage.setItem("accentColor", cachedData.store.colors.accent);
+          
+          return;
+        }
         
         // Fallback to localStorage (set by branding page)
         const storedPrimaryColor = localStorage.getItem("primaryColor") || "#000000";
@@ -371,6 +372,13 @@ export default function ColorPalettePage() {
         }
 
         console.log('🎨 Colors loaded from localStorage:', { primaryColor, secondaryColor, accentColor });
+      } catch (error) {
+        console.error('Failed to load colors:', error);
+        
+        // Set default colors
+        setPrimaryColor("#000000");
+        setSecondaryColor("#ffffff");
+        setAccentColor("#ff6b6b");
       }
     };
     
@@ -431,25 +439,29 @@ export default function ColorPalettePage() {
     const validAccentColor = validateHexColor(accentColor) ? accentColor : "#ff6b6b";
 
     try {
-      // Save colors to database
-      await updateStoreColors({
-        primary: validPrimaryColor,
-        secondary: validSecondaryColor,
-        accent: validAccentColor
-      });
-      console.log('✅ Colors updated in database');
+      // Save colors to cache instead of database
+      const cachedData = siteCraftCache.getData();
+      if (cachedData.store) {
+        cachedData.store.colors = {
+          primary: validPrimaryColor,
+          secondary: validSecondaryColor,
+          accent: validAccentColor
+        };
+        siteCraftCache.setData(cachedData);
+        console.log('💾 Colors saved to cache:', { validPrimaryColor, validSecondaryColor, validAccentColor });
+      }
       
       // Also save to localStorage for backward compatibility
       localStorage.setItem("primaryColor", validPrimaryColor);
       localStorage.setItem("secondaryColor", validSecondaryColor);
       localStorage.setItem("accentColor", validAccentColor);
 
-      console.log('💾 Colors saved:', { validPrimaryColor, validSecondaryColor, validAccentColor });
+      console.log('✅ Colors updated in cache and localStorage');
 
       // Navigate to templates page
       router.push("/templates");
     } catch (error) {
-      console.error('💥 Error updating colors:', error);
+      console.error('💥 Error saving colors to cache:', error);
       alert('Failed to save colors. Please try again.');
     }
   };

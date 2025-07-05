@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { Button } from "@/components/SiteCraft/ui/button";
 import Link from "next/link";
+import { siteCraftCache } from "@/lib/cache";
+import { commitCachedRegistration } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export interface Template {
   id: string;
@@ -11,6 +15,45 @@ export interface Template {
 }
 
 export function TemplateCard({ template }: { template: Template }) {
+  const router = useRouter();
+  const [isCommitting, setIsCommitting] = useState(false);
+
+  const handleTemplateSelect = async () => {
+    setIsCommitting(true);
+    try {
+      console.log('🎯 Template selected:', template);
+      
+      // Get cached data
+      const cachedData = siteCraftCache.getData();
+      if (!cachedData.user || !cachedData.store) {
+        throw new Error('Missing cached registration data');
+      }
+      
+      console.log('📦 Cached data found:', cachedData);
+      
+      // Commit all cached data to database
+      const result = await commitCachedRegistration({
+        user: cachedData.user,
+        store: cachedData.store,
+        template: template // Pass template info but don't save to cache
+      });
+      
+      console.log('✅ Registration committed successfully:', result);
+      
+      // Clear cache after successful commit
+      siteCraftCache.clearCache();
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
+      
+    } catch (error) {
+      console.error('❌ Error committing registration:', error);
+      alert('Failed to complete registration. Please try again.');
+    } finally {
+      setIsCommitting(false);
+    }
+  };
+
   return (
     <div className="border border-black-border rounded-lg overflow-hidden shadow-sm bg-background transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
       <div className="relative w-full h-40">
@@ -38,14 +81,14 @@ export function TemplateCard({ template }: { template: Template }) {
             >
               Preview
             </Button>
-            <Link href={"/dashboard"}>
-              <Button
-                size="sm"
-                className="bg-black text-primary-foreground hover:bg-gray-800 transition-colors"
-              >
-                Select
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              className="bg-black text-primary-foreground hover:bg-gray-800 transition-colors"
+              onClick={handleTemplateSelect}
+              disabled={isCommitting}
+            >
+              {isCommitting ? 'Creating...' : 'Select'}
+            </Button>
           </div>
         </div>
       </div>
