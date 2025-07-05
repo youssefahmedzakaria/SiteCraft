@@ -108,7 +108,7 @@ const getFontSize = (fontSize: string) => {
 };
 
 export default function FlexibleCard({
-  isClickable,
+  isClickable = true,
   // Core data
   item,
   type = "product",
@@ -189,14 +189,12 @@ export default function FlexibleCard({
     ? accentColor.replace("bg-", "hover:bg-") + "/90"
     : "hover:bg-blue-700";
 
-  // Determine the link path based on the item type
-  const href =
-    linkPath ||
-    (isClickable
-      ? type === "product"
-        ? `/${item.id}`
-        : `/e-commerce/${subdomain}/products`
-      : "#");
+  // Determine the link path based on the item type and isClickable condition
+  const href = linkPath || (isClickable
+    ? type === "product"
+      ? `/e-commerce/${subdomain}/product/${item.id}`
+      : `/e-commerce/${subdomain}/products?category=${encodeURIComponent(item.name)}`
+    : "#");
 
   // Get item description
   const description =
@@ -302,7 +300,15 @@ export default function FlexibleCard({
       <Link
         href={href}
         target={openInNewTab ? "_blank" : undefined}
-        className="block"
+        className="block w-full h-full"
+        onClick={(e) => {
+          // Prevent navigation if clicking on buttons or interactive elements
+          const target = e.target as HTMLElement;
+          if (target.closest('button') || target.closest('[role="button"]') || target.closest('a')) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
       >
         {children}
       </Link>
@@ -382,6 +388,8 @@ export default function FlexibleCard({
 
   // Use titleColor if provided, otherwise fall back to textColor
   const finalTitleFont = titleFont || fontFamily;
+
+
 
   // Render different card variants
   switch (variant) {

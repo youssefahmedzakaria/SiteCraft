@@ -33,8 +33,8 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     useState<HeaderCustomizationAttributes>({
       template: "template1",
       brandName: "Brand Name",
-      backgroundColor: "bg-[#00000080]", // bg-black/50
-      textColor: "text-[#FFFFFF]", // text-white
+      backgroundColor: "bg-[primary]", // bg-black/50
+      textColor: "text-[secondary]", // text-white
       logo: {
         src: "/placeholder.png",
         alt: "Custom Logo",
@@ -48,15 +48,15 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         { label: "About Us", isShown: true },
         { label: "Contact Us", isShown: true },
       ],
-      iconColor: "text-[#FFFFFF]", // text-white
+      iconColor: "text-[secondary]", // text-white
       dividerColor: "border-[#E5E7EB]", // border-gray-200
       fontFamily: "font-sans",
     });
   const [footerAttributes, setFooterAttributes] =
     useState<FooterCustomizationAttributes>({
       brandName: "Brand Name",
-      backgroundColor: "bg-[#FFFFFF]",
-      textColor: "text-[#000000]",
+      backgroundColor: "bg-[primary]",
+      textColor: "text-[secondary]",
       logo: {
         src: "/placeholder.png",
         alt: "Brand Logo",
@@ -68,7 +68,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           href: `/e-commerce/${subdomain}/#contact`,
           font: "font-serif",
           fontSize: "text-lg",
-          fontColor: "text-[#000000]",
+          fontColor: "text-[secondary]",
           isShown: true,
         },
         {
@@ -76,7 +76,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           href: `/e-commerce/${subdomain}/#about`,
           font: "font-serif",
           fontSize: "text-lg",
-          fontColor: "text-[#000000]",
+          fontColor: "text-[secondary]",
           isShown: true,
         },
         {
@@ -84,7 +84,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           href: `/e-commerce/${subdomain}/#policies`,
           font: "font-serif",
           fontSize: "text-lg",
-          fontColor: "text-[#000000]",
+          fontColor: "text-[secondary]",
           isShown: true,
         },
       ],
@@ -94,14 +94,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       },
       socialMediaStyles: {
         iconSize: 20,
-        iconColor: "text-[#000000]",
-        hoverColor: "text-[#000000]",
+        iconColor: "text-[secondary]",
+        hoverColor: "text-[accent]",
       },
       copyrightStyles: {
         font: "font-sans",
         fontSize: "text-sm",
         fontWeight: "font-light",
-        fontColor: "text-[#000000]",
+        fontColor: "text-[secondary]",
       },
     });
   const [isLoading, setIsLoading] = useState(true);
