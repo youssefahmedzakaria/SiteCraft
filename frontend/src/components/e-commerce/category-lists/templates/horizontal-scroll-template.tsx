@@ -6,7 +6,7 @@ import { useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import FlexibleCard from "@/components/e-commerce/card/card-templates"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 interface HorizontalScrollCategoryTemplateProps {
   isClickable?: boolean
@@ -117,6 +117,7 @@ export function HorizontalScrollCategoryTemplate({
   const path = usePathname()
   const pathSegments = path.split("/")
   const subdomain = pathSegments[2]
+  const router = useRouter()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const [scroll, setScroll] = useState({ left: 0, width: 0, scrollWidth: 0 })
@@ -146,6 +147,13 @@ export function HorizontalScrollCategoryTemplate({
       scrollRef.current.scrollBy({ left: amount, behavior: "smooth" })
     }
   }
+
+  const handleCategoryClick = (categoryName: string) => {
+    if (isClickable && subdomain) {
+      const url = `/e-commerce/${subdomain}/products?category=${encodeURIComponent(categoryName)}`;
+      router.push(url);
+    }
+  };
 
   // Convert image height to proper ratio
   const imageRatio = imageHeight.includes("h-") ? "portrait" : "square"
@@ -198,40 +206,38 @@ export function HorizontalScrollCategoryTemplate({
           ref={scrollRef}
           className="overflow-x-auto"
           style={{
-            scrollBehavior: "smooth",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
+            scrollbarWidth: showScrollbar ? "auto" : "none",
+            msOverflowStyle: showScrollbar ? "auto" : "none",
           }}
         >
-          <style jsx>{`
-            div[ref]::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          <div className="flex gap-4 md:gap-6 pb-4">
+          <div className={cn("flex gap-4 pb-4")}>
             {categories.map((category) => (
               <div key={category._id || category.id} className={cn("flex-shrink-0", cardWidth)}>
-                <FlexibleCard
-                  isClickable={isClickable}
-                  item={category}
-                  type="category"
-                  variant={cardVariant}
-                  imageRatio={imageRatio}
-                  cornerRadius={cornerRadius}
-                  showTitle={showCardTitle}
-                  showSubtitle={showSubtitle}
-                  showCta={showCta}
-                  ctaText={ctaText}
-                  bgColor="bg-transparent"
-                  textColor={textColor}
-                  accentColor={accentColor}
-                  borderColor={borderColor}
-                  overlayColor={overlayColor}
-                  fontFamily={fontFamily}
-                  cardShadow={cardShadow}
-                  hoverEffect={hoverEffect}
-                  linkPath={`/e-commerce/${subdomain}/products`}
-                />
+                <div
+                  className="cursor-pointer"
+                  onClick={() => handleCategoryClick(category.name)}
+                >
+                  <FlexibleCard
+                    isClickable={false}
+                    item={category}
+                    type="category"
+                    variant={cardVariant}
+                    imageRatio={imageRatio}
+                    cornerRadius={cornerRadius}
+                    showTitle={showCardTitle}
+                    showSubtitle={showSubtitle}
+                    showCta={showCta}
+                    ctaText={ctaText}
+                    bgColor={bgColor}
+                    textColor={textColor}
+                    accentColor={accentColor}
+                    borderColor={borderColor}
+                    overlayColor={overlayColor}
+                    fontFamily={fontFamily}
+                    cardShadow={cardShadow}
+                    hoverEffect={hoverEffect}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -253,11 +259,11 @@ export function HorizontalScrollCategoryTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
+              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",
-                "rounded-lg text-sm font-medium",
+                "rounded-lg text-sm font-medium"
               )}style={{
                 backgroundColor: showMorebuttonBgColor.includes("[")
                   ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
@@ -268,6 +274,20 @@ export function HorizontalScrollCategoryTemplate({
               }}
             >
               {showMoreText}
+              <svg
+                className="ml-2 w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </Link>
           </div>
         )}

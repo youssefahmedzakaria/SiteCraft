@@ -3,7 +3,7 @@
 "use client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface FeaturedGridCategoryTemplateProps {
@@ -106,6 +106,7 @@ export default function FeaturedGridCategoryTemplate({
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
+  const router = useRouter();
 
   // Get the first category as featured
   const featuredCategory = categories[0];
@@ -114,6 +115,13 @@ export default function FeaturedGridCategoryTemplate({
   if (!categories || categories.length === 0) {
     return null;
   }
+
+  const handleCategoryClick = (categoryName: string) => {
+    if (isClickable && subdomain) {
+      const url = `/e-commerce/${subdomain}/products?category=${encodeURIComponent(categoryName)}`;
+      router.push(url);
+    }
+  };
 
   return (
     <div className={cn("w-full flex-shrink-0")}style={{backgroundColor: bgColor.includes("[")
@@ -141,42 +149,47 @@ export default function FeaturedGridCategoryTemplate({
           {featuredCategory && (
             <div className="md:col-span-2 md:row-span-2 group w-full">
               <div
-                className={cn(
-                  "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
+                className="block w-full h-full cursor-pointer"
+                onClick={() => handleCategoryClick(featuredCategory.name)}
               >
-                <Image
-                  src={
-                    featuredCategory.images[0]?.url ||
-                    "/placeholder.png?height=600&width=800"
-                  }
-                  alt={featuredCategory.images[0]?.alt || ""}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 66vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
+                    borderRadius
                   )}
                 >
-                  <div className="p-6">
-                    <h3
-                      className="text-2xl font-bold flex items-center gap-2"
-                      style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}
-                    >
-                      {featuredCategory.name}
-                    </h3>
-                    {/* Subtitle */}
-                    {showSubtitle && featuredCategory.description && (
-                      <p className="opacity-80 mt-1 text-base" style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{featuredCategory.description}</p>
+                  <Image
+                    src={
+                      featuredCategory.images[0]?.url ||
+                      "/placeholder.png?height=600&width=800"
+                    }
+                    alt={featuredCategory.images[0]?.alt || ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
+                    className={cn(
+                      "object-cover",
+                      hoverEffect &&
+                        "transition-transform duration-500 group-hover:scale-105"
                     )}
-                    {showCta && <p className={cn(textColor, "mt-2")}>{ctaText}</p>}
+                  />
+                  <div
+                    className={cn(
+                      "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    )}
+                  >
+                    <div className="p-6">
+                      <h3
+                        className="text-2xl font-bold flex items-center gap-2"
+                        style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}
+                      >
+                        {featuredCategory.name}
+                      </h3>
+                      {/* Subtitle */}
+                      {showSubtitle && featuredCategory.description && (
+                        <p className="opacity-80 mt-1 text-base" style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{featuredCategory.description}</p>
+                      )}
+                      {showCta && <p className={cn(textColor, "mt-2")}>{ctaText}</p>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -186,44 +199,49 @@ export default function FeaturedGridCategoryTemplate({
           {remainingCategories.map((category) => (
             <div className="group w-full" key={category.id || category._id}>
               <div
-                className={cn(
-                  "relative h-64 bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
+                className="block w-full h-full cursor-pointer"
+                onClick={() => handleCategoryClick(category.name)}
               >
-                <Image
-                  src={
-                    category.images[0]?.url ||
-                    "/placeholder.png"
-                  }
-                  alt={category.images[0]?.alt || ""}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    "relative h-64 bg-slate-100 overflow-hidden w-full",
+                    borderRadius
                   )}
                 >
-                  <div className="p-4">
-                    <h3
-                      className="text-lg font-medium flex items-center gap-2"
-                      style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}
-                    >
-                      {category.name}
-                    </h3>
-                    {/* Subtitle */}
-                    {showSubtitle && category.description && (
-                      <p className="opacity-80 text-sm mt-1" style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{category.description}</p>
+                  <Image
+                    src={
+                      category.images[0]?.url ||
+                      "/placeholder.png"
+                    }
+                    alt={category.images[0]?.alt || ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className={cn(
+                      "object-cover",
+                      hoverEffect &&
+                        "transition-transform duration-500 group-hover:scale-105"
                     )}
-                    {showCta && (
-                      <p className={cn(textColor, "text-sm mt-1")}style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{ctaText}</p>
+                  />
+                  <div
+                    className={cn(
+                      "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
                     )}
+                  >
+                    <div className="p-4">
+                      <h3
+                        className="text-lg font-medium flex items-center gap-2"
+                        style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}
+                      >
+                        {category.name}
+                      </h3>
+                      {/* Subtitle */}
+                      {showSubtitle && category.description && (
+                        <p className="opacity-80 text-sm mt-1" style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{category.description}</p>
+                      )}
+                      {showCta && (
+                        <p className={cn(textColor, "text-sm mt-1")}style={{ color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor, fontFamily: getFontFamily(fontFamily) }}>{ctaText}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
