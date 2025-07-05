@@ -2,11 +2,7 @@
 
 import Link from "next/link";
 import { TemplateCard } from "@/components/SiteCraft/templates/TemplateCard";
-import {
-  suggestedTemplates,
-  TemplateProvider,
-  useTemplates,
-} from "@/lib/templates";
+import { useTemplates } from "@/lib/templates";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useRouter } from "next/navigation";
