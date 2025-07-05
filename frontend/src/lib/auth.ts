@@ -1,4 +1,5 @@
 import { siteCraftCache } from './cache';
+import { CustomizedTemplate } from './customization';
 
 // Authentication API utilities for SiteCraft admin/store owner
 
@@ -300,7 +301,7 @@ export async function createStore(storeData: {
 export async function commitCachedRegistration(cachedData: {
   user: { email: string; password: string; name: string; phone: string; gender: string };
   store: { storeName: string; storeType: string; description?: string; phoneNumber?: string; emailAddress?: string; address?: string; addressLink?: string; openingHours?: string; colors?: { primary: string; secondary: string; accent: string } };
-  template: { id: string; title: string };
+  template: CustomizedTemplate;
 }) {
   console.log('🚀 Committing cached registration data...', cachedData);
   
