@@ -31,12 +31,21 @@ export function TemplateCard({ template }: { template: Template }) {
         throw new Error('Missing cached registration data');
       }
       
+      // Validate required store fields
+      if (!cachedData.store.storeName || !cachedData.store.storeType) {
+        throw new Error('Store name and type are required');
+      }
+      
       console.log('📦 Cached data found:', cachedData);
       
       // Commit all cached data to database
       const result = await commitCachedRegistration({
         user: cachedData.user,
-        store: cachedData.store,
+        store: {
+          ...cachedData.store,
+          storeName: cachedData.store.storeName,
+          storeType: cachedData.store.storeType
+        },
         template: template // Pass template info but don't save to cache
       });
       
