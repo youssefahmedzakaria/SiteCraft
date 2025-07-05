@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { BackendCategory, getCategories } from "@/lib/categories";
 
 export default function CategoriesPage({
   // Text configuration props
@@ -49,7 +50,23 @@ export default function CategoriesPage({
   titleFontSize = "text-3xl",
   showMoreButton = false,
 }) {
-  const { backendCategories } = useCategoryManagement();
+  const [backendCategories, setBackendCategories] = useState<BackendCategory[]>(
+    []
+  );
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setBackendCategories(data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItemsPerPage, setSelectedItemsPerPage] =
     useState(itemsPerPage);
