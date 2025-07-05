@@ -13,13 +13,15 @@ export function ProductRecord({
   categories = [],
   isSelected = false,
   onSelect,
-  fetchProducts
+  fetchProducts,
+  onSetStock
 }: {
   product: SimplifiedProduct;
   categories?: any[];
   isSelected?: boolean;
   onSelect?: (id: number) => void;
   fetchProducts?: () => void;
+  onSetStock?: () => void;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -112,7 +114,16 @@ export function ProductRecord({
         <div className="text-sm text-gray-500">{formatPriceWithDiscount()}</div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-        <div className="text-sm text-gray-500">{product.stock}</div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-500">{product.stock}</span>
+          {onSetStock && (
+            <button
+              onClick={onSetStock}
+              className="text-sm text-logo-dark-button hover:underline"
+            >
+            </button>
+          )}
+        </div>
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
         <span

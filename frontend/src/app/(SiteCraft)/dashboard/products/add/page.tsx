@@ -100,6 +100,9 @@ export default function AddProductPage() {
   const [price, setPrice] = useState(0);
   const [productionCost, setProductionCost] = useState(0);
 
+  // Add state for parent stocks
+  const [parentStocks, setParentStocks] = useState<Record<string, number>>({});
+
   // Function to add a new attribute
   const handleAddAttribute = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -142,12 +145,11 @@ export default function AddProductPage() {
   // Function to generate all possible variant combinations
   const generateVariants = (attrs: ProductAttributeDTO[]) => {
     if (attrs.length === 0) {
-      // Create a default variant when no attributes are provided
       const defaultVariant: ProductVariantDTO = {
         stock: 0,
-        price: price, // Use current global price
-        productionCost: productionCost, // Use current global production cost
-        attributes: [] // No attributes for default variant
+        price: price,
+        productionCost: productionCost,
+        attributes: []
       };
       setVariants([defaultVariant]);
       return;
@@ -157,21 +159,53 @@ export default function AddProductPage() {
     const combinations = generateCombinations(attrs);
     
     // Create variants from combinations
-    const newVariants: ProductVariantDTO[] = combinations.map((combination, index) => {
+    const newVariants: ProductVariantDTO[] = combinations.map((combination) => {
       const variantAttributes: VariantAttributeDTO[] = combination.map((value, attrIndex) => ({
         name: attrs[attrIndex].name,
         value: value
       }));
 
+      // For first attribute (parent), get its stock value
+      const parentValue = combination[0];
+      const parentStock = parentStocks[parentValue] || 0;
+
+      // Find all combinations that share this parent value
+      const siblingCombos = combinations.filter(combo => combo[0] === parentValue);
+      const siblingCount = siblingCombos.length;
+      const siblingIndex = siblingCombos.findIndex(combo => 
+        JSON.stringify(combo) === JSON.stringify(combination)
+      );
+
+      // Calculate this variant's portion of parent stock
+      let stock = 0;
+      if (siblingCount > 0) {
+        const base = Math.floor(parentStock / siblingCount);
+        const remainder = parentStock % siblingCount;
+        stock = base + (siblingIndex < remainder ? 1 : 0);
+      }
+
+      console.log(`Creating variant:
+        Parent Value: ${parentValue}
+        Parent Total Stock: ${parentStock}
+        Sibling Count: ${siblingCount}
+        Sibling Index: ${siblingIndex}
+        Assigned Stock: ${stock}
+        Full Combination: ${combination.join('-')}
+      `);
+
       return {
-        stock: 0,
-        price: price, // Use current global price
-        productionCost: productionCost, // Use current global production cost
+        stock,
+        price: price,
+        productionCost: productionCost,
         attributes: variantAttributes
       };
     });
 
-    console.log('🔄 Generated variants:', newVariants);
+    console.log('Final variants with stock:', newVariants.map(v => ({
+      attributes: v.attributes?.map(a => `${a.name}: ${a.value}`).join(', ') || 'No attributes',
+      stock: v.stock
+    })));
+    
     setVariants(newVariants);
   };
 
@@ -208,44 +242,102 @@ export default function AddProductPage() {
       return;
     }
 
-    setStockValues(firstVariation.values.map((value) => ({ value, stock: 0 })));
+    // Initialize with current parent stocks or 0
+    setStockValues(firstVariation.values.map((value) => ({ 
+      value, 
+      stock: parentStocks[value] || 0 
+    })));
     setShowStockModal(true);
-  };
-
-  // Handle stock changes
-  const handleStockChange = (index: number, value: string) => {
-    const newStock = [...stockValues];
-    newStock[index].stock = Number(value);
-    setStockValues(newStock);
   };
 
   // Handler to open stock modal for a specific attribute
   const openStockModalForAttribute = (index: number) => {
+    // Always use first variation for stock management
+    if (index !== 0) {
+      alert("Stock can only be set for the first attribute");
+      return;
+    }
+
+    const firstVariation = attributes[0];
+    if (!firstVariation || firstVariation.values.length === 0) {
+      alert("Please add values to the first attribute first");
+      return;
+    }
+
     setStockAttributeIndex(index);
-    const attr = attributes[index];
-    setStockValues(attr.values.map(value => ({ value, stock: 0 })));
+    setStockValues(firstVariation.values.map(value => ({ 
+      value, 
+      stock: parentStocks[value] || 0 
+    })));
     setShowStockModal(true);
   };
 
   // Save stock values for the selected attribute
   const handleSaveStock = () => {
     if (stockAttributeIndex === null) return;
-    // Sum all entered stock values
-    const totalStock = stockValues.reduce((sum, sv) => sum + (parseInt(sv.stock as any, 10) || 0), 0);
-    if (isNaN(totalStock) || totalStock < 0) {
-      alert('Please enter valid stock values.');
+    
+    // Only allow setting stock for the first attribute (parent)
+    if (stockAttributeIndex !== 0) {
+      alert("Stock can only be set for the first attribute");
+      setShowStockModal(false);
       return;
     }
-    // Distribute totalStock among all variants
-    if (variants.length > 0) {
-      const base = Math.floor(totalStock / variants.length);
-      const remainder = totalStock % variants.length;
-      const updatedVariants = variants.map((variant, idx) => ({
-        ...variant,
-        stock: base + (idx < remainder ? 1 : 0),
-      }));
-      setVariants(updatedVariants);
-    }
+
+    // Update parent stocks
+    const newParentStocks = { ...parentStocks };
+    stockValues.forEach(sv => {
+      newParentStocks[sv.value] = parseInt(sv.stock as any, 10) || 0;
+    });
+    
+    console.log('Setting parent stocks:', newParentStocks);
+    setParentStocks(newParentStocks);
+
+    // Find all variants for each parent value and distribute stock
+    const updatedVariants = [...variants];
+    Object.entries(newParentStocks).forEach(([parentValue, totalStock]) => {
+      // Find all variants with this parent value
+      const matchingVariants = updatedVariants.filter(variant => 
+        variant.attributes?.[0]?.value === parentValue
+      );
+
+      console.log(`Distributing stock for ${parentValue}:`, {
+        totalStock,
+        variantCount: matchingVariants.length
+      });
+
+      if (matchingVariants.length > 0) {
+        const base = Math.floor(totalStock / matchingVariants.length);
+        const remainder = totalStock % matchingVariants.length;
+
+        matchingVariants.forEach((variant, idx) => {
+          const variantStock = base + (idx < remainder ? 1 : 0);
+          const variantIndex = updatedVariants.findIndex(v => 
+            v.attributes?.[0]?.value === variant.attributes?.[0]?.value &&
+            v.attributes?.[1]?.value === variant.attributes?.[1]?.value
+          );
+
+          if (variantIndex !== -1) {
+            updatedVariants[variantIndex] = {
+              ...updatedVariants[variantIndex],
+              stock: variantStock
+            };
+
+            console.log(`Set stock for variant:`, {
+              parentValue,
+              childValue: variant.attributes?.[1]?.value,
+              stock: variantStock
+            });
+          }
+        });
+      }
+    });
+
+    console.log('Final variants after stock distribution:', updatedVariants.map(v => ({
+      combination: v.attributes?.map(a => a.value).join('-'),
+      stock: v.stock
+    })));
+
+    setVariants(updatedVariants);
     setShowStockModal(false);
   };
 
