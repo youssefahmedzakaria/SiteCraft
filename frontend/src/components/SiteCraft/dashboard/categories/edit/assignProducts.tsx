@@ -32,7 +32,10 @@ export default function AssignProducts() {
       const filtered = products.filter(
         (product) =>
           product.name.toLowerCase().includes(lowercaseQuery) ||
-          (product.category?.title || '').toLowerCase().includes(lowercaseQuery) ||
+          (product.categories &&
+            product.categories.some((cat) =>
+              cat.name.toLowerCase().includes(lowercaseQuery)
+            )) ||
           product.id.toString().includes(lowercaseQuery)
       );
       setFilteredProducts(filtered);

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from './useAuth'
 import { useRouter } from 'next/navigation'
+import { siteCraftCache } from '@/lib/cache'
 
 export const useSignupForm = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ export const useSignupForm = () => {
     gender: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const { signup, signupError, isLoading, clearError } = useAuth()
+  const { signupError, isLoading, clearError } = useAuth()
   const router = useRouter()
 
   const validateForm = () => {
@@ -60,26 +61,23 @@ export const useSignupForm = () => {
       return
     }
 
-    console.log('✅ Form validation passed, calling signup...');
+    console.log('✅ Form validation passed, saving to cache...');
     try {
-      // Register the user (store will be created automatically by backend)
-      const userId = await signup({
+      // Save user data to cache instead of registering immediately
+      const userData = {
         email: formData.email,
         password: formData.password,
         name: formData.name,
         phone: formData.phone,
         gender: formData.gender
-      })
+      };
 
-      console.log('📥 Signup returned userId:', userId);
+      siteCraftCache.saveUserData(userData);
+      console.log('💾 User data saved to cache:', userData);
 
-      if (userId) {
-        console.log('🎯 Redirecting to branding page...');
-        // Redirect to branding page after registration
-        router.push('/branding')
-      } else {
-        console.log('⚠️ No userId returned from signup');
-      }
+      console.log('🎯 Redirecting to branding page...');
+      // Redirect to branding page after saving to cache
+      router.push('/branding')
     } catch (error) {
       console.error('💥 Registration error in form:', error)
     }

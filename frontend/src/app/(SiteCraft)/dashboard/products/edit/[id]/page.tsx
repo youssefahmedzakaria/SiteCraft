@@ -29,12 +29,14 @@ import { Input } from "@/components/SiteCraft/ui/input";
 import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { StockManagementSection } from "@/components/SiteCraft/dashboard/products/add/stockManagement";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params?.id ? parseInt(params.id as string) : null;
   const { isAuthenticated } = useAuth();
+  const { isInactive } = useStoreStatus();
   
   const { handleUpdateProduct, isUpdating, error, clearError } = useProductManagement();
   
@@ -48,6 +50,30 @@ export default function EditProductPage() {
     "Product's Options and Variations",
     "Stock Management",
   ];
+
+  // Show inactive store message if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -78,8 +104,7 @@ export default function EditProductPage() {
   const [basicFormData, setBasicFormData] = useState({
     name: '',
     description: '',
-    categoryId: 0, // Keep for backward compatibility
-    categoryIds: [], // New field for multiple categories
+    categoryIds: [] as number[],
   });
 
   // Discount settings
@@ -116,6 +141,9 @@ export default function EditProductPage() {
   const [price, setPrice] = useState(0);
   const [productionCost, setProductionCost] = useState(0);
 
+  // Add state for parent stocks
+  const [parentStocks, setParentStocks] = useState<Record<string, number>>({});
+
   // Load existing product data
   useEffect(() => {
     if (productId) {
@@ -137,8 +165,7 @@ export default function EditProductPage() {
       setBasicFormData({
         name: product.name,
         description: product.description,
-        categoryId: product.categoryId || (categoryIds.length > 0 ? categoryIds[0] : 0), // Keep first category for backward compatibility
-        categoryIds: categoryIds, // Extract category IDs from categories array
+        categoryIds: categoryIds,
       });
 
       // Set discount settings
@@ -186,24 +213,19 @@ export default function EditProductPage() {
       // Transform variants from backend format to frontend format
       if (product.variants && product.variants.length > 0) {
         const transformedVariants: ProductVariantDTO[] = product.variants.map(variant => {
-          let variantAttributes = variantIdToAttributes[variant.id];
+          let variantAttributes = variantIdToAttributes[variant.id || 0];
           if (!variantAttributes || variantAttributes.length === 0 || (variantAttributes.length === 1 && variantAttributes[0].name === "Default" && variantAttributes[0].value === "Default")) {
-            // Parse the SKU and use everything after the second '|', then format nicely
-            let parsedName = variant.sku || "-";
-            if (parsedName.includes("|")) {
-              const parts = parsedName.split("|");
+            // Parse the SKU and use everything after the second '|', then format as array of { name, value }
+            let parsedAttributes: { name: string; value: string }[] = [];
+            if (variant.sku && variant.sku.includes("|")) {
+              const parts = variant.sku.split("|");
               const attributes = parts.length > 2 ? parts.slice(2) : [parts[parts.length - 1]];
-              parsedName = attributes
-                .map(attr => {
-                  const [name, value] = attr.split("-");
-                  if (!name || !value) return attr;
-                  return `${name.charAt(0).toUpperCase() + name.slice(1)}: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
-                })
-                .join(", ");
+              parsedAttributes = attributes.map(attr => {
+                const [name, value] = attr.split("-");
+                return name && value ? { name, value } : { name: "", value: attr };
+              });
             }
-            // Remove leading colons, spaces, and any other unwanted characters
-            parsedName = parsedName.replace(/^[:|\s]+/, "").trim();
-            variantAttributes = [{ name: "", value: parsedName }];
+            variantAttributes = parsedAttributes;
           }
           return {
             id: variant.id,
@@ -283,12 +305,11 @@ export default function EditProductPage() {
   // Function to generate all possible variant combinations
   const generateVariants = (attrs: ProductAttributeDTO[]) => {
     if (attrs.length === 0) {
-      // Create a default variant when no attributes are provided
       const defaultVariant: ProductVariantDTO = {
         stock: 0,
-        price: price, // Use current global price
-        productionCost: productionCost, // Use current global production cost
-        attributes: [] // No attributes for default variant
+        price: price,
+        productionCost: productionCost,
+        attributes: []
       };
       setVariants([defaultVariant]);
       return;
@@ -298,21 +319,53 @@ export default function EditProductPage() {
     const combinations = generateCombinations(attrs);
     
     // Create variants from combinations
-    const newVariants: ProductVariantDTO[] = combinations.map((combination, index) => {
+    const newVariants: ProductVariantDTO[] = combinations.map((combination) => {
       const variantAttributes: VariantAttributeDTO[] = combination.map((value, attrIndex) => ({
         name: attrs[attrIndex].name,
         value: value
       }));
 
+      // For first attribute (parent), get its stock value
+      const parentValue = combination[0];
+      const parentStock = parentStocks[parentValue] || 0;
+
+      // Find all combinations that share this parent value
+      const siblingCombos = combinations.filter(combo => combo[0] === parentValue);
+      const siblingCount = siblingCombos.length;
+      const siblingIndex = siblingCombos.findIndex(combo => 
+        JSON.stringify(combo) === JSON.stringify(combination)
+      );
+
+      // Calculate this variant's portion of parent stock
+      let stock = 0;
+      if (siblingCount > 0) {
+        const base = Math.floor(parentStock / siblingCount);
+        const remainder = parentStock % siblingCount;
+        stock = base + (siblingIndex < remainder ? 1 : 0);
+      }
+
+      console.log(`Creating variant:
+        Parent Value: ${parentValue}
+        Parent Total Stock: ${parentStock}
+        Sibling Count: ${siblingCount}
+        Sibling Index: ${siblingIndex}
+        Assigned Stock: ${stock}
+        Full Combination: ${combination.join('-')}
+      `);
+
       return {
-        stock: 0,
-        price: price, // Use current global price
-        productionCost: productionCost, // Use current global production cost
+        stock,
+        price: price,
+        productionCost: productionCost,
         attributes: variantAttributes
       };
     });
 
-    console.log('🔄 Generated variants:', newVariants);
+    console.log('Final variants with stock:', newVariants.map(v => ({
+      attributes: v.attributes?.map(a => `${a.name}: ${a.value}`).join(', ') || 'No attributes',
+      stock: v.stock
+    })));
+    
     setVariants(newVariants);
   };
 
@@ -340,48 +393,93 @@ export default function EditProductPage() {
     return combinations;
   };
 
-  // Modified handleAddDefaults
-  const handleAddDefaults = (index: number) => {
+  // Handler to open stock modal for a specific attribute
+  const openStockModalForAttribute = (index: number) => {
     // Always use first variation for stock management
+    if (index !== 0) {
+      alert("Stock can only be set for the first attribute");
+      return;
+    }
+
     const firstVariation = attributes[0];
     if (!firstVariation || firstVariation.values.length === 0) {
       alert("Please add values to the first attribute first");
       return;
     }
 
-    setStockValues(firstVariation.values.map((value) => ({ value, stock: 0 })));
-    setShowStockModal(true);
-  };
-
-  // Handle stock changes
-  const handleStockChange = (index: number, value: string) => {
-    const newStock = [...stockValues];
-    newStock[index].stock = Number(value);
-    setStockValues(newStock);
-  };
-
-  // Handler to open stock modal for a specific attribute
-  const openStockModalForAttribute = (index: number) => {
     setStockAttributeIndex(index);
-    const attr = attributes[index];
-    setStockValues(attr.values.map(value => ({ value, stock: 0 })));
+    setStockValues(firstVariation.values.map(value => ({ 
+      value, 
+      stock: parentStocks[value] || 0 
+    })));
     setShowStockModal(true);
   };
 
   // Save stock values for the selected attribute
   const handleSaveStock = () => {
     if (stockAttributeIndex === null) return;
-    const attrName = attributes[stockAttributeIndex].name;
-    const updatedVariants = variants.map(variant => {
-      const attr = variant.attributes?.find(a => a.name === attrName);
-      if (attr) {
-        const stockObj = stockValues.find(sv => sv.value === attr.value);
-        if (stockObj) {
-          return { ...variant, stock: stockObj.stock };
-        }
-      }
-      return variant;
+    
+    // Only allow setting stock for the first attribute (parent)
+    if (stockAttributeIndex !== 0) {
+      alert("Stock can only be set for the first attribute");
+      setShowStockModal(false);
+      return;
+    }
+
+    // Update parent stocks
+    const newParentStocks = { ...parentStocks };
+    stockValues.forEach(sv => {
+      newParentStocks[sv.value] = parseInt(sv.stock as any, 10) || 0;
     });
+    
+    console.log('Setting parent stocks:', newParentStocks);
+    setParentStocks(newParentStocks);
+
+    // Find all variants for each parent value and distribute stock
+    const updatedVariants = [...variants];
+    Object.entries(newParentStocks).forEach(([parentValue, totalStock]) => {
+      // Find all variants with this parent value
+      const matchingVariants = updatedVariants.filter(variant => 
+        variant.attributes?.[0]?.value === parentValue
+      );
+
+      console.log(`Distributing stock for ${parentValue}:`, {
+        totalStock,
+        variantCount: matchingVariants.length
+      });
+
+      if (matchingVariants.length > 0) {
+        const base = Math.floor(totalStock / matchingVariants.length);
+        const remainder = totalStock % matchingVariants.length;
+
+        matchingVariants.forEach((variant, idx) => {
+          const variantStock = base + (idx < remainder ? 1 : 0);
+          const variantIndex = updatedVariants.findIndex(v => 
+            v.attributes?.[0]?.value === variant.attributes?.[0]?.value &&
+            v.attributes?.[1]?.value === variant.attributes?.[1]?.value
+          );
+
+          if (variantIndex !== -1) {
+            updatedVariants[variantIndex] = {
+              ...updatedVariants[variantIndex],
+              stock: variantStock
+            };
+
+            console.log(`Set stock for variant:`, {
+              parentValue,
+              childValue: variant.attributes?.[1]?.value,
+              stock: variantStock
+            });
+          }
+        });
+      }
+    });
+
+    console.log('Final variants after stock distribution:', updatedVariants.map(v => ({
+      combination: v.attributes?.map(a => a.value).join('-'),
+      stock: v.stock
+    })));
+
     setVariants(updatedVariants);
     setShowStockModal(false);
   };
@@ -420,25 +518,6 @@ export default function EditProductPage() {
 
     setDraggedVariationIndex(null);
     setDragOverVariationIndex(null);
-  };
-
-  // Handler to distribute stock among all variants
-  const handleDistributeStock = () => {
-    if (variants.length === 0) return;
-    const totalStockStr = prompt('Enter total stock to distribute among all variants:');
-    if (!totalStockStr) return;
-    const totalStock = parseInt(totalStockStr, 10);
-    if (isNaN(totalStock) || totalStock < 0) {
-      alert('Please enter a valid positive number.');
-      return;
-    }
-    const base = Math.floor(totalStock / variants.length);
-    const remainder = totalStock % variants.length;
-    const newVariants = variants.map((variant, idx) => ({
-      ...variant,
-      stock: base + (idx < remainder ? 1 : 0),
-    }));
-    setVariants(newVariants);
   };
 
   // Form submission handler
@@ -504,8 +583,7 @@ export default function EditProductPage() {
       const productData: ProductCreateDTO = {
         name: basicFormData.name,
         description: basicFormData.description,
-        categoryId: basicFormData.categoryId, // Keep for backward compatibility
-        categoryIds: basicFormData.categoryIds, // New field for multiple categories
+        categoryIds: basicFormData.categoryIds,
         discountType: discountSettings.discountType,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],
@@ -555,11 +633,6 @@ export default function EditProductPage() {
   const updateImageFiles = (files: File[]) => {
     setImageFiles(files);
   };
-
-  // UseEffect to regenerate variants when attributes change
-  useEffect(() => {
-    generateVariants(attributes);
-  }, [attributes]);
 
   // UseEffect to regenerate default variant when price or production cost changes
   useEffect(() => {
@@ -721,7 +794,7 @@ export default function EditProductPage() {
                           onDelete={() => handleDeleteAttribute(index)}
                           onChange={(name) => handleAttributeNameChange(index, name)}
                           onValuesChange={(values) => handleAttributeValuesChange(index, values)}
-                          onSetStock={index === 0 ? handleDistributeStock : () => {}}
+                          onSetStock={() => openStockModalForAttribute(index)}
                           isDragging={draggedVariationIndex === index}
                         />
                       </div>

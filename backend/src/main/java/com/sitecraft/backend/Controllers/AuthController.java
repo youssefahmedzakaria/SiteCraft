@@ -1,16 +1,23 @@
 package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Users;
 import com.sitecraft.backend.Models.UserRole;
+import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.UserService;
+import com.sitecraft.backend.Services.StoreService;
+import com.sitecraft.backend.Repositories.UserRoleRepo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.io.File;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,6 +25,12 @@ import java.util.List;
 public class AuthController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private StoreService storeService;
+
+    @Autowired
+    private UserRoleRepo userRoleRepo;
 
     @PostMapping(path = "/register")
     public ResponseEntity register(@RequestBody Users user) throws Exception {
@@ -197,14 +210,17 @@ public class AuthController {
         Long userId = (Long) session.getAttribute("userId");
         Long storeId = (Long) session.getAttribute("storeId");
         String role = (String) session.getAttribute("role");
-        
-        // Don't refresh session data from database for users with multiple roles
-        // This can cause issues when a user has roles in multiple stores
-        
         sessionData.put("storeId", storeId);
         sessionData.put("userId", userId);
         sessionData.put("role", role);
-        
+        if (storeId != null) {
+            try {
+                Store store = storeService.getStore(storeId);
+                sessionData.put("storeStatus", store.getStatus());
+            } catch (Exception e) {
+                sessionData.put("storeStatus", null);
+            }
+        }
         System.out.println("🔐 getSession returning: " + sessionData);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
@@ -216,6 +232,110 @@ public class AuthController {
         session.setAttribute("storeId", in.get("storeId") != null ? Long.valueOf(in.get("storeId").toString()) : null);
         session.setAttribute("role", in.get("role"));
         System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId") + ", role: " + in.get("role"));
+    }
+
+    @PostMapping("/commitRegistration")
+    public ResponseEntity commitRegistration(@RequestParam("registrationData") String registrationDataJson,
+                                          @RequestParam(value = "logo", required = false) MultipartFile logo,
+                                          HttpSession session) throws Exception {
+        try {
+            System.out.println("🚀 Commit registration endpoint called");
+            
+            // Parse the registration data JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode registrationData = objectMapper.readTree(registrationDataJson);
+            
+            // Extract user data
+            JsonNode userData = registrationData.get("user");
+            Users user = new Users();
+            user.setEmail(userData.get("email").asText());
+            user.setPassword(userData.get("password").asText());
+            user.setName(userData.get("name").asText());
+            user.setPhone(userData.get("phone").asText());
+            user.setGender(userData.get("gender").asText());
+            
+            // Extract store data
+            JsonNode storeData = registrationData.get("store");
+            
+            System.out.println("📋 Parsed registration data:");
+            System.out.println("- User email: " + user.getEmail());
+            System.out.println("- Store name: " + storeData.get("storeName").asText());
+            
+            // 1. Register the user
+            System.out.println("👤 Registering user...");
+            Users registeredUser = userService.register(user);
+            System.out.println("✅ User registered with ID: " + registeredUser.getId());
+            
+            // 2. Create store
+            System.out.println("🏪 Creating store...");
+            Store store = new Store();
+            store.setStoreName(storeData.get("storeName").asText());
+            store.setStoreType(storeData.get("storeType").asText());
+            store.setDescription(storeData.get("description").asText());
+            store.setPhoneNumber(storeData.get("phoneNumber").asText());
+            store.setEmailAddress(storeData.get("emailAddress").asText());
+            store.setAddress(storeData.get("address").asText());
+            store.setAddressLink(storeData.get("addressLink").asText());
+            store.setOpeningHours(storeData.get("openingHours").asText());
+            
+            // Set colors
+            JsonNode colorsData = storeData.get("colors");
+            if (colorsData != null) {
+                store.setColors(colorsData);
+            }
+            
+            Store savedStore = storeService.createStore(store, registeredUser.getId());
+            System.out.println("✅ Store created with ID: " + savedStore.getId());
+            
+            // Handle logo upload if present (using same logic as StoreController)
+            if (logo != null && !logo.isEmpty()) {
+                System.out.println("🖼️ Uploading logo...");
+                String originalFilename = logo.getOriginalFilename();
+                String extension = originalFilename != null ?
+                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                String filename = "Store_Logo" + savedStore.getId() + "_" + logo.getOriginalFilename();
+
+                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + savedStore.getId();
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                File destFile = new File(dir, filename);
+                logo.transferTo(destFile);
+
+                // Update store with complete logo URL including server address
+                String logoUrl = "http://localhost:8080/uploads/stores/" + savedStore.getId() + "/" + filename;
+                savedStore.setLogo(logoUrl);
+                savedStore = storeService.updateStorePartial(savedStore.getId(), savedStore);
+                System.out.println("✅ Logo uploaded successfully: " + logoUrl);
+            }
+            
+            // 4. Set session data
+            session.setAttribute("userId", registeredUser.getId());
+            session.setAttribute("storeId", savedStore.getId());
+            session.setAttribute("role", "owner");
+            System.out.println("✅ Session data set");
+            
+            // 5. Return success response
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Registration completed successfully");
+            response.put("userId", registeredUser.getId());
+            response.put("storeId", savedStore.getId());
+            response.put("role", "owner");
+            
+            System.out.println("🎉 Registration committed successfully!");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+            
+        } catch (Exception e) {
+            System.out.println("💥 Error in commit registration: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     public static class LoginRequest {
