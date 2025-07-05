@@ -11,6 +11,7 @@ import {
   HeaderCustomizationAttributes,
 } from "@/lib/customization";
 import React from "react";
+import { TemplateProvider } from "@/lib/templates";
 
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -117,7 +118,11 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const handleSearch = (query: string) => {
     if (query.trim()) {
       // Navigate to products page with search query
-      router.push(`/e-commerce/${subdomain}/products?search=${encodeURIComponent(query.trim())}`);
+      router.push(
+        `/e-commerce/${subdomain}/products?search=${encodeURIComponent(
+          query.trim()
+        )}`
+      );
     }
   };
 
@@ -242,92 +247,94 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col">
-      {!isAuthPage && <SiteCraftNavbar />}
-      {isEcommercePage && (
-        <Navbar
-          template={headerAttributes?.template}
-          brandName={headerAttributes?.brandName}
-          backgroundColor={headerAttributes?.backgroundColor}
-          textColor={headerAttributes?.textColor}
-          logo={headerAttributes.logo}
-          menuItems={headerAttributes.menuItems.map((item) => {
-            // Map menu items to their correct URLs
-            let href = "#";
-            switch (item.label.toLowerCase()) {
-              case "home":
-                href = `/e-commerce/${subdomain}`;
-                break;
-              case "products":
-                href = `/e-commerce/${subdomain}/products`;
-                break;
-              case "categories":
-                href = `/e-commerce/${subdomain}/categories`;
-                break;
-              case "about us":
-                href = `/e-commerce/${subdomain}/#about`;
-                break;
-              case "contact us":
-                href = `/e-commerce/${subdomain}/#contact`;
-                break;
-              default:
-                href = `/e-commerce/${subdomain}`;
-            }
-            return {
-              label: item.label,
-              href: href,
-              isShown: item.isShown,
-            };
-          })}
-          iconColor={headerAttributes.iconColor}
-          dividerColor={headerAttributes.dividerColor}
-          fontFamily={headerAttributes.fontFamily}
-          onSearch={handleSearch}
-        />
-      )}
-      <main className="flex-1">{children}</main>
-      {!isAuthPage && <SiteCraftFooter />}
-      {isEcommercePage && (
-        <Footer
-          isCustomize={false}
-          companyName={footerAttributes.brandName}
-          textColor={footerAttributes.textColor}
-          companyLogo={{
-            src: footerAttributes.logo.src || "/placeholder.png",
-            alt: footerAttributes.logo.alt,
-            width: parseInt(footerAttributes.logo.size) || 50,
-            height: parseInt(footerAttributes.logo.size) || 50,
-          }}
-          aboutLinks={footerAttributes.aboutLinks.map((link) => {
-            // Ensure footer links have the correct URLs with subdomain
-            let href = link.href;
-            if (!href.startsWith('http') && !href.startsWith('mailto:')) {
-              // Map specific footer links to their correct URLs
-              switch (link.label.toLowerCase()) {
-                case "contact us":
-                  href = `/e-commerce/${subdomain}/#contact`;
+    <TemplateProvider>
+      <div className="relative flex min-h-screen flex-col">
+        {!isAuthPage && <SiteCraftNavbar />}
+        {isEcommercePage && (
+          <Navbar
+            template={headerAttributes?.template}
+            brandName={headerAttributes?.brandName}
+            backgroundColor={headerAttributes?.backgroundColor}
+            textColor={headerAttributes?.textColor}
+            logo={headerAttributes.logo}
+            menuItems={headerAttributes.menuItems.map((item) => {
+              // Map menu items to their correct URLs
+              let href = "#";
+              switch (item.label.toLowerCase()) {
+                case "home":
+                  href = `/e-commerce/${subdomain}`;
+                  break;
+                case "products":
+                  href = `/e-commerce/${subdomain}/products`;
+                  break;
+                case "categories":
+                  href = `/e-commerce/${subdomain}/categories`;
                   break;
                 case "about us":
                   href = `/e-commerce/${subdomain}/#about`;
                   break;
-                case "policies":
-                  href = `/e-commerce/${subdomain}/#policies`;
+                case "contact us":
+                  href = `/e-commerce/${subdomain}/#contact`;
                   break;
                 default:
                   href = `/e-commerce/${subdomain}`;
               }
-            }
-            return {
-              ...link,
-              href: href,
-            };
-          })}
-          socialMedia={footerAttributes.socialMedia}
-          socialMediaStyles={footerAttributes.socialMediaStyles}
-          copyrightStyles={footerAttributes.copyrightStyles}
-          backgroundColor={footerAttributes.backgroundColor}
-        />
-      )}
-    </div>
+              return {
+                label: item.label,
+                href: href,
+                isShown: item.isShown,
+              };
+            })}
+            iconColor={headerAttributes.iconColor}
+            dividerColor={headerAttributes.dividerColor}
+            fontFamily={headerAttributes.fontFamily}
+            onSearch={handleSearch}
+          />
+        )}
+        <main className="flex-1">{children}</main>
+        {!isAuthPage && <SiteCraftFooter />}
+        {isEcommercePage && (
+          <Footer
+            isCustomize={false}
+            companyName={footerAttributes.brandName}
+            textColor={footerAttributes.textColor}
+            companyLogo={{
+              src: footerAttributes.logo.src || "/placeholder.png",
+              alt: footerAttributes.logo.alt,
+              width: parseInt(footerAttributes.logo.size) || 50,
+              height: parseInt(footerAttributes.logo.size) || 50,
+            }}
+            aboutLinks={footerAttributes.aboutLinks.map((link) => {
+              // Ensure footer links have the correct URLs with subdomain
+              let href = link.href;
+              if (!href.startsWith("http") && !href.startsWith("mailto:")) {
+                // Map specific footer links to their correct URLs
+                switch (link.label.toLowerCase()) {
+                  case "contact us":
+                    href = `/e-commerce/${subdomain}/#contact`;
+                    break;
+                  case "about us":
+                    href = `/e-commerce/${subdomain}/#about`;
+                    break;
+                  case "policies":
+                    href = `/e-commerce/${subdomain}/#policies`;
+                    break;
+                  default:
+                    href = `/e-commerce/${subdomain}`;
+                }
+              }
+              return {
+                ...link,
+                href: href,
+              };
+            })}
+            socialMedia={footerAttributes.socialMedia}
+            socialMediaStyles={footerAttributes.socialMediaStyles}
+            copyrightStyles={footerAttributes.copyrightStyles}
+            backgroundColor={footerAttributes.backgroundColor}
+          />
+        )}
+      </div>
+    </TemplateProvider>
   );
 }
