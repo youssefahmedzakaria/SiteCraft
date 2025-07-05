@@ -2,15 +2,6 @@
 import type { LucideIcon } from "lucide-react"
 import type { Product, ProductVariant } from "@/lib/products"
 
-// Theme configuration type
-export type ThemeConfig = {
-  backgroundColor: string
-  textColor: string
-  accentColor: string
-  secondaryColor: string
-  borderRadius: string
-  fontFamily: string
-}
 
 // Related product type for the related products component
 export type RelatedProduct = {

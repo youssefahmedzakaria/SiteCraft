@@ -10,21 +10,17 @@ import { usePathname } from "next/navigation";
 import { useLoginForm } from "@/hooks/e-commerce/ecommerceUseLoginForm";
 import { Icons } from "@/components/SiteCraft/icons";
 
-// Theme configuration matching product page
-const defaultTheme = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
 export default function LoginPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
 
   const {
     email,
@@ -39,20 +35,19 @@ export default function LoginPage() {
 
   return (
     <div
-      className={`min-h-screen flex pt-20 items-center justify-center px-4 ${defaultTheme.fontFamily}`}
-      style={{ backgroundColor: defaultTheme.backgroundColor }}
+      className={`min-h-screen flex pt-20 items-center justify-center px-4 bg-[#ffffff] font-sans `}
     >
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2
             className="text-3xl font-bold"
-            style={{ color: defaultTheme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             Welcome Back
           </h2>
           <p
             className="mt-2 opacity-60"
-            style={{ color: defaultTheme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             Sign in to your account
           </p>
@@ -67,7 +62,7 @@ export default function LoginPage() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email" style={{ color: defaultTheme.textColor }}>
+              <Label htmlFor="email" style={{ color: initialColors.primary }}>
                 Email address
               </Label>
               <Input
@@ -83,8 +78,8 @@ export default function LoginPage() {
                   }
                 }}
                 placeholder="name@example.com"
-                className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                style={{ borderColor: defaultTheme.secondaryColor }}
+                className={`mt-1 border-2 rounded-lg`}
+                style={{ borderColor: initialColors.secondary }}
                 required
                 disabled={isLoading}
               />
@@ -93,7 +88,7 @@ export default function LoginPage() {
             <div>
               <Label
                 htmlFor="password"
-                style={{ color: defaultTheme.textColor }}
+                style={{ color: initialColors.primary }}
               >
                 Password
               </Label>
@@ -109,8 +104,8 @@ export default function LoginPage() {
                     }
                   }}
                   placeholder="••••••••"
-                  className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
-                  style={{ borderColor: defaultTheme.secondaryColor }}
+                  className={`pr-10 border-2 rounded-lg`}
+                  style={{ borderColor: initialColors.secondary }}
                   required
                   autoComplete="current-password"
                   disabled={isLoading}
@@ -125,12 +120,12 @@ export default function LoginPage() {
                   {showPassword ? (
                     <EyeOff
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     />
                   ) : (
                     <Eye
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     />
                   )}
                 </button>
@@ -142,7 +137,7 @@ export default function LoginPage() {
             <Link
               href={`/e-commerce/${subdomain}/forgot-password`}
               className="text-sm hover:underline"
-              style={{ color: defaultTheme.textColor }}
+              style={{ color: initialColors.primary }}
             >
               Forgot your password?
             </Link>
@@ -150,8 +145,8 @@ export default function LoginPage() {
 
           <Button
             type="submit"
-            className={`w-full text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-            style={{ backgroundColor: defaultTheme.secondaryColor }}
+            className={`w-full text-white hover:opacity-90 rounded-lg`}
+            style={{ backgroundColor: initialColors.secondary }}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -167,13 +162,13 @@ export default function LoginPage() {
           <div className="text-center">
             <p
               className="text-sm opacity-60"
-              style={{ color: defaultTheme.textColor }}
+              style={{ color: initialColors.primary }}
             >
               {"Don't have an account? "}
               <Link
                 href={`/e-commerce/${subdomain}/register`}
                 className="font-medium hover:underline"
-                style={{ color: defaultTheme.textColor }}
+                style={{ color: initialColors.primary }}
               >
                 Sign up
               </Link>

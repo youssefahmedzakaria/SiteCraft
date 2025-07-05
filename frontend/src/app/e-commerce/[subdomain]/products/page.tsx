@@ -17,16 +17,11 @@ import { useProductManagement } from "@/hooks/useProductManagement";
 import { getCategories, SimplifiedProduct } from "@/lib/products";
 import { useSearchParams, useRouter } from "next/navigation";
 
-// Theme configuration (matching product page structure)
-const defaultTheme = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
+const [initialColors, setInitialColors] = useState({
+  primary: "#000000",
+  secondary: "#000000",
+  accent: "#000000",
+});
 // Optionally, import ThemeConfig type from product page for type safety
 // import type { ThemeConfig } from "../product/[slug]/product"
 
@@ -40,7 +35,6 @@ function normalize(str: string) {
 }
 
 export default function ProductsPage({
-  theme = defaultTheme,
   // Text configuration props
   mainTitle = "Jewelry Products",
   subtitle = "Discover our exquisite collection of handcrafted jewelry pieces, each designed to tell your unique story",
@@ -322,23 +316,13 @@ export default function ProductsPage({
   //-----------------------------------------------------------------------------------------------------------------------
 
   return (
-    <div
-      className={`min-h-screen pt-20 ${theme.fontFamily}`}
-      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
-    >
+    <div className={`min-h-screen bg-[#ffffff] pt-20`}>
       <div className="container mx-auto px-4 py-12">
-        {/* Page Title */}
         <div className="text-center mb-12">
-          <h1
-            className={`text-5xl font-bold mb-4`}
-            style={{ color: theme.textColor }}
-          >
+          <h1 className={`text-5xl font-bold mb-4`} style={{ color: initialColors.primary }}>
             {mainTitle}
           </h1>
-          <p
-            className={`text-xl font-light max-w-2xl mx-auto`}
-            style={{ color: theme.textColor + "CC" }}
-          >
+          <p className={`text-xl font-light max-w-2xl mx-auto`} style={{ color: initialColors.primary }}>
             {subtitle}
           </p>
         </div>
@@ -373,7 +357,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Maximum Price
                       </h3>
@@ -389,7 +373,7 @@ export default function ProductsPage({
                       />
                       <div
                         className={`flex justify-between text-sm`}
-                        style={{ color: theme.textColor + "B3" }}
+                        style={{ color: initialColors.primary }}
                       >
                         <span>$0</span>
                         <span>${maxPrice}</span>
@@ -402,7 +386,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Categories
                       </h3>
@@ -426,7 +410,7 @@ export default function ProductsPage({
                             />
                             <span
                               className={`font-medium text-sm`}
-                              style={{ color: theme.textColor }}
+                              style={{ color: initialColors.primary }}
                             >
                               {category.name}
                             </span>
@@ -449,7 +433,7 @@ export default function ProductsPage({
                         />
                         <span
                           className={`font-medium`}
-                          style={{ color: theme.textColor }}
+                          style={{ color: initialColors.primary }}
                         >
                           In Stock Only
                         </span>
@@ -462,7 +446,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Sort By
                       </h3>
@@ -491,8 +475,8 @@ export default function ProductsPage({
                     variant="outline"
                     className={`w-full border-2 border-current rounded-xl font-semibold`}
                     style={{
-                      color: theme.textColor,
-                      borderColor: theme.textColor,
+                      color: initialColors.primary,
+                      borderColor: initialColors.primary,
                     }}
                     onClick={clearAllFilters}
                   >
@@ -515,7 +499,7 @@ export default function ProductsPage({
                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                     <h2
                       className={`text-xl font-bold`}
-                      style={{ color: theme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       Filters
                     </h2>
@@ -524,7 +508,7 @@ export default function ProductsPage({
                       size="sm"
                       onClick={() => setIsFilterOpen(false)}
                       className={`rounded-full`}
-                      style={{ color: theme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       ✕
                     </Button>
@@ -536,7 +520,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Maximum Price
                       </h3>
@@ -552,7 +536,7 @@ export default function ProductsPage({
                       />
                       <div
                         className={`flex justify-between text-sm`}
-                        style={{ color: theme.textColor + "B3" }}
+                        style={{ color: initialColors.primary }}
                       >
                         <span>$0</span>
                         <span>${maxPrice}</span>
@@ -565,7 +549,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Categories
                       </h3>
@@ -589,7 +573,7 @@ export default function ProductsPage({
                             />
                             <span
                               className={`font-medium text-sm`}
-                              style={{ color: theme.textColor }}
+                              style={{ color: initialColors.primary }}
                             >
                               {category.name}
                             </span>
@@ -612,7 +596,7 @@ export default function ProductsPage({
                         />
                         <span
                           className={`font-medium`}
-                          style={{ color: theme.textColor }}
+                          style={{ color: initialColors.primary }}
                         >
                           In Stock Only
                         </span>
@@ -625,7 +609,7 @@ export default function ProductsPage({
                     <div className="space-y-4 mb-6">
                       <h3
                         className={`text-lg font-semibold`}
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Sort By
                       </h3>
@@ -656,8 +640,8 @@ export default function ProductsPage({
                       variant="outline"
                       className={`flex-1 border-2 border-current rounded-xl font-semibold`}
                       style={{
-                        color: theme.textColor,
-                        borderColor: theme.textColor,
+                        color: initialColors.primary,
+                        borderColor: initialColors.primary,
                       }}
                       onClick={clearAllFilters}
                     >
@@ -666,8 +650,8 @@ export default function ProductsPage({
                     <Button
                       className={`flex-1 rounded-xl font-semibold`}
                       style={{
-                        backgroundColor: theme.textColor,
-                        color: theme.backgroundColor,
+                        backgroundColor: initialColors.accent,
+                        color: initialColors.primary,
                       }}
                       onClick={() => setIsFilterOpen(false)}
                     >
@@ -683,7 +667,7 @@ export default function ProductsPage({
           <div className="flex-1">
             {/* Items per page selector and results info */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-              <div className={`text-sm`} style={{ color: theme.textColor }}>
+              <div className={`text-sm`} style={{ color: initialColors.primary }}>
                 {Math.min(endIndex, totalItems)} out of {totalItems} products
               </div>
 
@@ -694,8 +678,8 @@ export default function ProductsPage({
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`border-2 border-current rounded-xl`}
                     style={{
-                      color: theme.textColor,
-                      borderColor: theme.textColor,
+                      color: initialColors.primary,
+                      borderColor: initialColors.primary,
                     }}
                   >
                     <Filter className="w-4 h-4 mr-2" />
@@ -710,9 +694,9 @@ export default function ProductsPage({
               <div
                 className="mb-6 p-4 rounded-lg border"
                 style={{
-                  backgroundColor: theme.backgroundColor + "20",
-                  borderColor: theme.textColor + "30",
-                  color: theme.textColor,
+                  backgroundColor: initialColors.secondary + "20",
+                  borderColor: initialColors.primary + "30",
+                  color: initialColors.primary,
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -733,8 +717,8 @@ export default function ProductsPage({
                     onClick={handleClearSearch}
                     className="text-xs"
                     style={{
-                      color: theme.textColor,
-                      borderColor: theme.textColor,
+                      color: initialColors.primary,
+                      borderColor: initialColors.primary,
                     }}
                   >
                     Clear Search
@@ -748,19 +732,19 @@ export default function ProductsPage({
               <div className="text-center py-16">
                 <h3
                   className={`text-2xl font-semibold mb-4`}
-                  style={{ color: theme.textColor }}
+                  style={{ color: initialColors.primary }}
                 >
                   No products found
                 </h3>
-                <p className={`mb-6`} style={{ color: theme.textColor + "B3" }}>
+                <p className={`mb-6`} style={{ color: initialColors.primary }}>
                   Try adjusting your filters to find what you are looking for.
                 </p>
                 <Button
                   onClick={clearAllFilters}
                   className={`rounded-xl px-8 py-3 font-semibold`}
                   style={{
-                    backgroundColor: theme.textColor,
-                    color: theme.backgroundColor,
+                    backgroundColor: initialColors.accent,
+                    color: initialColors.primary,
                   }}
                 >
                   Clear Filters
@@ -773,22 +757,22 @@ export default function ProductsPage({
                 showTitle={showTitle}
                 gap={gap}
                 bgColor="bg-transparent"
-                textColor={theme.textColor}
-                accentColor={theme.accentColor}
-                borderColor={theme.backgroundColor}
-                borderRadius={theme.borderRadius}
-                overlayColor={theme.secondaryColor + "80"}
+                textColor={initialColors.primary}
+                accentColor={initialColors.accent}
+                borderColor={initialColors.secondary}
+                borderRadius={`rounded-lg`}
+                overlayColor={initialColors.secondary + "80"}
                 showCta={showCta}
                 ctaText={ctaText}
                 titlePosition={titlePosition}
                 imageHeight={imageHeight}
-                fontFamily={theme.fontFamily}
+                fontFamily={`font-sans`}
                 cardShadow={cardShadow}
                 hoverEffect={hoverEffect}
                 cardVariant={cardVariant}
                 showSubtitle={showSubtitle}
                 cornerRadius={cornerRadius}
-                titleColor={theme.textColor}
+                titleColor={initialColors.primary}
                 titleFontSize={titleFontSize}
                 titleFont={titleFont}
                 onAddToCart={handleAddToCart}
@@ -814,8 +798,8 @@ export default function ProductsPage({
                     style={
                       currentPage !== 1
                         ? {
-                            color: theme.textColor,
-                            borderColor: theme.textColor,
+                            color: initialColors.primary,
+                            borderColor: initialColors.primary,
                           }
                         : {}
                     }
@@ -846,12 +830,12 @@ export default function ProductsPage({
                           style={
                             page === currentPage
                               ? {
-                                  backgroundColor: theme.textColor,
-                                  color: theme.backgroundColor,
+                                  backgroundColor: initialColors.accent,
+                                  color: initialColors.primary,
                                 }
                               : {
-                                  color: theme.textColor,
-                                  borderColor: theme.textColor,
+                                  color: initialColors.primary,
+                                  borderColor: initialColors.primary,
                                   borderWidth: 1,
                                   borderStyle: "solid",
                                 }
@@ -875,8 +859,8 @@ export default function ProductsPage({
                     style={
                       currentPage !== totalPages
                         ? {
-                            color: theme.textColor,
-                            borderColor: theme.textColor,
+                            color: initialColors.primary,
+                            borderColor: initialColors.primary,
                           }
                         : {}
                     }
@@ -885,7 +869,7 @@ export default function ProductsPage({
                   </button>
                 </div>
 
-                <div className={`text-sm`} style={{ color: theme.textColor }}>
+                <div className={`text-sm`} style={{ color: initialColors.primary }}>
                   Page {currentPage} of {totalPages}
                 </div>
               </div>

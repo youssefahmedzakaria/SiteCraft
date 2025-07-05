@@ -89,8 +89,8 @@ export default function CustomizeTemplatePage() {
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
     brandName: "Brand Name",
-    backgroundColor: "bg-[primary]", // bg-black/50
-    textColor: "text-[secondary]", // text-white
+    backgroundColor: `bg-[${initialColors.primary}]`, // bg-black/50
+    textColor: `text-[${initialColors.secondary}]`, // text-white
     logo: {
       src: "/placeholder.png",
       alt: "Custom Logo",
@@ -104,8 +104,8 @@ export default function CustomizeTemplatePage() {
       { label: "About Us", isShown: true },
       { label: "Contact Us", isShown: true },
     ],
-    iconColor: "text-[secondary]", // text-white
-    dividerColor: "border-[accent]", // border-gray-200
+    iconColor: `text-[${initialColors.secondary}]`, // text-white
+    dividerColor: `border-[${initialColors.accent}]`, // border-gray-200
     fontFamily: "font-sans",
   };
 
@@ -150,11 +150,11 @@ export default function CustomizeTemplatePage() {
     titleColor: "text-[primary]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-[secondary]", // text-white
+    descriptionColor: `text-[${initialColors.secondary}]`, // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-[accent]", // bg-white
-    buttonTextColor: "text-[primary]", // text-black
+    buttonColor: `bg-[${initialColors.accent}]`, // bg-white
+    buttonTextColor: `text-[${initialColors.primary}]`, // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -177,14 +177,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[secondary]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[accent]",
-    showMorebuttonTextColor: "text-[primary]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -192,7 +192,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -259,14 +259,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[secondary]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[accent]",
-    showMorebuttonTextColor: "text-[primary]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -274,7 +274,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -351,7 +351,7 @@ export default function CustomizeTemplatePage() {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-[primary]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -371,7 +371,7 @@ export default function CustomizeTemplatePage() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: "text-[secondary]",
+    sectionColor: `text-[${initialColors.secondary}]`,
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -409,15 +409,15 @@ export default function CustomizeTemplatePage() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: "text-[primary]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-[secondary]", // text-black
+    sectionTitleColor: `text-[${initialColors.secondary}]`, // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-[secondary]", // text-black
+    sectionContentColor: `text-[${initialColors.secondary}]`, // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -453,10 +453,10 @@ export default function CustomizeTemplatePage() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-[secondary]",
+    contentColor: `text-[${initialColors.secondary}]`,
     contentSize: "text-lg",
   };
 
@@ -473,8 +473,8 @@ export default function CustomizeTemplatePage() {
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "Brand Name",
-    backgroundColor: "bg-[primary]",
-    textColor: "text-[secondary]",
+    backgroundColor: `bg-[${initialColors.primary}]`,
+    textColor: `text-[${initialColors.secondary}]`,
     logo: {
       src: "/placeholder.png",
       alt: "Brand Logo",
@@ -486,7 +486,7 @@ export default function CustomizeTemplatePage() {
         href: "/contact",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[secondary]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
       {
@@ -494,7 +494,7 @@ export default function CustomizeTemplatePage() {
         href: "/about",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[secondary]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
       {
@@ -502,7 +502,7 @@ export default function CustomizeTemplatePage() {
         href: "/policies",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[secondary]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
     ],
@@ -512,14 +512,14 @@ export default function CustomizeTemplatePage() {
     },
     socialMediaStyles: {
       iconSize: 20,
-      iconColor: "text-[secondary]",
-      hoverColor: "text-[accent]",
+    iconColor: `text-[${initialColors.secondary}]`,
+    hoverColor: `text-[${initialColors.accent}]`,
     },
     copyrightStyles: {
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-light",
-      fontColor: "text-[secondary]",
+      fontColor: `text-[${initialColors.secondary}]`,
     },
   };
 
