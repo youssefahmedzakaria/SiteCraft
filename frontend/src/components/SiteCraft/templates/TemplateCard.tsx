@@ -5,6 +5,7 @@ import { siteCraftCache } from "@/lib/cache";
 import { commitCachedRegistration } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface Template {
   id: string;
@@ -17,6 +18,7 @@ export interface Template {
 export function TemplateCard({ template }: { template: Template }) {
   const router = useRouter();
   const [isCommitting, setIsCommitting] = useState(false);
+  const { checkSession } = useAuth();
 
   const handleTemplateSelect = async () => {
     setIsCommitting(true);
@@ -42,6 +44,11 @@ export function TemplateCard({ template }: { template: Template }) {
       
       // Clear cache after successful commit
       siteCraftCache.clearCache();
+      
+      // Refresh session to get updated store status
+      console.log('🔄 Refreshing session after registration...');
+      await checkSession();
+      console.log('✅ Session refreshed with updated store status');
       
       // Redirect to dashboard
       router.push('/dashboard');

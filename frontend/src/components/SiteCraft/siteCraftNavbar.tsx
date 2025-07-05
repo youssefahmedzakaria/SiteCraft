@@ -67,6 +67,17 @@ export function SiteCraftNavbar() {
                   ${pathname === "/pricing" ? "scale-x-100 opacity-100" : ""}`}
               ></span>
             </Link>
+            <Link
+            href = "/dashboard"
+            className={`text-sm font-medium text-logo-txt transition-colors hover:text-logo-txt-hover relative group`}
+              >
+                Dashboard
+                <span
+                className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover opacity-100 transform transition-all duration-300
+                  group-hover:scale-x-100 group-hover:opacity-100 scale-x-0
+                  ${pathname === "/pricing" ? "scale-x-100 opacity-100" : ""}`}
+              ></span>
+            </Link>
           </nav>
         </div>
         <div className="flex items-center">

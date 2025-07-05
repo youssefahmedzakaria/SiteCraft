@@ -209,14 +209,17 @@ public class AuthController {
         Long userId = (Long) session.getAttribute("userId");
         Long storeId = (Long) session.getAttribute("storeId");
         String role = (String) session.getAttribute("role");
-        
-        // Don't refresh session data from database for users with multiple roles
-        // This can cause issues when a user has roles in multiple stores
-        
         sessionData.put("storeId", storeId);
         sessionData.put("userId", userId);
         sessionData.put("role", role);
-        
+        if (storeId != null) {
+            try {
+                Store store = storeService.getStore(storeId);
+                sessionData.put("storeStatus", store.getStatus());
+            } catch (Exception e) {
+                sessionData.put("storeStatus", null);
+            }
+        }
         System.out.println("🔐 getSession returning: " + sessionData);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(sessionData);
     }
