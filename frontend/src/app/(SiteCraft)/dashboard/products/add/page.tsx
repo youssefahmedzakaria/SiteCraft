@@ -28,6 +28,10 @@ export default function AddProductPage() {
   const { handleCreateProduct, isCreating, error, clearError } = useProductManagement();
   const { isAuthenticated } = useAuth();
   
+  // Add local state for error handling
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  
   const [activeTab, setActiveTab] = useState<
     | "Product's Overview"
     | "Product's Options and Variations"
@@ -382,9 +386,13 @@ export default function AddProductPage() {
     e.preventDefault();
     
     try {
+      setSubmitError(null);
+      setSubmitSuccess(false);
+      clearError(); // Clear any existing errors from the hook
+      
       // Validate global price and production cost
       if (price <= 0 || productionCost <= 0) {
-        alert('Please enter valid price and production cost');
+        setSubmitError('Please enter valid price and production cost');
         return;
       }
 
@@ -409,13 +417,13 @@ export default function AddProductPage() {
 
       // Validate stock for each variant
       if (finalVariants.some(v => v.stock == null || v.stock < 0)) {
-        alert('Please ensure all variants have valid stock levels');
+        setSubmitError('Please ensure all variants have valid stock levels');
         return;
       }
 
       // Validate required fields
       if (!basicFormData.name || !basicFormData.description || (basicFormData.categoryIds || []).length === 0) {
-        alert('Please fill in all required fields');
+        setSubmitError('Please fill in all required fields');
         return;
       }
 
@@ -440,8 +448,8 @@ export default function AddProductPage() {
       // Create product
       const newProduct = await handleCreateProduct(productData, imageFiles);
       
-      // Show success dialog
-      setShowSuccessDialog(true);
+      // Show success message
+      setSubmitSuccess(true);
       
       // Redirect to products page after a short delay
       setTimeout(() => {
@@ -450,7 +458,8 @@ export default function AddProductPage() {
       
     } catch (err: any) {
       console.error('Error creating product:', err);
-      alert(`Failed to create product: ${err.message}`);
+      clearError(); // Clear hook error to avoid duplication
+      setSubmitError(err.message || 'Failed to create product');
     }
   };
 
@@ -500,7 +509,35 @@ export default function AddProductPage() {
           </h2>
         </div>
 
-        {/* Error Alert */}
+        {/* Success Message */}
+        {submitSuccess && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <span className="text-green-800">Product created successfully! Redirecting...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {submitError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <span className="text-red-800">{submitError}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSubmitError(null)}
+                className="text-red-600 hover:text-red-800"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Error Alert from hook */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center space-x-2">
