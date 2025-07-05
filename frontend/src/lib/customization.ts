@@ -153,7 +153,6 @@ export interface AboutCustomizationAttributes {
   sectionFont: string;
   sectionSize: string;
   sectionFontWeight: string;
-  
 }
 
 export interface PoliciesCustomizationAttributes {
@@ -236,4 +235,16 @@ export interface FooterCustomizationAttributes {
     fontWeight: string;
     fontColor: string;
   };
+}
+
+export interface Template {
+  id: string;
+  header: HeaderCustomizationAttributes;
+  promo?: PromoCustomizationAttributes;
+  categories?: CategoryCustomizationAttributes;
+  products?: ProductCustomizationAttributes;
+  about?: AboutCustomizationAttributes;
+  policies?: PoliciesCustomizationAttributes;
+  contact?: ContactCustomizationAttributes;
+  footer: FooterCustomizationAttributes;
 }

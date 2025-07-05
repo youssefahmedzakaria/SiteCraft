@@ -59,7 +59,6 @@ import {
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { form } from "@heroui/theme";
-import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -72,11 +71,10 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
-
-  const [initialColors, setInitialColors] = useState( {
-    "primary": "#000000",
-    "secondary": "#000000",
-    "accent": "#000000"
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -736,7 +734,6 @@ export default function CustomizeTemplatePage() {
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link || "",
           },
-
         }));
 
         setFooterAttributes((prev) => ({
@@ -750,14 +747,19 @@ export default function CustomizeTemplatePage() {
                 : "/placeholder.png",
           },
           socialMedia: {
+            ...(prev.socialMedia || {}),
             facebook:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link || prev.socialMedia.facebook,
+              )?.link ||
+              prev.socialMedia?.facebook ||
+              "",
             instagram:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link || prev.socialMedia.instagram,
+              )?.link ||
+              prev.socialMedia?.instagram ||
+              "",
           },
         }));
 

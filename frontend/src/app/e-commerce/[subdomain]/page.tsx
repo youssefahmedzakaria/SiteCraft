@@ -545,12 +545,12 @@ export default function Home() {
         setAboutAttributes((prev) => ({
           ...prev,
           sections:
-            storeData.aboutUs?.map((p: any) => ({
+            storeData.store.aboutUs?.map((p: any) => ({
               sectionTitle: p.title,
               description: p.content,
             })) || prev.sections,
         }));
-        // Policies (only sections)
+
         setPoliciesAttributes((prev) => ({
           ...prev,
           sections:
@@ -559,29 +559,27 @@ export default function Home() {
               content: p.description,
             })) || prev.sections,
         }));
-        // Contact (only contactEmail and socialLinks)
+
         setContactAttributes((prev) => ({
           ...prev,
-          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          address: storeData.store.address || "",
+          addressUrl: storeData.store.addressLink || "",
+          openHours: storeData.store.openingHours || "",
+          phone: storeData.store.phoneNumber || "",
+          contactEmail: storeData.store.emailAddress || "",
           socialLinks: {
             facebook:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link ||
-              prev.socialLinks?.facebook ||
-              "",
+              )?.link || "",
             instagram:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link ||
-              prev.socialLinks?.instagram ||
-              "",
+              )?.link || "",
             twitter:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "twitter"
-              )?.link ||
-              prev.socialLinks?.twitter ||
-              "",
+              )?.link || "",
           },
         }));
 

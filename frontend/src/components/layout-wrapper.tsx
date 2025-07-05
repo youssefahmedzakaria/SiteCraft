@@ -49,7 +49,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         { label: "Contact Us", isShown: true },
       ],
       iconColor: "text-[secondary]", // text-white
-      dividerColor: "border-[#E5E7EB]", // border-gray-200
+      dividerColor: "border-[secondary]", // border-gray-200
       fontFamily: "font-sans",
     });
   const [footerAttributes, setFooterAttributes] =
