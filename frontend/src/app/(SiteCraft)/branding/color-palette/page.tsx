@@ -6,7 +6,9 @@ import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
-import { siteCraftCache } from '@/lib/cache'
+import { siteCraftCache } from "@/lib/cache";
+import { fetchPixabayImages } from "@/lib/pixabay";
+import { templates as initialTemplates } from "@/lib/templates";
 
 // Color theory utility functions
 const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
@@ -307,15 +309,66 @@ interface ColorPalette {
   colors: string[];
 }
 
+// Map store type to search queries for different sections
+const storeTypeToQueries = (storeType: string) => {
+  switch (storeType.toLowerCase()) {
+    case "jewelry":
+      return {
+        promo: "jewelry showcase",
+        categories: "jewelry category",
+        products: "jewelry product",
+        about: "jewelry store",
+        contact: "jewelry shop exterior",
+      };
+    case "fashion & apparel":
+      return {
+        promo: "fashion model",
+        categories: "fashion category",
+        products: "fashion product",
+        about: "fashion boutique",
+        contact: "fashion store exterior",
+      };
+    case "electronics":
+      return {
+        promo: "tech gadgets",
+        categories: "tech category",
+        products: "tech product",
+        about: "tech store",
+        contact: "tech shop exterior",
+      };
+    case "home & furniture":
+      return {
+        promo: "home decor",
+        categories: "home decor category",
+        products: "home decor product",
+        about: "home decor shop",
+        contact: "home decor store exterior",
+      };
+    default:
+      return {
+        promo: storeType,
+        categories: storeType,
+        products: storeType,
+        about: storeType,
+        contact: storeType,
+      };
+  }
+};
+
 export default function ColorPalettePage() {
   const [primaryColor, setPrimaryColor] = useState("#000000");
   const [secondaryColor, setSecondaryColor] = useState("#ffffff");
   const [accentColor, setAccentColor] = useState("#ff6b6b");
-  const [suggestedPalettes, setSuggestedPalettes] = useState<ColorPalette[]>([]);
+  const [suggestedPalettes, setSuggestedPalettes] = useState<ColorPalette[]>(
+    []
+  );
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [brandingPalette, setBrandingPalette] = useState<ColorPalette | null>(null);
+  const [brandingPalette, setBrandingPalette] = useState<ColorPalette | null>(
+    null
+  );
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -341,8 +394,10 @@ export default function ColorPalettePage() {
       return;
     }
     // Fallback to localStorage (set by branding page)
-    const storedPrimaryColor = localStorage.getItem("primaryColor") || "#000000";
-    const storedSecondaryColor = localStorage.getItem("secondaryColor") || "#ffffff";
+    const storedPrimaryColor =
+      localStorage.getItem("primaryColor") || "#000000";
+    const storedSecondaryColor =
+      localStorage.getItem("secondaryColor") || "#ffffff";
     const storedAccentColor = localStorage.getItem("accentColor") || "#ff6b6b";
     setPrimaryColor(storedPrimaryColor);
     setSecondaryColor(storedSecondaryColor);
@@ -357,15 +412,33 @@ export default function ColorPalettePage() {
   useEffect(() => {
     if (!isClient) return;
     const palettes: ColorPalette[] = [
-      { name: "Analogous Harmony", colors: generateAnalogousPalette(primaryColor) },
-      { name: "Complementary Contrast", colors: generateComplementaryPalette(primaryColor) },
+      {
+        name: "Analogous Harmony",
+        colors: generateAnalogousPalette(primaryColor),
+      },
+      {
+        name: "Complementary Contrast",
+        colors: generateComplementaryPalette(primaryColor),
+      },
       { name: "Triadic Balance", colors: generateTriadicPalette(primaryColor) },
-      { name: "Monochromatic Shades", colors: generateMonochromaticPalette(primaryColor) },
-      { name: "Split Complementary", colors: generateSplitComplementaryPalette(primaryColor) },
-      { name: "Tetradic Harmony", colors: generateTetradicPalette(primaryColor) },
+      {
+        name: "Monochromatic Shades",
+        colors: generateMonochromaticPalette(primaryColor),
+      },
+      {
+        name: "Split Complementary",
+        colors: generateSplitComplementaryPalette(primaryColor),
+      },
+      {
+        name: "Tetradic Harmony",
+        colors: generateTetradicPalette(primaryColor),
+      },
       { name: "Warm Variations", colors: generateWarmPalette(primaryColor) },
       { name: "Cool Variations", colors: generateCoolPalette(primaryColor) },
-      { name: "High Contrast", colors: generateHighContrastPalette(primaryColor) },
+      {
+        name: "High Contrast",
+        colors: generateHighContrastPalette(primaryColor),
+      },
       { name: "Soft Pastels", colors: generateSoftPastelPalette(primaryColor) },
       { name: "Deep & Rich", colors: generateDeepRichPalette(primaryColor) },
     ];
@@ -378,94 +451,264 @@ export default function ColorPalettePage() {
   };
 
   // Ensure color contrast for accessibility
-  const ensureContrast = (backgroundColor: string, textColor: string): string => {
+  const ensureContrast = (
+    backgroundColor: string,
+    textColor: string
+  ): string => {
     const bgRgb = hexToRgb(backgroundColor);
     const textRgb = hexToRgb(textColor);
-    
+
     if (!bgRgb || !textRgb) return textColor;
-    
+
     const bgBrightness = (bgRgb.r * 299 + bgRgb.g * 587 + bgRgb.b * 114) / 1000;
-    const textBrightness = (textRgb.r * 299 + textRgb.g * 587 + textRgb.b * 114) / 1000;
-    
+    const textBrightness =
+      (textRgb.r * 299 + textRgb.g * 587 + textRgb.b * 114) / 1000;
+
     const contrast = Math.abs(bgBrightness - textBrightness);
-    
+
     // If contrast is too low, return a contrasting color
     if (contrast < 128) {
       return bgBrightness > 128 ? "#000000" : "#ffffff";
     }
-    
+
     return textColor;
   };
 
   const handleSaveChanges = async () => {
     if (!isClient) return;
-    
+
+    setIsLoading(true);
+
     // Validate colors before saving
-    const validPrimaryColor = validateHexColor(primaryColor) ? primaryColor : "#000000";
-    const validSecondaryColor = validateHexColor(secondaryColor) ? secondaryColor : "#ffffff";
-    const validAccentColor = validateHexColor(accentColor) ? accentColor : "#ff6b6b";
+    const validPrimaryColor = validateHexColor(primaryColor)
+      ? primaryColor
+      : "#000000";
+    const validSecondaryColor = validateHexColor(secondaryColor)
+      ? secondaryColor
+      : "#ffffff";
+    const validAccentColor = validateHexColor(accentColor)
+      ? accentColor
+      : "#ff6b6b";
 
     try {
+      console.log("🚀 Starting image fetch process...");
+
       // Save colors to cache instead of database
       const cachedData = siteCraftCache.getData();
       if (cachedData.store) {
         cachedData.store.colors = {
           primary: validPrimaryColor,
           secondary: validSecondaryColor,
-          accent: validAccentColor
+          accent: validAccentColor,
         };
-        siteCraftCache.setData(cachedData);
-        console.log('💾 Colors saved to cache:', { validPrimaryColor, validSecondaryColor, validAccentColor });
+
+        // Get store type and logo
+        const storeType = cachedData.store.storeType || "store";
+        const storeName = cachedData.store.storeName || "My Store";
+        const logoFile = siteCraftCache.getCachedLogoFile();
+        let logoUrl = "";
+        if (logoFile) {
+          logoUrl = URL.createObjectURL(logoFile);
+          console.log(`🖼️ Logo URL: ${logoUrl}`);
+        }
+
+        console.log(`🏪 Store type: ${storeType}`);
+        console.log(`🖼️ Logo file: ${logoFile ? "Found" : "Not found"}`);
+
+        // Map store type to queries
+        const queries = storeTypeToQueries(storeType);
+        console.log("🔍 Search queries:", queries);
+
+        // Fetch images for each section with individual error handling
+        console.log("📡 Fetching images from Pixabay...");
+
+        const imagePromises = [
+          fetchPixabayImages(queries.promo, 3).catch(err => {
+            console.warn('⚠️ Failed to fetch promo images:', err);
+            return [];
+          }),
+          fetchPixabayImages(queries.categories, 6).catch(err => {
+            console.warn('⚠️ Failed to fetch category images:', err);
+            return [];
+          }),
+          fetchPixabayImages(queries.products, 8).catch(err => {
+            console.warn('⚠️ Failed to fetch product images:', err);
+            return [];
+          }),
+          fetchPixabayImages(queries.about, 3).catch(err => {
+            console.warn('⚠️ Failed to fetch about images:', err);
+            return [];
+          }),
+          fetchPixabayImages(queries.contact, 3).catch(err => {
+            console.warn('⚠️ Failed to fetch contact images:', err);
+            return [];
+          })
+        ];
+
+        const [
+          promoImages,
+          categoryImages,
+          productImages,
+          aboutImages,
+          contactImages,
+        ] = await Promise.all(imagePromises);
+
+        console.log("📊 Image fetch results:", {
+          promo: promoImages.length,
+          categories: categoryImages.length,
+          products: productImages.length,
+          about: aboutImages.length,
+          contact: contactImages.length,
+        });
+
+        // Update all templates with new images (except header/footer logos)
+        console.log("🔄 Updating templates with fetched images...");
+        const updatedTemplates = initialTemplates.map(
+          (template, templateIndex) => {
+            console.log(`📝 Updating template ${templateIndex + 1}...`);
+
+            // Header logo
+            if (template.header) {
+              template.header.logo = {
+                ...template.header.logo,
+                src: logoUrl,
+                alt: "Brand Logo",
+              };
+              template.header.brandName = storeName;
+            }
+
+            // Footer logo
+            if (template.footer) {
+              template.footer.logo = {
+                ...template.footer.logo,
+                src: logoUrl,
+                alt: "Brand Logo",
+              };
+              template.footer.brandName = storeName;
+            }
+
+            // PromoSlider images
+            if (template.PromoSlider && promoImages.length > 0) {
+              template.PromoSlider.slides = template.PromoSlider.slides.map(
+                (slide, idx) => ({
+                  ...slide,
+                  image: promoImages[idx % promoImages.length].url,
+                  imageAlt: promoImages[idx % promoImages.length].alt,
+                })
+              );
+            }
+
+            // Categories images
+            if (template.Categories && categoryImages.length > 0) {
+              template.Categories.categories =
+                template.Categories.categories.map((cat, idx) => ({
+                  ...cat,
+                  images: [
+                    {
+                      id: 1,
+                      url: categoryImages[idx % categoryImages.length].url,
+                      alt: categoryImages[idx % categoryImages.length].alt,
+                    },
+                  ],
+                }));
+            }
+
+            // Products images
+            if (template.Products && productImages.length > 0) {
+              template.Products.products = template.Products.products.map(
+                (prod, idx) => ({
+                  ...prod,
+                  images: [
+                    {
+                      id: 1,
+                      url: productImages[idx % productImages.length].url,
+                      alt: productImages[idx % productImages.length].alt,
+                    },
+                  ],
+                })
+              );
+            }
+
+            // AboutUs image
+            if (template.AboutUs && aboutImages.length > 0) {
+              template.AboutUs.image = aboutImages[0].url;
+              template.AboutUs.imageAlt = aboutImages[0].alt;
+            }
+
+            // ContactUs image
+            if (template.ContactUs && contactImages.length > 0) {
+              template.ContactUs.image = contactImages[0].url;
+            }
+
+            console.log(`📝 Updated template ${templateIndex + 1}:`, template);
+            return template;
+          }
+        );
+
+        // Save updated templates to cache
+        console.log("💾 Saving updated templates to cache...");
+        siteCraftCache.setData({
+          ...cachedData,
+          store: cachedData.store,
+          templates: updatedTemplates,
+        });
+
+        console.log("✅ Successfully saved colors and images to cache");
       }
-      
+
       // Also save to localStorage for backward compatibility
       localStorage.setItem("primaryColor", validPrimaryColor);
       localStorage.setItem("secondaryColor", validSecondaryColor);
       localStorage.setItem("accentColor", validAccentColor);
 
-      console.log('✅ Colors updated in cache and localStorage');
+      console.log("✅ Colors updated in cache and localStorage");
 
       // Navigate to templates page
-      router.push("/templates");
+      router.push("/branding/templates");
     } catch (error) {
-      console.error('💥 Error saving colors to cache:', error);
-      alert('Failed to save colors. Please try again.');
+      console.error("💥 Error saving colors/images to cache:", error);
+      alert("Failed to save colors or images. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSelectPalette = (palette: ColorPalette) => {
     if (!isClient) return;
-    
+
     // Validate palette colors before setting
-    const validColors = palette.colors.map(color => 
+    const validColors = palette.colors.map((color) =>
       validateHexColor(color) ? color : "#000000"
     );
-    
+
     setPrimaryColor(validColors[0] || "#000000");
     setSecondaryColor(validColors[1] || "#ffffff");
     if (validColors[2]) {
       setAccentColor(validColors[2]);
     }
     setSelectedPaletteName(palette.name);
-    
-    console.log('🎨 Palette selected:', palette.name, validColors);
+
+    console.log("🎨 Palette selected:", palette.name, validColors);
   };
 
   // Handle color input changes with validation
-  const handleColorChange = (colorType: 'primary' | 'secondary' | 'accent', value: string) => {
+  const handleColorChange = (
+    colorType: "primary" | "secondary" | "accent",
+    value: string
+  ) => {
     if (!isClient) return;
-    
-    const cleanValue = value.startsWith('#') ? value : `#${value}`;
-    
+
+    const cleanValue = value.startsWith("#") ? value : `#${value}`;
+
     if (validateHexColor(cleanValue)) {
       switch (colorType) {
-        case 'primary':
+        case "primary":
           setPrimaryColor(cleanValue);
           break;
-        case 'secondary':
+        case "secondary":
           setSecondaryColor(cleanValue);
           break;
-        case 'accent':
+        case "accent":
           setAccentColor(cleanValue);
           break;
       }
@@ -567,13 +810,15 @@ export default function ColorPalettePage() {
                         )}
                       </div>
                       <div className="flex justify-center space-x-2">
-                        {brandingPalette.colors.slice(0, 3).map((color, colorIndex) => (
-                          <div
-                            key={colorIndex}
-                            className="w-8 h-8 rounded-full border border-gray-200"
-                            style={{ backgroundColor: color }}
-                          ></div>
-                        ))}
+                        {brandingPalette.colors
+                          .slice(0, 3)
+                          .map((color, colorIndex) => (
+                            <div
+                              key={colorIndex}
+                              className="w-8 h-8 rounded-full border border-gray-200"
+                              style={{ backgroundColor: color }}
+                            ></div>
+                          ))}
                       </div>
                     </div>
                   )}
@@ -641,13 +886,17 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={primaryColor}
-                          onChange={(e) => handleColorChange('primary', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("primary", e.target.value)
+                          }
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={primaryColor}
-                          onChange={(e) => handleColorChange('primary', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("primary", e.target.value)
+                          }
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -670,13 +919,17 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={secondaryColor}
-                          onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("secondary", e.target.value)
+                          }
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={secondaryColor}
-                          onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("secondary", e.target.value)
+                          }
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -699,13 +952,17 @@ export default function ColorPalettePage() {
                         <Input
                           type="text"
                           value={accentColor}
-                          onChange={(e) => handleColorChange('accent', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("accent", e.target.value)
+                          }
                           className="w-32 border-gray-300"
                         />
                         <Input
                           type="color"
                           value={accentColor}
-                          onChange={(e) => handleColorChange('accent', e.target.value)}
+                          onChange={(e) =>
+                            handleColorChange("accent", e.target.value)
+                          }
                           className="w-12 h-9 p-1 ml-2 cursor-pointer"
                         />
                       </div>
@@ -722,11 +979,17 @@ export default function ColorPalettePage() {
                     >
                       <h3
                         className="text-lg font-semibold"
-                        style={{ color: ensureContrast(primaryColor, secondaryColor) }}
+                        style={{
+                          color: ensureContrast(primaryColor, secondaryColor),
+                        }}
                       >
                         Primary Color
                       </h3>
-                      <p style={{ color: ensureContrast(primaryColor, secondaryColor) }}>
+                      <p
+                        style={{
+                          color: ensureContrast(primaryColor, secondaryColor),
+                        }}
+                      >
                         This shows how your primary color will look with text.
                       </p>
                       <Button
@@ -747,11 +1010,17 @@ export default function ColorPalettePage() {
                       >
                         <h3
                           className="text-lg font-semibold"
-                          style={{ color: ensureContrast(secondaryColor, primaryColor) }}
+                          style={{
+                            color: ensureContrast(secondaryColor, primaryColor),
+                          }}
                         >
                           Secondary Color
                         </h3>
-                        <p style={{ color: ensureContrast(secondaryColor, primaryColor) }}>
+                        <p
+                          style={{
+                            color: ensureContrast(secondaryColor, primaryColor),
+                          }}
+                        >
                           Secondary color text preview.
                         </p>
                       </div>
@@ -760,13 +1029,19 @@ export default function ColorPalettePage() {
                         className="p-5"
                         style={{ backgroundColor: accentColor }}
                       >
-                        <h3 
+                        <h3
                           className="text-lg font-semibold"
-                          style={{ color: ensureContrast(accentColor, "#ffffff") }}
+                          style={{
+                            color: ensureContrast(accentColor, "#ffffff"),
+                          }}
                         >
                           Accent Color
                         </h3>
-                        <p style={{ color: ensureContrast(accentColor, "#ffffff") }}>
+                        <p
+                          style={{
+                            color: ensureContrast(accentColor, "#ffffff"),
+                          }}
+                        >
                           Accent color text preview.
                         </p>
                       </div>
@@ -784,6 +1059,7 @@ export default function ColorPalettePage() {
             onClick={handleBackClick}
             variant="outline"
             className="border-gray-300 hover:bg-gray-100"
+            disabled={isLoading}
           >
             <svg
               className="w-4 h-4 mr-2"
@@ -804,8 +1080,16 @@ export default function ColorPalettePage() {
           <Button
             onClick={handleSaveChanges}
             className="bg-black text-white hover:bg-gray-800"
+            disabled={isLoading}
           >
-            Save Changes
+            {isLoading ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </main>

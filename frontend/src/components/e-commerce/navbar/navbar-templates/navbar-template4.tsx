@@ -72,14 +72,6 @@ export const NavbarTemplate4: React.FC<NavbarTemplate4Props> = ({
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
 
-  console.log("NavbarTemplate4 props:", {
-    backgroundColor,
-    textColor,
-    fontFamily,
-    iconColor,
-    dividerColor,
-  })
-
   return (
     <>
       <MobileMenu

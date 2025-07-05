@@ -17,10 +17,6 @@ export default function SuggestedTemplatesPage() {
 
   const router = useRouter();
 
-  const handleNextClick = () => {
-    router.push("/dashboard");
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto p-4 md:p-6">

@@ -25,6 +25,8 @@ export interface SiteCraftCacheData {
       accent: string;
     };
   };
+  // Add templates property for storing updated templates
+  templates?: any[];
 }
 
 // Global variable to store File objects (since they can't be serialized)

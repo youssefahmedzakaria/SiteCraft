@@ -39,7 +39,7 @@ interface Section {
 
 const initialSections: Section[] = [];
 
-export default function TemplateCard() {
+export default function TemplateView() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const templateId = pathSegments[3];

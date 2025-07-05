@@ -580,14 +580,12 @@ export default function BrandingPage() {
   const [accentColor, setAccentColor] = useState("#ff6b6b");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [storeType, setStoreType] = useState("");
-  const [subdomain, setSubdomain] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [existingStore, setExistingStore] = useState<StoreData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isClient, setIsClient] = useState(false);
-  const { user, updateSessionAfterStoreCreation } = useAuth();
   const router = useRouter();
 
   // Ensure we're on the client side
@@ -596,36 +594,36 @@ export default function BrandingPage() {
   }, []);
 
   // Load existing store data if user has a store
-  useEffect(() => {
-    if (!isClient || !user?.userId) {
-      setIsLoading(false);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!isClient || !user?.userId) {
+  //     setIsLoading(false);
+  //     return;
+  //   }
 
-    const loadStoreData = async () => {
-      try {
-        // If user has a storeId, try to load existing store data
-        if (user.storeId) {
-          const storeData = await getStoreSettings();
-          setExistingStore(storeData);
+  //   const loadStoreData = async () => {
+  //     try {
+  //       // If user has a storeId, try to load existing store data
+  //       if (user.storeId) {
+  //         const storeData = await getStoreSettings();
+  //         setExistingStore(storeData);
           
-          // Pre-fill form with existing data
-          setStoreName(storeData.storeName || "My Store");
-          setStoreType(storeData.storeType || "");
-          setSubdomain(storeData.subdomain || "");
+  //         // Pre-fill form with existing data
+  //         setStoreName(storeData.storeName || "My Store");
+  //         setStoreType(storeData.storeType || "");
+  //         setSubdomain(storeData.subdomain || "");
           
-          console.log('✅ Existing store data loaded:', storeData);
-        }
-      } catch (err) {
-        console.log('ℹ️ No existing store found or error loading store data');
-        // This is expected for new users who don't have a store yet
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //         console.log('✅ Existing store data loaded:', storeData);
+  //       }
+  //     } catch (err) {
+  //       console.log('ℹ️ No existing store found or error loading store data');
+  //       // This is expected for new users who don't have a store yet
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    loadStoreData();
-  }, [user, isClient]);
+  //   loadStoreData();
+  // }, [user, isClient]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isClient) return;
@@ -836,20 +834,20 @@ export default function BrandingPage() {
   }
 
   // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <main className="container mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center space-x-2">
-              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="text-lg text-gray-600">Loading store data...</span>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100">
+  //       <main className="container mx-auto p-4 md:p-6">
+  //         <div className="flex items-center justify-center h-64">
+  //           <div className="flex items-center space-x-2">
+  //             <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+  //             <span className="text-lg text-gray-600">Loading store data...</span>
+  //           </div>
+  //         </div>
+  //       </main>
+  //     </div>
+  //   );
+  // }
 
   // Error state
   if (error) {

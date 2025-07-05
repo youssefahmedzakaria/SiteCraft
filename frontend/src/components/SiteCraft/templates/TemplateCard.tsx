@@ -27,7 +27,6 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
   const [isCommitting, setIsCommitting] = useState(false);
-  const { checkSession } = useAuth();
 
   const handleTemplateSelect = async () => {
     setIsCommitting(true);
@@ -65,7 +64,6 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
       
       // Refresh session to get updated store status
       console.log('🔄 Refreshing session after registration...');
-      await checkSession();
       console.log('✅ Session refreshed with updated store status');
       
       // Redirect to dashboard

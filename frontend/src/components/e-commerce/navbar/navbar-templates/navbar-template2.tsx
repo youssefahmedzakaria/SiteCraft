@@ -72,14 +72,6 @@ export const NavbarTemplate2: React.FC<NavbarTemplate2Props> = ({
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
 
-  console.log("NavbarTemplate2 props:", {
-    backgroundColor,
-    textColor,
-    fontFamily,
-    iconColor,
-    dividerColor,
-  })
-
   return (
     <>
       <MobileMenu
