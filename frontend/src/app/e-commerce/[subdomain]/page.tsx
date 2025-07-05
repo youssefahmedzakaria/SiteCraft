@@ -98,14 +98,14 @@ export default function Home() {
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     titleFont: "font-sans",
-    titleColor: "text-[#FFFFFF]", // text-white
+    titleColor: "text-[primary]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-[#FFFFFF]", // text-white
+    descriptionColor: "text-[secondary]", // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-[#FFFFFF]", // bg-white
-    buttonTextColor: "text-[#000000]", // text-black
+    buttonColor: "bg-[accent]", // bg-white
+    buttonTextColor: "text-[primary]", // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -118,17 +118,17 @@ export default function Home() {
   const initialCategory: CategoryCustomizationAttributes = {
     id: "categories",
     template: "FeaturedGrid", // You can adjust this if needed
-    isClickable: false,
+    isClickable: true,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: "text-[secondary]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: "bg-[accent]",
+    showMorebuttonTextColor: "text-[primary]",
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -136,7 +136,7 @@ export default function Home() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -199,23 +199,28 @@ export default function Home() {
   const updateCategoryAttributes = (
     updates: Partial<CategoryCustomizationAttributes>
   ) => {
-    setCategoryAttributes((prev) => ({ ...prev, ...updates }));
+    setCategoryAttributes((prev) => ({ 
+      ...prev, 
+      ...updates,
+      // Always ensure isClickable is true in e-commerce context
+      isClickable: true 
+    }));
   };
 
   const initialProduct: ProductCustomizationAttributes = {
     id: "products",
     template: "FeaturedGrid", // You can adjust this if needed
-    isClickable: false,
+    isClickable: true,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: "text-[secondary]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: "bg-[accent]",
+    showMorebuttonTextColor: "text-[primary]",
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -223,7 +228,7 @@ export default function Home() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -292,14 +297,19 @@ export default function Home() {
   const updateProductAttributes = (
     updates: Partial<ProductCustomizationAttributes>
   ) => {
-    setProductAttributes((prev) => ({ ...prev, ...updates }));
+    setProductAttributes((prev) => ({ 
+      ...prev, 
+      ...updates,
+      // Always ensure isClickable is true in e-commerce context
+      isClickable: true 
+    }));
   };
 
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-[#000000]", // text-black
+    titleColor: "text-[primary]", // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -318,7 +328,7 @@ export default function Home() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: "text-[#000000]",
+    sectionColor: "text-[secondary]",
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -355,15 +365,15 @@ export default function Home() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: "text-[#000000]", // text-black
+    titleColor: "text-[primary]", // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-[#000000]", // text-black
+    sectionTitleColor: "text-[secondary]", // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-[#000000]", // text-black
+    sectionContentColor: "text-[secondary]", // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -398,10 +408,10 @@ export default function Home() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-[#000000]",
+    contentColor: "text-[secondary]",
     contentSize: "text-lg",
   };
 
@@ -411,21 +421,21 @@ export default function Home() {
 
   const sectionComponents = {
     PromoSlider: {
-      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={false} />,
+      CenteredPromo: <CenteredPromo {...promoAttributes} isClickable={true} />,
       LeftAlignedPromo: (
-        <LeftAlignedPromo {...promoAttributes} isClickable={false} />
+        <LeftAlignedPromo {...promoAttributes} isClickable={true} />
       ),
       RightAlignedPromo: (
-        <RightAlignedPromo {...promoAttributes} isClickable={false} />
+        <RightAlignedPromo {...promoAttributes} isClickable={true} />
       ),
       MinimalLeftPromo: (
-        <MinimalLeftPromo {...promoAttributes} isClickable={false} />
+        <MinimalLeftPromo {...promoAttributes} isClickable={true} />
       ),
       MinimalRightPromo: (
-        <MinimalRightPromo {...promoAttributes} isClickable={false} />
+        <MinimalRightPromo {...promoAttributes} isClickable={true} />
       ),
-      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={false} />,
-      SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
+      OverlayPromo: <OverlayPromo {...promoAttributes} isClickable={true} />,
+      SplitPromo: <SplitPromo {...promoAttributes} isClickable={true} />,
     },
     Products: {
       FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
@@ -535,12 +545,12 @@ export default function Home() {
         setAboutAttributes((prev) => ({
           ...prev,
           sections:
-            storeData.aboutUs?.map((p: any) => ({
+            storeData.store.aboutUs?.map((p: any) => ({
               sectionTitle: p.title,
               description: p.content,
             })) || prev.sections,
         }));
-        // Policies (only sections)
+
         setPoliciesAttributes((prev) => ({
           ...prev,
           sections:
@@ -549,29 +559,27 @@ export default function Home() {
               content: p.description,
             })) || prev.sections,
         }));
-        // Contact (only contactEmail and socialLinks)
+
         setContactAttributes((prev) => ({
           ...prev,
-          contactEmail: storeData.store.emailAddress || prev.contactEmail,
+          address: storeData.store.address || "",
+          addressUrl: storeData.store.addressLink || "",
+          openHours: storeData.store.openingHours || "",
+          phone: storeData.store.phoneNumber || "",
+          contactEmail: storeData.store.emailAddress || "",
           socialLinks: {
             facebook:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link ||
-              prev.socialLinks?.facebook ||
-              "",
+              )?.link || "",
             instagram:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link ||
-              prev.socialLinks?.instagram ||
-              "",
+              )?.link || "",
             twitter:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "twitter"
-              )?.link ||
-              prev.socialLinks?.twitter ||
-              "",
+              )?.link || "",
           },
         }));
 

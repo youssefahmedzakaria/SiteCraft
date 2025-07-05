@@ -89,7 +89,7 @@ const OutOfStockBadge = (product: any) => {
 };
 
 export function FeaturedGridProductTemplate({
-  isClickable,
+  isClickable = true,
   products,
   bgColor = "bg-white",
   textColor = "text-gray-800",
@@ -132,26 +132,35 @@ export function FeaturedGridProductTemplate({
   const regularProducts = products.slice(1);
 
   return (
-    <div className={cn("w-full flex-shrink-0",)}
-    style={{backgroundColor: bgColor.includes("[")
-            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
-            : bgColor,}}
+    <div
+      className={cn("w-full flex-shrink-0")}
+      style={{
+        backgroundColor: bgColor.includes("[")
+          ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+          : bgColor,
+      }}
     >
       <div
-        className={cn(" mx-auto px-16 py-8 md:py-16", )}
-        style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
-                      fontFamily: getFontFamily(fontFamily),
-                    }}
+        className={cn(" mx-auto px-16 py-8 md:py-16")}
+        style={{
+          color: textColor?.includes("[")
+            ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : textColor,
+          fontFamily: getFontFamily(fontFamily),
+        }}
       >
         {showTitle && (
           <h2
             className={cn(
-              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6"
             )}
-            style={{color: titleColor?.includes("[") ? titleColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : titleColor,
-                      fontSize: getFontSize(titleFontSize??""),
-                      fontFamily: getFontFamily(fontFamily),
-                    }}
+            style={{
+              color: titleColor?.includes("[")
+                ? titleColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                : titleColor,
+              fontSize: getFontSize(titleFontSize ?? ""),
+              fontFamily: getFontFamily(fontFamily),
+            }}
           >
             {title}
           </h2>
@@ -161,183 +170,192 @@ export function FeaturedGridProductTemplate({
           {/* Featured Product */}
           {featuredProduct && (
             <div className="md:col-span-2 md:row-span-2 group w-full">
-              <div
-                className={cn(
-                  "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
+              <Link
+                href={isClickable ? `/e-commerce/${subdomain}/product/${featuredProduct.id}` : "#"}
+                className="block w-full h-full"
               >
-                <Image
-                  src={
-                    featuredProduct.image[0]?.url ||
-                    "/placeholder.png?height=600&width=800"
-                  }
-                  alt={featuredProduct.image[0]?.alt || ""}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 66vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    "relative h-96 md:h-full bg-slate-100 overflow-hidden w-full",
+                    borderRadius
                   )}
                 >
-                  <div className="p-6">
-                    <h3 className={cn(cardTextColor, "text-2xl font-bold flex items-center gap-2")}>{featuredProduct.name}
-                      {/* Discount badge */}
+                  <Image
+                    src={
+                      featuredProduct.images[0]?.url ||
+                      "/placeholder.png?height=600&width=800"
+                    }
+                    alt={featuredProduct.images[0]?.alt || ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
+                    className={cn(
+                      "object-cover",
+                      hoverEffect &&
+                        "transition-transform duration-500 group-hover:scale-105"
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    )}
+                  >
+                    <div className="p-6">
+                      <h3 className={cn(cardTextColor, "text-2xl font-bold flex items-center gap-2")}>{featuredProduct.name}
+                        {/* Discount badge */}
+                        {(() => {
+                          const originalPrice = featuredProduct.price;
+                          let currentPrice = originalPrice;
+                          let discountPercent = null;
+                          if (featuredProduct.discountType && typeof featuredProduct.discountValue === 'number') {
+                            if (featuredProduct.discountType === 'percentage') {
+                              currentPrice = originalPrice - (originalPrice * featuredProduct.discountValue) / 100;
+                              discountPercent = featuredProduct.discountValue;
+                            } else if (featuredProduct.discountType === 'fixed amount') {
+                              currentPrice = originalPrice - featuredProduct.discountValue;
+                              discountPercent = Math.round((featuredProduct.discountValue / originalPrice) * 100);
+                            }
+                          }
+                          const isDiscounted = currentPrice < originalPrice;
+                          return isDiscounted && discountPercent ? (
+                            <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+                              {discountPercent}% OFF
+                            </span>
+                          ) : null;
+                        })()}
+                        {OutOfStockBadge(featuredProduct)}
+                      </h3>
+                      {/* Subtitle */}
+                      {showSubtitle && featuredProduct.description && (
+                        <p className={cn(cardTextColor, "opacity-80 mt-1 text-base")}>{featuredProduct.description}</p>
+                      )}
+                      {/* Price display */}
                       {(() => {
                         const originalPrice = featuredProduct.price;
                         let currentPrice = originalPrice;
-                        let discountPercent = null;
                         if (featuredProduct.discountType && typeof featuredProduct.discountValue === 'number') {
                           if (featuredProduct.discountType === 'percentage') {
                             currentPrice = originalPrice - (originalPrice * featuredProduct.discountValue) / 100;
-                            discountPercent = featuredProduct.discountValue;
                           } else if (featuredProduct.discountType === 'fixed amount') {
                             currentPrice = originalPrice - featuredProduct.discountValue;
-                            discountPercent = Math.round((featuredProduct.discountValue / originalPrice) * 100);
                           }
                         }
                         const isDiscounted = currentPrice < originalPrice;
-                        return isDiscounted && discountPercent ? (
-                          <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
-                            {discountPercent}% OFF
-                          </span>
-                        ) : null;
+                        return (
+                          <>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className={cn("font-semibold", cardTextColor)}>
+                                ${currentPrice.toFixed(2)}
+                              </span>
+                              {isDiscounted && (
+                                <span className="text-sm line-through text-gray-200">${originalPrice.toFixed(2)}</span>
+                              )}
+                            </div>
+                          </>
+                        );
                       })()}
-                      {OutOfStockBadge(featuredProduct)}
-                    </h3>
-                    {/* Subtitle */}
-                    {showSubtitle && featuredProduct.description && (
-                      <p className={cn(cardTextColor, "opacity-80 mt-1 text-base")}>{featuredProduct.description}</p>
-                    )}
-                    {/* Price display */}
-                    {(() => {
-                      const originalPrice = featuredProduct.price;
-                      let currentPrice = originalPrice;
-                      if (featuredProduct.discountType && typeof featuredProduct.discountValue === 'number') {
-                        if (featuredProduct.discountType === 'percentage') {
-                          currentPrice = originalPrice - (originalPrice * featuredProduct.discountValue) / 100;
-                        } else if (featuredProduct.discountType === 'fixed amount') {
-                          currentPrice = originalPrice - featuredProduct.discountValue;
-                        }
-                      }
-                      const isDiscounted = currentPrice < originalPrice;
-                      return (
-                        <>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className={cn("font-semibold", cardTextColor)}>
-                              ${currentPrice.toFixed(2)}
-                            </span>
-                            {isDiscounted && (
-                              <span className="text-sm line-through text-gray-200">${originalPrice.toFixed(2)}</span>
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
-                    {showCta && <p className={cn(cardTextColor, "mt-2")}>{ctaText}</p>}
+                      {showCta && <p className={cn(cardTextColor, "mt-2")}>{ctaText}</p>}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           )}
 
           {/* Regular Products */}
           {regularProducts.map((product) => (
-            (() => { console.log('PRODUCT DEBUG:', product); return null; })(),
             <div className="group w-full" key={product.id}>
-              <div
-                className={cn(
-                  "relative h-64 bg-slate-100 overflow-hidden w-full",
-                  borderRadius
-                )}
+              <Link
+                href={isClickable ? `/e-commerce/${subdomain}/product/${product.id}` : "#"}
+                className="block w-full h-full"
               >
-                <Image
-                  src={
-                    product.image[0]?.url ||
-                    "/placeholder.png"
-                  }
-                  alt={product.image[0]?.alt || ""}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className={cn(
-                    "object-cover",
-                    hoverEffect &&
-                      "transition-transform duration-500 group-hover:scale-105"
-                  )}
-                />
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    "relative h-64 bg-slate-100 overflow-hidden w-full",
+                    borderRadius
                   )}
                 >
-                  <div className="p-4">
-                    <h3 className={cn(cardTextColor, "text-lg font-medium flex items-center gap-2")}>{product.name}
-                      {/* Discount badge */}
-                      {product.discountType && typeof product.discountValue === 'number' && (() => {
-                        let currentPrice = product.price;
-                        let discountPercent = null;
-                        if (product.discountType === 'percentage') {
-                          currentPrice = product.price - (product.price * product.discountValue) / 100;
-                          discountPercent = product.discountValue;
-                        } else if (product.discountType === 'fixed amount') {
-                          currentPrice = product.price - product.discountValue;
-                          discountPercent = Math.round((product.discountValue / product.price) * 100);
-                        }
-                        const isDiscounted = currentPrice < product.price;
-                        return isDiscounted && discountPercent ? (
-                          <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
-                            {discountPercent}% OFF
-                          </span>
-                        ) : null;
-                      })()}
-                      {OutOfStockBadge(product)}
-                    </h3>
-                    {/* Subtitle */}
-                    {showSubtitle && product.description && (
-                      <p className={cn(cardTextColor, "opacity-80 text-sm mt-1")}>{product.description}</p>
+                  <Image
+                    src={
+                      product.images[0]?.url ||
+                      "/placeholder.png"
+                    }
+                    alt={product.images[0]?.alt || ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className={cn(
+                      "object-cover",
+                      hoverEffect &&
+                        "transition-transform duration-500 group-hover:scale-105"
                     )}
-                    {/* Price display */}
-                    {(() => {
-                      const originalPrice = product.price;
-                      let currentPrice = originalPrice;
-                      if (product.discountType && typeof product.discountValue === 'number') {
-                        if (product.discountType === 'percentage') {
-                          currentPrice = originalPrice - (originalPrice * product.discountValue) / 100;
-                        } else if (product.discountType === 'fixed amount') {
-                          currentPrice = originalPrice - product.discountValue;
-                        }
-                      }
-                      const isDiscounted = currentPrice < originalPrice;
-                      return (
-                        <>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={cn("font-semibold", cardTextColor)}>
-                              ${currentPrice.toFixed(2)}
+                  />
+                  <div
+                    className={cn(
+                      "absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent"
+                    )}
+                  >
+                    <div className="p-4">
+                      <h3 className={cn(cardTextColor, "text-lg font-medium flex items-center gap-2")}>{product.name}
+                        {/* Discount badge */}
+                        {product.discountType && typeof product.discountValue === 'number' && (() => {
+                          let currentPrice = product.price;
+                          let discountPercent = null;
+                          if (product.discountType === 'percentage') {
+                            currentPrice = product.price - (product.price * product.discountValue) / 100;
+                            discountPercent = product.discountValue;
+                          } else if (product.discountType === 'fixed amount') {
+                            currentPrice = product.price - product.discountValue;
+                            discountPercent = Math.round((product.discountValue / product.price) * 100);
+                          }
+                          const isDiscounted = currentPrice < product.price;
+                          return isDiscounted && discountPercent ? (
+                            <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+                              {discountPercent}% OFF
                             </span>
-                            {isDiscounted && (
-                              <>
-                                <span className="text-xs line-through text-gray-200">${originalPrice.toFixed(2)}</span>
-                                <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
-                                  {product.discountType === 'percentage' ? product.discountValue : Math.round((product.discountValue / product.price) * 100)}% OFF
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
-                    {showCta && (
-                      <p className={cn(cardTextColor, "text-sm mt-1")}>{ctaText}</p>
-                    )}
+                          ) : null;
+                        })()}
+                        {OutOfStockBadge(product)}
+                      </h3>
+                      {/* Subtitle */}
+                      {showSubtitle && product.description && (
+                        <p className={cn(cardTextColor, "opacity-80 text-sm mt-1")}>{product.description}</p>
+                      )}
+                      {/* Price display */}
+                      {(() => {
+                        const originalPrice = product.price;
+                        let currentPrice = originalPrice;
+                        if (product.discountType && typeof product.discountValue === 'number') {
+                          if (product.discountType === 'percentage') {
+                            currentPrice = originalPrice - (originalPrice * product.discountValue) / 100;
+                          } else if (product.discountType === 'fixed amount') {
+                            currentPrice = originalPrice - product.discountValue;
+                          }
+                        }
+                        const isDiscounted = currentPrice < originalPrice;
+                        return (
+                          <>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={cn("font-semibold", cardTextColor)}>
+                                ${currentPrice.toFixed(2)}
+                              </span>
+                              {isDiscounted && (
+                                <>
+                                  <span className="text-xs line-through text-gray-200">${originalPrice.toFixed(2)}</span>
+                                  <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-md align-middle">
+                                    {product.discountType === 'percentage' ? product.discountValue : Math.round((product.discountValue / product.price) * 100)}% OFF
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
+                      {showCta && (
+                        <p className={cn(cardTextColor, "text-sm mt-1")}>{ctaText}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>
@@ -349,14 +367,16 @@ export function FeaturedGridProductTemplate({
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",
-                "rounded-lg text-sm font-medium",
+                "rounded-lg text-sm font-medium"
               )}
               style={{
                 backgroundColor: showMorebuttonBgColor.includes("[")
-                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) ||
+                    "#ffffff"
                   : showMorebuttonBgColor,
                 color: showMorebuttonTextColor.includes("[")
-                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) ||
+                    "#ffffff"
                   : showMorebuttonTextColor,
               }}
             >

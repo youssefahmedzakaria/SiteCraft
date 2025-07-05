@@ -59,7 +59,6 @@ import {
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { form } from "@heroui/theme";
-import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -72,6 +71,12 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [aboutImage, setAboutImage] = useState<File | undefined>();
@@ -84,8 +89,8 @@ export default function CustomizeTemplatePage() {
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
     brandName: "Brand Name",
-    backgroundColor: "bg-[#00000080]", // bg-black/50
-    textColor: "text-[#FFFFFF]", // text-white
+    backgroundColor: "bg-[primary]", // bg-black/50
+    textColor: "text-[secondary]", // text-white
     logo: {
       src: "/placeholder.png",
       alt: "Custom Logo",
@@ -99,8 +104,8 @@ export default function CustomizeTemplatePage() {
       { label: "About Us", isShown: true },
       { label: "Contact Us", isShown: true },
     ],
-    iconColor: "text-[#FFFFFF]", // text-white
-    dividerColor: "border-[#E5E7EB]", // border-gray-200
+    iconColor: "text-[secondary]", // text-white
+    dividerColor: "border-[accent]", // border-gray-200
     fontFamily: "font-sans",
   };
 
@@ -142,14 +147,14 @@ export default function CustomizeTemplatePage() {
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     titleFont: "font-sans",
-    titleColor: "text-[#FFFFFF]", // text-white
+    titleColor: "text-[primary]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-[#FFFFFF]", // text-white
+    descriptionColor: "text-[secondary]", // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-[#FFFFFF]", // bg-white
-    buttonTextColor: "text-[#000000]", // text-black
+    buttonColor: "bg-[accent]", // bg-white
+    buttonTextColor: "text-[primary]", // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -172,14 +177,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: "text-[secondary]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: "bg-[accent]",
+    showMorebuttonTextColor: "text-[primary]",
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -187,7 +192,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -254,14 +259,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: "text-[secondary]",
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: "bg-[accent]",
+    showMorebuttonTextColor: "text-[primary]",
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -269,7 +274,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -346,7 +351,7 @@ export default function CustomizeTemplatePage() {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-[#000000]", // text-black
+    titleColor: "text-[primary]", // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -366,7 +371,7 @@ export default function CustomizeTemplatePage() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: "text-#4B5563",
+    sectionColor: "text-[secondary]",
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -404,15 +409,15 @@ export default function CustomizeTemplatePage() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: "text-[#000000]", // text-black
+    titleColor: "text-[primary]", // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-[#000000]", // text-black
+    sectionTitleColor: "text-[secondary]", // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-[#000000]", // text-black
+    sectionContentColor: "text-[secondary]", // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -448,10 +453,10 @@ export default function CustomizeTemplatePage() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-[#000000]",
+    titleColor: "text-[primary]",
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-[#000000]",
+    contentColor: "text-[secondary]",
     contentSize: "text-lg",
   };
 
@@ -468,8 +473,8 @@ export default function CustomizeTemplatePage() {
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "Brand Name",
-    backgroundColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    backgroundColor: "bg-[primary]",
+    textColor: "text-[secondary]",
     logo: {
       src: "/placeholder.png",
       alt: "Brand Logo",
@@ -481,7 +486,7 @@ export default function CustomizeTemplatePage() {
         href: "/contact",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: "text-[secondary]",
         isShown: true,
       },
       {
@@ -489,7 +494,7 @@ export default function CustomizeTemplatePage() {
         href: "/about",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: "text-[secondary]",
         isShown: true,
       },
       {
@@ -497,7 +502,7 @@ export default function CustomizeTemplatePage() {
         href: "/policies",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: "text-[secondary]",
         isShown: true,
       },
     ],
@@ -507,14 +512,14 @@ export default function CustomizeTemplatePage() {
     },
     socialMediaStyles: {
       iconSize: 20,
-      iconColor: "text-[#000000]",
-      hoverColor: "text-[#000000]",
+      iconColor: "text-[secondary]",
+      hoverColor: "text-[accent]",
     },
     copyrightStyles: {
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-light",
-      fontColor: "text-[#000000]",
+      fontColor: "text-[secondary]",
     },
   };
 
@@ -548,18 +553,36 @@ export default function CustomizeTemplatePage() {
       SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
     Products: {
-      FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollProductTemplate {...productAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridProductTemplate {...productAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: <GridProductTemplate {...productAttributes} isClickable={false} />,
     },
     Categories: {
-      FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollCategoryTemplate {...categoryAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: (
+        <GridCategoryTemplate {...categoryAttributes} isClickable={false} />
+      ),
     },
     AboutUs: {
       TopImageAbout: <TopImageAbout {...aboutAttributes} />,
@@ -729,7 +752,6 @@ export default function CustomizeTemplatePage() {
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link || "",
           },
-
         }));
 
         setFooterAttributes((prev) => ({
@@ -743,14 +765,19 @@ export default function CustomizeTemplatePage() {
                 : "/placeholder.png",
           },
           socialMedia: {
+            ...(prev.socialMedia || {}),
             facebook:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link || prev.socialMedia.facebook,
+              )?.link ||
+              prev.socialMedia?.facebook ||
+              "",
             instagram:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link || prev.socialMedia.instagram,
+              )?.link ||
+              prev.socialMedia?.instagram ||
+              "",
           },
         }));
 
@@ -1105,7 +1132,7 @@ export default function CustomizeTemplatePage() {
               Access Denied
             </h2>
             <p className="text-gray-600">
-              You don't have permission to access this page.
+              You do not have permission to access this page.
             </p>
           </div>
         </div>

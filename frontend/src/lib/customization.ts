@@ -27,7 +27,14 @@ export interface HeaderCustomizationAttributes {
 }
 
 export interface PromoCustomizationAttributes {
-  template: string;
+  template:
+    | "CenteredPromo"
+    | "LeftAlignedPromo"
+    | "RightAlignedPromo"
+    | "MinimalLeftPromo"
+    | "MinimalRightPromo"
+    | "OverlayPromo"
+    | "SplitPromo";
   id: string;
   slides: {
     title: string;
@@ -56,7 +63,7 @@ export interface PromoCustomizationAttributes {
 
 export interface CategoryCustomizationAttributes {
   id: string;
-  template: string; //
+  template: "FeaturedGrid" | "HorizontalScroll" | "Grid";
   isClickable: boolean; //
   title: string; //
   bgColor: string; //
@@ -95,7 +102,7 @@ export interface CategoryCustomizationAttributes {
 
 export interface ProductCustomizationAttributes {
   id: string;
-  template: string;
+  template: "FeaturedGrid" | "HorizontalScroll" | "Grid";
   isClickable: boolean;
   title: string;
   bgColor: string;
@@ -135,7 +142,11 @@ export interface ProductCustomizationAttributes {
 }
 
 export interface AboutCustomizationAttributes {
-  template: string;
+  template:
+    | "TopImageAbout"
+    | "CenteredAbout"
+    | "LeftAlignedAbout"
+    | "RightAlignedAbout";
   id: string;
   title: string;
   titleColor: string;
@@ -153,11 +164,14 @@ export interface AboutCustomizationAttributes {
   sectionFont: string;
   sectionSize: string;
   sectionFontWeight: string;
-  
 }
 
 export interface PoliciesCustomizationAttributes {
-  template: string;
+  template:
+    | "TitleLeftContentCenterPolicies"
+    | "DefaultPolicies"
+    | "LeftPolicies"
+    | "CenteredPolicies";
   id: string;
   title: string;
   sections: {
@@ -180,7 +194,12 @@ export interface PoliciesCustomizationAttributes {
 }
 
 export interface ContactCustomizationAttributes {
-  template: string;
+  template:
+    | "MinimalRightContact"
+    | "CenteredContact"
+    | "LeftAlignedContact"
+    | "RightAlignedContact"
+    | "MinimalLeftContact";
   id: string;
   title: string;
   address: string;
@@ -236,4 +255,22 @@ export interface FooterCustomizationAttributes {
     fontWeight: string;
     fontColor: string;
   };
+}
+
+export interface CustomizedTemplate {
+  id: string;
+  header: HeaderCustomizationAttributes;
+  PromoSlider?: PromoCustomizationAttributes;
+  Categories?: CategoryCustomizationAttributes;
+  Products?: ProductCustomizationAttributes;
+  AboutUs?: AboutCustomizationAttributes;
+  Policies?: PoliciesCustomizationAttributes;
+  ContactUs?: ContactCustomizationAttributes;
+  footer: FooterCustomizationAttributes;
+}
+
+export interface ColorTheme {
+  primary: string;
+  secondary: string;
+  accent: string;
 }

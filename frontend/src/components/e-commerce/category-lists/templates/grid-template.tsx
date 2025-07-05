@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import FlexibleCard from "@/components/e-commerce/card/card-templates";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface GridCategoryTemplateProps {
   isClickable?: boolean;
@@ -119,6 +119,7 @@ export function GridCategoryTemplate({
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
+  const router = useRouter();
 
   // Generate dynamic grid classes based on columns prop
   const gridCols = cn(
@@ -127,6 +128,13 @@ export function GridCategoryTemplate({
     columns.lg && `lg:grid-cols-${columns.lg}`,
     columns.xl && `xl:grid-cols-${columns.xl}`
   );
+
+  const handleCategoryClick = (categoryName: string) => {
+    if (isClickable && subdomain) {
+      const url = `/e-commerce/${subdomain}/products?category=${encodeURIComponent(categoryName)}`;
+      router.push(url);
+    }
+  };
 
   return (
     <div className={cn("w-full flex-shrink-0")}style={{backgroundColor: bgColor.includes("[")
@@ -154,34 +162,38 @@ export function GridCategoryTemplate({
         )}
         <div className={cn("grid", gridCols, gap)}>
           {categories.map((category) => (
-            <FlexibleCard
-              isClickable={isClickable}
-              key={category._id || category.id  }
-              item={category}
-              type="category"
-              variant={cardVariant}
-              imageRatio={
-                imageHeight === "aspect-square"
-                  ? "square"
-                  : imageHeight === "aspect-[3/4]"
-                  ? "portrait"
-                  : "landscape"
-              }
-              cornerRadius={cornerRadius}
-              showTitle={showCardTitle}
-              showSubtitle={showSubtitle}
-              showCta={showCta}
-              ctaText={ctaText}
-              bgColor={bgColor}
-              textColor={textColor}
-              accentColor={accentColor}
-              borderColor={borderColor}
-              overlayColor={overlayColor}
-              fontFamily={fontFamily}
-              cardShadow={cardShadow}
-              hoverEffect={hoverEffect}
-              linkPath={`/e-commerce/${subdomain}/products`}
-            />
+            <div
+              key={category._id || category.id}
+              className="cursor-pointer"
+              onClick={() => handleCategoryClick(category.name)}
+            >
+              <FlexibleCard
+                isClickable={false}
+                item={category}
+                type="category"
+                variant={cardVariant}
+                imageRatio={
+                  imageHeight === "aspect-square"
+                    ? "square"
+                    : imageHeight === "aspect-[3/4]"
+                    ? "portrait"
+                    : "landscape"
+                }
+                cornerRadius={cornerRadius}
+                showTitle={showCardTitle}
+                showSubtitle={showSubtitle}
+                showCta={showCta}
+                ctaText={ctaText}
+                bgColor={bgColor}
+                textColor={textColor}
+                accentColor={accentColor}
+                borderColor={borderColor}
+                overlayColor={overlayColor}
+                fontFamily={fontFamily}
+                cardShadow={cardShadow}
+                hoverEffect={hoverEffect}
+              />
+            </div>
           ))}
         </div>
         {/* Show More Button */}

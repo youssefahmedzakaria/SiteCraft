@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { BackendCategory, getCategories } from "@/lib/categories";
 
 export default function CategoriesPage({
   // Text configuration props
@@ -49,24 +50,41 @@ export default function CategoriesPage({
   titleFontSize = "text-3xl",
   showMoreButton = false,
 }) {
-  const {
-    categories,
-    statistics,
-    isLoading,
-    error,
-    clearError,
-    fetchCategories,
-  } = useCategoryManagement();
+  const [backendCategories, setBackendCategories] = useState<BackendCategory[]>(
+    []
+  );
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setBackendCategories(data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItemsPerPage, setSelectedItemsPerPage] =
     useState(itemsPerPage);
 
   // Calculate pagination
-  const totalItems = categories.length;
+  const totalItems = backendCategories.length;
   const totalPages = Math.ceil(totalItems / selectedItemsPerPage);
   const startIndex = (currentPage - 1) * selectedItemsPerPage;
   const endIndex = startIndex + selectedItemsPerPage;
-  const currentCategories = categories.slice(startIndex, endIndex);
+  const currentCategories = backendCategories
+    .slice(startIndex, endIndex)
+    .map((category) => ({
+      name: category.name,
+      images: [{ id: category.id, url: category.image, alt: category.name }],
+      id: category.id,
+      Description: category.description,
+      link: `/${category.id}`,
+    }));
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

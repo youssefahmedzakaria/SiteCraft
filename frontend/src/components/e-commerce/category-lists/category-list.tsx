@@ -5,6 +5,7 @@ import { GridCategoryTemplate } from "@/components/e-commerce/category-lists/tem
 import { HorizontalScrollCategoryTemplate } from "@/components/e-commerce/category-lists/templates/horizontal-scroll-template";
 import FeaturedGridCategoryTemplate from "@/components/e-commerce/category-lists/templates/featured-grid-template";
 interface CategoryListProps {
+  isClickable?: boolean;
   categories: any[];
   template?: "grid" | "horizontal" | "featured" | "list";
   // Template customization props
@@ -41,6 +42,7 @@ interface CategoryListProps {
 }
 
 export default function CategoryList({
+  isClickable = true,
   categories,
   template = "grid",
   // Template customization props
@@ -81,6 +83,7 @@ export default function CategoryList({
       case "horizontal":
         return (
           <HorizontalScrollCategoryTemplate
+            isClickable={isClickable}
             categories={categories}
             bgColor={bgColor}
             textColor={textColor}
@@ -116,6 +119,7 @@ export default function CategoryList({
           cardVariant === "default" ? "default" : cardVariant;
         return (
           <FeaturedGridCategoryTemplate
+            isClickable={isClickable}
             categories={categories}
             bgColor={bgColor}
             textColor={textColor}
@@ -148,6 +152,7 @@ export default function CategoryList({
       default: // grid template
         return (
           <GridCategoryTemplate
+            isClickable={isClickable}
             categories={categories}
             bgColor={bgColor}
             textColor={textColor}

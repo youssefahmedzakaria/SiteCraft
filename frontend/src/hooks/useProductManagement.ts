@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
 import {
   Product,
@@ -23,6 +24,7 @@ export const useProductManagement = () => {
   const [isUpdating, setIsUpdating] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState<number | null>(null)
   const [statistics, setStatistics] = useState<ProductStatistics | null>(null)
+  const [backendProduct, setBackendProduct] = useState<Product | null>(null)
   const { isAuthenticated, isLoading: authLoading } = useAuth()
 
   const fetchProducts = async () => {
@@ -54,6 +56,7 @@ export const useProductManagement = () => {
       setError('')
 
       const product = await getProduct(productId)
+      setBackendProduct(product)
       return product
     } catch (err: any) {
       console.error('💥 Error fetching product:', err);
@@ -182,6 +185,7 @@ export const useProductManagement = () => {
   }, [isAuthenticated, authLoading])
 
   return {
+    backendProduct,
     products,
     isLoading: isLoading || authLoading,
     error,
