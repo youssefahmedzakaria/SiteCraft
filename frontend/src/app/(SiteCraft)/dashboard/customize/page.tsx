@@ -1114,7 +1114,7 @@ export default function CustomizeTemplatePage() {
               Access Denied
             </h2>
             <p className="text-gray-600">
-              You don't have permission to access this page.
+              You do not have permission to access this page.
             </p>
           </div>
         </div>

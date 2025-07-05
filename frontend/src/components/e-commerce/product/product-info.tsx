@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Star,
   ShoppingCart,
   Heart,
   Share2,
@@ -18,6 +17,7 @@ import {
 import { ProductVariants } from "@/components/e-commerce/product/product-variants";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type { VariantGroup } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { Product, ProductVariant } from "@/lib/products";
 
 interface ProductInfoProps {
@@ -61,51 +61,29 @@ export function ProductInfo({
   justAddedToFavorites,
   shareClicked,
 }: ProductInfoProps) {
+ 
+
   return (
     <div className="space-y-8">
       {/* Product Title and Rating */}
       <div>
         <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "w-5 h-5",
-                  i < Math.floor(product.rating)
-                    ? "fill-current"
-                    : "text-gray-300"
-                )}
-                style={{
-                  color:
-                    i < Math.floor(product.rating)
-                      ? theme.secondaryColor
-                      : undefined,
-                }}
-              />
-            ))}
-            <span className="ml-2 text-sm opacity-75">
-              ({product.reviewCount} reviews)
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Price Section */}
       <div className="flex items-baseline gap-4">
-        <span className="text-3xl font-bold">${currentVariant.price}</span>
-        {currentVariant.compareAtPrice && (
+        <span className="text-3xl font-bold">${currentVariant.price || 0}</span>
+        {product.discountValue && product.discountValue > 0 && (
           <span className="text-xl opacity-75 line-through">
-            ${currentVariant.compareAtPrice}
+            ${(currentVariant.price || 0) + Number(product.discountValue)}
           </span>
         )}
-        {currentVariant.compareAtPrice && (
+        {product.discountValue && product.discountValue > 0 && (
           <span
             className="text-sm font-medium"
             style={{ color: theme.secondaryColor }}
           >
-            Save ${currentVariant.compareAtPrice - currentVariant.price}
+            Save ${product.discountValue}
           </span>
         )}
       </div>
@@ -170,7 +148,7 @@ export function ProductInfo({
                 : theme.secondaryColor,
               color: theme.backgroundColor,
             }}
-            disabled={!currentVariant.inStock}
+            disabled={!currentVariant.stock || currentVariant.stock <= 0}
           >
             {justAddedToCart ? (
               <>
@@ -185,7 +163,7 @@ export function ProductInfo({
             ) : (
               <>
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {currentVariant.inStock ? "Add to Cart" : "Out of Stock"}
+                {currentVariant.stock && currentVariant.stock > 0 ? "Add to Cart" : "Out of Stock"}
               </>
             )}
             <div
@@ -270,32 +248,38 @@ export function ProductInfo({
           )}
         </div>
 
-        {/* Product Features */}
-        <div className="grid grid-cols-3 gap-4">
-          {product.features.map((feature, index) => (
-            <div
-              key={index}
-              className={cn(
-                "flex items-center gap-3 p-4 group relative",
-                theme.borderRadius
-              )}
-              style={{ backgroundColor: `${theme.secondaryColor}20` }}
-            >
-              <feature.icon className="w-5 h-5" />
-              <div>
-                <h4 className="font-medium text-sm">{feature.title}</h4>
-                <p className="text-sm opacity-75">{feature.description}</p>
-              </div>
+        {/* Product Features - Show attributes if available */}
+        {product.attributes && product.attributes.length > 0 && variantGroups.length === 0 && (
+          <div className="grid grid-cols-3 gap-4">
+            {product.attributes.map((attribute, index) => (
               <div
+                key={index}
                 className={cn(
-                  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
-                  theme.borderRadius,
-                  "bg-black/5"
+                  "flex items-center gap-3 p-4 group relative",
+                  theme.borderRadius
                 )}
-              />
-            </div>
-          ))}
-        </div>
+                style={{ backgroundColor: `${theme.secondaryColor}20` }}
+              >
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <span className="text-xs font-bold">A</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-sm">{attribute.attributeName}</h4>
+                  <p className="text-sm opacity-75">
+                    {attribute.attributeValues.map(v => v.attributeValue).join(", ")}
+                  </p>
+                </div>
+                <div
+                  className={cn(
+                    "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                    theme.borderRadius,
+                    "bg-black/5"
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product Information Tabs */}
@@ -325,42 +309,58 @@ export function ProductInfo({
               )}
             />
           </TabsTrigger>
-          <TabsTrigger
-            value="shipping"
-            className="group relative data-[state=active]:bg-white/30"
-          >
-            Shipping & Returns
-            <div
-              className={cn(
-                "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
-                "bg-black/5"
-              )}
-            />
-          </TabsTrigger>
         </TabsList>
         <TabsContent value="description" className="mt-6">
           <p className="opacity-90 leading-relaxed">{product.description}</p>
         </TabsContent>
         <TabsContent value="specifications" className="mt-6">
-          <div className="space-y-4">
-            <p className="opacity-90 whitespace-pre-line">
-              {
-                product.additionalInfoSections.find(
-                  (section) => section.title === "specifications"
-                )?.description
-              }
-            </p>
-          </div>
-        </TabsContent>
-        <TabsContent value="shipping" className="mt-6">
-          <div className="space-y-4">
-            <p className="opacity-90">
-              Estimated delivery: {product.shipping.estimatedDays} business days
-            </p>
-            <p className="opacity-90">
-              If you are not completely satisfied with your purchase, you can
-              return it within 30 days for a full refund.
-            </p>
+          <div className="space-y-4 opacity-90 whitespace-pre-line">
+            {variantGroups.length > 0 ? (
+              <div className="space-y-4">
+                <h4 className="font-semibold text-lg">Product Specifications</h4>
+                {variantGroups.map((group) => {
+                  const selectedOption = group.options.find(
+                    (option) => option.id === selectedVariants[group.id]
+                  );
+                  
+                  return (
+                    <div key={group.id} className="border-b pb-4">
+                      <h5 className="font-medium mb-2">{group.name}</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {group.options.map((option) => (
+                          <span
+                            key={option.id}
+                            className={cn(
+                              "px-3 py-1 text-sm rounded-full",
+                              option.id === selectedVariants[group.id]
+                                ? "bg-blue-100 text-blue-800 border border-blue-200"
+                                : "bg-gray-100 text-gray-600"
+                            )}
+                          >
+                            {option.label}
+                          </span>
+                        ))}
+                      </div>
+                      {selectedOption && (
+                        <p className="text-sm text-gray-600 mt-2">
+                          Selected: <span className="font-medium">{selectedOption.label}</span>
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : product.attributes && product.attributes.length > 0 ? (
+              <div className="space-y-2">
+                {product.attributes.map((attr, index) => (
+                  <div key={index}>
+                    <strong>{attr.attributeName}:</strong> {attr.attributeValues.map(v => v.attributeValue).join(", ")}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>No specifications available for this product.</div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

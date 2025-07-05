@@ -2,7 +2,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
-import type { VariantGroup } from "@/app/e-commerce/[subdomain]/product/[id]/product";
+import type { VariantGroup, VariantOption } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import Image from "next/image";
 
 interface ProductVariantsProps {
@@ -26,7 +26,7 @@ export function ProductVariants({
 }: ProductVariantsProps) {
   const handleVariantChange = (groupId: string, optionId: string) => {
     const group = variantGroups.find((g) => g.id === groupId);
-    const option = group?.options.find((o) => o.id === optionId);
+    const option = group?.options.find((o: VariantOption) => o.id === optionId);
 
     // If this variant changes images, pass them to the parent
     const productImages = option?.productImages;
@@ -35,7 +35,7 @@ export function ProductVariants({
 
   const renderColorVariant = (group: VariantGroup) => (
     <div className="flex flex-wrap gap-3">
-      {group.options.map((option) => {
+      {group.options.map((option: VariantOption) => {
         const isSelected = selectedVariants[group.id] === option.id;
 
         return (
@@ -78,7 +78,7 @@ export function ProductVariants({
 
   const renderButtonVariant = (group: VariantGroup) => (
     <div className="flex flex-wrap gap-2">
-      {group.options.map((option) => {
+      {group.options.map((option: VariantOption) => {
         const isSelected = selectedVariants[group.id] === option.id;
 
         return (
@@ -109,7 +109,7 @@ export function ProductVariants({
 
   const renderImageGridVariant = (group: VariantGroup) => (
     <div className="grid grid-cols-4 gap-3">
-      {group.options.map((option) => {
+      {group.options.map((option: VariantOption) => {
         const isSelected = selectedVariants[group.id] === option.id;
 
         return (
@@ -166,7 +166,7 @@ export function ProductVariants({
 
   const renderDropdownVariant = (group: VariantGroup) => {
     const selectedOption = group.options.find(
-      (o) => o.id === selectedVariants[group.id]
+      (o: VariantOption) => o.id === selectedVariants[group.id]
     );
 
     return (
@@ -180,7 +180,7 @@ export function ProductVariants({
         )}
       >
         <option value="">Select {group.name}</option>
-        {group.options.map((option) => (
+        {group.options.map((option: VariantOption) => (
           <option key={option.id} value={option.id}>
             {option.label}
             {option.metadata?.priceAdjustment &&
@@ -213,7 +213,7 @@ export function ProductVariants({
     <div className={cn("space-y-6", className)}>
       {variantGroups.map((group) => {
         const selectedOption = group.options.find(
-          (o) => o.id === selectedVariants[group.id]
+          (o: VariantOption) => o.id === selectedVariants[group.id]
         );
 
         return (
@@ -223,11 +223,6 @@ export function ProductVariants({
                 {group.name}
                 {group.required && <span className="text-red-500 ml-1">*</span>}
               </label>
-              {group.changesImages && (
-                <span className="text-xs text-gray-500">
-                  Changes product images
-                </span>
-              )}
             </div>
 
             {renderVariantGroup(group)}
