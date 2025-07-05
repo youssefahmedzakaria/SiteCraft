@@ -204,6 +204,17 @@ public class CustomerService {
         }
     }
 
+    public Customer getCustomer(Long id) {
+        try {
+            Optional<Customer> customer = customerRepo.findById(id);
+            if (customer.isEmpty()) {
+                throw new RuntimeException("Customer not found");
+            }
+            return customer.get();
+        }catch (Exception e) {
+            throw new RuntimeException("Failed to get customer: " + e.getMessage());
+        }
+    }
 
 //    public List<Order> getCustomerOrders(Long customerId) {
 //        /* Optional sanity-check that customer exists */

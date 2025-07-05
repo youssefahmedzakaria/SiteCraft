@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Image from "next/image";
@@ -17,7 +19,6 @@ import { Switch } from "@/components/e-commerce/ui/switch";
 import { usePathname, useRouter } from "next/navigation";
 import { Session } from "inspector/promises";
 import { getSession } from "@/lib/e-commerce/ecommerceAuth";
-import { useAuth } from "@/hooks/e-commerce/ecommerceUseAuth";
 
 // Theme configuration matching product page
 const defaultTheme = {
@@ -48,16 +49,18 @@ interface Order {
     quantity: number;
     price: number;
   }>;
+  shipping?: number;
 }
 
 interface Address {
   id: string;
   type: string;
-  street: string;
   city: string;
-  state: string;
-  zipCode: string;
-  country: string;
+  streetNum: string;
+  buildingNum: string;
+  floorNum: string;
+  apartmentNum: string;
+  landmark: string;
   isDefault: boolean;
 }
 
@@ -66,7 +69,6 @@ export default function ProfilePage() {
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [mock,setMock] = useState<UserData | null>(null);
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [profileData, setProfileData] = useState<UserData | null>(null);
@@ -83,80 +85,120 @@ export default function ProfilePage() {
     {
       id: "1",
       type: "Home",
-      street: "ahmed shafeek street",
       city: "hdaek el kobba",
-      state: "Cairo",
-      zipCode: "12345",
-      country: "Egypt",
+      streetNum: "ahmed shafeek street",
+      buildingNum: "",
+      floorNum: "",
+      apartmentNum: "",
+      landmark: "",
       isDefault: true,
     },
   ]);
   const [newAddress, setNewAddress] = useState({
     type: "",
-    street: "",
     city: "",
-    state: "",
-    zipCode: "",
-    country: "",
+    streetNum: "",
+    buildingNum: "",
+    floorNum: "",
+    apartmentNum: "",
+    landmark: "",
   });
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [editAddress, setEditAddress] = useState({
     type: "",
-    street: "",
     city: "",
-    state: "",
-    zipCode: "",
-    country: "",
+    streetNum: "",
+    buildingNum: "",
+    floorNum: "",
+    apartmentNum: "",
+    landmark: "",
   });
 
-  // Mock orders data
-  const mockOrders: Order[] = [
-    {
-      id: "ORD-001",
-      date: "2024-01-15",
-      status: "Delivered",
-      total: 299.99,
-      items: [{ name: "Diamond Ring", quantity: 1, price: 299.99 }],
-    },
-    {
-      id: "ORD-002",
-      date: "2024-01-10",
-      status: "Shipped",
-      total: 599.98,
-      items: [
-        { name: "Gold Necklace", quantity: 1, price: 399.99 },
-        { name: "Pearl Earrings", quantity: 1, price: 199.99 },
-      ],
-    },
-    {
-      id: "ORD-003",
-      date: "2024-01-05",
-      status: "Processing",
-      total: 149.99,
-      items: [{ name: "Silver Bracelet", quantity: 1, price: 149.99 }],
-    },
-  ];
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [addressLoading, setAddressLoading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(`/e-commerce/${subdomain}/login`);
-      return;
-    }
-
-    // Set mock user data directly
-    const mockUser: UserData = {
-      id: 1,
-      firstName: "amna",
-      lastName: "yahia",
-      email: "amnayahia@gmail.com",
-      phone: "+201117518970",
-      avatar: "/placeholder.png?height=100&width=100",
+    const checkSessionAndFetch = async () => {
+      setIsLoading(true);
+      const session = await getSession();
+      if (!session || !session.customerId) {
+        router.push(`/e-commerce/${subdomain}/login`);
+        return;
+      }
+      // If customerId exists, fetch customer data
+      await fetchCustomerData();
     };
-    setMock(mockUser);
-    setProfileData(mockUser);
-    setIsLoading(false);
+    checkSessionAndFetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  const fetchCustomerData = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/customer/getCustomer", {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.success && data.customer) {
+        // Split name into firstName and lastName if possible
+        let firstName = "";
+        let lastName = "";
+        if (data.customer.name) {
+          const nameParts = data.customer.name.split(" ");
+          firstName = nameParts[0] || "";
+          lastName = nameParts.slice(1).join(" ") || "";
+        }
+        setProfileData({
+          id: data.customer.id,
+          firstName,
+          lastName,
+          email: data.customer.email,
+          phone: data.customer.phone,
+          avatar: data.customer.avatar || "/placeholder.png?height=100&width=100",
+        });
+        // Map backend addresses to frontend Address type
+        setAddresses(
+          (data.customer.addresses || []).map((addr: any) => ({
+            id: String(addr.id),
+            type: addr.title || "Home",
+            city: addr.city || "",
+            streetNum: addr.streetNum || "",
+            buildingNum: addr.buildingNum || "",
+            floorNum: addr.floorNum || "",
+            apartmentNum: addr.apartmentNum || "",
+            landmark: addr.landmark || "",
+            isDefault: false, // Backend does not provide, so default to false
+          }))
+        );
+        // Map backend orders to frontend Order type
+        setOrders(
+          (data.customer.orders || []).map((order: any) => ({
+            id: String(order.id),
+            date: order.issueDate ? order.issueDate : new Date().toISOString(),
+            status: order.status || "Pending",
+            total: order.price || 0,
+            shipping: order.shipping?.cost ?? 0,
+            items: (order.orderProducts || []).map((prod: any) => ({
+              name: prod.sku || "Product",
+              quantity: prod.quantity || 1,
+              price: prod.price || 0,
+            })),
+          }))
+        );
+      } else {
+        setProfileData(null);
+        setAddresses([]);
+        setOrders([]);
+      }
+    } catch (error) {
+      setProfileData(null);
+      setAddresses([]);
+      setOrders([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleProfileUpdate = (field: keyof UserData, value: string) => {
     setProfileData((prev) => (prev ? { ...prev, [field]: value } : null));
@@ -179,90 +221,172 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLogout = (): void => {
-    localStorage.removeItem("token");
-    router.push(`/e-commerce/${subdomain}/login`);
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await fetch("http://localhost:8080/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      // Optionally handle error, but always redirect
+    } finally {
+      router.push(`/e-commerce/${subdomain}/login`);
+    }
   };
 
-  const handleSaveProfile = () => {
-    setMock(profileData);
-    alert("Profile updated successfully!");
+  const handleSaveProfile = async () => {
+    if (!profileData) return;
+    setIsSaving(true);
+    try {
+      // Combine firstName and lastName into name
+      const payload = {
+        name: `${profileData.firstName} ${profileData.lastName}`.trim(),
+        email: profileData.email,
+        phone: profileData.phone,
+      };
+      const res = await fetch("http://localhost:8080/customer/updateCustomerInfo", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Profile updated successfully!");
+        // Optionally, refetch profile data here
+      } else {
+        alert(data.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      alert("An error occurred while updating the profile.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleAddAddress = () => {
-    if (!newAddress.type || !newAddress.street || !newAddress.city) {
+  const handleAddAddress = async () => {
+    if (!newAddress.type || !newAddress.city) {
       alert("Please fill in all required fields");
       return;
     }
-
-    const addressToAdd = {
-      id: Date.now().toString(),
-      ...newAddress,
-      isDefault: addresses.length === 0,
-    };
-
-    setAddresses([...addresses, addressToAdd]);
-    setNewAddress({
-      type: "",
-      street: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-    });
-    setShowAddAddress(false);
-    alert("Address added successfully!");
+    setAddressLoading(true);
+    try {
+      const payload = {
+        title: newAddress.type,
+        city: newAddress.city,
+        streetNum: newAddress.streetNum,
+        buildingNum: newAddress.buildingNum,
+        floorNum: newAddress.floorNum,
+        apartmentNum: newAddress.apartmentNum,
+        landmark: newAddress.landmark,
+      };
+      const res = await fetch("http://localhost:8080/customer/addAddress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowAddAddress(false);
+        setNewAddress({ type: "", city: "", streetNum: "", buildingNum: "", floorNum: "", apartmentNum: "", landmark: "" });
+        await fetchCustomerData();
+        alert("Address added successfully!");
+      } else {
+        alert(data.message || "Failed to add address.");
+      }
+    } catch (error) {
+      alert("An error occurred while adding the address.");
+    } finally {
+      setAddressLoading(false);
+    }
   };
 
-  const handleDeleteAddress = (addressId: string) => {
-    setAddresses(addresses.filter((addr) => addr.id !== addressId));
+  const handleDeleteAddress = async (addressId: string) => {
+    if (!window.confirm("Are you sure you want to delete this address?")) return;
+    setAddressLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8080/customer/deleteAddress/${addressId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchCustomerData();
+        alert("Address deleted successfully!");
+      } else {
+        alert(data.message || "Failed to delete address.");
+      }
+    } catch (error) {
+      alert("An error occurred while deleting the address.");
+    } finally {
+      setAddressLoading(false);
+    }
   };
 
   const handleEditAddress = (address: Address) => {
     setEditingAddressId(address.id);
     setEditAddress({
       type: address.type,
-      street: address.street,
       city: address.city,
-      state: address.state,
-      zipCode: address.zipCode,
-      country: address.country,
+      streetNum: address.streetNum || "",
+      buildingNum: address.buildingNum || "",
+      floorNum: address.floorNum || "",
+      apartmentNum: address.apartmentNum || "",
+      landmark: address.landmark || "",
     });
   };
 
-  const handleUpdateAddress = () => {
-    if (!editAddress.type || !editAddress.street || !editAddress.city) {
+  const handleUpdateAddress = async () => {
+    if (!editAddress.type || !editAddress.city) {
       alert("Please fill in all required fields");
       return;
     }
-
-    setAddresses(
-      addresses.map((addr) =>
-        addr.id === editingAddressId ? { ...addr, ...editAddress } : addr
-      )
-    );
-
-    setEditingAddressId(null);
-    setEditAddress({
-      type: "",
-      street: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-    });
-    alert("Address updated successfully!");
+    setAddressLoading(true);
+    try {
+      const payload = {
+        title: editAddress.type,
+        city: editAddress.city,
+        streetNum: editAddress.streetNum,
+        buildingNum: editAddress.buildingNum,
+        floorNum: editAddress.floorNum,
+        apartmentNum: editAddress.apartmentNum,
+        landmark: editAddress.landmark,
+      };
+      const res = await fetch(`http://localhost:8080/customer/updateAddress/${editingAddressId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingAddressId(null);
+        setEditAddress({ type: "", city: "", streetNum: "", buildingNum: "", floorNum: "", apartmentNum: "", landmark: "" });
+        await fetchCustomerData();
+        alert("Address updated successfully!");
+      } else {
+        alert(data.message || "Failed to update address.");
+      }
+    } catch (error) {
+      alert("An error occurred while updating the address.");
+    } finally {
+      setAddressLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
     setEditingAddressId(null);
     setEditAddress({
       type: "",
-      street: "",
       city: "",
-      state: "",
-      zipCode: "",
-      country: "",
+      streetNum: "",
+      buildingNum: "",
+      floorNum: "",
+      apartmentNum: "",
+      landmark: "",
     });
   };
 
@@ -295,7 +419,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  if (!profileData) {
     return null;
   }
 
@@ -349,7 +473,7 @@ export default function ProfilePage() {
             className="space-y-6"
           >
             <TabsList
-              className={`grid w-full grid-cols-3 ${defaultTheme.borderRadius}`}
+              className={`grid w-full grid-cols-2 ${defaultTheme.borderRadius}`}
               style={{ backgroundColor: defaultTheme.secondaryColor }}
             >
               <TabsTrigger
@@ -365,13 +489,6 @@ export default function ProfilePage() {
               >
                 <Package className="w-4 h-4" />
                 Orders
-              </TabsTrigger>
-              <TabsTrigger
-                value="settings"
-                className="flex items-center gap-2 text-white data-[state=active]:bg-white data-[state=active]:text-black"
-              >
-                <Settings className="w-4 h-4" />
-                Settings
               </TabsTrigger>
             </TabsList>
 
@@ -438,11 +555,10 @@ export default function ProfilePage() {
                       id="email"
                       type="email"
                       value={profileData?.email || ""}
-                      onChange={(e) =>
-                        handleProfileUpdate("email", e.target.value)
-                      }
+                      onChange={(e) => handleProfileUpdate("email", e.target.value)}
                       className={`border-2 ${defaultTheme.borderRadius}`}
                       style={{ borderColor: defaultTheme.secondaryColor }}
+                      readOnly
                     />
                   </div>
                   <div>
@@ -466,8 +582,9 @@ export default function ProfilePage() {
                     onClick={handleSaveProfile}
                     className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
                     style={{ backgroundColor: defaultTheme.secondaryColor }}
+                    disabled={isSaving}
                   >
-                    Save Changes
+                    {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               </div>
@@ -522,11 +639,8 @@ export default function ProfilePage() {
                                 opacity: 0.7,
                               }}
                             >
-                              {address.street}
-                              <br />
-                              {address.city}, {address.state} {address.zipCode}
-                              <br />
-                              {address.country}
+                              {address.city}<br />
+                              {address.streetNum}
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -539,6 +653,7 @@ export default function ProfilePage() {
                                 color: defaultTheme.textColor,
                               }}
                               onClick={() => handleEditAddress(address)}
+                              disabled={addressLoading}
                             >
                               Edit
                             </Button>
@@ -547,6 +662,7 @@ export default function ProfilePage() {
                               size="sm"
                               className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 ${defaultTheme.borderRadius}`}
                               onClick={() => handleDeleteAddress(address.id)}
+                              disabled={addressLoading}
                             >
                               Delete
                             </Button>
@@ -555,178 +671,97 @@ export default function ProfilePage() {
                       </div>
 
                       {editingAddressId === address.id && (
-                        <div
-                          className={`p-4 border ${defaultTheme.borderRadius}`}
-                          style={{
-                            borderColor: defaultTheme.secondaryColor,
-                            backgroundColor: defaultTheme.accentColor,
-                          }}
-                        >
-                          <h4
-                            className="text-lg font-semibold mb-4"
-                            style={{ color: defaultTheme.textColor }}
-                          >
+                        <div className={`p-4 border ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor, backgroundColor: defaultTheme.accentColor }}>
+                          <h4 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
                             Edit Address
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label
-                                htmlFor="editAddressType"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                Address Type *
-                              </Label>
+                              <Label htmlFor="editAddressType" style={{ color: defaultTheme.textColor }}>Title *</Label>
                               <Input
                                 id="editAddressType"
                                 value={editAddress.type}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    type: e.target.value,
-                                  })
-                                }
+                                onChange={e => setEditAddress({ ...editAddress, type: e.target.value })}
                                 placeholder="e.g., Home, Work, Office"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
                               />
                             </div>
                             <div>
-                              <Label
-                                htmlFor="editCountry"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                Country
-                              </Label>
-                              <Input
-                                id="editCountry"
-                                value={editAddress.country}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    country: e.target.value,
-                                  })
-                                }
-                                placeholder="Country"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
-                              />
-                            </div>
-                            <div className="md:col-span-2">
-                              <Label
-                                htmlFor="editStreet"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                Street Address *
-                              </Label>
-                              <Input
-                                id="editStreet"
-                                value={editAddress.street}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    street: e.target.value,
-                                  })
-                                }
-                                placeholder="Street address"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
-                              />
-                            </div>
-                            <div>
-                              <Label
-                                htmlFor="editCity"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                City *
-                              </Label>
+                              <Label htmlFor="editCity" style={{ color: defaultTheme.textColor }}>City *</Label>
                               <Input
                                 id="editCity"
                                 value={editAddress.city}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    city: e.target.value,
-                                  })
-                                }
+                                onChange={e => setEditAddress({ ...editAddress, city: e.target.value })}
                                 placeholder="City"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
                               />
                             </div>
                             <div>
-                              <Label
-                                htmlFor="editState"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                State/Province
-                              </Label>
+                              <Label htmlFor="editStreetNum" style={{ color: defaultTheme.textColor }}>Street Number</Label>
                               <Input
-                                id="editState"
-                                value={editAddress.state}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    state: e.target.value,
-                                  })
-                                }
-                                placeholder="State/Province"
+                                id="editStreetNum"
+                                value={editAddress.streetNum}
+                                onChange={e => setEditAddress({ ...editAddress, streetNum: e.target.value })}
+                                placeholder="Street Number"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
                               />
                             </div>
                             <div>
-                              <Label
-                                htmlFor="editZipCode"
-                                style={{ color: defaultTheme.textColor }}
-                              >
-                                ZIP/Postal Code
-                              </Label>
+                              <Label htmlFor="editBuildingNum" style={{ color: defaultTheme.textColor }}>Building Number</Label>
                               <Input
-                                id="editZipCode"
-                                value={editAddress.zipCode}
-                                onChange={(e) =>
-                                  setEditAddress({
-                                    ...editAddress,
-                                    zipCode: e.target.value,
-                                  })
-                                }
-                                placeholder="ZIP/Postal Code"
+                                id="editBuildingNum"
+                                value={editAddress.buildingNum}
+                                onChange={e => setEditAddress({ ...editAddress, buildingNum: e.target.value })}
+                                placeholder="Building Number"
                                 className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{
-                                  borderColor: defaultTheme.secondaryColor,
-                                }}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editFloorNum" style={{ color: defaultTheme.textColor }}>Floor Number</Label>
+                              <Input
+                                id="editFloorNum"
+                                value={editAddress.floorNum}
+                                onChange={e => setEditAddress({ ...editAddress, floorNum: e.target.value })}
+                                placeholder="Floor Number"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="editApartmentNum" style={{ color: defaultTheme.textColor }}>Apartment Number</Label>
+                              <Input
+                                id="editApartmentNum"
+                                value={editAddress.apartmentNum}
+                                onChange={e => setEditAddress({ ...editAddress, apartmentNum: e.target.value })}
+                                placeholder="Apartment Number"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
+                              />
+                            </div>
+                            <div className="md:col-span-2">
+                              <Label htmlFor="editLandmark" style={{ color: defaultTheme.textColor }}>Landmark</Label>
+                              <Input
+                                id="editLandmark"
+                                value={editAddress.landmark}
+                                onChange={e => setEditAddress({ ...editAddress, landmark: e.target.value })}
+                                placeholder="Landmark"
+                                className={`border-2 ${defaultTheme.borderRadius}`}
+                                style={{ borderColor: defaultTheme.secondaryColor }}
                               />
                             </div>
                           </div>
                           <div className="flex gap-2 mt-4">
-                            <Button
-                              onClick={handleUpdateAddress}
-                              className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                              style={{
-                                backgroundColor: defaultTheme.secondaryColor,
-                              }}
-                            >
+                            <Button onClick={handleUpdateAddress} className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                              style={{ backgroundColor: defaultTheme.secondaryColor }} disabled={addressLoading}>
                               Update Address
                             </Button>
-                            <Button
-                              onClick={handleCancelEdit}
-                              variant="outline"
-                              className={`border-2 ${defaultTheme.borderRadius}`}
-                              style={{
-                                borderColor: defaultTheme.secondaryColor,
-                                color: defaultTheme.textColor,
-                              }}
-                            >
+                            <Button onClick={handleCancelEdit} variant="outline" className={`border-2 ${defaultTheme.borderRadius}`}
+                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}>
                               Cancel
                             </Button>
                           </div>
@@ -764,127 +799,78 @@ export default function ProfilePage() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label
-                          htmlFor="addressType"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          Address Type *
-                        </Label>
+                        <Label htmlFor="addressType" style={{ color: defaultTheme.textColor }}>Title *</Label>
                         <Input
                           id="addressType"
                           value={newAddress.type}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              type: e.target.value,
-                            })
-                          }
+                          onChange={e => setNewAddress({ ...newAddress, type: e.target.value })}
                           placeholder="e.g., Home, Work, Office"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label
-                          htmlFor="country"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          Country
-                        </Label>
-                        <Input
-                          id="country"
-                          value={newAddress.country}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              country: e.target.value,
-                            })
-                          }
-                          placeholder="Country"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label
-                          htmlFor="street"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          Street Address *
-                        </Label>
-                        <Input
-                          id="street"
-                          value={newAddress.street}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              street: e.target.value,
-                            })
-                          }
-                          placeholder="Street address"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
-                        />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="city"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          City *
-                        </Label>
+                        <Label htmlFor="city" style={{ color: defaultTheme.textColor }}>City *</Label>
                         <Input
                           id="city"
                           value={newAddress.city}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              city: e.target.value,
-                            })
-                          }
+                          onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
                           placeholder="City"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label
-                          htmlFor="state"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          State/Province
-                        </Label>
+                        <Label htmlFor="streetNum" style={{ color: defaultTheme.textColor }}>Street Number</Label>
                         <Input
-                          id="state"
-                          value={newAddress.state}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              state: e.target.value,
-                            })
-                          }
-                          placeholder="State/Province"
+                          id="streetNum"
+                          value={newAddress.streetNum}
+                          onChange={e => setNewAddress({ ...newAddress, streetNum: e.target.value })}
+                          placeholder="Street Number"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
                       </div>
                       <div>
-                        <Label
-                          htmlFor="zipCode"
-                          style={{ color: defaultTheme.textColor }}
-                        >
-                          ZIP/Postal Code
-                        </Label>
+                        <Label htmlFor="buildingNum" style={{ color: defaultTheme.textColor }}>Building Number</Label>
                         <Input
-                          id="zipCode"
-                          value={newAddress.zipCode}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              zipCode: e.target.value,
-                            })
-                          }
-                          placeholder="ZIP/Postal Code"
+                          id="buildingNum"
+                          value={newAddress.buildingNum}
+                          onChange={e => setNewAddress({ ...newAddress, buildingNum: e.target.value })}
+                          placeholder="Building Number"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="floorNum" style={{ color: defaultTheme.textColor }}>Floor Number</Label>
+                        <Input
+                          id="floorNum"
+                          value={newAddress.floorNum}
+                          onChange={e => setNewAddress({ ...newAddress, floorNum: e.target.value })}
+                          placeholder="Floor Number"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="apartmentNum" style={{ color: defaultTheme.textColor }}>Apartment Number</Label>
+                        <Input
+                          id="apartmentNum"
+                          value={newAddress.apartmentNum}
+                          onChange={e => setNewAddress({ ...newAddress, apartmentNum: e.target.value })}
+                          placeholder="Apartment Number"
+                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          style={{ borderColor: defaultTheme.secondaryColor }}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="landmark" style={{ color: defaultTheme.textColor }}>Landmark</Label>
+                        <Input
+                          id="landmark"
+                          value={newAddress.landmark}
+                          onChange={e => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                          placeholder="Landmark"
                           className={`border-2 ${defaultTheme.borderRadius}`}
                           style={{ borderColor: defaultTheme.secondaryColor }}
                         />
@@ -931,7 +917,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 <div className="space-y-4">
-                  {mockOrders.map((order) => (
+                  {orders.map((order) => (
                     <div
                       key={order.id}
                       className={`border ${defaultTheme.borderRadius} p-4 hover:shadow-md transition-shadow`}
@@ -1019,99 +1005,7 @@ export default function ProfilePage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="settings" className="space-y-6">
-              <div
-                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
-              >
-                <div className="flex items-center gap-2 mb-6">
-                  <Bell
-                    className="w-5 h-5"
-                    style={{ color: defaultTheme.textColor }}
-                  />
-                  <div>
-                    <h2
-                      className="text-xl font-semibold"
-                      style={{ color: defaultTheme.textColor }}
-                    >
-                      Notifications
-                    </h2>
-                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
-                      Manage your notification preferences
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p
-                        className="font-medium"
-                        style={{ color: defaultTheme.textColor }}
-                      >
-                        Order Updates
-                      </p>
-                      <p
-                        className="text-sm"
-                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
-                      >
-                        Get notified about order status changes
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notifications.orderUpdates}
-                      onCheckedChange={(checked: boolean) =>
-                        handleNotificationChange("orderUpdates", checked)
-                      }
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p
-                        className="font-medium"
-                        style={{ color: defaultTheme.textColor }}
-                      >
-                        Promotions
-                      </p>
-                      <p
-                        className="text-sm"
-                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
-                      >
-                        Receive promotional offers and discounts
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notifications.promotions}
-                      onCheckedChange={(checked: boolean) =>
-                        handleNotificationChange("promotions", checked)
-                      }
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p
-                        className="font-medium"
-                        style={{ color: defaultTheme.textColor }}
-                      >
-                        Newsletter
-                      </p>
-                      <p
-                        className="text-sm"
-                        style={{ color: defaultTheme.textColor, opacity: 0.7 }}
-                      >
-                        Stay updated with our latest news
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notifications.newsletter}
-                      onCheckedChange={(checked: boolean) =>
-                        handleNotificationChange("newsletter", checked)
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
+            
 
             <TabsContent value="order-details" className="space-y-6">
               {selectedOrderId && (
@@ -1142,12 +1036,12 @@ export default function ProfilePage() {
                   </div>
 
                   {(() => {
-                    const order = mockOrders.find(
+                    const order = orders.find(
                       (o) => o.id === selectedOrderId
                     );
                     if (!order) return null;
 
-                    const shipping = order.total > 500 ? 0 : 25;
+                    const shipping = order.shipping ?? 0;
                     const tax = order.total * 0.08;
                     const subtotal = order.total - tax - shipping;
 
@@ -1250,9 +1144,7 @@ export default function ProfilePage() {
                                   Shipping
                                 </span>
                                 <span style={{ color: defaultTheme.textColor }}>
-                                  {shipping === 0
-                                    ? "Free"
-                                    : `$${shipping.toFixed(2)}`}
+                                  {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
                                 </span>
                               </div>
 

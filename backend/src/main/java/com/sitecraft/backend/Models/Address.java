@@ -1,11 +1,13 @@
 package com.sitecraft.backend.Models;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 // Address.java
 @Entity
 @Table(name = "Address")
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Address {
 
     @Id
@@ -22,7 +24,7 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
+    @JsonBackReference
     private Customer customer;
 
     public Address(Long id, String title, String city, String streetNum, String buildingNum, String floorNum, String apartmentNum, String landmark, Customer customer) {

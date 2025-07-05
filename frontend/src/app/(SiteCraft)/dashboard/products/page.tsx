@@ -28,6 +28,14 @@ import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { SimplifiedProduct } from "@/lib/products";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/SiteCraft/ui/dialog";
+import { Label } from "@/components/SiteCraft/ui/label";
+import { Input } from "@/components/SiteCraft/ui/input";
 
 export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
@@ -42,6 +50,9 @@ export default function ProductPage() {
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [stockValues, setStockValues] = useState([{ value: "Stock", stock: 0 }]);
+  const [selectedProductForStock, setSelectedProductForStock] = useState<SimplifiedProduct | null>(null);
 
   const {
     products,
@@ -92,9 +103,9 @@ export default function ProductPage() {
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
     // Filter by category
     if (categoryFilter !== "All Categories") {
-      if (!product.categoryId) return false;
-      const category = categories.find(c => c.id === product.categoryId);
-      if (!category || category.name !== categoryFilter) {
+      if (!product.categories || product.categories.length === 0) return false;
+      const hasMatchingCategory = product.categories.some(cat => cat.name === categoryFilter);
+      if (!hasMatchingCategory) {
         return false;
       }
     }
@@ -149,9 +160,8 @@ export default function ProductPage() {
   const handleSelectByCategory = (category: string) => {
     const categoryProducts = filteredProducts.filter(
       (product: SimplifiedProduct) => {
-        if (!product.categoryId) return false;
-        const categoryObj = categories.find(c => c.id === product.categoryId);
-        return categoryObj && categoryObj.name === category;
+        if (!product.categories || product.categories.length === 0) return false;
+        return product.categories.some(cat => cat.name === category);
       }
     );
     const newSelection = [...selectedProducts];
@@ -210,6 +220,26 @@ export default function ProductPage() {
   const handleRefreshAll = () => {
     refetchStats();
     fetchProducts();
+  };
+
+  const handleSetStock = (product: SimplifiedProduct) => {
+    setSelectedProductForStock(product);
+    // For now, just show a simple stock input
+    setStockValues([{ value: "Total Stock", stock: product.stock }]);
+    setShowStockModal(true);
+  };
+
+  const handleSaveStock = () => {
+    if (selectedProductForStock && stockValues.length > 0) {
+      const newStock = stockValues[0].stock;
+      console.log(`Setting stock for product ${selectedProductForStock.id} to ${newStock}`);
+      // Here you would typically make an API call to update the product stock
+      // For now, we'll just close the modal
+      setShowStockModal(false);
+      setSelectedProductForStock(null);
+      // Optionally refresh the products list
+      fetchProducts();
+    }
   };
 
   if (isLoading) {
@@ -459,46 +489,62 @@ export default function ProductPage() {
           />
         )}
 
-        {/* Product listing table */}
-        <div className="border rounded-lg border-logo-border overflow-hidden mt-6">
-          <table className="min-w-full divide-y divide-logo-border">
-            <ProductTableHeader
-              selectAll={selectAll}
-              onSelectAll={handleSelectAll}
-              selectedProducts={selectedProducts}
-              categories={categories}
-              filteredProducts={filteredProducts}
-              setSelectedProducts={setSelectedProducts}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
-            />
-            <tbody className="bg-white divide-y divide-logo-border">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product: SimplifiedProduct) => (
-                  <ProductRecord 
-                    key={product.id} 
+        {/* Products Table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <ProductTableHeader
+                onSelectAll={handleSelectAll}
+                selectAll={selectAll}
+              />
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredProducts.map((product) => (
+                  <ProductRecord
+                    key={product.id}
                     product={product}
                     categories={categories}
                     isSelected={selectedProducts.includes(product.id)}
                     onSelect={() => handleSelectProduct(product.id)}
                     fetchProducts={fetchProducts}
+                    onSetStock={() => handleSetStock(product)}
                   />
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="py-8 text-center text-muted-foreground"
-                  >
-                    {products.length === 0
-                      ? "No products found. Try adding your first product."
-                      : "No products match your filters."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {/* Stock Modal */}
+        <Dialog open={showStockModal} onOpenChange={setShowStockModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Set Stock for Variations</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {stockValues.map((item, idx) => (
+                <div key={idx} className="flex items-center space-x-4">
+                  <Label className="flex-1">{item.value}</Label>
+                  <Input
+                    type="number"
+                    value={item.stock}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const newStock = [...stockValues];
+                      newStock[idx].stock = Number(e.target.value);
+                      setStockValues(newStock);
+                    }}
+                    className="w-24"
+                  />
+                </div>
+              ))}
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowStockModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveStock}>Save</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

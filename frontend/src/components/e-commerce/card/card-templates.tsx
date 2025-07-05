@@ -399,7 +399,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden",
+                "relative overflow-hidden",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -468,7 +468,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden",
+                "relative overflow-hidden",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -505,7 +505,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden mb-3",
+                "relative overflow-hidden mb-3",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -623,7 +623,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative h-64 md:h-80 bg-slate-100 overflow-hidden",
+                "relative h-64 md:h-80 overflow-hidden",
                 radiusClass,
                 cardShadow,
                 imageClassName
@@ -684,7 +684,7 @@ export default function FlexibleCard({
           <ContentWrapper>
             <div
               className={cn(
-                "relative bg-slate-100 overflow-hidden mb-3",
+                "relative overflow-hidden mb-3",
                 aspectRatioClass,
                 radiusClass,
                 cardShadow,
@@ -745,9 +745,7 @@ export default function FlexibleCard({
                     }
                   }}
                   className={cn(
-                    "text-xs text-white px-3 py-1 rounded-full",
-                    buttonBgClass,
-                    buttonHoverClass
+                    "text-xs text-white bg-blue-500 px-3 py-1 rounded-full hover:bg-blue-600 transition-colors duration-300 ",
                   )}
                 >
                   {ctaText}

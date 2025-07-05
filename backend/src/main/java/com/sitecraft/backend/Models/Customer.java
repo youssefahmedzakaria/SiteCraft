@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -42,14 +43,17 @@ public class Customer {
     private Store store;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Order> orders;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Review> reviews;
 
-    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, LocalDateTime createdAt, LocalDateTime updatedAt, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews) {
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Address> addresses;
+
+    public Customer(Long id, String name, String email, String password, String gender, String phone, String status, LocalDateTime createdAt, LocalDateTime updatedAt, WishList wishList, ShoppingCart shoppingCart, Store store, List<Order> orders, List<Review> reviews, List<Address> addresses) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -64,6 +68,7 @@ public class Customer {
         this.store = store;
         this.orders = orders;
         this.reviews = reviews;
+        this.addresses = addresses;
     }
 
     public Customer() {
@@ -179,5 +184,13 @@ public class Customer {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
     }
 }

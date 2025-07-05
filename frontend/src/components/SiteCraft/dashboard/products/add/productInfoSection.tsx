@@ -11,8 +11,7 @@ import { deleteProductImage, getCategories } from '@/lib/products';
 interface BasicFormData {
   name: string;
   description: string;
-  categoryId?: number; // Keep for backward compatibility
-  categoryIds?: number[]; // New field for multiple categories
+  categoryIds?: number[];
 }
 
 interface ProductInfoSectionProps {
@@ -82,8 +81,7 @@ export function ProductInfoSection({
     }
     
     updateFormData({ 
-      categoryIds: newCategoryIds,
-      categoryId: newCategoryIds.length > 0 ? newCategoryIds[0] : undefined // Keep first for backward compatibility
+      categoryIds: newCategoryIds
     });
   };
 

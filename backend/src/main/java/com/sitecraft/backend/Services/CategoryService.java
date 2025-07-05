@@ -1,6 +1,7 @@
 package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.Models.Category;
+import com.sitecraft.backend.Models.Customer;
 import com.sitecraft.backend.Models.Product;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Repositories.CategoryRepo;
