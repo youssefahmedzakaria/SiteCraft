@@ -253,6 +253,16 @@ export default function CustomizeTemplatePage() {
     setCategoryAttributes((prev) => ({ ...prev, ...updates }));
   };
 
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 categories
+  useEffect(() => {
+    if (
+      categoryAttributes.template === "FeaturedGrid" &&
+      (categoryAttributes.categories?.length || 0) < 3
+    ) {
+      setCategoryAttributes((prev) => ({ ...prev, template: "Grid" }));
+    }
+  }, [categoryAttributes.categories?.length, categoryAttributes.template]);
+
   const initialProduct: ProductCustomizationAttributes = {
     id: "products",
     template: "HorizontalScroll", // You can adjust this if needed
@@ -346,6 +356,16 @@ export default function CustomizeTemplatePage() {
   ) => {
     setProductAttributes((prev) => ({ ...prev, ...updates }));
   };
+
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 products
+  useEffect(() => {
+    if (
+      productAttributes.template === "FeaturedGrid" &&
+      (productAttributes.products?.length || 0) < 3
+    ) {
+      setProductAttributes((prev) => ({ ...prev, template: "Grid" }));
+    }
+  }, [productAttributes.products?.length, productAttributes.template]);
 
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
@@ -647,7 +667,7 @@ export default function CustomizeTemplatePage() {
           productsRes.json(),
           categoriesRes.json(),
         ]);
-
+      console.log(productsData);
       if (
         templateData.success &&
         templateData["Customized Template"] &&
@@ -789,7 +809,7 @@ export default function CustomizeTemplatePage() {
             description: product.description,
             discountType: product.discountType,
             discountValue: product.discountValue,
-            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            price: product.variants && product.variants.length > 0 && product.variants[0]?.price ? product.variants[0].price : 0.0,
             images: [
               {
                 id:
@@ -1336,9 +1356,23 @@ export default function CustomizeTemplatePage() {
                   break;
                 case "Products":
                   template = productAttributes.template;
+                  // Auto-fallback to Grid if FeaturedGrid is selected but less than 3 products
+                  if (
+                    template === "FeaturedGrid" &&
+                    (productAttributes.products?.length || 0) < 3
+                  ) {
+                    template = "Grid";
+                  }
                   break;
                 case "Categories":
                   template = categoryAttributes.template;
+                  // Auto-fallback to Grid if FeaturedGrid is selected but less than 3 categories
+                  if (
+                    template === "FeaturedGrid" &&
+                    (categoryAttributes.categories?.length || 0) < 3
+                  ) {
+                    template = "Grid";
+                  }
                   break;
                 case "AboutUs":
                   template = aboutAttributes.template;

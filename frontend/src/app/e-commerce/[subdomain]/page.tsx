@@ -593,7 +593,7 @@ export default function Home() {
             description: product.description,
             discountType: product.discountType,
             discountValue: product.discountValue,
-            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            price: product.variants && product.variants.length > 0 && product.variants[0]?.price ? product.variants[0].price : 0.0,
             images: [
               {
                 id:

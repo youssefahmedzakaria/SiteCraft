@@ -1,8 +1,8 @@
 "use client";
+import React, { useState } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { ProductLayoutItems } from "./productLayoutItems";
 import { ProductCustomizationAttributes } from "@/lib/customization";
-import { useState } from "react";
 import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
@@ -69,6 +69,13 @@ export function RenderProductSection({
     updateProductAttributes({ cardVariant: "default" });
   };
 
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 products
+  React.useEffect(() => {
+    if (productAttributes.template === "FeaturedGrid" && (productAttributes.products?.length || 0) < 3) {
+      updateProductAttributes({ template: "Grid" });
+    }
+  }, [productAttributes.products?.length, productAttributes.template, updateProductAttributes]);
+
   return (
     <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
@@ -108,6 +115,7 @@ export function RenderProductSection({
               ].indexOf(productAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}
+            itemCount={productAttributes.products?.length || 0}
           />
 
           {/* General */}
