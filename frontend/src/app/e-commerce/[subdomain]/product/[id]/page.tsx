@@ -227,45 +227,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       setShareClicked(false);
     }, 1000);
   };
-
-  // Create variant groups from product attributes
-  // This function maps backend product attributes to frontend variant groups
-  // with appropriate display styles based on the attribute name:
-  //
-  // Backend Attribute Name -> Frontend Display Style:
-  // - "Color" or "colour" -> Color circles (visual color selection)
-  // - "Size" -> Buttons (S, M, L, XL, etc.)
-  // - "Material" or "fabric" -> Buttons (Cotton, Polyester, etc.)
-  // - "Style" or "pattern" -> Image grid (different product images)
-  // - Any other attribute -> Buttons (default)
-  //
-  // Example backend data:
-  // {
-  //   "attributes": [
-  //     {
-  //       "id": 1,
-  //       "attributeName": "Color",
-  //       "attributeValues": [
-  //         {"id": 1, "attributeValue": "Red"},
-  //         {"id": 2, "attributeValue": "Blue"},
-  //         {"id": 3, "attributeValue": "Green"}
-  //       ]
-  //     },
-  //     {
-  //       "id": 2,
-  //       "attributeName": "Size",
-  //       "attributeValues": [
-  //         {"id": 4, "attributeValue": "S"},
-  //         {"id": 5, "attributeValue": "M"},
-  //         {"id": 6, "attributeValue": "L"}
-  //       ]
-  //     }
-  //   ]
-  // }
-  //
-  // This becomes:
-  // - Color variant group with color circles for Red, Blue, Green
-  // - Size variant group with buttons for S, M, L
+  
   const createVariantGroups = (): VariantGroup[] => {
     if (!productData || !productData.attributes) return [];
 

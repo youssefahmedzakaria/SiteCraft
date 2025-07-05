@@ -30,6 +30,9 @@ export function RelatedProducts({ products, theme }: RelatedProductsProps) {
             key={product.id}
             className={cn("overflow-hidden group relative", theme.borderRadius)}
             style={{ backgroundColor: `${theme.secondaryColor}10` }}
+            onClick={() => {
+              window.location.href = `/e-commerce/${subdomain}/product/${product.id}`;
+            }}
           >
             <div className="relative aspect-square">
               <Image
