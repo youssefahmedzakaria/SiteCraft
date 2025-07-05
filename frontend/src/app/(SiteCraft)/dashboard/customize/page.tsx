@@ -58,8 +58,6 @@ import {
   HorizontalScrollProductTemplate,
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
-import { form } from "@heroui/theme";
-import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -1112,7 +1110,7 @@ export default function CustomizeTemplatePage() {
               Access Denied
             </h2>
             <p className="text-gray-600">
-              You don't have permission to access this page.
+              You do not have permission to access this page.
             </p>
           </div>
         </div>
