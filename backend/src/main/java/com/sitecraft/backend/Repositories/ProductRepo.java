@@ -14,4 +14,6 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     List<Product> findByStoreIdWithCategory(@Param("storeId") Long storeId);
     
     Optional<Product> findByIdAndStoreId(Long id, Long storeId);
+    
+    boolean existsByNameAndStoreId(String name, Long storeId);
 }

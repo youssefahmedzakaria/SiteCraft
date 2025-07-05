@@ -4,8 +4,12 @@ import com.sitecraft.backend.DTOs.ProductCreateDTO;
 import com.sitecraft.backend.DTOs.ProductVariantDTO;
 import com.sitecraft.backend.DTOs.ProductAttributeDTO;
 import com.sitecraft.backend.DTOs.VariantAttributeDTO;
+import com.sitecraft.backend.DTOs.ProductImportDTO;
+import com.sitecraft.backend.DTOs.ProductExportDTO;
 import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,8 +19,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class ProductService {
@@ -637,5 +645,230 @@ public class ProductService {
             product.setPercentageMax(null);
             product.setMaxCap(null);
         }
+    }
+
+    // Excel Import/Export Methods
+    public Map<String, Object> importProductsFromExcel(MultipartFile file, Long storeId) throws IOException {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<ProductImportDTO> productsToImport = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        int successCount = 0;
+        int errorCount = 0;
+
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(is)) {
+            
+            Sheet sheet = workbook.getSheetAt(0);
+            int rowNum = 0;
+            
+            for (Row row : sheet) {
+                rowNum++;
+                if (rowNum == 1) continue; // Skip header row
+                
+                try {
+                    String name = getCellValueAsString(row.getCell(0));
+                    String description = getCellValueAsString(row.getCell(1));
+                    
+                    if (name == null || name.trim().isEmpty()) {
+                        errors.add("Row " + rowNum + ": Product name is required");
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    name = name.trim();
+                    description = description != null ? description.trim() : "";
+                    
+                    // Check for duplicate names within the store
+                    if (productRepo.existsByNameAndStoreId(name, storeId)) {
+                        errors.add("Row " + rowNum + ": Product '" + name + "' already exists");
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    productsToImport.add(new ProductImportDTO(name, description));
+                    
+                } catch (Exception e) {
+                    errors.add("Row " + rowNum + ": " + e.getMessage());
+                    errorCount++;
+                }
+            }
+        }
+
+        // Create products in batch
+        for (ProductImportDTO productDTO : productsToImport) {
+            try {
+                ProductCreateDTO createDTO = new ProductCreateDTO();
+                createDTO.setName(productDTO.getName());
+                createDTO.setDescription(productDTO.getDescription());
+                
+                // Set default values for required fields
+                createDTO.setDiscountType(null);
+                createDTO.setDiscountValue(null);
+                createDTO.setLowStockEnabled(false);
+                createDTO.setLowStockType(null);
+                createDTO.setLowStockThreshold(null);
+                createDTO.setAttributes(new ArrayList<>());
+                createDTO.setVariants(new ArrayList<>());
+                createDTO.setImageUrls(new ArrayList<>());
+                
+                Product product = createProduct(createDTO, storeId);
+                successCount++;
+            } catch (Exception e) {
+                errors.add("Failed to create product '" + productDTO.getName() + "': " + e.getMessage());
+                errorCount++;
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("successCount", successCount);
+        result.put("errorCount", errorCount);
+        result.put("errors", errors);
+        result.put("totalProcessed", successCount + errorCount);
+        
+        return result;
+    }
+
+    public byte[] exportProductsToExcel(Long storeId) throws IOException {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<Product> products = getAllProducts(storeId);
+        List<ProductExportDTO> exportData = new ArrayList<>();
+
+        for (Product product : products) {
+            // Get all category names concatenated
+            String categoryName = "";
+            try {
+                if (product.getCategories() != null && !product.getCategories().isEmpty()) {
+                    // Join all category names with commas
+                    categoryName = product.getCategories().stream()
+                            .map(category -> category.getName())
+                            .filter(name -> name != null && !name.trim().isEmpty())
+                            .collect(Collectors.joining(", "));
+                }
+            } catch (Exception e) {
+                // If there's any issue getting category names, just use empty string
+                categoryName = "";
+            }
+            
+            // Get price and stock from variants (similar to frontend logic)
+            Double price = 0.0;
+            Integer stock = 0;
+            
+            if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+                // Get the first variant with a price as the main price (like frontend)
+                for (ProductVariants variant : product.getVariants()) {
+                    if (variant.getPrice() != null) {
+                        price = variant.getPrice().doubleValue();
+                        break;
+                    }
+                }
+                
+                // Calculate total stock from all variants
+                stock = product.getVariants().stream()
+                        .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
+                        .sum();
+            }
+            
+            exportData.add(new ProductExportDTO(
+                product.getName(),
+                product.getDescription(),
+                price,
+                stock,
+                categoryName
+            ));
+        }
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            
+            Sheet sheet = workbook.createSheet("Products");
+            
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            
+            String[] headers = {"Name", "Description", "Price", "Stock", "Category"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            // Create data rows
+            CellStyle currencyStyle = createCurrencyStyle(workbook);
+            
+            for (int i = 0; i < exportData.size(); i++) {
+                Row row = sheet.createRow(i + 1);
+                ProductExportDTO product = exportData.get(i);
+                
+                row.createCell(0).setCellValue(product.getName());
+                row.createCell(1).setCellValue(product.getDescription());
+                
+                Cell priceCell = row.createCell(2);
+                priceCell.setCellValue(product.getPrice());
+                priceCell.setCellStyle(currencyStyle);
+                
+                row.createCell(3).setCellValue(product.getStock());
+                row.createCell(4).setCellValue(product.getCategoryName());
+            }
+            
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) return null;
+        
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                }
+                return String.valueOf((long) cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return null;
+        }
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        return style;
+    }
+
+    private CellStyle createDateStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss"));
+        return style;
+    }
+
+    private CellStyle createCurrencyStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("$#,##0.00"));
+        return style;
     }
 }

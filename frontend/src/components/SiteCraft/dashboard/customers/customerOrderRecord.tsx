@@ -10,7 +10,17 @@ export function CustomerOrderRecord({ order }: { order: Order }) {
     <tr className="hover:bg-gray-50">
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">{order.id}</td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-        {format(new Date(order.issueDate), "MMM dd, yyyy")}
+        {order.issueDate ? 
+          (() => {
+            try {
+              const date = new Date(order.issueDate);
+              return isNaN(date.getTime()) ? 'N/A' : format(date, "MMM dd, yyyy");
+            } catch (error) {
+              return 'N/A';
+            }
+          })() 
+          : 'N/A'
+        }
       </td>
       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
         {(order.price || 0).toFixed(2)} EGP

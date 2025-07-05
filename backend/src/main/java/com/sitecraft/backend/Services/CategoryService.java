@@ -9,12 +9,21 @@ import com.sitecraft.backend.Repositories.ProductRepo;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.DTOs.CategoryCreateDTO;
 import com.sitecraft.backend.DTOs.CategoryResponseDTO;
+import com.sitecraft.backend.DTOs.CategoryImportDTO;
+import com.sitecraft.backend.DTOs.CategoryExportDTO;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -236,5 +245,179 @@ public class CategoryService {
         if (file.exists()) {
             file.delete();
         }
+    }
+
+    // Excel Import/Export Methods
+    public Map<String, Object> importCategoriesFromExcel(MultipartFile file, Long storeId) throws IOException {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<CategoryImportDTO> categoriesToImport = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        int successCount = 0;
+        int errorCount = 0;
+
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(is)) {
+            
+            Sheet sheet = workbook.getSheetAt(0);
+            int rowNum = 0;
+            
+            for (Row row : sheet) {
+                rowNum++;
+                if (rowNum == 1) continue; // Skip header row
+                
+                try {
+                    String name = getCellValueAsString(row.getCell(0));
+                    String description = getCellValueAsString(row.getCell(1));
+                    
+                    if (name == null || name.trim().isEmpty()) {
+                        errors.add("Row " + rowNum + ": Category name is required");
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    name = name.trim();
+                    description = description != null ? description.trim() : "";
+                    
+                    // Check for duplicate names
+                    if (categoryRepo.existsByNameAndStoreId(name, storeId)) {
+                        errors.add("Row " + rowNum + ": Category '" + name + "' already exists");
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    categoriesToImport.add(new CategoryImportDTO(name, description));
+                    
+                } catch (Exception e) {
+                    errors.add("Row " + rowNum + ": " + e.getMessage());
+                    errorCount++;
+                }
+            }
+        }
+
+        // Create categories in batch
+        for (CategoryImportDTO categoryDTO : categoriesToImport) {
+            try {
+                Category category = new Category();
+                category.setName(categoryDTO.getName());
+                category.setDescription(categoryDTO.getDescription());
+                category.setStore(existingStore);
+                categoryRepo.save(category);
+                successCount++;
+            } catch (Exception e) {
+                errors.add("Failed to create category '" + categoryDTO.getName() + "': " + e.getMessage());
+                errorCount++;
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("successCount", successCount);
+        result.put("errorCount", errorCount);
+        result.put("errors", errors);
+        result.put("totalProcessed", successCount + errorCount);
+        
+        return result;
+    }
+
+    public byte[] exportCategoriesToExcel(Long storeId) throws IOException {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<Category> categories = categoryRepo.findByStoreId(storeId);
+        List<CategoryExportDTO> exportData = new ArrayList<>();
+
+        for (Category category : categories) {
+            Long productCount = categoryRepo.countProductsByCategoryId(category.getId());
+            exportData.add(new CategoryExportDTO(
+                category.getName(),
+                category.getDescription(),
+                productCount,
+                category.getCreatedAt()
+            ));
+        }
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            
+            Sheet sheet = workbook.createSheet("Categories");
+            
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            
+            String[] headers = {"Name", "Description", "Number of Products", "Created Date"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            // Create data rows
+            CellStyle dateStyle = createDateStyle(workbook);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            
+            for (int i = 0; i < exportData.size(); i++) {
+                Row row = sheet.createRow(i + 1);
+                CategoryExportDTO category = exportData.get(i);
+                
+                row.createCell(0).setCellValue(category.getName());
+                row.createCell(1).setCellValue(category.getDescription());
+                row.createCell(2).setCellValue(category.getProductCount());
+                
+                Cell dateCell = row.createCell(3);
+                dateCell.setCellValue(category.getCreatedAt().format(formatter));
+                dateCell.setCellStyle(dateStyle);
+            }
+            
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) return null;
+        
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                }
+                return String.valueOf((long) cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return null;
+        }
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        return style;
+    }
+
+    private CellStyle createDateStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss"));
+        return style;
     }
 }

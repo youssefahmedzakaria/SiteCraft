@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { 
-  Product, 
+import {
+  Product,
   SimplifiedProduct,
-  getProducts, 
-  getProduct, 
-  createProduct, 
-  updateProduct, 
+  getProducts,
+  getProduct,
+  createProduct,
+  updateProduct,
   deleteProduct,
   getProductStatistics,
   getLowStockProducts,
@@ -13,6 +13,7 @@ import {
   ProductCreateDTO,
   ProductStatistics
 } from '@/lib/products'
+import { useAuth } from './useAuth'
 
 export const useProductManagement = () => {
   const [products, setProducts] = useState<SimplifiedProduct[]>([])
@@ -22,13 +23,20 @@ export const useProductManagement = () => {
   const [isUpdating, setIsUpdating] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState<number | null>(null)
   const [statistics, setStatistics] = useState<ProductStatistics | null>(null)
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
 
   const fetchProducts = async () => {
+    // Don't fetch if not authenticated
+    if (!isAuthenticated) {
+      setIsLoading(false)
+      return
+    }
+
     try {
       console.log('📝 Fetching products...');
       setIsLoading(true)
       setError('')
-      
+
       const fetchedProducts = await getProducts()
       setProducts(fetchedProducts)
       console.log('✅ Products loaded successfully');
@@ -44,7 +52,7 @@ export const useProductManagement = () => {
     try {
       console.log('📝 Fetching product:', productId);
       setError('')
-      
+
       const product = await getProduct(productId)
       return product
     } catch (err: any) {
@@ -59,11 +67,11 @@ export const useProductManagement = () => {
       console.log('📝 Creating product...');
       setIsCreating(true)
       setError('')
-      
+
       const newProduct = await createProduct(productData, images)
       // Refresh the products list to get the updated data
       await fetchProducts()
-      
+
       console.log('✅ Product created successfully');
       return newProduct
     } catch (err: any) {
@@ -80,11 +88,11 @@ export const useProductManagement = () => {
       console.log('📝 Updating product:', productId);
       setIsUpdating(productId)
       setError('')
-      
+
       const updatedProduct = await updateProduct(productId, productData, images)
       // Refresh the products list to get the updated data
       await fetchProducts()
-      
+
       console.log('✅ Product updated successfully');
       return updatedProduct
     } catch (err: any) {
@@ -101,10 +109,10 @@ export const useProductManagement = () => {
       console.log('📝 Deleting product:', productId);
       setIsDeleting(productId)
       setError('')
-      
+
       await deleteProduct(productId)
       setProducts(prev => prev.filter(product => product.id !== productId))
-      
+
       console.log('✅ Product deleted successfully');
     } catch (err: any) {
       console.error('💥 Error deleting product:', err);
@@ -119,7 +127,7 @@ export const useProductManagement = () => {
     try {
       console.log('📝 Fetching product statistics...');
       setError('')
-      
+
       const stats = await getProductStatistics()
       setStatistics(stats)
       console.log('✅ Product statistics loaded successfully');
@@ -135,7 +143,7 @@ export const useProductManagement = () => {
     try {
       console.log('📝 Fetching low stock products...');
       setError('')
-      
+
       const lowStockProducts = await getLowStockProducts()
       console.log('✅ Low stock products loaded successfully');
       return lowStockProducts
@@ -150,7 +158,7 @@ export const useProductManagement = () => {
     try {
       console.log('📝 Fetching out of stock products...');
       setError('')
-      
+
       const outOfStockProducts = await getOutOfStockProducts()
       console.log('✅ Out of stock products loaded successfully');
       return outOfStockProducts
@@ -164,12 +172,18 @@ export const useProductManagement = () => {
   const clearError = () => setError('')
 
   useEffect(() => {
-    fetchProducts()
-  }, [])
+    // Only fetch products if authenticated and auth loading is complete
+    if (!authLoading && isAuthenticated) {
+      fetchProducts()
+    } else if (!authLoading && !isAuthenticated) {
+      // If not authenticated, stop loading
+      setIsLoading(false)
+    }
+  }, [isAuthenticated, authLoading])
 
   return {
     products,
-    isLoading,
+    isLoading: isLoading || authLoading,
     error,
     isCreating,
     isUpdating,

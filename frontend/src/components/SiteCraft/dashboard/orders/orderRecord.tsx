@@ -13,7 +13,17 @@ export function OrderRecord({ order }: { order: Order }) {
           {order.customer?.name || 'N/A'}
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-          {format(new Date(order.issueDate), "MMM dd, yyyy")}
+          {order.issueDate ? 
+            (() => {
+              try {
+                const date = new Date(order.issueDate);
+                return isNaN(date.getTime()) ? 'N/A' : format(date, "MMM dd, yyyy");
+              } catch (error) {
+                return 'N/A';
+              }
+            })() 
+            : 'N/A'
+          }
         </td>
         <td className="px-3 md:px-6 py-4 whitespace-nowrap">
           {(order.price || 0).toFixed(2)} EGP
