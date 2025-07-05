@@ -84,7 +84,7 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
       <div className="relative w-full h-40 overflow-hidden items-center justify-center">
         <div>
           <iframe
-            src={`/templates/${template.id}`}
+            src={`/branding/templates/${template.id}`}
             scrolling="no"
             style={{
               width: "1024px",
@@ -116,7 +116,7 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
                 </DialogHeader>
                 <div className="relative w-full h-[70vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-50 rounded-lg">
                   <iframe
-                    src={`/templates/${template.id}`}
+                    src={`/branding/templates/${template.id}`}
                     style={{
                       width: "100%",
                       height: "100%",
@@ -134,7 +134,7 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
               onClick={handleTemplateSelect}
               disabled={isCommitting}
             >
-              {isCommitting ? 'Creating...' : 'Select'}
+              {isCommitting ? "Creating..." : "Select"}
             </Button>
           </div>
         </div>

@@ -42,7 +42,7 @@ const initialSections: Section[] = [];
 export default function TemplateCard() {
   const path = usePathname();
   const pathSegments = path.split("/");
-  const templateId = pathSegments[2];
+  const templateId = pathSegments[3];
   const { getTemplate } = useTemplates();
   const [params, setParams] = useState<CustomizedTemplate>(
     getTemplate(templateId)!
