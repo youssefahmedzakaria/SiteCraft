@@ -77,7 +77,7 @@ const initialTemplates: CustomizedTemplate[] = [
       dividerColor: "border-[#cccccc]",
       fontFamily: "font-sans-serif",
     },
-    promo: {
+    PromoSlider: {
       template: "CenteredPromo",
       id: "promo",
       slides: [
@@ -122,7 +122,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-[#000000]",
       imageObjectFit: "cover",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "FeaturedGrid",
       isClickable: true,
@@ -152,39 +152,39 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category4",
           images: [{ id: 4, url: "", alt: "category4" }],
           id: "4",
           Description: "description of category4",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category5",
           images: [{ id: 5, url: "", alt: "category5" }],
           id: "5",
           Description: "description of category5",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "FeaturedGrid",
       isClickable: true,
@@ -253,7 +253,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "TopImageAbout",
       id: "about",
       title: "About Us",
@@ -275,7 +275,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-semibold",
     },
-    policies: {
+    Policies: {
       template: "TitleLeftContentCenterPolicies",
       id: "policies",
       title: "Our Policies",
@@ -320,7 +320,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "CenteredContact",
       id: "contact",
       title: "Contact Us",
@@ -420,7 +420,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "text-[#000000]",
       dividerColor: "border-[#cccccc]",
     },
-    promo: {
+    PromoSlider: {
       template: "SplitPromo",
       id: "promo",
       slides: [
@@ -457,7 +457,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-[#000000]",
       imageObjectFit: "cover",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "FeaturedGrid",
       isClickable: true,
@@ -487,25 +487,25 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "/placeholder.png", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "/placeholder.png", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "/placeholder.png", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "HorizontalScroll",
       isClickable: true,
@@ -602,7 +602,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "CenteredAbout",
       id: "about",
       title: "know more about us",
@@ -624,7 +624,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    policies: {
+    Policies: {
       template: "DefaultPolicies",
       id: "policies",
       title: "Policies",
@@ -659,7 +659,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "LeftAlignedContact",
       id: "contact",
       title: "Contact Us",
@@ -750,7 +750,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "MinimalLeftPromo",
       id: "promo",
       slides: [
@@ -795,7 +795,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "Grid",
       isClickable: true,
@@ -825,60 +825,60 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "/placeholder.png", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "/placeholder.png", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "/placeholder.png", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category4",
           images: [{ id: 4, url: "/placeholder.png", alt: "category4" }],
           id: "4",
           Description: "description of category4",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category5",
           images: [{ id: 5, url: "/placeholder.png", alt: "category5" }],
           id: "5",
           Description: "description of category5",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category6",
           images: [{ id: 6, url: "/placeholder.png", alt: "category6" }],
           id: "6",
           Description: "description of category6",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category7",
           images: [{ id: 7, url: "/placeholder.png", alt: "category7" }],
           id: "7",
           Description: "description of category7",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category8",
           images: [{ id: 8, url: "/placeholder.png", alt: "category8" }],
           id: "8",
           Description: "description of category8",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "Grid",
       isClickable: true,
@@ -961,7 +961,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "LeftAlignedAbout",
       id: "about",
       title: "About Us",
@@ -983,7 +983,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    contact: {
+    ContactUs: {
       template: "RightAlignedContact",
       id: "contact",
       title: "Contact Us",
@@ -1075,7 +1075,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "FeaturedGrid",
       isClickable: true,
@@ -1105,39 +1105,39 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "/placeholder.png", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "/placeholder.png", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "/placeholder.png", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category4",
           images: [{ id: 4, url: "/placeholder.png", alt: "category4" }],
           id: "4",
           Description: "description of category4",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category5",
           images: [{ id: 5, url: "/placeholder.png", alt: "category5" }],
           id: "5",
           Description: "description of category5",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "Grid",
       isClickable: true,
@@ -1220,7 +1220,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "RightAlignedAbout",
       id: "about",
       title: "About Us",
@@ -1242,7 +1242,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    policies: {
+    Policies: {
       template: "CenteredPolicies",
       id: "policies",
       title: "Our Policies",
@@ -1277,7 +1277,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "MinimalRightContact",
       id: "contact",
       title: "Contact Us",
@@ -1444,7 +1444,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "CenteredPromo",
       id: "promo",
       slides: [
@@ -1473,7 +1473,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    products: {
+    Products: {
       id: "products",
       template: "FeaturedGrid",
       isClickable: true,
@@ -1563,7 +1563,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "CenteredAbout",
       id: "about",
       title: " Who We Are",
@@ -1585,7 +1585,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    policies: {
+    Policies: {
       template: "TitleLeftContentCenterPolicies",
       id: "policies",
       title: "Our Policies",
@@ -1688,7 +1688,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "MinimalRightPromo",
       id: "promo",
       slides: [
@@ -1725,7 +1725,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "FeaturedGrid",
       isClickable: true,
@@ -1755,25 +1755,25 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "/placeholder.png", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "/placeholder.png", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "/placeholder.png", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "Grid",
       isClickable: true,
@@ -1870,7 +1870,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    about: {
+    AboutUs: {
       template: "LeftAlignedAbout",
       id: "about",
       title: "Who We Are",
@@ -1892,7 +1892,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    contact: {
+    ContactUs: {
       template: "MinimalLeftContact",
       id: "contact",
       title: "Contact Us",
@@ -1983,7 +1983,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "RightAlignedPromo",
       id: "promo",
       slides: [
@@ -2028,7 +2028,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    categories: {
+    Categories: {
       id: "categories",
       template: "HorizontalScroll",
       isClickable: true,
@@ -2058,74 +2058,74 @@ const initialTemplates: CustomizedTemplate[] = [
           images: [{ id: 1, url: "/placeholder.png", alt: "category1" }],
           id: "1",
           Description: "description of category1",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category2",
           images: [{ id: 2, url: "/placeholder.png", alt: "category2" }],
           id: "2",
           Description: "description of category",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category3",
           images: [{ id: 3, url: "/placeholder.png", alt: "category3" }],
           id: "3",
           Description: "description of category3",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category4",
           images: [{ id: 4, url: "/placeholder.png", alt: "category4" }],
           id: "4",
           Description: "description of category4",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category5",
           images: [{ id: 5, url: "/placeholder.png", alt: "category5" }],
           id: "5",
           Description: "description of category5",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category6",
           images: [{ id: 6, url: "/placeholder.png", alt: "category6" }],
           id: "6",
           Description: "description of category6",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category7",
           images: [{ id: 7, url: "/placeholder.png", alt: "category7" }],
           id: "7",
           Description: "description of category7",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category8",
           images: [{ id: 8, url: "/placeholder.png", alt: "category8" }],
           id: "8",
           Description: "description of category8",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category9",
           images: [{ id: 9, url: "/placeholder.png", alt: "category9" }],
           id: "9",
           Description: "description of category9",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
         {
           name: "category10",
           images: [{ id: 10, url: "/placeholder.png", alt: "category10" }],
           id: "10",
           Description: "description of category10",
-          link: "/e-commerce/${subdomain}/products",
+          link: "#",
         },
       ],
     },
-    products: {
+    Products: {
       id: "products",
       template: "HorizontalScroll",
       isClickable: true,
@@ -2222,7 +2222,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    policies: {
+    Policies: {
       template: "CenteredPolicies",
       id: "policies",
       title: "Policies",
@@ -2247,7 +2247,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "CenteredContact",
       id: "contact",
       title: "Contact Us",
@@ -2339,7 +2339,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    products: {
+    Products: {
       id: "products",
       template: "Grid",
       isClickable: true,
@@ -2422,7 +2422,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    policies: {
+    Policies: {
       template: "DefaultPolicies",
       id: "policies",
       title: "Our Policies",
@@ -2452,7 +2452,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    about: {
+    AboutUs: {
       template: "CenteredAbout",
       id: "about",
       title: "Our Story",
@@ -2475,7 +2475,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    contact: {
+    ContactUs: {
       template: "MinimalLeftContact",
       id: "contact",
       title: "Contact Us",
@@ -2573,7 +2573,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "LeftAlignedPromo",
       id: "promo",
       slides: [
@@ -2610,7 +2610,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    products: {
+    Products: {
       id: "products",
       template: "FeaturedGrid",
       isClickable: true,
@@ -2700,7 +2700,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    policies: {
+    Policies: {
       template: "LeftPolicies",
       id: "policies",
       title: "Policies",
@@ -2730,7 +2730,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "MinimalRightContact",
       id: "contact",
       title: "Contact Us",
@@ -2822,7 +2822,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "CenteredPromo",
       id: "promo",
       slides: [
@@ -2867,7 +2867,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    products: {
+    Products: {
       id: "products",
       template: "HorizontalScroll",
       isClickable: true,
@@ -2964,7 +2964,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    policies: {
+    Policies: {
       template: "TitleLeftContentCenterPolicies",
       id: "policies",
       title: "Policies",
@@ -2992,7 +2992,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    about: {
+    AboutUs: {
       template: "CenteredAbout",
       id: "about",
       title: "about us",
@@ -3083,7 +3083,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "MinimalLeftPromo",
       id: "promo",
       slides: [
@@ -3120,7 +3120,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    products: {
+    Products: {
       id: "products",
       template: "FeaturedGrid",
       isClickable: true,
@@ -3189,7 +3189,7 @@ const initialTemplates: CustomizedTemplate[] = [
         },
       ],
     },
-    policies: {
+    Policies: {
       template: "DefaultPolicies",
       id: "policies",
       title: "Policies",
@@ -3214,7 +3214,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    contact: {
+    ContactUs: {
       template: "MinimalRightContact",
       id: "contact",
       title: "Contact Us",
@@ -3305,7 +3305,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "MinimalRightPromo",
       id: "promo",
       slides: [
@@ -3342,7 +3342,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    about: {
+    AboutUs: {
       template: "TopImageAbout",
       id: "about",
       title: "know more about us",
@@ -3431,7 +3431,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    about: {
+    AboutUs: {
       template: "LeftAlignedAbout",
       id: "about",
       title: "about us",
@@ -3529,7 +3529,7 @@ const initialTemplates: CustomizedTemplate[] = [
       iconColor: "#000000",
       dividerColor: "#cccccc",
     },
-    promo: {
+    PromoSlider: {
       template: "OverlayPromo",
       id: "promo",
       slides: [
@@ -3558,7 +3558,7 @@ const initialTemplates: CustomizedTemplate[] = [
       backgroundColor: "bg-black",
       imageObjectFit: "cover",
     },
-    about: {
+    AboutUs: {
       template: "RightAlignedAbout",
       id: "about",
       title: "our story",

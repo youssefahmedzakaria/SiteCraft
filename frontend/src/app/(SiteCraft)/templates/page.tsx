@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { TemplateCard } from "@/components/SiteCraft/templates/TemplateCard";
-import { suggestedTemplates } from "@/lib/templates";
+import {
+  suggestedTemplates,
+  TemplateProvider,
+  useTemplates,
+} from "@/lib/templates";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function SuggestedTemplatesPage() {
+  const { templates, getTemplate } = useTemplates();
+
   const router = useRouter();
 
   const handleNextClick = () => {
@@ -51,19 +57,17 @@ export default function SuggestedTemplatesPage() {
           <p className="text-gray-500 w-full md:w-auto">
             Choose from our suggested collection of professional templates
           </p>
-          <Link href="/templates/view-all" className="w-full md:w-auto">
-            <Button className="bg-black text-white hover:bg-gray-800 w-full">
-              View All Templates
-            </Button>
-          </Link>
         </div>
 
         {/* Templates Card */}
         <Card className="bg-white shadow-md">
           <CardContent className="pt-2 pb-2">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {suggestedTemplates.map((template) => (
-                <TemplateCard key={template.id} template={template} />
+              {templates.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={getTemplate(template.id)!}
+                />
               ))}
             </div>
           </CardContent>
@@ -79,13 +83,6 @@ export default function SuggestedTemplatesPage() {
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          {/* <Button
-            onClick={handleNextClick}
-            className="bg-black text-white hover:bg-gray-800 flex items-center gap-2 px-6"
-          >
-            Next
-            <ArrowRight className="w-4 h-4" />
-          </Button> */}
         </div>
       </main>
     </div>

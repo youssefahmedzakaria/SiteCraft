@@ -553,18 +553,36 @@ export default function CustomizeTemplatePage() {
       SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
     Products: {
-      FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollProductTemplate {...productAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridProductTemplate {...productAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: <GridProductTemplate {...productAttributes} isClickable={false} />,
     },
     Categories: {
-      FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollCategoryTemplate {...categoryAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: (
+        <GridCategoryTemplate {...categoryAttributes} isClickable={false} />
+      ),
     },
     AboutUs: {
       TopImageAbout: <TopImageAbout {...aboutAttributes} />,
