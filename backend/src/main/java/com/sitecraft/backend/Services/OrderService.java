@@ -2,6 +2,7 @@ package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
+import com.sitecraft.backend.DTOs.OrderExportDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,6 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.math.BigDecimal;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Service
 public class OrderService {
@@ -38,6 +45,7 @@ public class OrderService {
     private CartService cartService;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
     private LowStockNotificationService lowStockNotificationService;
 
 
@@ -249,5 +257,126 @@ public class OrderService {
                         !order.getIssueDate().toLocalDate().isBefore(start) &&
                         !order.getIssueDate().toLocalDate().isAfter(end))
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    // Excel Export Method
+    public byte[] exportOrdersToExcel(Long storeId) throws IOException {
+        Store existingStore = storeRepo.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+
+        List<Order> orders = getAllOrders(storeId);
+        List<OrderExportDTO> exportData = new ArrayList<>();
+
+        for (Order order : orders) {
+            // Get customer information
+            String customerName = "";
+            String customerEmail = "";
+            if (order.getCustomer() != null) {
+                customerName = order.getCustomer().getName() != null ? order.getCustomer().getName() : "";
+                customerEmail = order.getCustomer().getEmail() != null ? order.getCustomer().getEmail() : "";
+            }
+
+            // Calculate total amount and item count
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            Integer itemCount = 0;
+            
+            if (order.getOrderProducts() != null && !order.getOrderProducts().isEmpty()) {
+                totalAmount = order.getOrderProducts().stream()
+                        .map(op -> BigDecimal.valueOf(op.getPrice() * op.getQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                
+                itemCount = order.getOrderProducts().stream()
+                        .mapToInt(OrderProduct::getQuantity)
+                        .sum();
+            }
+
+            exportData.add(new OrderExportDTO(
+                order.getId(),
+                customerName,
+                customerEmail,
+                order.getStatus() != null ? order.getStatus() : "",
+                totalAmount,
+                itemCount,
+                order.getIssueDate()
+            ));
+        }
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            
+            Sheet sheet = workbook.createSheet("Orders");
+            
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            
+            String[] headers = {"Order ID", "Customer Name", "Customer Email", "Status", "Total Amount", "Item Count", "Issue Date"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            // Create data rows
+            CellStyle currencyStyle = createCurrencyStyle(workbook);
+            CellStyle dateStyle = createDateStyle(workbook);
+            
+            for (int i = 0; i < exportData.size(); i++) {
+                Row row = sheet.createRow(i + 1);
+                OrderExportDTO order = exportData.get(i);
+                
+                row.createCell(0).setCellValue(order.getOrderId());
+                row.createCell(1).setCellValue(order.getCustomerName());
+                row.createCell(2).setCellValue(order.getCustomerEmail());
+                row.createCell(3).setCellValue(order.getStatus());
+                
+                Cell amountCell = row.createCell(4);
+                amountCell.setCellValue(order.getTotalAmount().doubleValue());
+                amountCell.setCellStyle(currencyStyle);
+                
+                row.createCell(5).setCellValue(order.getItemCount());
+                
+                Cell dateCell = row.createCell(6);
+                if (order.getIssueDate() != null) {
+                    dateCell.setCellValue(order.getIssueDate());
+                    dateCell.setCellStyle(dateStyle);
+                }
+            }
+            
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        return style;
+    }
+
+    private CellStyle createDateStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss"));
+        return style;
+    }
+
+    private CellStyle createCurrencyStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("$#,##0.00"));
+        return style;
     }
 }

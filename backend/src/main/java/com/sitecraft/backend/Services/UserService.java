@@ -6,6 +6,7 @@ import com.sitecraft.backend.Repositories.UserRepo;
 import com.sitecraft.backend.Repositories.UserRoleRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,6 +32,7 @@ public class UserService {
     private OTPRepo otpRepo;
 
     @Autowired
+    @Lazy
     private StoreService storeService;
 
     private final JavaMailSender mailSender; // You need to configure this
