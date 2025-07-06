@@ -436,7 +436,7 @@ export async function commitCachedRegistration(cachedData: {
   const dtoList = sections.map((section, idx) => {
     let value = {};
     switch (section.id) {
-      case "header":
+      case "Header":
         value = cachedData.template.Header;
         break;
       case "PromoSlider":
@@ -457,18 +457,20 @@ export async function commitCachedRegistration(cachedData: {
       case "ContactUs":
         value = cachedData.template.ContactUs!;
         break;
-      case "footer":
+      case "Footer":
         value = cachedData.template.Footer;
         break;
       default:
-        return;
+        break;
     }
-    return {
-      title: section.id,
-      value: stripBackendFields(section.id, value),
-      index: idx - 1,
-      // storeId,
-    };
+    if (section.id != "id") {
+      return {
+        title: section.id,
+        value: stripBackendFields(section.id, value),
+        index: idx - 1,
+        // storeId,
+      };
+    }
   });
 
   try {

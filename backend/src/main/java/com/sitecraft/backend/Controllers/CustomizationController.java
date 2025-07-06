@@ -105,16 +105,18 @@ public class CustomizationController {
 
             List<CustomizedTemplateSection> customizedTemplate = new ArrayList<>();
             for (CustomizedTemplateDTO dto : dtoList) {
-                Store store = storeRepo.findById(storeId)
-                        .orElseThrow(() -> new RuntimeException("Store not found"));
+                if(dto != null) {
+                    Store store = storeRepo.findById(storeId)
+                            .orElseThrow(() -> new RuntimeException("Store not found"));
 
-                CustomizedTemplateSection section = new CustomizedTemplateSection();
-                section.setTitle(dto.title());
-                section.setValue(dto.value());
-                section.setIndex(dto.index());
-                section.setStore(store);
+                    CustomizedTemplateSection section = new CustomizedTemplateSection();
+                    section.setTitle(dto.title());
+                    section.setValue(dto.value());
+                    section.setIndex(dto.index());
+                    section.setStore(store);
 
-                customizedTemplate.add(section);
+                    customizedTemplate.add(section);
+                }
             }
 
             customizationService.addCustomizedTemplate(storeId, customizedTemplate);
