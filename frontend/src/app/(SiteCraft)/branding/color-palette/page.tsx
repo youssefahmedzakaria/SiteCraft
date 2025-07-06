@@ -505,15 +505,10 @@ export default function ColorPalettePage() {
         // Get store type and logo
         const storeType = cachedData.store.storeType || "store";
         const storeName = cachedData.store.storeName || "My Store";
-        const logoFile = siteCraftCache.getCachedLogoFile();
-        let logoUrl = "";
-        if (logoFile) {
-          logoUrl = URL.createObjectURL(logoFile);
-          console.log(`🖼️ Logo URL: ${logoUrl}`);
-        }
+        const logoUrl = cachedData.logo;
 
+        console.log(`🏪 Logo Url: ${logoUrl}`);
         console.log(`🏪 Store type: ${storeType}`);
-        console.log(`🖼️ Logo file: ${logoFile ? "Found" : "Not found"}`);
 
         // Map store type to queries
         const queries = storeTypeToQueries(storeType);
@@ -523,26 +518,26 @@ export default function ColorPalettePage() {
         console.log("📡 Fetching images from Pixabay...");
 
         const imagePromises = [
-          fetchPixabayImages(queries.promo, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch promo images:', err);
+          fetchPixabayImages(queries.promo, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch promo images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.categories, 6).catch(err => {
-            console.warn('⚠️ Failed to fetch category images:', err);
+          fetchPixabayImages(queries.categories, 6).catch((err) => {
+            console.warn("⚠️ Failed to fetch category images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.products, 8).catch(err => {
-            console.warn('⚠️ Failed to fetch product images:', err);
+          fetchPixabayImages(queries.products, 8).catch((err) => {
+            console.warn("⚠️ Failed to fetch product images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.about, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch about images:', err);
+          fetchPixabayImages(queries.about, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch about images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.contact, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch contact images:', err);
+          fetchPixabayImages(queries.contact, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch contact images:", err);
             return [];
-          })
+          }),
         ];
 
         const [
@@ -571,7 +566,7 @@ export default function ColorPalettePage() {
             if (template.header) {
               template.header.logo = {
                 ...template.header.logo,
-                src: logoUrl,
+                src: logoUrl || '/placeholder.png',
                 alt: "Brand Logo",
               };
               template.header.brandName = storeName;
@@ -581,7 +576,7 @@ export default function ColorPalettePage() {
             if (template.footer) {
               template.footer.logo = {
                 ...template.footer.logo,
-                src: logoUrl,
+                src: logoUrl || '/placeholder.png',
                 alt: "Brand Logo",
               };
               template.footer.brandName = storeName;
