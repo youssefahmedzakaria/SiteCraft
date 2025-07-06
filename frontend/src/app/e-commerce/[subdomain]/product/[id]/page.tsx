@@ -127,7 +127,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         price: p.price,
         compareAtPrice: p.discountValue ? p.price + p.discountValue : undefined,
         image: p.images && p.images.length > 0 ? p.images[0].url : "/placeholder.png",
-        category: p.categories && p.categories.length > 0 ? p.categories[0].title : "",
+        category: p.categories && p.categories.length > 0 ? p.categories[0].name : "",
         rating: 4.0, // You can replace with real rating if available
         reviewCount: 0 // You can replace with real review count if available
       }));

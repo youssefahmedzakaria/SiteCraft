@@ -9,17 +9,15 @@ import { Label } from "@/components/e-commerce/ui/label";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icons } from "@/components/SiteCraft/icons";
-import { useSignupForm } from "@/hooks/e-commerce/ecommerceUseSignUpForm";
-
-// Theme configuration matching product  
-
-const [initialColors, setInitialColors] = useState({
-  primary: "#000000",
-  secondary: "#000000",
-  accent: "#000000",
-});
+import { useSignupForm } from "@/hooks/e-commerce/ecommerceUseSignUpForm"; 
 
 export default function RegisterPage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];

@@ -20,12 +20,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Session } from "inspector/promises";
 import { getSession } from "@/lib/e-commerce/ecommerceAuth";
 
-const [initialColors, setInitialColors] = useState({
-  primary: "#000000",
-  secondary: "#000000",
-  accent: "#000000",
-});
-
 interface UserData {
   id: number;
   firstName: string;
@@ -61,6 +55,12 @@ interface Address {
 }
 
 export default function ProfilePage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+  
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];

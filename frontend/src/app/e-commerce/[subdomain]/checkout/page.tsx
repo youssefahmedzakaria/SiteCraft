@@ -23,7 +23,6 @@ import {
 import { Separator } from "@/components/e-commerce/ui/separator";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
-import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { usePathname } from "next/navigation";
 
 export default function CheckoutPage() {
