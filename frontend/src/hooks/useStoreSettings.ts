@@ -33,7 +33,6 @@ export function useStoreSettings() {
   const updateStore = async (storeData: Partial<Store>, logo?: File) => {
     try {
       setUpdating(true);
-      setError(null);
       console.log('🔄 Updating store info...', storeData);
       
       const updatedStore = await updateStoreInfo(storeData, logo);
@@ -43,7 +42,8 @@ export function useStoreSettings() {
       return updatedStore;
     } catch (err) {
       console.error('❌ Failed to update store info:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update store info');
+      // Don't set the global error state for update errors
+      // Let the component handle these errors in its try-catch block
       throw err;
     } finally {
       setUpdating(false);

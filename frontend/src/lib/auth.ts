@@ -281,6 +281,13 @@ export async function createStore(storeData: {
   });
   
   if (!res.ok) {
+    if (res.status === 413) {
+      // 413 Payload Too Large
+      throw new Error(
+        "Logo image is too large. Please upload files smaller than 5 MB each."
+      );
+    }
+    // for other errors, pull the server's message if available
     let msg = 'Failed to create store';
     try { 
       const data = await res.json();

@@ -631,6 +631,11 @@ export default function BrandingPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setLogoFile(file);
+      
+      // Clear errors when a new logo is selected
+      if (error) {
+        setError(null);
+      }
 
       const img = new window.Image();
       img.crossOrigin = "Anonymous";
@@ -696,9 +701,12 @@ export default function BrandingPage() {
 
   const handleStoreNameChange = (value: string) => {
     setStoreName(value);
-    // Clear store name error when user starts typing
+    // Clear errors when user starts typing
     if (errors.storeName) {
       setErrors(prev => ({ ...prev, storeName: '' }));
+    }
+    if (error) {
+      setError(null);
     }
   };
 
@@ -709,9 +717,13 @@ export default function BrandingPage() {
     }
 
     if (!storeName.trim() || !storeType) {
-      alert('Please fill in store name and store type');
+      setError('Please fill in store name and store type.');
       return;
     }
+
+    // Clear any existing errors
+    setError(null);
+    setErrors({});
 
     // Validate colors before saving
     const validPrimaryColor = validateHexColor(primaryColor) ? primaryColor : "#000000";
@@ -757,8 +769,22 @@ export default function BrandingPage() {
       // Navigate to the color-palette page
       router.push('/branding/color-palette');
     } catch (error) {
-      console.error('💥 Error saving store to cache:', error);
-      setError('An unexpected error occurred. Please try again.');
+      console.error('💥 Error saving store:', error);
+      
+      // Handle different types of errors
+      if (error instanceof Error) {
+        if (error.message.includes('File size too large') || error.message.includes('image is too large')) {
+          setError('The logo image you uploaded is too large. Please choose a smaller image (under 5MB) and try again.');
+        } else if (error.message.includes('subdomain') || error.message.includes('unique constraint') || error.message.includes('already taken')) {
+          setErrors({ storeName: 'A store with this name already exists. Please choose a different store name.' });
+        } else if (error.message.includes('duplicate key')) {
+          setErrors({ storeName: 'This store name is already taken. Please choose a different name.' });
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsCreating(false);
     }
@@ -849,26 +875,6 @@ export default function BrandingPage() {
   //   );
   // }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <main className="container mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Store</h2>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>
-                Try Again
-              </Button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Main Content */}
@@ -908,6 +914,22 @@ export default function BrandingPage() {
             : 'Personalize your store\'s appearance with your brand colors and information'
           }
         </p>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-6 p-4 border border-red-300 rounded-md bg-red-50">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+              <p className="text-red-800">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-red-600 hover:text-red-800"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
 
         <Card className="bg-white">
           <CardContent className="pt-2 pb-2">
@@ -1018,7 +1040,13 @@ export default function BrandingPage() {
                       <select
                         id="storeType"
                         value={storeType}
-                        onChange={(e) => setStoreType(e.target.value)}
+                        onChange={(e) => {
+                          setStoreType(e.target.value);
+                          // Clear errors when user makes a selection
+                          if (error) {
+                            setError(null);
+                          }
+                        }}
                         className="block w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] appearance-none"
                         required
                       >

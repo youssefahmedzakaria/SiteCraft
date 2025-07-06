@@ -219,9 +219,17 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
         console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('📥 Error response body:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+            if (response.status === 413) {
+                // 413 Payload Too Large
+                throw new Error(
+                    "Image is too large. Please upload files smaller than 5 MB each."
+                );
+            }
+            // for other errors, pull the server's message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+                `Failed to create product: ${errText} (status ${response.status})`
+            );
         }
 
         const data = await response.json();
@@ -258,8 +266,19 @@ export const updateProduct = async (productId: number, productData: ProductCreat
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+             if (response.status === 413) {
+    // 413 Payload Too Large
+             throw new Error(
+                 "Image is too large. Please upload files smaller than 5 MB each."
+            );
+  }
+  // for other errors, pull the server’s message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+            `Failed to update product: ${errText} (status ${response.status})`
+  );
+}
+
 
         const data = await response.json();
         console.log('✅ Product updated successfully:', data);
