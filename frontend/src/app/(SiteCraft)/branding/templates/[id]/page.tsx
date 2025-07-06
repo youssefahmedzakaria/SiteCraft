@@ -199,19 +199,19 @@ export default function TemplateView() {
       >
         <Navbar
           isCustomize={true}
-          template={params.header.template}
-          brandName={params.header.brandName}
-          backgroundColor={params.header.backgroundColor}
-          textColor={params.header.textColor}
-          logo={params.header.logo}
-          menuItems={params.header.menuItems.map((item) => ({
+          template={params.Header.template}
+          brandName={params.Header.brandName}
+          backgroundColor={params.Header.backgroundColor}
+          textColor={params.Header.textColor}
+          logo={params.Header.logo}
+          menuItems={params.Header.menuItems.map((item) => ({
             label: item.label,
             href: "#",
             isShown: item.isShown,
           }))}
-          iconColor={params.header.iconColor}
-          dividerColor={params.header.dividerColor}
-          fontFamily={params.header.fontFamily}
+          iconColor={params.Header.iconColor}
+          dividerColor={params.Header.dividerColor}
+          fontFamily={params.Header.fontFamily}
         />
 
         {/* Render middle sections dynamically */}
@@ -261,19 +261,19 @@ export default function TemplateView() {
 
         <Footer
           isCustomize={true}
-          companyName={params.footer.brandName}
-          textColor={params.footer.textColor}
+          companyName={params.Footer.brandName}
+          textColor={params.Footer.textColor}
           companyLogo={{
-            src: params.footer.logo.src || "/placeholder.png",
-            alt: params.footer.logo.alt,
-            width: parseInt(params.footer.logo.size) || 50,
-            height: parseInt(params.footer.logo.size) || 50,
+            src: params.Footer.logo.src || "/placeholder.png",
+            alt: params.Footer.logo.alt,
+            width: parseInt(params.Footer.logo.size) || 50,
+            height: parseInt(params.Footer.logo.size) || 50,
           }}
-          aboutLinks={params.footer.aboutLinks}
-          socialMedia={params.footer.socialMedia}
-          socialMediaStyles={params.footer.socialMediaStyles}
-          copyrightStyles={params.footer.copyrightStyles}
-          backgroundColor={params.footer.backgroundColor}
+          aboutLinks={params.Footer.aboutLinks}
+          socialMedia={params.Footer.socialMedia}
+          socialMediaStyles={params.Footer.socialMediaStyles}
+          copyrightStyles={params.Footer.copyrightStyles}
+          backgroundColor={params.Footer.backgroundColor}
         />
       </div>
     </div>

@@ -69,8 +69,10 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
       // Redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
-      console.error("❌ Error committing registration:", error);
-      alert("Failed to complete registration. Please try again.");
+      console.log("❌ Error committing registration:", error);
+      alert(
+        "Failed to complete registration. Please try again.\n Reason: " + error
+      );
     } finally {
       setIsCommitting(false);
     }

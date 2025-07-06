@@ -113,6 +113,30 @@ class SiteCraftCache {
     // const { ...storeDataWithoutLogo } = storeData;
     this.setData(storeData);
   }
+
+  getCachedLogoFile() {
+    const logoDataUrl = this.getData().logo;
+    if (!logoDataUrl || typeof logoDataUrl !== 'string' || !logoDataUrl.startsWith('data:')) {
+      return null;
+    }
+    // Parse the data URL
+    const matches = logoDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/);
+    if (!matches) return null;
+    const mimeType = matches[1] || 'image/jpeg';
+    const base64Data = matches[2];
+    try {
+      const byteString = atob(base64Data);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new File([ab], 'logo.jpg', { type: mimeType });
+    } catch (e) {
+      console.error('Failed to convert data URL to File:', e);
+      return null;
+    }
+  }
 }
 
 // Export singleton instance
