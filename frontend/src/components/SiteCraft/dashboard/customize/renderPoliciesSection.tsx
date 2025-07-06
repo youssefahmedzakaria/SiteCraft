@@ -107,35 +107,31 @@ export function RenderPoliciesSection({
   };
 
   return (
-    <div className="flex flex-col h-full w-full min-h-0">
+    <div>
       {detailedSectionTab === "content" ? (
-        <div className="flex flex-col flex-1 min-h-0 p-4">
+        <div className="p-4 space-y-6">
           {/* Title */}
-          <div className="space-y-8 flex-1 min-h-0 overflow-y-auto">
-            <div className="space-y-1">
-              <h1 className="text-lg font-semibold tracking-tight">Title</h1>
-              <Input
-                value={policiesAttributes.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="Enter section title"
-              />
-            </div>
+          <div className="space-y-3">
+            <h1 className="text-lg font-semibold tracking-tight">Title</h1>
+            <Input
+              value={policiesAttributes.title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder="Enter section title"
+            />
           </div>
-
-          <div className="pt-8 flex justify-start">
+          <div className="pt-8 flex justify-end">
             {onDeleteSection && (
               <button
-                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
                 onClick={onDeleteSection}
               >
-                <Trash2 size={16} />
                 Delete Section
               </button>
             )}
           </div>
         </div>
       ) : (
-        <div className="p-4 space-y-6 flex-1 min-h-0 overflow-y-auto">
+        <div className="p-4 space-y-6">
           {/* Layout Selection */}
           <PoliciesLayoutItems
             selectedLayout={

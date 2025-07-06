@@ -7,26 +7,22 @@ import { Button } from "@/components/e-commerce/ui/button";
 import { useFavorites } from "@/contexts/favorites-context";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
-import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { usePathname } from "next/navigation";
-
-const defaultTheme: ThemeConfig = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
+import { useState } from "react";
 
 export default function FavoritesPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const { state, removeFromFavorites } = useFavorites();
   const { addToCart } = useCart();
-  const theme = defaultTheme;
 
   const handleAddToCart = (item: any) => {
     addToCart({
@@ -41,32 +37,29 @@ export default function FavoritesPage() {
   if (state.items.length === 0) {
     return (
       <div
-        className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-        style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
-        }}
+        className={cn("min-h-screen pt-20 px-8 bg-[#ffffff] font-sans")}
+        style={{ color: initialColors.primary }}
       >
         <div className="text-center py-16">
           <Heart
             className="w-24 h-24 mx-auto mb-6"
-            style={{ color: theme.secondaryColor }}
+            style={{ color: initialColors.secondary }}
           />
           <h1
             className="text-3xl font-bold mb-4"
-            style={{ color: theme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             Your favorites list is empty
           </h1>
-          <p className="mb-8" style={{ color: theme.secondaryColor }}>
+          <p className="mb-8" style={{ color: initialColors.secondary }}>
             Save items you love to easily find them later.
           </p>
           <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
-                backgroundColor: theme.secondaryColor,
-                color: theme.backgroundColor,
+                backgroundColor: initialColors.accent,
+                color: initialColors.primary,
               }}
             >
               Browse Products
@@ -79,14 +72,14 @@ export default function FavoritesPage() {
 
   return (
     <div
-      className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
+      className={cn("min-h-screen pt-20 px-8 bg-[#ffffff]")}
+      style={{ color: initialColors.primary }}
     >
       <div className="flex justify-between items-center pt-8 mb-8">
-        <h1 className="text-3xl font-bold" style={{ color: theme.textColor }}>
+        <h1 className="text-3xl font-bold" style={{ color: initialColors.primary }}>
           My Favorites
         </h1>
-        <p style={{ color: theme.secondaryColor }}>
+        <p style={{ color: initialColors.secondary }}>
           {state.items.length} items
         </p>
       </div>
@@ -96,12 +89,11 @@ export default function FavoritesPage() {
           <div
             key={item.id}
             className={cn(
-              "group relative border overflow-hidden hover:shadow-lg transition-shadow",
-              theme.borderRadius
+              "group relative border overflow-hidden hover:shadow-lg transition-shadow rounded-lg"
             )}
             style={{
-              backgroundColor: theme.accentColor,
-              borderColor: theme.secondaryColor,
+              backgroundColor: initialColors.accent,
+              borderColor: initialColors.secondary,
             }}
           >
             <div className="relative aspect-square bg-gray-100">
@@ -114,13 +106,13 @@ export default function FavoritesPage() {
               <button
                 onClick={() => removeFromFavorites(item.id)}
                 className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md transition-colors"
-                style={{ color: theme.secondaryColor }}
+                style={{ color: initialColors.secondary }}
               >
                 <Heart
                   className="w-4 h-4"
                   style={{
-                    stroke: theme.secondaryColor,
-                    fill: theme.secondaryColor,
+                    stroke: initialColors.secondary,
+                    fill: initialColors.secondary,
                     strokeWidth: 2,
                   }}
                 />
@@ -131,14 +123,14 @@ export default function FavoritesPage() {
               <Link href={`/e-commerce/${subdomain}/product/${item.id}`}>
                 <h3
                   className="font-medium hover:underline"
-                  style={{ color: theme.textColor }}
+                  style={{ color: initialColors.primary }}
                 >
                   {item.name}
                 </h3>
               </Link>
               <p
                 className="text-lg font-semibold mt-2"
-                style={{ color: theme.textColor }}
+                style={{ color: initialColors.primary }}
               >
                 ${item.price}
               </p>
@@ -149,8 +141,8 @@ export default function FavoritesPage() {
                   className="flex-1"
                   size="sm"
                   style={{
-                    backgroundColor: theme.secondaryColor,
-                    color: theme.backgroundColor,
+                    backgroundColor: initialColors.secondary,
+                    color: initialColors.accent,
                   }}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
@@ -161,8 +153,8 @@ export default function FavoritesPage() {
                   size="sm"
                   onClick={() => removeFromFavorites(item.id)}
                   style={{
-                    borderColor: theme.secondaryColor,
-                    color: theme.secondaryColor,
+                    borderColor: initialColors.secondary,
+                    color: initialColors.secondary,
                   }}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -179,8 +171,8 @@ export default function FavoritesPage() {
             variant="outline"
             size="lg"
             style={{
-              backgroundColor: theme.secondaryColor,
-              color: theme.backgroundColor,
+              backgroundColor: initialColors.secondary,
+              color: initialColors.accent,
             }}
           >
             Continue Shopping

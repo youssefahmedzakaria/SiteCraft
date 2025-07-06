@@ -1,89 +1,88 @@
-import { useState } from 'react'
-import { useAuth } from './useAuth'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { useAuth } from "./useAuth";
+import { useRouter } from "next/navigation";
+import { siteCraftCache } from "@/lib/cache";
 
 export const useSignupForm = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    phone: '',
-    gender: ''
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const { signup, signupError, isLoading, clearError } = useAuth()
-  const router = useRouter()
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+    phone: "",
+    gender: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { signupError, isLoading, clearError } = useAuth();
+  const router = useRouter();
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     if (!formData.email) {
-      newErrors.email = 'Email is required'
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid'
+      newErrors.email = "Email is invalid";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     if (!formData.name) {
-      newErrors.name = 'Name is required'
+      newErrors.name = "Name is required";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-  }
+  };
 
   const onSubmit = async (event: React.SyntheticEvent) => {
-    event.preventDefault()
-    console.log('📝 Form submitted with data:', formData);
-    clearError()
+    event.preventDefault();
+    console.log("📝 Form submitted with data:", formData);
+    clearError();
+    siteCraftCache.clearCache();
 
     if (!validateForm()) {
-      console.log('❌ Form validation failed');
-      return
+      console.log("❌ Form validation failed");
+      return;
     }
 
-    console.log('✅ Form validation passed, calling signup...');
+    console.log("✅ Form validation passed, saving to cache...");
     try {
-      // Register the user (store will be created automatically by backend)
-      const userId = await signup({
+      // Save user data to cache instead of registering immediately
+      const userData = {
         email: formData.email,
         password: formData.password,
         name: formData.name,
         phone: formData.phone,
-        gender: formData.gender
-      })
+        gender: formData.gender,
+      };
 
-      console.log('📥 Signup returned userId:', userId);
+      siteCraftCache.saveUserData(userData);
+      console.log("💾 User data saved to cache:", userData);
 
-      if (userId) {
-        console.log('🎯 Redirecting to branding page...');
-        // Redirect to branding page after registration
-        router.push('/branding')
-      } else {
-        console.log('⚠️ No userId returned from signup');
-      }
+      console.log("🎯 Redirecting to branding page...");
+      // Redirect to branding page after saving to cache
+      router.push("/branding");
     } catch (error) {
-      console.error('💥 Registration error in form:', error)
+      console.error("💥 Registration error in form:", error);
     }
-  }
+  };
 
   return {
     formData,
@@ -92,6 +91,6 @@ export const useSignupForm = () => {
     signupError,
     isLoading,
     onSubmit,
-    clearError
-  }
-} 
+    clearError,
+  };
+};

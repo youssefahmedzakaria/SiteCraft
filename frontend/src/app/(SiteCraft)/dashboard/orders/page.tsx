@@ -9,9 +9,11 @@ import { OrderRecord } from "@/components/SiteCraft/dashboard/orders/orderRecord
 import { OrderTableHeader } from "@/components/SiteCraft/dashboard/orders/orderTableHeader";
 import { FilterButton } from "@/components/SiteCraft/dashboard/orders/ordersFilter";
 import { format } from "date-fns";
-import { X, AlertCircle, RefreshCw } from "lucide-react";
+import { X, AlertCircle, RefreshCw, Download } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
@@ -30,6 +32,7 @@ export default function OrdersPage() {
   } = useOrderManagement();
 
   const { isAuthenticated } = useAuth();
+  const { isInactive } = useStoreStatus();
   const router = useRouter();
 
   const orderStatuses = [
@@ -51,6 +54,38 @@ export default function OrdersPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
+  };
+
+  const handleExportOrders = async () => {
+    try {
+      toast.loading("Exporting orders...");
+      
+      const response = await fetch('/api/orders/export', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Export failed');
+      }
+
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'orders_export.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success("Orders exported successfully!");
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export orders');
+    }
   };
 
   // Filter orders based on selected filters and search
@@ -84,6 +119,30 @@ export default function OrdersPage() {
 
     return true;
   });
+
+  // Show inactive store message if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -184,7 +243,11 @@ export default function OrdersPage() {
               </Button>
             </div>
             <div className="flex-shrink-0">
-              <Button className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
+              <Button 
+                onClick={handleExportOrders}
+                className="w-full sm:w-auto bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                <Download className="h-4 w-4 mr-2" />
                 <span>Export Orders</span>
               </Button>
             </div>

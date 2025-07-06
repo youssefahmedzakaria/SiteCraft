@@ -9,20 +9,15 @@ import { Label } from "@/components/e-commerce/ui/label";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icons } from "@/components/SiteCraft/icons";
-import { useSignupForm } from "@/hooks/e-commerce/ecommerceUseSignUpForm";
-
-// Theme configuration matching product page
-const defaultTheme = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
+import { useSignupForm } from "@/hooks/e-commerce/ecommerceUseSignUpForm"; 
 
 export default function RegisterPage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
@@ -43,20 +38,20 @@ export default function RegisterPage() {
 
   return (
     <div
-      className={`min-h-screen flex pt-20 items-center justify-center px-4 py-8 ${defaultTheme.fontFamily}`}
-      style={{ backgroundColor: defaultTheme.backgroundColor }}
+      className={`min-h-screen flex pt-20 items-center justify-center px-4 py-8 font-sans`}
+      style={{ backgroundColor: "bg-[#FFFFFF]", color: `text-[${initialColors.primary}]` }}
     >
       <div className="max-w-md pt-8 w-full space-y-8">
         <div className="text-center">
           <h2
             className="text-3xl font-bold"
-            style={{ color: defaultTheme.textColor }}
+            style={{ color: `text-[${initialColors.primary}]` }}
           >
             Create Account
           </h2>
           <p
             className="mt-2 opacity-60"
-            style={{ color: defaultTheme.textColor }}
+            style={{ color: `text-[${initialColors.primary}]` }}
           >
             Join us today
           </p>
@@ -71,7 +66,7 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name" style={{ color: defaultTheme.textColor }}>
+              <Label htmlFor="name" style={{ color: `text-[${initialColors.primary}]` }}>
                 Name *
               </Label>
               <Input
@@ -84,8 +79,8 @@ export default function RegisterPage() {
                   if (errors.name) clearError();
                 }}
                 placeholder="Full Name"
-                className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                style={{ borderColor: defaultTheme.secondaryColor }}
+                className={`mt-1 border-2 rounded-lg`}
+                style={{ borderColor: `text-[${initialColors.secondary}]` }}
                 required
                 autoComplete="name"
                 disabled={isLoading}
@@ -96,7 +91,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="email" style={{ color: defaultTheme.textColor }}>
+              <Label htmlFor="email" style={{ color: `text-[${initialColors.primary}]` }}>
                 Email address *
               </Label>
               <Input
@@ -112,8 +107,8 @@ export default function RegisterPage() {
                   handleInputChange("email", e.target.value);
                   if (errors.email) clearError();
                 }}
-                className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                style={{ borderColor: defaultTheme.secondaryColor }}
+                className={`mt-1 border-2 rounded-lg`}
+                style={{ borderColor: `text-[${initialColors.secondary}]` }}
               />
               {errors.email && (
                 <p className="text-sm text-red-600">{errors.email}</p>
@@ -121,7 +116,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="phone" style={{ color: defaultTheme.textColor }}>
+              <Label htmlFor="phone" style={{ color: `text-[${initialColors.primary}]` }}>
                 Phone Number
               </Label>
               <Input
@@ -137,8 +132,8 @@ export default function RegisterPage() {
                   handleInputChange("phone", e.target.value);
                   if (errors.phone) clearError();
                 }}
-                className={`mt-1 border-2 ${defaultTheme.borderRadius}`}
-                style={{ borderColor: defaultTheme.secondaryColor }}
+                className={`mt-1 border-2 rounded-lg`}
+                style={{ borderColor: `text-[${initialColors.secondary}]` }}
               />
               {errors.phone && (
                 <p className="text-sm text-red-600">{errors.phone}</p>
@@ -148,7 +143,7 @@ export default function RegisterPage() {
             <div>
               <Label
                 htmlFor="password"
-                style={{ color: defaultTheme.textColor }}
+                style={{ color: `text-[${initialColors.primary}]` }}
               >
                 Password *
               </Label>
@@ -166,8 +161,8 @@ export default function RegisterPage() {
                     handleInputChange("password", e.target.value);
                     if (errors.password) clearError();
                   }}
-                  className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
-                  style={{ borderColor: defaultTheme.secondaryColor }}
+                  className={`pr-10 border-2 rounded-lg`}
+                  style={{ borderColor: `text-[${initialColors.secondary}]` }}
                 />
 
                 <button
@@ -178,12 +173,12 @@ export default function RegisterPage() {
                   {showPassword ? (
                     <EyeOff
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: `text-[${initialColors.primary}]` }}
                     />
                   ) : (
                     <Eye
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: `text-[${initialColors.primary}]` }}
                     />
                   )}
                 </button>
@@ -197,7 +192,7 @@ export default function RegisterPage() {
             <div>
               <Label
                 htmlFor="confirmPassword"
-                style={{ color: defaultTheme.textColor }}
+                style={{ color: `text-[${initialColors.primary}]` }}
               >
                 Confirm Password *
               </Label>
@@ -216,8 +211,8 @@ export default function RegisterPage() {
                     handleInputChange("confirmPassword", e.target.value);
                     if (errors.confirmPassword) clearError();
                   }}
-                  className={`pr-10 border-2 ${defaultTheme.borderRadius}`}
-                  style={{ borderColor: defaultTheme.secondaryColor }}
+                  className={`pr-10 border-2 rounded-lg`}
+                  style={{ borderColor: `text-[${initialColors.secondary}]` }}
                 />
                 <button
                   type="button"
@@ -227,12 +222,12 @@ export default function RegisterPage() {
                   {showConfirmPassword ? (
                     <EyeOff
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: `text-[${initialColors.primary}]` }}
                     />
                   ) : (
                     <Eye
                       className="h-4 w-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: `text-[${initialColors.primary}]` }}
                     />
                   )}
                 </button>
@@ -246,8 +241,8 @@ export default function RegisterPage() {
 
           <Button
             type="submit"
-            className={`w-full text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-            style={{ backgroundColor: defaultTheme.secondaryColor }}
+            className={`w-full text-white hover:opacity-90 rounded-lg`}
+            style={{ backgroundColor: `bg-[${initialColors.secondary}]` }}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -263,13 +258,13 @@ export default function RegisterPage() {
           <div className="text-center">
             <p
               className="text-sm opacity-60"
-              style={{ color: defaultTheme.textColor }}
+              style={{ color: `text-[${initialColors.primary}]` }}
             >
               Already have an account?{" "}
               <Link
                 href={`/e-commerce/${subdomain}/login`}
                 className="font-medium hover:underline"
-                style={{ color: defaultTheme.textColor }}
+                style={{ color: `text-[${initialColors.primary}]` }}
               >
                 Sign in
               </Link>

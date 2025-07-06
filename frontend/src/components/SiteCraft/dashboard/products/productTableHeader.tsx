@@ -54,13 +54,27 @@ export function ProductTableHeader({
     let newSelectedCategories = [...selectedCategories];
 
     if (allInCategorySelected) {
-      // Deselect all in this category
+      // Deselect all in this category ONLY if not in any other selected category
+      // Find products that are ONLY in this category (not in any other selected category)
+      const otherSelectedCategories = newSelectedCategories.filter((c) => c !== categoryName);
+      const productsInOtherCategories = new Set(
+        filteredProducts
+          .filter((p: any) =>
+            p.categories &&
+            p.categories.some((cat: any) => otherSelectedCategories.includes(cat.name))
+          )
+          .map((p: any) => p.id)
+      );
       newSelectedProducts = newSelectedProducts.filter(
-        (id) => !categoryProducts.some((p: any) => p.id === id)
+        (id) =>
+          !categoryProducts.some(
+            (p: any) =>
+              p.id === id && !productsInOtherCategories.has(p.id)
+          )
       );
       newSelectedCategories = newSelectedCategories.filter((c) => c !== categoryName);
     } else {
-      // Select all in this category
+      // Select all in this category (union)
       categoryProducts.forEach((p: any) => {
         if (!newSelectedProducts.includes(p.id)) {
           newSelectedProducts.push(p.id);

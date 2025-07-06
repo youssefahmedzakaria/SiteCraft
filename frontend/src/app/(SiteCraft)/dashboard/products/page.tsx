@@ -21,12 +21,15 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
 } from "@/components/SiteCraft/ui/dropdown-menu";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { saveAs } from 'file-saver';
 import { getCategories } from "@/lib/products";
 import { ApplyDiscountDialog } from "@/components/SiteCraft/dashboard/products/dicountDialog";
-import { ChevronDown, Plus, RefreshCw, AlertCircle } from "lucide-react";
+import { ImportProgressModal } from "@/components/SiteCraft/dashboard/categories/ImportProgressModal";
+import { ChevronDown, Plus, RefreshCw, AlertCircle, Download, Upload, FileText } from "lucide-react";
 import { SimplifiedProduct } from "@/lib/products";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -36,7 +39,8 @@ import {
 } from "@/components/SiteCraft/ui/dialog";
 import { Label } from "@/components/SiteCraft/ui/label";
 import { Input } from "@/components/SiteCraft/ui/input";
-
+import { parseProductExcelFile, validateProductExcelData, createProductImportTemplate } from "@/lib/productExcelUtils";
+import { toast } from "react-toastify";
 export default function ProductPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
   const [stockFilter, setStockFilter] = useState<string>("All Stock");
@@ -44,7 +48,6 @@ export default function ProductPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const stockStatuses = ["All Stock", "In Stock", "Out of Stock"];
-  const [file, setFile] = useState<File | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionDropdownOpen, setSelectionDropdownOpen] = useState(false);
@@ -53,7 +56,12 @@ export default function ProductPage() {
   const [showStockModal, setShowStockModal] = useState(false);
   const [stockValues, setStockValues] = useState([{ value: "Stock", stock: 0 }]);
   const [selectedProductForStock, setSelectedProductForStock] = useState<SimplifiedProduct | null>(null);
-
+  const [file, setFile] = useState<File | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importResult, setImportResult] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     products,
     isLoading,
@@ -70,7 +78,32 @@ export default function ProductPage() {
   } = useProductStatistics();
 
   const { isAuthenticated, user } = useAuth();
+  const { isInactive } = useStoreStatus();
   const router = useRouter();
+
+  // Show inactive store message if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Fetch categories from backend
   useEffect(() => {
@@ -132,11 +165,103 @@ export default function ProductPage() {
     return true;
   });
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
-      console.log("File selected:", selectedFile.name);
+      console.log('File selected:', selectedFile.name, selectedFile.size);
+      
+      // Validate file type
+      const validTypes = ['.xlsx', '.xls', '.csv'];
+      const fileExtension = selectedFile.name.toLowerCase().substring(selectedFile.name.lastIndexOf('.'));
+      
+      if (!validTypes.includes(fileExtension)) {
+        toast.error('Please select a valid Excel file (.xlsx, .xls) or CSV file');
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      
+      try {
+        console.log('Starting import process...');
+        setIsImporting(true);
+        setIsImportModalOpen(true);
+        console.log('Modal should be open now');
+        setImportProgress(10);
+        
+        // Parse and validate Excel file
+        console.log('Parsing Excel file...');
+        const parsedData = await parseProductExcelFile(selectedFile);
+        console.log('Parsed data:', parsedData);
+        setImportProgress(30);
+        
+        const validation = validateProductExcelData(parsedData);
+        console.log('Validation result:', validation);
+        setImportProgress(50);
+        
+        if (!validation.isValid) {
+          console.log('Validation failed:', validation.errors);
+          setImportResult({
+            successCount: 0,
+            errorCount: validation.errors.length,
+            errors: validation.errors,
+            totalProcessed: validation.errors.length
+          });
+          setIsImporting(false);
+          setImportProgress(100);
+          return;
+        }
+        
+        // Upload to backend
+        console.log('Uploading to backend...');
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        const response = await fetch('/api/products/import', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        console.log('Backend response status:', response.status);
+        setImportProgress(80);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Backend error:', errorData);
+          throw new Error(errorData.message || 'Import failed');
+        }
+        
+        const result = await response.json();
+        console.log('Backend result:', result);
+        setImportResult(result.data);
+        setImportProgress(100);
+        
+        if (result.data.successCount > 0) {
+          toast.success(`Successfully imported ${result.data.successCount} products`);
+          fetchProducts(); // Refresh the products list
+        }
+        
+        if (result.data.errorCount > 0) {
+          toast.warning(`${result.data.errorCount} products failed to import`);
+        }
+        
+      } catch (error) {
+        console.error('Import error:', error);
+        setImportResult({
+          successCount: 0,
+          errorCount: 1,
+          errors: [error instanceof Error ? error.message : 'Import failed'],
+          totalProcessed: 0
+        });
+        toast.error('Import failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      } finally {
+        setIsImporting(false);
+        setImportProgress(100);
+      }
     }
   };
 
@@ -242,7 +367,29 @@ export default function ProductPage() {
     }
   };
 
-  if (isLoading) {
+  const handleExportProducts = async () => {
+    try {
+      const response = await fetch('/api/products/export', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to export products');
+      }
+      const blob = await response.blob();
+      saveAs(blob, 'products_export.xlsx');
+      toast.success('Products exported successfully');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Export failed');
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    createProductImportTemplate();
+    toast.success('Import template downloaded');
+  };  
+if (isLoading) {
     return (
       <div className="flex min-h-screen bg-gray-100">
         <Sidebar />
@@ -283,6 +430,15 @@ export default function ProductPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
+      {/* Hidden file input for import - moved to top level */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         {/* Header section */}
@@ -306,25 +462,32 @@ export default function ProductPage() {
                     size="lg"
                     className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
                   >
-                    <span className="ml-2">Import or Export Categories</span>
+                    <span className="ml-2">Import or Export Products</span>
                     <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>
-                    <label htmlFor="import-file">
-                      Import Categories From Excel Sheet
-                    </label>
-                    <input
-                      id="import-file"
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                    />
+                  <DropdownMenuItem onClick={handleDownloadTemplate}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download Import Template
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => console.log(file)}>
-                    Export All Categories
+                  <DropdownMenuItem onClick={() => {
+                    console.log('Import menu item clicked');
+                    console.log('File input ref:', fileInputRef.current);
+                    // Trigger file input click using ref
+                    if (fileInputRef.current) {
+                      console.log('File input found, clicking...');
+                      fileInputRef.current.click();
+                    } else {
+                      console.log('File input not found');
+                    }
+                  }}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import Products From Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportProducts}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export All Products
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -496,6 +659,12 @@ export default function ProductPage() {
               <ProductTableHeader
                 onSelectAll={handleSelectAll}
                 selectAll={selectAll}
+                categories={categories}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                selectedProducts={selectedProducts}
+                setSelectedProducts={setSelectedProducts}
+                filteredProducts={filteredProducts}
               />
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
@@ -546,6 +715,15 @@ export default function ProductPage() {
           </DialogContent>
         </Dialog>
       </main>
+
+      {/* Import Progress Modal */}
+      <ImportProgressModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        isImporting={isImporting}
+        progress={importProgress}
+        result={importResult}
+      />
     </div>
   );
 }

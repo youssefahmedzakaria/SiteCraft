@@ -1,8 +1,8 @@
 "use client";
+import React, { useState } from "react";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { CategoryLayoutItems } from "./categoryLayoutItems";
 import { CategoryCustomizationAttributes } from "@/lib/customization";
-import { useState } from "react";
 import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
@@ -69,6 +69,13 @@ export function RenderCategorySection({
     updateCategoryAttributes({ cardVariant: "default" });
   };
 
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 categories
+  React.useEffect(() => {
+    if (categoryAttributes.template === "FeaturedGrid" && (categoryAttributes.categories?.length || 0) < 3) {
+      updateCategoryAttributes({ template: "Grid" });
+    }
+  }, [categoryAttributes.categories?.length, categoryAttributes.template, updateCategoryAttributes]);
+
   return (
     <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
@@ -108,6 +115,7 @@ export function RenderCategorySection({
               ].indexOf(categoryAttributes.template) + 1
             }
             onLayoutSelect={handleLayoutSelection}
+            itemCount={categoryAttributes.categories?.length || 0}
           />
 
           {/* General */}

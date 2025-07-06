@@ -11,6 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 
 @Service
@@ -43,39 +50,28 @@ public class StoreService {
         System.out.println("🏪 StoreService.createStore called for user ID: " + userId);
         try {
             store.setCreationDate(LocalDateTime.now());
-            store.setStatus("active");
+            store.setStatus("inactive");
             
-            // Set default colors if not provided
-            String colors = store.getColors();
-            if (colors == null || colors.isEmpty()) {
-                colors = "{\"primary\": \"#000000\", \"secondary\": \"#ffffff\", \"accent\": \"#ff6b6b\"}";
+            // Set colors from the store data
+            if (store.getColors() != null) {
+                System.out.println("Store colors to be set: " + store.getColors());
+                // Colors are already set in the store object
+            } else {
+                // Set default colors using the new method
+                store.setColorsFromIndividual("#000000", "#ffffff", "#ff6b6b");
             }
             
             System.out.println("📅 Store creation date set");
-            System.out.println("✅ Store status set to active");
-            System.out.println("🎨 Store colors to be set: " + colors);
+            System.out.println("✅ Store status set to inactive");
 
-            // Save the store without colors first to get the ID
+            // Generate subdomain before saving
+            String subdomain = generateSubdomain(store.getStoreName(), null);
+            store.setSubdomain(subdomain);
+            
+            // Save the store with all data including colors
             Store savedStore = storeRepo.save(store);
             System.out.println("✅ Store saved with ID: " + savedStore.getId());
-            
-            // Generate and set unique subdomain after getting the store ID
-            try {
-                String subdomain = generateSubdomain(savedStore.getStoreName(), savedStore.getId());
-                savedStore.setSubdomain(subdomain);
-                savedStore = storeRepo.save(savedStore);
-                System.out.println("🌐 Subdomain generated and set: " + subdomain);
-            } catch (Exception e) {
-                System.out.println("⚠️ Error setting subdomain: " + e.getMessage());
-                throw new RuntimeException("Failed to generate unique subdomain. Please try again with a different store name.");
-            }
-            
-            // Now update the colors using native query
-            storeRepo.updateStoreColors(savedStore.getId(), colors);
-            System.out.println("🎨 Store colors updated using native query");
-            
-            // Refresh the store to get the updated colors
-            savedStore = storeRepo.findById(savedStore.getId()).orElse(savedStore);
+            System.out.println("🌐 Subdomain generated and set: " + subdomain);
             
             Users tempUser = new Users();
             tempUser.setId(userId);
@@ -444,7 +440,7 @@ public class StoreService {
         }
         
         // Generate base subdomain: storename + storeid
-        String baseSubdomain = cleanStoreName + storeId;
+        String baseSubdomain = cleanStoreName + (storeId != null ? storeId.toString() : "");
         
         // Check if this subdomain already exists
         int counter = 1;
@@ -456,6 +452,36 @@ public class StoreService {
         }
         
         return finalSubdomain;
+    }
+
+    public String uploadLogo(MultipartFile logo) throws IOException {
+        try {
+            // Create uploads directory if it doesn't exist
+            String uploadDir = "uploads/logos";
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Generate unique filename
+            String originalFilename = logo.getOriginalFilename();
+            String fileExtension = originalFilename != null ? 
+                originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+            
+            // Save file
+            Path filePath = uploadPath.resolve(uniqueFilename);
+            Files.copy(logo.getInputStream(), filePath);
+            
+            // Return the relative path for database storage
+            String relativePath = uploadDir + "/" + uniqueFilename;
+            System.out.println("✅ Logo uploaded successfully: " + relativePath);
+            
+            return relativePath;
+        } catch (IOException e) {
+            System.out.println("❌ Error uploading logo: " + e.getMessage());
+            throw new IOException("Failed to upload logo: " + e.getMessage());
+        }
     }
 
 }

@@ -20,16 +20,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Session } from "inspector/promises";
 import { getSession } from "@/lib/e-commerce/ecommerceAuth";
 
-// Theme configuration matching product page
-const defaultTheme = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
 interface UserData {
   id: number;
   firstName: string;
@@ -65,6 +55,12 @@ interface Address {
 }
 
 export default function ProfilePage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+  
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
@@ -403,15 +399,15 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${defaultTheme.fontFamily}`}
-        style={{ backgroundColor: defaultTheme.backgroundColor }}
+        className={`min-h-screen flex items-center justify-center font-sans`}
+        style={{ backgroundColor: "bg-[#FFFFFF]", color: initialColors.primary }}
       >
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-32 w-32 border-b-2 mx-auto"
-            style={{ borderColor: defaultTheme.secondaryColor }}
+            style={{ borderColor: initialColors.secondary }}
           ></div>
-          <p className="mt-4" style={{ color: defaultTheme.textColor }}>
+          <p className="mt-4" style={{ color: initialColors.primary }}>
             Loading...
           </p>
         </div>
@@ -424,18 +420,15 @@ export default function ProfilePage() {
   }
 
   return (
-    <div
-      className={`min-h-screen pt-20 ${defaultTheme.fontFamily}`}
-      style={{ backgroundColor: defaultTheme.backgroundColor }}
-    >
+    <div className={`min-h-screen bg-[#ffffff] pt-20`} style={{ color: initialColors.primary }}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <div
-                className={`w-16 h-16 ${defaultTheme.borderRadius} flex items-center justify-center`}
+                className={`w-16 h-16 rounded-lg flex items-center justify-center`}
                 style={{
-                  background: `linear-gradient(135deg, ${defaultTheme.secondaryColor} 0%, #8B4A6B 100%)`,
+                  background: `linear-gradient(135deg, ${initialColors.secondary} 0%, #8B4A6B 100%)`,
                 }}
               >
                 <User className="w-8 h-8 text-white" />
@@ -443,11 +436,11 @@ export default function ProfilePage() {
               <div>
                 <h1
                   className="text-3xl font-bold"
-                  style={{ color: defaultTheme.textColor }}
+                  style={{ color: initialColors.primary }}
                 >
                   {profileData?.firstName} {profileData?.lastName}
                 </h1>
-                <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                <p style={{ color: initialColors.primary, opacity: 0.7 }}>
                   {profileData?.email}
                 </p>
               </div>
@@ -455,11 +448,11 @@ export default function ProfilePage() {
             <Button
               onClick={handleLogout}
               variant="outline"
-              className={`flex items-center gap-2 ${defaultTheme.borderRadius} border-2`}
+              className={`flex items-center gap-2 rounded-lg border-2`}
               style={{
-                backgroundColor: defaultTheme.backgroundColor,
-                borderColor: defaultTheme.secondaryColor,
-                color: defaultTheme.textColor,
+                backgroundColor: "bg-[#FFFFFF]",
+                borderColor: initialColors.secondary,
+                color: initialColors.primary,
               }}
             >
               <LogOut className="w-4 h-4" />
@@ -473,8 +466,8 @@ export default function ProfilePage() {
             className="space-y-6"
           >
             <TabsList
-              className={`grid w-full grid-cols-2 ${defaultTheme.borderRadius}`}
-              style={{ backgroundColor: defaultTheme.secondaryColor }}
+              className={`grid w-full grid-cols-2 rounded-lg`}
+              style={{ backgroundColor: initialColors.secondary }}
             >
               <TabsTrigger
                 value="profile"
@@ -494,16 +487,16 @@ export default function ProfilePage() {
 
             <TabsContent value="profile" className="space-y-6">
               <div
-                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+                className={`bg-white rounded-lg shadow p-6`}
               >
                 <div className="mb-6">
                   <h2
                     className="text-xl font-semibold"
-                    style={{ color: defaultTheme.textColor }}
+                    style={{ color: initialColors.primary }}
                   >
                     Personal Information
                   </h2>
-                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                  <p style={{ color: initialColors.primary, opacity: 0.7 }}>
                     Update your personal details
                   </p>
                 </div>
@@ -512,7 +505,7 @@ export default function ProfilePage() {
                     <div>
                       <Label
                         htmlFor="firstName"
-                        style={{ color: defaultTheme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         First Name
                       </Label>
@@ -522,14 +515,14 @@ export default function ProfilePage() {
                         onChange={(e) =>
                           handleProfileUpdate("firstName", e.target.value)
                         }
-                        className={`border-2 ${defaultTheme.borderRadius}`}
-                        style={{ borderColor: defaultTheme.secondaryColor }}
+                        className={`border-2 rounded-lg`}
+                        style={{ borderColor: initialColors.secondary }}
                       />
                     </div>
                     <div>
                       <Label
                         htmlFor="lastName"
-                        style={{ color: defaultTheme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Last Name
                       </Label>
@@ -539,15 +532,15 @@ export default function ProfilePage() {
                         onChange={(e) =>
                           handleProfileUpdate("lastName", e.target.value)
                         }
-                        className={`border-2 ${defaultTheme.borderRadius}`}
-                        style={{ borderColor: defaultTheme.secondaryColor }}
+                        className={`border-2 rounded-lg`}
+                        style={{ borderColor: initialColors.secondary }}
                       />
                     </div>
                   </div>
                   <div>
                     <Label
                       htmlFor="email"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       Email
                     </Label>
@@ -556,15 +549,15 @@ export default function ProfilePage() {
                       type="email"
                       value={profileData?.email || ""}
                       onChange={(e) => handleProfileUpdate("email", e.target.value)}
-                      className={`border-2 ${defaultTheme.borderRadius}`}
-                      style={{ borderColor: defaultTheme.secondaryColor }}
+                      className={`border-2 rounded-lg`}
+                      style={{ borderColor: initialColors.secondary }}
                       readOnly
                     />
                   </div>
                   <div>
                     <Label
                       htmlFor="phone"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       Phone
                     </Label>
@@ -574,14 +567,14 @@ export default function ProfilePage() {
                       onChange={(e) =>
                         handleProfileUpdate("phone", e.target.value)
                       }
-                      className={`border-2 ${defaultTheme.borderRadius}`}
-                      style={{ borderColor: defaultTheme.secondaryColor }}
+                      className={`border-2 rounded-lg`}
+                      style={{ borderColor: initialColors.secondary }}
                     />
                   </div>
                   <Button
                     onClick={handleSaveProfile}
-                    className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                    style={{ backgroundColor: defaultTheme.secondaryColor }}
+                    className={`text-white hover:opacity-90 rounded-lg`}
+                    style={{ backgroundColor: initialColors.secondary }}
                     disabled={isSaving}
                   >
                     {isSaving ? "Saving..." : "Save Changes"}
@@ -590,21 +583,21 @@ export default function ProfilePage() {
               </div>
 
               <div
-                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+                className={`bg-white rounded-lg shadow p-6`}
               >
                 <div className="flex items-center gap-2 mb-6">
                   <MapPin
                     className="w-5 h-5"
-                    style={{ color: defaultTheme.textColor }}
+                    style={{ color: initialColors.primary }}
                   />
                   <div>
                     <h2
                       className="text-xl font-semibold"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       Addresses
                     </h2>
-                    <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                    <p style={{ color: initialColors.primary, opacity: 0.7 }}>
                       Manage your shipping addresses
                     </p>
                   </div>
@@ -614,15 +607,15 @@ export default function ProfilePage() {
                   {addresses.map((address) => (
                     <div key={address.id} className="space-y-4">
                       <div
-                        className={`border ${defaultTheme.borderRadius} p-4`}
-                        style={{ borderColor: defaultTheme.secondaryColor }}
+                        className={`border rounded-lg p-4`}
+                        style={{ borderColor: initialColors.secondary }}
                       >
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="flex items-center gap-2">
                               <p
                                 className="font-medium"
-                                style={{ color: defaultTheme.textColor }}
+                                style={{ color: initialColors.primary }}
                               >
                                 {address.type}
                               </p>
@@ -635,7 +628,7 @@ export default function ProfilePage() {
                             <p
                               className="text-sm mt-1"
                               style={{
-                                color: defaultTheme.textColor,
+                                color: initialColors.primary,
                                 opacity: 0.7,
                               }}
                             >
@@ -647,10 +640,10 @@ export default function ProfilePage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`border-2 ${defaultTheme.borderRadius}`}
+                              className={`border-2 rounded-lg`}
                               style={{
-                                borderColor: defaultTheme.secondaryColor,
-                                color: defaultTheme.textColor,
+                                borderColor: initialColors.secondary,
+                                color: initialColors.primary,
                               }}
                               onClick={() => handleEditAddress(address)}
                               disabled={addressLoading}
@@ -660,7 +653,7 @@ export default function ProfilePage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 ${defaultTheme.borderRadius}`}
+                              className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 rounded-lg`}
                               onClick={() => handleDeleteAddress(address.id)}
                               disabled={addressLoading}
                             >
@@ -671,97 +664,97 @@ export default function ProfilePage() {
                       </div>
 
                       {editingAddressId === address.id && (
-                        <div className={`p-4 border ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor, backgroundColor: defaultTheme.accentColor }}>
-                          <h4 className="text-lg font-semibold mb-4" style={{ color: defaultTheme.textColor }}>
+                        <div className={`p-4 border rounded-lg`}
+                          style={{ borderColor: initialColors.accent, backgroundColor: initialColors.secondary }}>
+                          <h4 className="text-lg font-semibold mb-4" style={{ color: initialColors.primary }}>
                             Edit Address
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor="editAddressType" style={{ color: defaultTheme.textColor }}>Title *</Label>
+                              <Label htmlFor="editAddressType" style={{ color: initialColors.primary }}>Title *</Label>
                               <Input
                                 id="editAddressType"
                                 value={editAddress.type}
                                 onChange={e => setEditAddress({ ...editAddress, type: e.target.value })}
                                 placeholder="e.g., Home, Work, Office"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editCity" style={{ color: defaultTheme.textColor }}>City *</Label>
+                              <Label htmlFor="editCity" style={{ color: initialColors.primary }}>City *</Label>
                               <Input
                                 id="editCity"
                                 value={editAddress.city}
                                 onChange={e => setEditAddress({ ...editAddress, city: e.target.value })}
                                 placeholder="City"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editStreetNum" style={{ color: defaultTheme.textColor }}>Street Number</Label>
+                              <Label htmlFor="editStreetNum" style={{ color: initialColors.primary }}>Street Number</Label>
                               <Input
                                 id="editStreetNum"
                                 value={editAddress.streetNum}
                                 onChange={e => setEditAddress({ ...editAddress, streetNum: e.target.value })}
                                 placeholder="Street Number"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editBuildingNum" style={{ color: defaultTheme.textColor }}>Building Number</Label>
+                              <Label htmlFor="editBuildingNum" style={{ color: initialColors.primary }}>Building Number</Label>
                               <Input
                                 id="editBuildingNum"
                                 value={editAddress.buildingNum}
                                 onChange={e => setEditAddress({ ...editAddress, buildingNum: e.target.value })}
                                 placeholder="Building Number"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editFloorNum" style={{ color: defaultTheme.textColor }}>Floor Number</Label>
+                              <Label htmlFor="editFloorNum" style={{ color: initialColors.primary }}>Floor Number</Label>
                               <Input
                                 id="editFloorNum"
                                 value={editAddress.floorNum}
                                 onChange={e => setEditAddress({ ...editAddress, floorNum: e.target.value })}
                                 placeholder="Floor Number"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editApartmentNum" style={{ color: defaultTheme.textColor }}>Apartment Number</Label>
+                              <Label htmlFor="editApartmentNum" style={{ color: initialColors.primary }}>Apartment Number</Label>
                               <Input
                                 id="editApartmentNum"
                                 value={editAddress.apartmentNum}
                                 onChange={e => setEditAddress({ ...editAddress, apartmentNum: e.target.value })}
                                 placeholder="Apartment Number"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <Label htmlFor="editLandmark" style={{ color: defaultTheme.textColor }}>Landmark</Label>
+                              <Label htmlFor="editLandmark" style={{ color: initialColors.primary }}>Landmark</Label>
                               <Input
                                 id="editLandmark"
                                 value={editAddress.landmark}
                                 onChange={e => setEditAddress({ ...editAddress, landmark: e.target.value })}
                                 placeholder="Landmark"
-                                className={`border-2 ${defaultTheme.borderRadius}`}
-                                style={{ borderColor: defaultTheme.secondaryColor }}
+                                className={`border-2 rounded-lg`}
+                                style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                           </div>
                           <div className="flex gap-2 mt-4">
-                            <Button onClick={handleUpdateAddress} className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                              style={{ backgroundColor: defaultTheme.secondaryColor }} disabled={addressLoading}>
+                            <Button onClick={handleUpdateAddress} className={`text-white hover:opacity-90 rounded-lg`}
+                              style={{ backgroundColor: initialColors.secondary }} disabled={addressLoading}>
                               Update Address
                             </Button>
-                            <Button onClick={handleCancelEdit} variant="outline" className={`border-2 ${defaultTheme.borderRadius}`}
-                              style={{ borderColor: defaultTheme.secondaryColor, color: defaultTheme.textColor }}>
+                            <Button onClick={handleCancelEdit} variant="outline" className={`border-2 rounded-lg`}
+                              style={{ borderColor: initialColors.secondary, color: initialColors.primary }}>
                               Cancel
                             </Button>
                           </div>
@@ -775,122 +768,122 @@ export default function ProfilePage() {
                   <Button
                     onClick={() => setShowAddAddress(true)}
                     variant="outline"
-                    className={`mt-4 border-2 ${defaultTheme.borderRadius}`}
+                    className={`mt-4 border-2 rounded-lg`}
                     style={{
-                      borderColor: defaultTheme.secondaryColor,
-                      color: defaultTheme.textColor,
+                      borderColor: initialColors.secondary,
+                      color: initialColors.primary,
                     }}
                   >
                     Add New Address
                   </Button>
                 ) : (
                   <div
-                    className={`mt-6 p-4 border ${defaultTheme.borderRadius}`}
+                    className={`mt-6 p-4 border rounded-lg`}
                     style={{
-                      borderColor: defaultTheme.secondaryColor,
-                      backgroundColor: defaultTheme.accentColor,
+                      borderColor: initialColors.secondary,
+                      backgroundColor: initialColors.accent,
                     }}
                   >
                     <h3
                       className="text-lg font-semibold mb-4"
-                      style={{ color: defaultTheme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       Add New Address
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="addressType" style={{ color: defaultTheme.textColor }}>Title *</Label>
+                        <Label htmlFor="addressType" style={{ color: initialColors.primary }}>Title *</Label>
                         <Input
                           id="addressType"
                           value={newAddress.type}
                           onChange={e => setNewAddress({ ...newAddress, type: e.target.value })}
                           placeholder="e.g., Home, Work, Office"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city" style={{ color: defaultTheme.textColor }}>City *</Label>
+                        <Label htmlFor="city" style={{ color: initialColors.primary }}>City *</Label>
                         <Input
                           id="city"
                           value={newAddress.city}
                           onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
                           placeholder="City"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="streetNum" style={{ color: defaultTheme.textColor }}>Street Number</Label>
+                        <Label htmlFor="streetNum" style={{ color: initialColors.primary }}>Street Number</Label>
                         <Input
                           id="streetNum"
                           value={newAddress.streetNum}
                           onChange={e => setNewAddress({ ...newAddress, streetNum: e.target.value })}
                           placeholder="Street Number"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="buildingNum" style={{ color: defaultTheme.textColor }}>Building Number</Label>
+                        <Label htmlFor="buildingNum" style={{ color: initialColors.primary }}>Building Number</Label>
                         <Input
                           id="buildingNum"
                           value={newAddress.buildingNum}
                           onChange={e => setNewAddress({ ...newAddress, buildingNum: e.target.value })}
                           placeholder="Building Number"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="floorNum" style={{ color: defaultTheme.textColor }}>Floor Number</Label>
+                        <Label htmlFor="floorNum" style={{ color: initialColors.primary }}>Floor Number</Label>
                         <Input
                           id="floorNum"
                           value={newAddress.floorNum}
                           onChange={e => setNewAddress({ ...newAddress, floorNum: e.target.value })}
                           placeholder="Floor Number"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="apartmentNum" style={{ color: defaultTheme.textColor }}>Apartment Number</Label>
+                        <Label htmlFor="apartmentNum" style={{ color: initialColors.primary }}>Apartment Number</Label>
                         <Input
                           id="apartmentNum"
                           value={newAddress.apartmentNum}
                           onChange={e => setNewAddress({ ...newAddress, apartmentNum: e.target.value })}
                           placeholder="Apartment Number"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor="landmark" style={{ color: defaultTheme.textColor }}>Landmark</Label>
+                        <Label htmlFor="landmark" style={{ color: initialColors.primary }}>Landmark</Label>
                         <Input
                           id="landmark"
                           value={newAddress.landmark}
                           onChange={e => setNewAddress({ ...newAddress, landmark: e.target.value })}
                           placeholder="Landmark"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
-                          style={{ borderColor: defaultTheme.secondaryColor }}
+                          className={`border-2 rounded-lg`}
+                          style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4">
                       <Button
                         onClick={handleAddAddress}
-                        className={`text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
-                        style={{ backgroundColor: defaultTheme.secondaryColor }}
+                        className={`text-white hover:opacity-90 rounded-lg`}
+                        style={{ backgroundColor: initialColors.secondary }}
                       >
                         Save Address
                       </Button>
                       <Button
                         onClick={() => setShowAddAddress(false)}
                         variant="outline"
-                        className={`border-2 ${defaultTheme.borderRadius}`}
+                        className={`border-2 rounded-lg`}
                         style={{
-                          borderColor: defaultTheme.secondaryColor,
-                          color: defaultTheme.textColor,
+                          borderColor: initialColors.secondary,
+                          color: initialColors.primary,
                         }}
                       >
                         Cancel
@@ -903,16 +896,16 @@ export default function ProfilePage() {
 
             <TabsContent value="orders" className="space-y-6">
               <div
-                className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+                className={`bg-white rounded-lg shadow p-6`}
               >
                 <div className="mb-6">
                   <h2
                     className="text-xl font-semibold"
-                    style={{ color: defaultTheme.textColor }}
+                    style={{ color: initialColors.primary }}
                   >
                     Order History
                   </h2>
-                  <p style={{ color: defaultTheme.textColor, opacity: 0.7 }}>
+                  <p style={{ color: initialColors.primary, opacity: 0.7 }}>
                     View your past orders and track current ones
                   </p>
                 </div>
@@ -920,21 +913,21 @@ export default function ProfilePage() {
                   {orders.map((order) => (
                     <div
                       key={order.id}
-                      className={`border ${defaultTheme.borderRadius} p-4 hover:shadow-md transition-shadow`}
-                      style={{ borderColor: defaultTheme.secondaryColor }}
+                      className={`border rounded-lg p-4 hover:shadow-md transition-shadow`}
+                      style={{ borderColor: initialColors.secondary }}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <p
                             className="font-medium"
-                            style={{ color: defaultTheme.textColor }}
+                            style={{ color: initialColors.primary }}
                           >
                             Order {order.id}
                           </p>
                           <p
                             className="text-sm"
                             style={{
-                              color: defaultTheme.textColor,
+                              color: initialColors.primary,
                               opacity: 0.7,
                             }}
                           >
@@ -952,7 +945,7 @@ export default function ProfilePage() {
                           </span>
                           <p
                             className="text-lg font-semibold mt-1"
-                            style={{ color: defaultTheme.textColor }}
+                            style={{ color: initialColors.primary }}
                           >
                             ${order.total}
                           </p>
@@ -964,7 +957,7 @@ export default function ProfilePage() {
                             key={index}
                             className="text-sm"
                             style={{
-                              color: defaultTheme.textColor,
+                              color: initialColors.primary,
                               opacity: 0.7,
                             }}
                           >
@@ -977,22 +970,22 @@ export default function ProfilePage() {
                           onClick={() => handleViewOrderDetails(order.id)}
                           variant="outline"
                           size="sm"
-                          className={`border-2 ${defaultTheme.borderRadius}`}
+                          className={`border-2 rounded-lg`}
                           style={{
-                            borderColor: defaultTheme.secondaryColor,
-                            color: defaultTheme.textColor,
-                          }}
-                        >
-                          View Details
+                            borderColor: initialColors.secondary,
+                            color: initialColors.primary,
+                              }}
+                            >
+                              View Details
                         </Button>
                         {order.status === "Delivered" && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`border-2 ${defaultTheme.borderRadius}`}
+                            className={`border-2 rounded-lg`}
                             style={{
-                              borderColor: defaultTheme.secondaryColor,
-                              color: defaultTheme.textColor,
+                              borderColor: initialColors.secondary,
+                              color: initialColors.primary,
                             }}
                           >
                             Reorder
@@ -1010,17 +1003,17 @@ export default function ProfilePage() {
             <TabsContent value="order-details" className="space-y-6">
               {selectedOrderId && (
                 <div
-                  className={`bg-white ${defaultTheme.borderRadius} shadow p-6`}
+                  className={`bg-white rounded-lg shadow p-6`}
                 >
                   <div className="flex items-center gap-4 mb-6">
                     <Button
                       onClick={handleBackToOrders}
                       variant="outline"
                       size="sm"
-                      className={`border-2 ${defaultTheme.borderRadius}`}
+                      className={`border-2 rounded-lg`}
                       style={{
-                        borderColor: defaultTheme.secondaryColor,
-                        color: defaultTheme.textColor,
+                        borderColor: initialColors.secondary,
+                        color: initialColors.primary,
                       }}
                     >
                       ← Back to Orders
@@ -1028,7 +1021,7 @@ export default function ProfilePage() {
                     <div>
                       <h2
                         className="text-xl font-semibold"
-                        style={{ color: defaultTheme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         Order Details - {selectedOrderId}
                       </h2>
@@ -1052,7 +1045,7 @@ export default function ProfilePage() {
                           <div>
                             <h3
                               className="text-lg font-semibold mb-4"
-                              style={{ color: defaultTheme.textColor }}
+                              style={{ color: initialColors.primary }}
                             >
                               Order Items ({order.items.length})
                             </h3>
@@ -1060,14 +1053,14 @@ export default function ProfilePage() {
                               {order.items.map((item, index) => (
                                 <div
                                   key={index}
-                                  className={`flex items-center gap-4 p-4 border ${defaultTheme.borderRadius}`}
+                                  className={`flex items-center gap-4 p-4 border rounded-lg`}
                                   style={{
-                                    backgroundColor: `${defaultTheme.secondaryColor}20`,
-                                    borderColor: defaultTheme.secondaryColor,
+                                    backgroundColor: initialColors.secondary,
+                                    borderColor: initialColors.secondary,
                                   }}
                                 >
                                   <div
-                                    className={`relative w-20 h-20 bg-gray-100 ${defaultTheme.borderRadius} overflow-hidden`}
+                                    className={`relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden`}
                                   >
                                     <Image
                                       src="/placeholder.png?height=80&width=80"
@@ -1080,14 +1073,14 @@ export default function ProfilePage() {
                                   <div className="flex-1">
                                     <h4
                                       className="font-medium"
-                                      style={{ color: defaultTheme.textColor }}
+                                      style={{ color: initialColors.primary }}
                                     >
                                       {item.name}
                                     </h4>
                                     <p
                                       className="text-sm"
                                       style={{
-                                        color: defaultTheme.textColor,
+                                        color: initialColors.primary,
                                         opacity: 0.7,
                                       }}
                                     >
@@ -1095,7 +1088,7 @@ export default function ProfilePage() {
                                     </p>
                                     <p
                                       className="text-lg font-semibold"
-                                      style={{ color: defaultTheme.textColor }}
+                                      style={{ color: initialColors.primary }}
                                     >
                                       ${item.price}
                                     </p>
@@ -1103,7 +1096,7 @@ export default function ProfilePage() {
                                   <div className="text-right">
                                     <p
                                       className="font-semibold"
-                                      style={{ color: defaultTheme.textColor }}
+                                      style={{ color: initialColors.primary }}
                                     >
                                       ${(item.price * item.quantity).toFixed(2)}
                                     </p>
@@ -1117,57 +1110,55 @@ export default function ProfilePage() {
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
                           <div
-                            className={`p-6 ${defaultTheme.borderRadius} sticky top-24`}
+                            className={`p-6 rounded-lg sticky top-24`}
                             style={{
-                              backgroundColor: `${defaultTheme.secondaryColor}20`,
+                              backgroundColor: initialColors.secondary,
                             }}
                           >
                             <h3
                               className="text-xl font-semibold mb-6"
-                              style={{ color: defaultTheme.textColor }}
+                              style={{ color: initialColors.primary }}
                             >
                               Order Summary
                             </h3>
 
                             <div className="space-y-4">
                               <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   Subtotal
                                 </span>
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   ${subtotal.toFixed(2)}
                                 </span>
                               </div>
 
                               <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   Shipping
-                                </span>
-                                <span style={{ color: defaultTheme.textColor }}>
                                   {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
                                 </span>
                               </div>
 
                               <div className="flex justify-between">
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   Tax
                                 </span>
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   ${tax.toFixed(2)}
                                 </span>
                               </div>
 
                               <hr
                                 style={{
-                                  borderColor: defaultTheme.secondaryColor,
+                                  borderColor: initialColors.secondary,
                                 }}
                               />
 
                               <div className="flex justify-between text-lg font-semibold">
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   Total
                                 </span>
-                                <span style={{ color: defaultTheme.textColor }}>
+                                <span style={{ color: initialColors.primary }}>
                                   ${order.total.toFixed(2)}
                                 </span>
                               </div>
@@ -1177,7 +1168,7 @@ export default function ProfilePage() {
                               <div>
                                 <h4
                                   className="font-medium mb-2"
-                                  style={{ color: defaultTheme.textColor }}
+                                  style={{ color: initialColors.primary }}
                                 >
                                   Order Status
                                 </h4>
@@ -1193,14 +1184,14 @@ export default function ProfilePage() {
                               <div>
                                 <h4
                                   className="font-medium mb-2"
-                                  style={{ color: defaultTheme.textColor }}
+                                  style={{ color: initialColors.primary }}
                                 >
                                   Order Date
                                 </h4>
                                 <p
                                   className="text-sm"
                                   style={{
-                                    color: defaultTheme.textColor,
+                                    color: initialColors.primary,
                                     opacity: 0.7,
                                   }}
                                 >
@@ -1210,10 +1201,10 @@ export default function ProfilePage() {
 
                               {order.status === "Delivered" && (
                                 <Button
-                                  className={`w-full text-white hover:opacity-90 ${defaultTheme.borderRadius}`}
+                                  className={`w-full text-white hover:opacity-90 rounded-lg`}
                                   style={{
                                     backgroundColor:
-                                      defaultTheme.secondaryColor,
+                                      initialColors.secondary,
                                   }}
                                 >
                                   Reorder Items

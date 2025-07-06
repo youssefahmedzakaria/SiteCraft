@@ -133,7 +133,19 @@ export default function OrderDetailsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Order Date:</span>
-                <span>{format(new Date(order.issueDate), "MMM dd, yyyy")}</span>
+                <span>
+                  {order.issueDate ? 
+                    (() => {
+                      try {
+                        const date = new Date(order.issueDate);
+                        return isNaN(date.getTime()) ? 'N/A' : format(date, "MMM dd, yyyy");
+                      } catch (error) {
+                        return 'N/A';
+                      }
+                    })() 
+                    : 'N/A'
+                  }
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment Method:</span>

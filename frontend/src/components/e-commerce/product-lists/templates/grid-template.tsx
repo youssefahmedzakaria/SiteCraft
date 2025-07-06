@@ -26,12 +26,7 @@ interface GridProductTemplateProps {
   fontFamily?: string;
   hoverEffect?: boolean;
   // Card related props
-  cardVariant?:
-    | "default"
-    | "minimal"
-    | "hover"
-    | "overlay"
-    | "featured";
+  cardVariant?: "default" | "minimal" | "hover" | "overlay" | "featured";
   showCardTitle?: boolean;
   showSubtitle?: boolean;
   showCta?: boolean;
@@ -137,21 +132,27 @@ export function GridProductTemplate({
   );
 
   return (
-    <div className={cn("w-full flex-shrink-0")}
-    style={{backgroundColor: bgColor.includes("[")
-            ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
-            : bgColor,}}
+    <div
+      className={cn("w-full flex-shrink-0")}
+      style={{
+        backgroundColor: bgColor.includes("[")
+          ? bgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+          : bgColor,
+      }}
     >
       <div
-        className={cn(" mx-auto px-16 py-8 md:py-16",)}
-         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+        className={cn(" mx-auto px-16 py-8 md:py-16")}
+        style={{
+          color: textColor?.includes("[")
+            ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+            : textColor,
           fontFamily: getFontFamily(fontFamily),
-                    }}
+        }}
       >
         {showTitle && (
           <h2
             className={cn(
-              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6",
+              "text-4xl md:text-4xl font-bold text-center pb-4 mb-6"
             )}
             style={{
               color: titleColor?.includes("[")
@@ -167,6 +168,7 @@ export function GridProductTemplate({
         <div className={cn("grid", gridCols, gap)}>
           {products.map((product) => (
             <FlexibleCard
+              isClickable={isClickable}
               key={product._id || product.id}
               item={product}
               type="product"
@@ -205,14 +207,16 @@ export function GridProductTemplate({
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",
-                "rounded-lg text-sm font-medium",
+                "rounded-lg text-sm font-medium"
               )}
               style={{
                 backgroundColor: showMorebuttonBgColor.includes("[")
-                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) || "#ffffff"
+                  ? showMorebuttonBgColor.split("-[")[1]?.slice(0, -1) ||
+                    "#ffffff"
                   : showMorebuttonBgColor,
                 color: showMorebuttonTextColor.includes("[")
-                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) || "#000000"
+                  ? showMorebuttonTextColor.split("-[")[1]?.slice(0, -1) ||
+                    "#000000"
                   : showMorebuttonTextColor,
               }}
             >

@@ -9,7 +9,9 @@ import com.sitecraft.backend.DTOs.CategoryCreateDTO;
 import com.sitecraft.backend.DTOs.CategoryResponseDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -316,6 +318,77 @@ public class CategoryController {
             response.put("data", analytics);
 
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<?> importCategories(@RequestParam("file") MultipartFile file, HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            // Validate file
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Please select a file to upload."));
+            }
+
+            String fileName = file.getOriginalFilename();
+            if (fileName == null || (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv"))) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Please upload an Excel file (.xlsx, .xls) or CSV file."));
+            }
+
+            // Check file size (max 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "File size must be less than 5MB."));
+            }
+
+            Map<String, Object> importResult = categoryService.importCategoriesFromExcel(file, storeId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Import completed");
+            response.put("data", importResult);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<?> exportCategories(HttpSession session) {
+        try {
+            Long storeId = (Long) session.getAttribute("storeId");
+            if (storeId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("success", false, "message", "Store ID not found in session."));
+            }
+
+            byte[] excelData = categoryService.exportCategoriesToExcel(storeId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "categories_export.xlsx");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(excelData);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);

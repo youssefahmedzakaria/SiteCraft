@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { BackendCategory, getCategories } from "@/lib/categories";
 
 export default function CategoriesPage({
   // Text configuration props
@@ -11,23 +12,12 @@ export default function CategoriesPage({
   subtitle = "Discover our exquisite range of handcrafted jewelry pieces, each telling its own unique story",
   ctaText = "Explore Collection",
 
-  // Background and styling props
-  bgColor = "bg-white",
-  pageTitleColor = "text-black",
-  subtitleColor = "text-black/80",
-  fontFamily = "font-serif",
-  titleFont = "font-bold",
-  accentColor = "bg-black/20",
-  overlayColor = "bg-black/50",
-
   // Pagination props
   itemsPerPage = 12,
   showPagination = true,
 
   // Other template props
   columns = { sm: 1, md: 2, lg: 3 },
-  textColor = "text-[#4A102A]",
-  borderRadius = "rounded-2xl",
   showTitle = false,
   hoverEffect = true,
   gap = "gap-8",
@@ -49,24 +39,48 @@ export default function CategoriesPage({
   titleFontSize = "text-3xl",
   showMoreButton = false,
 }) {
-  const {
-    categories,
-    statistics,
-    isLoading,
-    error,
-    clearError,
-    fetchCategories,
-  } = useCategoryManagement();
+  const [backendCategories, setBackendCategories] = useState<BackendCategory[]>(
+    []
+  );
+
+  // Add initialColors state
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setBackendCategories(data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItemsPerPage, setSelectedItemsPerPage] =
     useState(itemsPerPage);
 
   // Calculate pagination
-  const totalItems = categories.length;
+  const totalItems = backendCategories.length;
   const totalPages = Math.ceil(totalItems / selectedItemsPerPage);
   const startIndex = (currentPage - 1) * selectedItemsPerPage;
   const endIndex = startIndex + selectedItemsPerPage;
-  const currentCategories = categories.slice(startIndex, endIndex);
+  const currentCategories = backendCategories
+    .slice(startIndex, endIndex)
+    .map((category) => ({
+      name: category.name,
+      images: [{ id: category.id, url: category.image, alt: category.name }],
+      id: category.id,
+      Description: category.description,
+      link: `/${category.id}`,
+    }));
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -116,22 +130,20 @@ export default function CategoriesPage({
   };
 
   return (
-    <div className={`min-h-screen ${bgColor} pt-20`}>
+    <div className={`min-h-screen bg-[#ffffff] pt-20`}>
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className={`text-5xl ${titleFont} ${pageTitleColor} mb-4`}>
+          <h1 className={`text-5xl font-bold mb-4`} style={{ color: initialColors.primary }}>
             {mainTitle}
           </h1>
-          <p
-            className={`text-xl ${subtitleColor} font-light max-w-2xl mx-auto`}
-          >
+          <p className={`text-xl font-light max-w-2xl mx-auto`} style={{ color: initialColors.primary }}>
             {subtitle}
           </p>
         </div>
 
         {/* Items per page selector and results info */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-          <div className={`${textColor} text-sm`}>
+          <div className="text-sm" style={{ color: initialColors.primary }}>
             {Math.min(endIndex, totalItems)} out of {totalItems} categories
           </div>
         </div>
@@ -140,10 +152,10 @@ export default function CategoriesPage({
           categories={currentCategories}
           columns={columns}
           bgColor="bg-transparent"
-          textColor={textColor}
-          borderRadius={borderRadius}
+          textColor={initialColors.primary}
+          borderRadius="rounded-2xl"
           showTitle={showTitle}
-          fontFamily={fontFamily}
+          fontFamily="font-sans"
           hoverEffect={hoverEffect}
           gap={gap}
           imageHeight={imageHeight}
@@ -152,15 +164,15 @@ export default function CategoriesPage({
           ctaText={ctaText}
           cornerRadius={cornerRadius}
           cardShadow={cardShadow}
-          overlayColor={overlayColor}
+          overlayColor="bg-black/50"
           showSubtitle={showSubtitle}
-          accentColor={accentColor}
+          accentColor={initialColors.accent}
           borderColor={borderColor}
           cardVariant={cardVariant}
           showCardTitle={showCardTitle}
           titleColor={titleColor}
           titleFontSize={titleFontSize}
-          titleFont={titleFont}
+          titleFont="font-bold"
           showMoreButton={showMoreButton}
         />
 
@@ -174,7 +186,7 @@ export default function CategoriesPage({
                 className={`p-2 rounded-md border transition-colors ${
                   currentPage === 1
                     ? "border-gray-300 text-gray-400 cursor-not-allowed"
-                    : `border-current ${textColor} hover:bg-black/5`
+                    : `border-current ${initialColors.primary} hover:bg-black/5`
                 }`}
               >
                 <ChevronLeft size={20} />
@@ -193,7 +205,7 @@ export default function CategoriesPage({
                         ? `bg-[#4A102A] text-white`
                         : page === "..."
                         ? "text-gray-400 cursor-default"
-                        : `${textColor} hover:bg-black/5 border border-current`
+                        : `${initialColors.primary} hover:bg-black/5 border border-current`
                     }`}
                   >
                     {page}
@@ -207,14 +219,14 @@ export default function CategoriesPage({
                 className={`p-2 rounded-md border transition-colors ${
                   currentPage === totalPages
                     ? "border-gray-300 text-gray-400 cursor-not-allowed"
-                    : `border-current ${textColor} hover:bg-black/5`
+                    : `border-current ${initialColors.primary} hover:bg-black/5`
                 }`}
               >
                 <ChevronRight size={20} />
               </button>
             </div>
 
-            <div className={`${textColor} text-sm`}>
+            <div className={`text-sm`} style={{ color: initialColors.primary }}>
               Page {currentPage} of {totalPages}
             </div>
           </div>

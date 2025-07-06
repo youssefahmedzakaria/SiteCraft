@@ -59,8 +59,8 @@ import {
 } from "@/components/e-commerce/product-lists";
 import { GridCategoryTemplate } from "@/components/e-commerce/category-lists";
 import { form } from "@heroui/theme";
-import { productData } from "@/app/e-commerce/[subdomain]/product/[id]/sample-data";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import { useRouter } from "next/navigation";
 
 interface Section {
@@ -72,6 +72,12 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [aboutImage, setAboutImage] = useState<File | undefined>();
@@ -79,13 +85,38 @@ export default function CustomizeTemplatePage() {
   const [promoImages, setPromoImages] = useState<File[] | undefined>();
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isInactive } = useStoreStatus();
   const router = useRouter();
+
+  // Show inactive store message if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="w-80 bg-white border-r border-gray-200"></div>
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
     brandName: "Brand Name",
-    backgroundColor: "bg-[#00000080]", // bg-black/50
-    textColor: "text-[#FFFFFF]", // text-white
+    backgroundColor: `bg-[${initialColors.primary}]`, // bg-black/50
+    textColor: `text-[${initialColors.secondary}]`, // text-white
     logo: {
       src: "/placeholder.png",
       alt: "Custom Logo",
@@ -99,8 +130,8 @@ export default function CustomizeTemplatePage() {
       { label: "About Us", isShown: true },
       { label: "Contact Us", isShown: true },
     ],
-    iconColor: "text-[#FFFFFF]", // text-white
-    dividerColor: "border-[#E5E7EB]", // border-gray-200
+    iconColor: `text-[${initialColors.secondary}]`, // text-white
+    dividerColor: `border-[${initialColors.accent}]`, // border-gray-200
     fontFamily: "font-sans",
   };
 
@@ -142,14 +173,14 @@ export default function CustomizeTemplatePage() {
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     titleFont: "font-sans",
-    titleColor: "text-[#FFFFFF]", // text-white
+    titleColor: "text-[primary]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-[#FFFFFF]", // text-white
+    descriptionColor: `text-[${initialColors.secondary}]`, // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-[#FFFFFF]", // bg-white
-    buttonTextColor: "text-[#000000]", // text-black
+    buttonColor: `bg-[${initialColors.accent}]`, // bg-white
+    buttonTextColor: `text-[${initialColors.primary}]`, // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -172,14 +203,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -187,7 +218,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -248,20 +279,30 @@ export default function CustomizeTemplatePage() {
     setCategoryAttributes((prev) => ({ ...prev, ...updates }));
   };
 
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 categories
+  useEffect(() => {
+    if (
+      categoryAttributes.template === "FeaturedGrid" &&
+      (categoryAttributes.categories?.length || 0) < 3
+    ) {
+      setCategoryAttributes((prev) => ({ ...prev, template: "Grid" }));
+    }
+  }, [categoryAttributes.categories?.length, categoryAttributes.template]);
+
   const initialProduct: ProductCustomizationAttributes = {
     id: "products",
     template: "HorizontalScroll", // You can adjust this if needed
     isClickable: false,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[#000000]",
-    showMorebuttonTextColor: "text-[#EF4444]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -269,7 +310,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: "text-[#000000]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -342,11 +383,21 @@ export default function CustomizeTemplatePage() {
     setProductAttributes((prev) => ({ ...prev, ...updates }));
   };
 
+  // Auto-switch to Grid if Featured Grid is selected but less than 3 products
+  useEffect(() => {
+    if (
+      productAttributes.template === "FeaturedGrid" &&
+      (productAttributes.products?.length || 0) < 3
+    ) {
+      setProductAttributes((prev) => ({ ...prev, template: "Grid" }));
+    }
+  }, [productAttributes.products?.length, productAttributes.template]);
+
   const initialAbout: AboutCustomizationAttributes = {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-[#000000]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -366,7 +417,7 @@ export default function CustomizeTemplatePage() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: "text-#4B5563",
+    sectionColor: `text-[${initialColors.secondary}]`,
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -404,15 +455,15 @@ export default function CustomizeTemplatePage() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: "text-[#000000]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-[#000000]", // text-black
+    sectionTitleColor: `text-[${initialColors.secondary}]`, // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-[#000000]", // text-black
+    sectionContentColor: `text-[${initialColors.secondary}]`, // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -448,10 +499,10 @@ export default function CustomizeTemplatePage() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-[#000000]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-[#000000]",
+    contentColor: `text-[${initialColors.secondary}]`,
     contentSize: "text-lg",
   };
 
@@ -468,8 +519,8 @@ export default function CustomizeTemplatePage() {
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "Brand Name",
-    backgroundColor: "bg-[#FFFFFF]",
-    textColor: "text-[#000000]",
+    backgroundColor: `bg-[${initialColors.primary}]`,
+    textColor: `text-[${initialColors.secondary}]`,
     logo: {
       src: "/placeholder.png",
       alt: "Brand Logo",
@@ -481,7 +532,7 @@ export default function CustomizeTemplatePage() {
         href: "/contact",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
       {
@@ -489,7 +540,7 @@ export default function CustomizeTemplatePage() {
         href: "/about",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
       {
@@ -497,7 +548,7 @@ export default function CustomizeTemplatePage() {
         href: "/policies",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: "text-[#000000]",
+        fontColor: `text-[${initialColors.secondary}]`,
         isShown: true,
       },
     ],
@@ -507,14 +558,14 @@ export default function CustomizeTemplatePage() {
     },
     socialMediaStyles: {
       iconSize: 20,
-      iconColor: "text-[#000000]",
-      hoverColor: "text-[#000000]",
+    iconColor: `text-[${initialColors.secondary}]`,
+    hoverColor: `text-[${initialColors.accent}]`,
     },
     copyrightStyles: {
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-light",
-      fontColor: "text-[#000000]",
+      fontColor: `text-[${initialColors.secondary}]`,
     },
   };
 
@@ -548,18 +599,36 @@ export default function CustomizeTemplatePage() {
       SplitPromo: <SplitPromo {...promoAttributes} isClickable={false} />,
     },
     Products: {
-      FeaturedGrid: <FeaturedGridProductTemplate {...productAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollProductTemplate {...productAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridProductTemplate {...productAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollProductTemplate
+          {...productAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: <GridProductTemplate {...productAttributes} isClickable={false} />,
     },
     Categories: {
-      FeaturedGrid: <FeaturedGridCategoryTemplate {...categoryAttributes} />,
-      HorizontalScroll: (
-        <HorizontalScrollCategoryTemplate {...categoryAttributes} />
+      FeaturedGrid: (
+        <FeaturedGridCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
       ),
-      Grid: <GridCategoryTemplate {...categoryAttributes} />,
+      HorizontalScroll: (
+        <HorizontalScrollCategoryTemplate
+          {...categoryAttributes}
+          isClickable={false}
+        />
+      ),
+      Grid: (
+        <GridCategoryTemplate {...categoryAttributes} isClickable={false} />
+      ),
     },
     AboutUs: {
       TopImageAbout: <TopImageAbout {...aboutAttributes} />,
@@ -624,7 +693,7 @@ export default function CustomizeTemplatePage() {
           productsRes.json(),
           categoriesRes.json(),
         ]);
-
+      console.log(productsData);
       if (
         templateData.success &&
         templateData["Customized Template"] &&
@@ -729,7 +798,6 @@ export default function CustomizeTemplatePage() {
                 (acc: any) => acc.name.toLowerCase() === "twitter"
               )?.link || "",
           },
-
         }));
 
         setFooterAttributes((prev) => ({
@@ -743,14 +811,19 @@ export default function CustomizeTemplatePage() {
                 : "/placeholder.png",
           },
           socialMedia: {
+            ...(prev.socialMedia || {}),
             facebook:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "facebook"
-              )?.link || prev.socialMedia.facebook,
+              )?.link ||
+              prev.socialMedia?.facebook ||
+              "",
             instagram:
               storeData.store.socialMediaAccounts?.find(
                 (acc: any) => acc.name.toLowerCase() === "instagram"
-              )?.link || prev.socialMedia.instagram,
+              )?.link ||
+              prev.socialMedia?.instagram ||
+              "",
           },
         }));
 
@@ -762,7 +835,7 @@ export default function CustomizeTemplatePage() {
             description: product.description,
             discountType: product.discountType,
             discountValue: product.discountValue,
-            price: product.variants[0].price ? product.variants[0].price : 0.0,
+            price: product.variants && product.variants.length > 0 && product.variants[0]?.price ? product.variants[0].price : 0.0,
             images: [
               {
                 id:
@@ -1105,7 +1178,7 @@ export default function CustomizeTemplatePage() {
               Access Denied
             </h2>
             <p className="text-gray-600">
-              You don't have permission to access this page.
+              You do not have permission to access this page.
             </p>
           </div>
         </div>
@@ -1309,9 +1382,23 @@ export default function CustomizeTemplatePage() {
                   break;
                 case "Products":
                   template = productAttributes.template;
+                  // Auto-fallback to Grid if FeaturedGrid is selected but less than 3 products
+                  if (
+                    template === "FeaturedGrid" &&
+                    (productAttributes.products?.length || 0) < 3
+                  ) {
+                    template = "Grid";
+                  }
                   break;
                 case "Categories":
                   template = categoryAttributes.template;
+                  // Auto-fallback to Grid if FeaturedGrid is selected but less than 3 categories
+                  if (
+                    template === "FeaturedGrid" &&
+                    (categoryAttributes.categories?.length || 0) < 3
+                  ) {
+                    template = "Grid";
+                  }
                   break;
                 case "AboutUs":
                   template = aboutAttributes.template;

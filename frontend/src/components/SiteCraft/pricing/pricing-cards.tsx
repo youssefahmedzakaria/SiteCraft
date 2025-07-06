@@ -23,7 +23,7 @@ export function PricingCards() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [paymentDetails, setPaymentDetails] = useState<any>({});
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, checkSession } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [subscriptionResult, setSubscriptionResult] = useState<any>(null);
@@ -61,6 +61,10 @@ export function PricingCards() {
                 if (!res.ok) throw new Error(await res.text());
                 const data = await res.json();
                 setSubscriptionResult(data);
+                
+                // Refresh session to get updated store status
+                await checkSession();
+                
                 setPaymentSuccess(true);
               } catch (e) {
                 alert("Subscription failed: " + e);

@@ -54,14 +54,6 @@ export const NavbarTemplate3: React.FC<NavbarTemplate3Props> = ({
   // Filter visible menu items
   const visibleMenuItems = menuItems?.filter((item) => item.isShown !== false) || []
 
-  console.log("NavbarTemplate3 props:", {
-    backgroundColor,
-    textColor,
-    fontFamily,
-    iconColor,
-    dividerColor,
-  })
-
   // Utility for font family (local, not imported)
   const getFontFamily = (fontFamily: string) => {
     switch (fontFamily) {
