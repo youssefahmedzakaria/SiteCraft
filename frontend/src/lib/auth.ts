@@ -1,3 +1,6 @@
+import { siteCraftCache } from './cache';
+import { CustomizedTemplate } from './customization';
+
 // Authentication API utilities for SiteCraft admin/store owner
 
 export async function login(email: string, password: string) {
@@ -278,6 +281,13 @@ export async function createStore(storeData: {
   });
   
   if (!res.ok) {
+    if (res.status === 413) {
+      // 413 Payload Too Large
+      throw new Error(
+        "Logo image is too large. Please upload files smaller than 5 MB each."
+      );
+    }
+    // for other errors, pull the server's message if available
     let msg = 'Failed to create store';
     try { 
       const data = await res.json();
@@ -293,4 +303,67 @@ export async function createStore(storeData: {
   }
   
   return res.json();
+}
+
+export async function commitCachedRegistration(cachedData: {
+  user: { email: string; password: string; name: string; phone: string; gender: string };
+  store: { storeName: string; storeType: string; description?: string; phoneNumber?: string; emailAddress?: string; address?: string; addressLink?: string; openingHours?: string; colors?: { primary: string; secondary: string; accent: string } };
+  template: CustomizedTemplate;
+}) {
+  console.log('🚀 Committing cached registration data...', cachedData);
+  
+  const formData = new FormData();
+  
+  // Add all data as JSON
+  const registrationData = {
+    user: cachedData.user,
+    store: {
+      storeName: cachedData.store.storeName,
+      storeType: cachedData.store.storeType,
+      description: cachedData.store.description || '',
+      phoneNumber: cachedData.store.phoneNumber || '',
+      emailAddress: cachedData.store.emailAddress || '',
+      address: cachedData.store.address || '',
+      addressLink: cachedData.store.addressLink || '',
+      openingHours: cachedData.store.openingHours || '',
+      colors: cachedData.store.colors || { primary: '#000000', secondary: '#ffffff', accent: '#ff6b6b' }
+    }
+  };
+  
+  formData.append('registrationData', JSON.stringify(registrationData));
+  
+  // Get the cached logo file from the cache
+  const cachedLogoFile = siteCraftCache.getCachedLogoFile();
+  if (cachedLogoFile) {
+    console.log('🖼️ Adding cached logo file to commit:', cachedLogoFile.name);
+    formData.append('logo', cachedLogoFile);
+  } else {
+    console.log('ℹ️ No logo file found in cache');
+  }
+  
+  try {
+    const response = await fetch('http://localhost:8080/auth/commitRegistration', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Commit registration error response:', errorData);
+      throw new Error(errorData.message || 'Failed to commit registration');
+    }
+    
+    const result = await response.json();
+    console.log('✅ Registration committed successfully:', result);
+    
+    // Clear the cache after successful commit
+    siteCraftCache.clearCache();
+    
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error committing registration:', error);
+    throw error;
+  }
 }

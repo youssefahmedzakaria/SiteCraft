@@ -7,7 +7,7 @@ import { CardTitle } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Facebook, Instagram, Twitter, Youtube, Loader2 } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Loader2, AlertCircle } from "lucide-react";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { Store } from "@/lib/store-info";
 
@@ -34,6 +34,7 @@ export function StoreInformationSection() {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Update form data when store data loads
   useEffect(() => {
@@ -85,6 +86,10 @@ export function StoreInformationSection() {
       ...prev,
       [field]: value
     }));
+    // Clear errors when user starts typing
+    if (submitError) {
+      setSubmitError(null);
+    }
   };
 
   const handleSocialMediaChange = (platform: string, value: string) => {
@@ -98,6 +103,10 @@ export function StoreInformationSection() {
     const file = event.target.files?.[0];
     if (file) {
       setLogoFile(file);
+      // Clear errors when a new logo is selected
+      if (submitError) {
+        setSubmitError(null);
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         setLogoPreview(e.target?.result as string);
@@ -108,6 +117,9 @@ export function StoreInformationSection() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    // Clear any existing submit errors
+    setSubmitError(null);
     
     try {
       // Prepare social media accounts
@@ -148,7 +160,17 @@ export function StoreInformationSection() {
       console.log('✅ Store information updated successfully!');
     } catch (error) {
       console.error('❌ Failed to update store information:', error);
-      // Show error message (you can add a toast notification here)
+      
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('File size too large') || error.message.includes('image is too large')) {
+          setSubmitError('The logo image you uploaded is too large. Please choose a smaller image (under 5MB) and try again.');
+        } else {
+          setSubmitError(error.message);
+        }
+      } else {
+        setSubmitError('An unexpected error occurred. Please try again.');
+      }
     }
   };
 
@@ -161,19 +183,28 @@ export function StoreInformationSection() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600 mb-4">Error: {error}</p>
-        <Button onClick={() => window.location.reload()} variant="outline">
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Banner */}
+      {(submitError || error) && (
+        <div className="mb-6 p-4 border border-red-300 rounded-md bg-red-50">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+            <p className="text-red-800">{submitError || error}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSubmitError(null);
+                // You can also clear the hook error if needed
+              }}
+              className="ml-auto text-red-600 hover:text-red-800"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Store Information */}
       <div>
         <CardTitle className="font-bold text-2xl mb-6">

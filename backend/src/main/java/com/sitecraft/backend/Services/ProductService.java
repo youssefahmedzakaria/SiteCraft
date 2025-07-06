@@ -512,64 +512,58 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
-        Product product = updateProduct(id, productDTO, storeId);
-        
-        // Only handle images if images parameter is not null (meaning the frontend sent image data)
-        if (images != null) {
-            // Remove old images only if new images are provided
-            if (!images.isEmpty()) {
-                List<ProductImage> oldImages = productImageRepo.findByProductId(id);
-                for (ProductImage img : oldImages) {
-                    try {
-                        String imageUrl = img.getImageUrl();
-                        String relativePath;
-                        if (imageUrl.startsWith("http://localhost:8080")) {
-                            relativePath = imageUrl.substring("http://localhost:8080".length());
-                        } else {
-                            relativePath = imageUrl;
-                        }
-                        String path = System.getProperty("user.dir") + relativePath;
-                        File file = new File(path);
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                    } catch (Exception e) {
-                        // Log the error but don't fail the update
-                        System.err.println("Warning: Could not delete old image file: " + e.getMessage());
-                    }
-                }
-                productImageRepo.deleteAll(oldImages);
-                
-                // Save new images
-                saveProductImages(product.getStore().getId(), product.getId(), images, product);
-            }
-        }
-        
-        return getProductById(product.getId(), storeId);
+public Product updateProductWithImages(Long id, ProductCreateDTO productDTO, Long storeId, List<MultipartFile> images) throws IOException {
+    // 1. update all the non-image fields
+    Product product = updateProduct(id, productDTO, storeId);
+
+    // 2. if the front-end sent any new files, just save them—
+    //    leave existing images untouched
+    if (images != null && !images.isEmpty()) {
+        saveProductImages(product.getStore().getId(), product.getId(), images, product);
     }
 
-    private void saveProductImages(Long storeId, Long productId, List<MultipartFile> images, Product product) throws IOException {
-        String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + storeId + "/products/";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-        int count = 1;
-        String productNameSlug = product.getName().toLowerCase().replaceAll("[^a-z0-9]+", "-");
-        for (MultipartFile image : images) {
-            if (image.isEmpty()) continue;
-            String filename = productNameSlug + "_" + storeId + "_" + productId + "_img" + count + ".png";
-            File destFile = new File(dir, filename);
-            image.transferTo(destFile);
-            ProductImage productImage = new ProductImage();
-            // Store complete URL including server address
-            productImage.setImageUrl("http://localhost:8080/uploads/stores/" + storeId + "/products/" + filename);
-            productImage.setAlt(product.getName() + " image " + count);
-            productImage.setProduct(product);
-            productImageRepo.save(productImage);
-            count++;
-        }
-    }
+    // 3. return updated product with both old + newly-added images
+    return getProductById(product.getId(), storeId);
+}
 
+
+    private void saveProductImages(Long storeId,
+                               Long productId,
+                               List<MultipartFile> images,
+                               Product product) throws IOException {
+    String uploadDir = System.getProperty("user.dir")
+                     + "/uploads/stores/" + storeId + "/products/";
+    File dir = new File(uploadDir);
+    if (!dir.exists()) dir.mkdirs();
+
+    String slug = product.getName()
+                         .toLowerCase()
+                         .replaceAll("[^a-z0-9]+", "-");
+
+    for (MultipartFile image : images) {
+        if (image.isEmpty()) continue;
+
+        // preserve original file extension
+        String original = image.getOriginalFilename();
+        String ext = (original != null && original.contains("."))
+                     ? original.substring(original.lastIndexOf("."))
+                     : ".png";
+
+        // use a millisecond timestamp for uniqueness
+        String filename = String.format("%s_%d_%d_%d%s",
+            slug, storeId, productId, System.currentTimeMillis(), ext);
+
+        File dest = new File(dir, filename);
+        image.transferTo(dest);
+
+        ProductImage pi = new ProductImage();
+        pi.setImageUrl("http://localhost:8080/uploads/stores/"
+                       + storeId + "/products/" + filename);
+        pi.setAlt(product.getName() + " image");
+        pi.setProduct(product);
+        productImageRepo.save(pi);
+    }
+}
     @Transactional
     public void deleteProductImage(Long productId, Long imageId, Long storeId) {
         // 1. Fetch the product and check it belongs to the store

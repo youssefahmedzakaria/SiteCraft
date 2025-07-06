@@ -1,5 +1,8 @@
 package com.sitecraft.backend.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,8 +53,8 @@ public class Store {
 
     private String status;
 
-    @Column(name = "colors", columnDefinition = "jsonb", insertable = false, updatable = false)
-    private String colors;
+    @Column(name = "colors", columnDefinition = "jsonb")
+    private JsonNode colors;
 
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -220,11 +223,83 @@ public class Store {
     }
 
     public String getColors() {
-        return colors;
+        try {
+            if (colors != null) {
+                return new ObjectMapper().writeValueAsString(colors);
+            }
+        } catch (Exception e) {
+            // Return default colors if serialization fails
+        }
+        return "{\"primary\":\"#000000\",\"secondary\":\"#ffffff\",\"accent\":\"#ff6b6b\"}";
     }
 
     public void setColors(String colors) {
+        try {
+            this.colors = new ObjectMapper().readValue(colors, JsonNode.class);
+        } catch (Exception e) {
+            // Set default colors if JSON parsing fails
+            this.colors = new ObjectMapper().createObjectNode();
+        }
+    }
+
+    public void setColors(JsonNode colors) {
         this.colors = colors;
+    }
+
+    public String getPrimaryColor() {
+        try {
+            if (colors != null) {
+                return colors.get("primary").asText();
+            }
+        } catch (Exception e) {
+            // Return default if parsing fails
+        }
+        return "#000000";
+    }
+
+    public String getSecondaryColor() {
+        try {
+            if (colors != null) {
+                return colors.get("secondary").asText();
+            }
+        } catch (Exception e) {
+            // Return default if parsing fails
+        }
+        return "#ffffff";
+    }
+
+    public String getAccentColor() {
+        try {
+            if (colors != null) {
+                return colors.get("accent").asText();
+            }
+        } catch (Exception e) {
+            // Return default if parsing fails
+        }
+        return "#ff6b6b";
+    }
+
+    public void setColorsFromIndividual(String primary, String secondary, String accent) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode colorNode = mapper.createObjectNode();
+            colorNode.put("primary", primary);
+            colorNode.put("secondary", secondary);
+            colorNode.put("accent", accent);
+            this.colors = colorNode;
+        } catch (Exception e) {
+            // Set default colors if JSON creation fails
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode defaultNode = mapper.createObjectNode();
+                defaultNode.put("primary", "#000000");
+                defaultNode.put("secondary", "#ffffff");
+                defaultNode.put("accent", "#ff6b6b");
+                this.colors = defaultNode;
+            } catch (Exception ex) {
+                this.colors = null;
+            }
+        }
     }
 
     public List<CustomizedTemplateSection> getCustomizedTemplate() {

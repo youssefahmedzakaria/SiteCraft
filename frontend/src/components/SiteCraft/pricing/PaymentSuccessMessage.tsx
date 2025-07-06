@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/SiteCraft/ui/button";
+import { useRouter } from "next/navigation";
 
 interface PaymentSuccessMessageProps {
   planName: string | undefined;
@@ -8,6 +9,12 @@ interface PaymentSuccessMessageProps {
 }
 
 const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName, transactionId, onBack }) => {
+  const router = useRouter();
+
+  const handleContinueToDashboard = () => {
+    router.push('/dashboard');
+  };
+
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
       <div className="p-6 text-center">
@@ -26,7 +33,7 @@ const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName,
         </div>
         <Button
           className="w-full bg-gradient-to-r from-[#00B4D8] to-[#0077B6] hover:from-[#0096C7] hover:to-[#005577] text-white"
-          onClick={onBack}
+          onClick={handleContinueToDashboard}
         >
           Continue to Dashboard
         </Button>

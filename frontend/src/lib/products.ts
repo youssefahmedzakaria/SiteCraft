@@ -12,11 +12,10 @@ export interface Product {
     variants?: ProductVariant[]
     attributes?: ProductAttribute[]
     reviews?: ProductReview[]
-    categoryProducts?: CategoryProduct[]
-    categoryId?: number // Keep for backward compatibility
-    categoryIds?: number[] // New field for multiple categories
-    categories?: Category[] // New field for category objects
-    categoryName?: string
+    categories?: Category[]
+    lowStockNotificationEnabled?: boolean
+    currentTotalStock?: number
+    atLowStockLevel?: boolean
 }
 
 export interface ProductImage {
@@ -61,8 +60,10 @@ export interface CategoryProduct {
 
 export interface Category {
     id: number
-    title: string
-    status: string
+    name: string
+    description?: string
+    image?: string | null
+    createdAt?: string
 }
 
 // DTOs for creating/updating products
@@ -71,8 +72,7 @@ export interface ProductCreateDTO {
     description: string
     discountType?: string
     discountValue?: number
-    categoryId?: number // Keep for backward compatibility
-    categoryIds?: number[] // New field for multiple categories
+    categoryIds?: number[]
     attributes?: ProductAttributeDTO[]
     variants?: ProductVariantDTO[]
     imageUrls?: string[]
@@ -111,12 +111,9 @@ export interface SimplifiedProduct {
     status: string
     discountType?: string
     discountValue?: number
-    categoryId?: number // Keep for backward compatibility
-    categoryIds?: number[] // New field for multiple categories
-    categories?: Category[] // New field for category objects
+    categories?: Category[]
     storeId: number
     images?: SimplifiedProductImage[]
-    category?: Category
 }
 
 export interface SimplifiedProductImage {
@@ -222,9 +219,17 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
         console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('📥 Error response body:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+            if (response.status === 413) {
+                // 413 Payload Too Large
+                throw new Error(
+                    "Image is too large. Please upload files smaller than 5 MB each."
+                );
+            }
+            // for other errors, pull the server's message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+                `Failed to create product: ${errText} (status ${response.status})`
+            );
         }
 
         const data = await response.json();
@@ -261,8 +266,19 @@ export const updateProduct = async (productId: number, productData: ProductCreat
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+             if (response.status === 413) {
+    // 413 Payload Too Large
+             throw new Error(
+                 "Image is too large. Please upload files smaller than 5 MB each."
+            );
+  }
+  // for other errors, pull the server’s message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+            `Failed to update product: ${errText} (status ${response.status})`
+  );
+}
+
 
         const data = await response.json();
         console.log('✅ Product updated successfully:', data);
@@ -468,8 +484,9 @@ export const deleteProductImage = async (productId: number, imageId: number): Pr
 
 // Helper function to transform backend product to simplified frontend format
 export const transformProduct = (product: any): SimplifiedProduct => {
-    // Calculate total stock from variants
-    const totalStock = product.variants?.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0) || 0;
+    // Use backend's calculated stock if available, otherwise calculate from variants
+    const totalStock = product.currentTotalStock ?? 
+        (product.variants?.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0) || 0);
     
     // Get the first variant with a price as the main price
     const mainVariant = product.variants?.find((v: any) => v.price !== null);
@@ -482,13 +499,8 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         alt: img.alt
     })) || [];
 
-    // Handle multiple categories, mapping 'name' to 'title'
-    const categories = (product.categories || []).map((cat: any) => ({
-        ...cat,
-        title: cat.name
-    }));
-    const categoryIds = categories.map((cat: any) => cat.id) || [];
-    const categoryId = categoryIds.length > 0 ? categoryIds[0] : 0; // Keep first category for backward compatibility
+    // Backend categories already have the correct structure
+    const categories = product.categories || [];
 
     return {
         id: product.id,
@@ -499,12 +511,9 @@ export const transformProduct = (product: any): SimplifiedProduct => {
         status: totalStock > 0 ? 'In Stock' : 'Out Of Stock',
         discountType: product.discountType,
         discountValue: product.discountValue,
-        categoryId: categoryId,
-        categoryIds: categoryIds,
         categories: categories,
-        storeId: 0, // This will be set by the backend
-        images: transformedImages,
-        category: categories.length > 0 ? categories[0] : undefined
+        storeId: 0,
+        images: transformedImages
     };
 };
 

@@ -29,6 +29,7 @@ import { RightAlignedPromo } from "@/components/e-commerce/promo/templates/right
 import { SplitPromo } from "@/components/e-commerce/promo/templates/split-promo";
 import { CustomizedTemplate } from "@/lib/customization";
 import { useTemplates } from "@/lib/templates";
+import { siteCraftCache } from "@/lib/cache";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -39,18 +40,54 @@ interface Section {
 
 const initialSections: Section[] = [];
 
-export default function TemplateCard() {
+export default function TemplateView() {
   const path = usePathname();
   const pathSegments = path.split("/");
-  const templateId = pathSegments[2];
+  const templateId = pathSegments[3];
   const { getTemplate } = useTemplates();
-  const [params, setParams] = useState<CustomizedTemplate>(
-    getTemplate(templateId)!
-  );
+  const [params, setParams] = useState<CustomizedTemplate | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [sections, setSections] = useState<Section[]>(initialSections);
 
+  useEffect(() => {
+    // Try to get template from cache first, then fall back to static templates
+    const cachedData = siteCraftCache.getData();
+    let template: CustomizedTemplate | null = null;
+
+    if (cachedData.templates && cachedData.templates.length > 0) {
+      // Find the template in cached templates
+      template = cachedData.templates.find((t) => t.id === templateId) || null;
+      console.log(
+        `📦 Template ${templateId} from cache:`,
+        template ? "Found" : "Not found"
+      );
+    }
+
+    if (!template) {
+      // Fall back to static templates
+      template = getTemplate(templateId) || null;
+      console.log(
+        `📦 Template ${templateId} from static templates:`,
+        template ? "Found" : "Not found"
+      );
+    }
+
+    if (template) {
+      setParams(template);
+      console.log(`✅ Template ${templateId} loaded successfully:`, template);
+    } else {
+      console.error(
+        `❌ Template ${templateId} not found in cache or static templates`
+      );
+    }
+
+    setIsLoading(false);
+  }, [templateId, getTemplate]);
+
   const getSectionsFromTemplate = () => {
+    if (!params) return;
+
     const sectionIds = Object.keys(params);
     const sections = sectionIds.map((sectionId) => ({
       id: sectionId,
@@ -60,8 +97,23 @@ export default function TemplateCard() {
   };
 
   useEffect(() => {
-    getSectionsFromTemplate();
-  }, []);
+    if (params) {
+      getSectionsFromTemplate();
+    }
+  }, [params]);
+
+  if (isLoading || !params) {
+    return (
+      <div className="flex-1 bg-gray-100 rounded-lg overflow-y-auto">
+        <div className="flex items-center justify-center h-64">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
+            <span className="text-lg text-gray-600">Loading template...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const sectionComponents = {
     PromoSlider: {
@@ -139,6 +191,7 @@ export default function TemplateCard() {
       CenteredPolicies: <CenteredPolicies {...params.Policies} />,
     },
   };
+
   return (
     <div className="flex-1 bg-gray-100 rounded-lg overflow-y-auto">
       <div

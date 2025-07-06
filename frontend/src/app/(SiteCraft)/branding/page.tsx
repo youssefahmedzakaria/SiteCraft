@@ -5,11 +5,10 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { createStore } from "@/lib/auth";
 import { getStoreSettings, updateStoreInfo } from "@/lib/store-info";
-import { saveStoreColors, updateStoreColors } from "@/lib/store-colors";
 import { useRouter } from "next/navigation";
 import { RefreshCw, AlertCircle } from "lucide-react";
+import { siteCraftCache } from '@/lib/cache'
 
 interface StoreData {
   id: number;
@@ -581,14 +580,12 @@ export default function BrandingPage() {
   const [accentColor, setAccentColor] = useState("#ff6b6b");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [storeType, setStoreType] = useState("");
-  const [subdomain, setSubdomain] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [existingStore, setExistingStore] = useState<StoreData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isClient, setIsClient] = useState(false);
-  const { user, updateSessionAfterStoreCreation } = useAuth();
   const router = useRouter();
 
   // Ensure we're on the client side
@@ -597,36 +594,36 @@ export default function BrandingPage() {
   }, []);
 
   // Load existing store data if user has a store
-  useEffect(() => {
-    if (!isClient || !user?.userId) {
-      setIsLoading(false);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!isClient || !user?.userId) {
+  //     setIsLoading(false);
+  //     return;
+  //   }
 
-    const loadStoreData = async () => {
-      try {
-        // If user has a storeId, try to load existing store data
-        if (user.storeId) {
-          const storeData = await getStoreSettings();
-          setExistingStore(storeData);
+  //   const loadStoreData = async () => {
+  //     try {
+  //       // If user has a storeId, try to load existing store data
+  //       if (user.storeId) {
+  //         const storeData = await getStoreSettings();
+  //         setExistingStore(storeData);
           
-          // Pre-fill form with existing data
-          setStoreName(storeData.storeName || "My Store");
-          setStoreType(storeData.storeType || "");
-          setSubdomain(storeData.subdomain || "");
+  //         // Pre-fill form with existing data
+  //         setStoreName(storeData.storeName || "My Store");
+  //         setStoreType(storeData.storeType || "");
+  //         setSubdomain(storeData.subdomain || "");
           
-          console.log('✅ Existing store data loaded:', storeData);
-        }
-      } catch (err) {
-        console.log('ℹ️ No existing store found or error loading store data');
-        // This is expected for new users who don't have a store yet
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //         console.log('✅ Existing store data loaded:', storeData);
+  //       }
+  //     } catch (err) {
+  //       console.log('ℹ️ No existing store found or error loading store data');
+  //       // This is expected for new users who don't have a store yet
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    loadStoreData();
-  }, [user, isClient]);
+  //   loadStoreData();
+  // }, [user, isClient]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isClient) return;
@@ -634,6 +631,11 @@ export default function BrandingPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setLogoFile(file);
+      
+      // Clear errors when a new logo is selected
+      if (error) {
+        setError(null);
+      }
 
       const img = new window.Image();
       img.crossOrigin = "Anonymous";
@@ -699,22 +701,29 @@ export default function BrandingPage() {
 
   const handleStoreNameChange = (value: string) => {
     setStoreName(value);
-    // Clear store name error when user starts typing
+    // Clear errors when user starts typing
     if (errors.storeName) {
       setErrors(prev => ({ ...prev, storeName: '' }));
+    }
+    if (error) {
+      setError(null);
     }
   };
 
   const handleSaveChanges = async () => {
-    if (!isClient || !user?.userId) {
-      alert('User not authenticated');
+    if (!isClient) {
+      alert('Please wait for page to load');
       return;
     }
 
     if (!storeName.trim() || !storeType) {
-      alert('Please fill in store name and store type');
+      setError('Please fill in store name and store type.');
       return;
     }
+
+    // Clear any existing errors
+    setError(null);
+    setErrors({});
 
     // Validate colors before saving
     const validPrimaryColor = validateHexColor(primaryColor) ? primaryColor : "#000000";
@@ -723,79 +732,34 @@ export default function BrandingPage() {
 
     setIsCreating(true);
     try {
-      if (existingStore) {
-        // Update existing store
-        console.log('🏪 Updating existing store with data:', {
-          storeName,
-          storeType,
-          logoFile: logoFile?.name
-        });
+      // Save store data to cache instead of creating in database
+      console.log('🏪 Saving store data to cache:', {
+        storeName,
+        storeType,
+        logoFile: logoFile?.name
+      });
 
-        const storeData = {
-          storeName: storeName.trim(),
-          storeType: storeType,
-          description: existingStore.description || `Store updated for ${storeName}`,
-          subdomain: subdomain.trim() || undefined
-        };
-
-        const result = await updateStoreInfo(storeData, logoFile || undefined);
-        console.log('✅ Store updated successfully:', result);
-        
-        // Update store colors in database
-        try {
-          await updateStoreColors({
-            primary: validPrimaryColor,
-            secondary: validSecondaryColor,
-            accent: validAccentColor
-          });
-          console.log('✅ Store colors updated in database');
-        } catch (colorError) {
-          console.error('⚠️ Failed to update colors in database:', colorError);
-          // Continue anyway, don't block the flow
+      const storeData = {
+        storeName: storeName.trim(),
+        storeType: storeType,
+        description: `Store created for ${storeName}`,
+        phoneNumber: '',
+        emailAddress: '',
+        address: '',
+        addressLink: '',
+        openingHours: '',
+        logo: logoFile || undefined,
+        colors: {
+          primary: validPrimaryColor,
+          secondary: validSecondaryColor,
+          accent: validAccentColor
         }
-        
-        // Show success message and redirect to color palette
-        alert('Store updated successfully!');
-        router.push('/branding/color-palette');
-      } else {
-        // Create new store
-        console.log('🏪 Creating new store with data:', {
-          storeName,
-          storeType,
-          logoFile: logoFile?.name
-        });
+      };
 
-        const storeData = {
-          storeName: storeName.trim(),
-          storeType: storeType,
-          description: `Store created for ${storeName}`,
-          logo: logoFile || undefined
-        };
+      siteCraftCache.saveStoreData(storeData);
+      console.log('💾 Store data saved to cache:', storeData);
 
-        const result = await createStore(storeData, user.userId);
-        console.log('✅ Store created successfully:', result);
-
-        // Update session with store information
-        if (result.store && result.store.id) {
-          await updateSessionAfterStoreCreation(result.store.id, 'owner');
-          console.log('✅ Session updated with store information');
-          
-          // Save store colors to database
-          try {
-            await saveStoreColors({
-              primary: validPrimaryColor,
-              secondary: validSecondaryColor,
-              accent: validAccentColor
-            });
-            console.log('✅ Store colors saved to database');
-          } catch (colorError) {
-            console.error('⚠️ Failed to save colors to database:', colorError);
-            // Continue anyway, don't block the flow
-          }
-        }
-      }
-
-      // Save validated colors to localStorage for the color-palette page
+      // Save colors to localStorage for the color-palette page
       localStorage.setItem("primaryColor", validPrimaryColor);
       localStorage.setItem("secondaryColor", validSecondaryColor);
       localStorage.setItem("accentColor", validAccentColor);
@@ -807,12 +771,11 @@ export default function BrandingPage() {
     } catch (error) {
       console.error('💥 Error saving store:', error);
       
-      // Clear any existing errors
-      setErrors({});
-      
-      // Provide more specific error messages
+      // Handle different types of errors
       if (error instanceof Error) {
-        if (error.message.includes('subdomain') || error.message.includes('unique constraint') || error.message.includes('already taken')) {
+        if (error.message.includes('File size too large') || error.message.includes('image is too large')) {
+          setError('The logo image you uploaded is too large. Please choose a smaller image (under 5MB) and try again.');
+        } else if (error.message.includes('subdomain') || error.message.includes('unique constraint') || error.message.includes('already taken')) {
           setErrors({ storeName: 'A store with this name already exists. Please choose a different store name.' });
         } else if (error.message.includes('duplicate key')) {
           setErrors({ storeName: 'This store name is already taken. Please choose a different name.' });
@@ -897,40 +860,20 @@ export default function BrandingPage() {
   }
 
   // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <main className="container mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center space-x-2">
-              <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="text-lg text-gray-600">Loading store data...</span>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <main className="container mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Store</h2>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>
-                Try Again
-              </Button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100">
+  //       <main className="container mx-auto p-4 md:p-6">
+  //         <div className="flex items-center justify-center h-64">
+  //           <div className="flex items-center space-x-2">
+  //             <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+  //             <span className="text-lg text-gray-600">Loading store data...</span>
+  //           </div>
+  //         </div>
+  //       </main>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -971,6 +914,22 @@ export default function BrandingPage() {
             : 'Personalize your store\'s appearance with your brand colors and information'
           }
         </p>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-6 p-4 border border-red-300 rounded-md bg-red-50">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+              <p className="text-red-800">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-red-600 hover:text-red-800"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
 
         <Card className="bg-white">
           <CardContent className="pt-2 pb-2">
@@ -1081,7 +1040,13 @@ export default function BrandingPage() {
                       <select
                         id="storeType"
                         value={storeType}
-                        onChange={(e) => setStoreType(e.target.value)}
+                        onChange={(e) => {
+                          setStoreType(e.target.value);
+                          // Clear errors when user makes a selection
+                          if (error) {
+                            setError(null);
+                          }
+                        }}
                         className="block w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] appearance-none"
                         required
                       >

@@ -11,8 +11,7 @@ import { deleteProductImage, getCategories } from '@/lib/products';
 interface BasicFormData {
   name: string;
   description: string;
-  categoryId?: number; // Keep for backward compatibility
-  categoryIds?: number[]; // New field for multiple categories
+  categoryIds?: number[];
 }
 
 interface ProductInfoSectionProps {
@@ -50,7 +49,7 @@ export function ProductInfoSection({
         setCategoriesError(null);
         const data = await getCategories();
         setCategories(data);
-      } catch (err) {
+      } catch {
         setCategoriesError('Failed to fetch categories');
       } finally {
         setCategoriesLoading(false);
@@ -59,189 +58,115 @@ export function ProductInfoSection({
     fetchCategories();
   }, []);
 
-  // Handle form field changes
+  // Form field handlers
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateFormData({ name: e.target.value });
   };
-
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateFormData({ description: e.target.value });
   };
-
   const handleCategoryChange = (categoryId: number) => {
-    const currentCategoryIds = formData.categoryIds || [];
-    const isSelected = currentCategoryIds.includes(categoryId);
-    
-    let newCategoryIds: number[];
-    if (isSelected) {
-      // Remove category if already selected
-      newCategoryIds = currentCategoryIds.filter(id => id !== categoryId);
-    } else {
-      // Add category if not selected
-      newCategoryIds = [...currentCategoryIds, categoryId];
-    }
-    
-    updateFormData({ 
-      categoryIds: newCategoryIds,
-      categoryId: newCategoryIds.length > 0 ? newCategoryIds[0] : undefined // Keep first for backward compatibility
-    });
+    const current = formData.categoryIds || [];
+    const updated = current.includes(categoryId)
+      ? current.filter(id => id !== categoryId)
+      : [...current, categoryId];
+    updateFormData({ categoryIds: updated });
   };
 
-  // Image handling
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      addImageFiles(Array.from(files));
-    }
-  };
-
-  const addImageFiles = (newFiles: File[]) => {
-    // Process each new file
-    newFiles.forEach((file) => {
-      // Create a preview for the file
+  // Image addition & preview
+  const addImageFiles = (files: File[]) => {
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
+        setImagePreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
-
-    // Add files to state
-    updateImageFiles([...imageFiles, ...newFiles]);
+    updateImageFiles([...imageFiles, ...files]);
   };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length) {
+      addImageFiles(Array.from(e.target.files));
+    }
   };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
+  const handleBrowseClick = () => fileInputRef.current?.click();
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      addImageFiles(Array.from(files));
+    if (e.dataTransfer.files.length) {
+      addImageFiles(Array.from(e.dataTransfer.files));
     }
   };
 
+  // Remove a newly added image
   const removeImage = (index: number) => {
-    const newImageFiles = imageFiles.filter((_, i) => i !== index);
-    const newImagePreviews = imagePreviews.filter((_, i) => i !== index);
-    updateImageFiles(newImageFiles);
-    setImagePreviews(newImagePreviews);
+    const newFiles = imageFiles.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    updateImageFiles(newFiles);
+    setImagePreviews(newPreviews);
   };
 
+  // Drag & drop reordering (new images only)
   const handleImageDragStart = (index: number) => {
     setDraggedIndex(index);
   };
-
   const handleImageDragEnter = (index: number) => {
     setDragOverIndex(index);
   };
-
   const handleImageDragEnd = () => {
     if (
       draggedIndex !== null &&
       dragOverIndex !== null &&
       draggedIndex !== dragOverIndex
     ) {
-      // Reorder the images
+      // 1) clone state arrays
       const newImageFiles = [...imageFiles];
       const newImagePreviews = [...imagePreviews];
 
-      // Remove from original position
-      const [movedFile] = newImageFiles.splice(draggedIndex, 1);
+      // 2) remove the dragged item
+      const [movedFile]    = newImageFiles.splice(draggedIndex, 1);
       const [movedPreview] = newImagePreviews.splice(draggedIndex, 1);
 
-      // Insert at new position
-      newImageFiles.splice(dragOverIndex, 0, movedFile);
+      // 3) re-insert at the new index
+      newImageFiles.splice(dragOverIndex,    0, movedFile);
       newImagePreviews.splice(dragOverIndex, 0, movedPreview);
 
-      // Update state
+      // 4) update component state
       updateImageFiles(newImageFiles);
       setImagePreviews(newImagePreviews);
     }
 
-    // Reset drag states
+    // reset drag indices
     setDraggedIndex(null);
     setDragOverIndex(null);
   };
 
-  // Get selected category names
+  // Category display helpers
   const getSelectedCategoryNames = () => {
-    const categoryIds = formData.categoryIds || [];
-    if (categoryIds.length === 0) return "Select categories";
-    
-    const selectedCategories = categories.filter(c => categoryIds.includes(c.id));
-    if (selectedCategories.length === 0) return "Select categories";
-    
-    if (selectedCategories.length === 1) {
-      return selectedCategories[0].name || selectedCategories[0].title;
-    }
-    
-    return `${selectedCategories.length} categories selected`;
+    const ids = formData.categoryIds || [];
+    if (!ids.length) return "Select categories";
+    const sel = categories.filter(c => ids.includes(c.id));
+    if (!sel.length) return "Select categories";
+    return sel.length === 1 ? sel[0].name || sel[0].title : `${sel.length} categories selected`;
   };
-
-  // Check if a category is selected
-  const isCategorySelected = (categoryId: number) => {
-    return (formData.categoryIds || []).includes(categoryId);
-  };
+  const isCategorySelected = (id: number) =>
+    (formData.categoryIds || []).includes(id);
 
   return (
     <div className="space-y-4">
+      {/* Header */}
       <div className="mb-2">
         <CardTitle className="font-bold">Product Info</CardTitle>
         <p className="text-gray-500">Enter the details of your new product</p>
       </div>
 
-      {/* Existing Images (from backend) */}
-      {existingImages.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {existingImages.map((img, idx) => (
-            <div key={img.id || idx} className="relative w-24 h-24 border rounded overflow-hidden bg-gray-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={img.imageUrl}
-                alt={img.alt || `Product image ${idx + 1}`}
-                className="object-cover w-full h-full"
-              />
-              {productId && setExistingImages && (
-                <button
-                  type="button"
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                  title="Delete image"
-                  onClick={async () => {
-                    try {
-                      await deleteProductImage(productId, img.id);
-                      setExistingImages(existingImages.filter((image) => image.id !== img.id));
-                    } catch (err) {
-                      alert('Failed to delete image');
-                    }
-                  }}
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Product Name and Category */}
+      {/* Name & Category Select */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        {/* Product Name */}
         <div className="flex-1 space-y-2">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label className="block text-sm font-medium text-gray-700">
             Name <span className="text-red-500">*</span>
           </label>
           <Input
-            id="name"
-            name="name"
             value={formData.name}
             onChange={handleNameChange}
             placeholder="e.g. T-Shirt"
@@ -249,44 +174,38 @@ export function ProductInfoSection({
             required
           />
         </div>
-
-        {/* Product Category */}
         <div className="relative flex-1 space-y-2">
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label className="block text-sm font-medium text-gray-700">
             Categories <span className="text-red-500">*</span>
           </label>
           <div
-            className="flex w-full border border-input bg-white rounded flex h-9 px-3 py-1 gap-2 items-center justify-between cursor-pointer"
+            className="flex w-full border border-input bg-white rounded h-9 px-3 py-1 items-center justify-between cursor-pointer"
             onClick={() => setOpenCategories(!openCategories)}
           >
-            <span className={(formData.categoryIds || []).length === 0 ? "text-gray-500" : ""}>
+            <span className={!formData.categoryIds?.length ? "text-gray-500" : ""}>
               {getSelectedCategoryNames()}
             </span>
             {openCategories ? (
-              <ChevronUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronUp className="h-4 w-4 opacity-50" />
             ) : (
-              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronDown className="h-4 w-4 opacity-50" />
             )}
           </div>
-
           {openCategories && (
             <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10 max-h-60 overflow-y-auto">
-              {categories.map((category) => (
+              {categories.map(cat => (
                 <div
-                  key={category.id}
+                  key={cat.id}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-                  onClick={() => handleCategoryChange(parseInt(category.id))}
+                  onClick={() => handleCategoryChange(cat.id)}
                 >
                   <input
                     type="checkbox"
-                    checked={isCategorySelected(parseInt(category.id))}
-                    onChange={() => {}} // Handle change in parent div
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    readOnly
+                    checked={isCategorySelected(cat.id)}
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
                   />
-                  <span>{category.name || category.title}</span>
+                  <span>{cat.name || cat.title}</span>
                 </div>
               ))}
             </div>
@@ -294,17 +213,12 @@ export function ProductInfoSection({
         </div>
       </div>
 
-      {/* Product Description */}
+      {/* Description */}
       <div className="space-y-2">
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label className="block text-sm font-medium text-gray-700">
           Description <span className="text-red-500">*</span>
         </label>
         <Textarea
-          id="description"
-          name="description"
           value={formData.description}
           onChange={handleDescriptionChange}
           placeholder="Describe your product..."
@@ -318,11 +232,36 @@ export function ProductInfoSection({
         <label className="block text-sm font-medium text-gray-700">
           Product Gallery
         </label>
-
-        {/* Gallery Container */}
         <div className="p-4 border border-gray-200 rounded-lg">
-          {/* Gallery Preview */}
           <div className="flex flex-wrap gap-4">
+            {/* Existing Images */}
+            {existingImages.map((img, idx) => (
+              <div key={img.id} className="relative w-24 h-24 group">
+                <img
+                  src={img.imageUrl}
+                  alt={img.alt || `Product image ${idx + 1}`}
+                  className="object-cover w-full h-full rounded-md"
+                />
+                {productId && setExistingImages && (
+                  <button
+                    type="button"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={async () => {
+                      try {
+                        await deleteProductImage(productId, img.id);
+                        setExistingImages(existingImages.filter(i => i.id !== img.id));
+                      } catch {
+                        alert("Failed to delete image");
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+
+            {/* New Images */}
             {imageFiles.map((file, index) => (
               <div
                 key={index}
@@ -331,65 +270,53 @@ export function ProductInfoSection({
                 }`}
                 draggable
                 onDragStart={() => handleImageDragStart(index)}
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={e => e.preventDefault()}
                 onDragEnter={() => handleImageDragEnter(index)}
                 onDragEnd={handleImageDragEnd}
               >
                 <Image
                   src={imagePreviews[index] || URL.createObjectURL(file)}
-                  alt={`Product image ${index + 1}`}
+                  alt={`Product image ${existingImages.length + index + 1}`}
                   fill
                   className="object-cover rounded-md"
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 rounded-md">
-                  <span className="text-white text-xs font-medium">
-                    Drag to move
-                  </span>
-                </div>
                 <button
                   type="button"
-                  onClick={() => removeImage(index)}
                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => removeImage(index)}
                 >
                   ✕
                 </button>
-                {index === 0 && (
-                  <div className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
-                    Main
-                  </div>
-                )}
               </div>
             ))}
 
             {/* Add Image Button */}
-            {imageFiles.length !== 0 && (
-              <div
-                className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
-                onClick={handleBrowseClick}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                <div className="flex flex-col items-center">
-                  <span className="text-2xl text-gray-400">+</span>
-                  <span className="text-xs text-gray-500">Add</span>
-                </div>
+            <div
+              className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
+              onClick={handleBrowseClick}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <div className="flex flex-col items-center">
+                <span className="text-2xl text-gray-400">+</span>
+                <span className="text-xs text-gray-500">Add</span>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Drop Area (only shown when no images) */}
-          {imageFiles.length === 0 && (
+          {/* Drop Area when no images */}
+          {existingImages.length === 0 && imageFiles.length === 0 && (
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
-              <div className="flex flex-col items-center justify-center gap-2">
+              <div className="flex flex-col items-center gap-2">
                 <Upload size={40} />
                 <p className="text-sm text-gray-500">
                   Drag and drop your images here, or{" "}
                   <span
-                    className="text-blue-600 cursor-pointer hover:text-blue-800"
+                    className="text-blue-600 cursor-pointer"
                     onClick={handleBrowseClick}
                   >
                     browse
@@ -402,7 +329,6 @@ export function ProductInfoSection({
             </div>
           )}
 
-          {/* Hidden File Input */}
           <input
             ref={fileInputRef}
             id="image"
@@ -414,8 +340,6 @@ export function ProductInfoSection({
             onChange={handleImageChange}
           />
         </div>
-
-        {/* Help Text */}
         <p className="text-xs text-gray-400">
           You can upload multiple images. The first image will be used as the
           main product image.

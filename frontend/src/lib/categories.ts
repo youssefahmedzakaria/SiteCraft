@@ -144,7 +144,17 @@ export const createCategory = async (categoryData: CategoryCreateDTO, image?: Fi
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if (response.status === 413) {
+                // 413 Payload Too Large
+                throw new Error(
+                    "Image is too large. Please upload files smaller than 5 MB each."
+                );
+            }
+            // for other errors, pull the server's message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+                `Failed to create category: ${errText} (status ${response.status})`
+            );
         }
 
         const data = await response.json();
@@ -179,7 +189,17 @@ export const updateCategory = async (categoryId: number, categoryData: CategoryC
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if (response.status === 413) {
+                // 413 Payload Too Large
+                throw new Error(
+                    "Image is too large. Please upload files smaller than 5 MB each."
+                );
+            }
+            // for other errors, pull the server's message if available
+            const errText = await response.text().catch(() => response.statusText);
+            throw new Error(
+                `Failed to update category: ${errText} (status ${response.status})`
+            );
         }
 
         const data = await response.json();
