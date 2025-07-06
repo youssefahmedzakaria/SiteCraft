@@ -26,19 +26,16 @@ import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { usePathname } from "next/navigation";
 
-const defaultTheme: ThemeConfig = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
 export default function CheckoutPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
+
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
 
   const { state, clearCart } = useCart();
   const [step, setStep] = useState(1); // 1: Shipping, 2: Payment, 3: Confirmation
@@ -67,8 +64,6 @@ export default function CheckoutPage() {
   const tax = state.total * 0.08;
   const total = state.total + shipping + tax;
 
-  const theme = defaultTheme;
-
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -83,28 +78,25 @@ export default function CheckoutPage() {
   if (state.items.length === 0 && step !== 3) {
     return (
       <div
-        className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-        style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
-        }}
+        className={cn("min-h-screen pt-20 px-8 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
       >
         <div className="text-center pt-16 py-16">
           <h1
             className="text-3xl font-bold mb-4"
-            style={{ color: theme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             No items to checkout
           </h1>
-          <p className="mb-8" style={{ color: theme.secondaryColor }}>
+          <p className="mb-8" style={{ color: initialColors.secondary }}>
             Your cart is empty. Add some items before proceeding to checkout.
           </p>
           <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
-                backgroundColor: theme.secondaryColor,
-                color: theme.backgroundColor,
+                backgroundColor: initialColors.secondary,
+                color: initialColors.accent,
               }}
             >
               Continue Shopping
@@ -119,44 +111,41 @@ export default function CheckoutPage() {
   if (step === 3) {
     return (
       <div
-        className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-        style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
-        }}
+        className={cn("min-h-screen pt-20 px-8 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
       >
         <div className="max-w-2xl pt-16 mx-auto text-center">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ backgroundColor: theme.accentColor }}
+            style={{ backgroundColor: initialColors.accent }}
           >
             <Check
               className="w-8 h-8"
-              style={{ color: theme.secondaryColor }}
+              style={{ color: initialColors.secondary }}
             />
           </div>
           <h1
             className="text-3xl font-bold mb-4"
-            style={{ color: theme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             Order Confirmed!
           </h1>
-          <p className="mb-8" style={{ color: theme.secondaryColor }}>
+          <p className="mb-8" style={{ color: initialColors.secondary }}>
             Thank you for your purchase. Your order has been confirmed and will
             be shipped soon.
           </p>
           <div
             className="p-6 rounded-lg mb-8"
-            style={{ backgroundColor: theme.accentColor }}
+            style={{ backgroundColor: initialColors.accent }}
           >
             <h2 className="font-semibold mb-2">Order Details</h2>
-            <p className="text-sm" style={{ color: theme.secondaryColor }}>
+            <p className="text-sm" style={{ color: initialColors.secondary }}>
               Order #: ORD-{Date.now()}
             </p>
-            <p className="text-sm" style={{ color: theme.secondaryColor }}>
+            <p className="text-sm" style={{ color: initialColors.secondary }}>
               Total: ${total.toFixed(2)}
             </p>
-            <p className="text-sm" style={{ color: theme.secondaryColor }}>
+            <p className="text-sm" style={{ color: initialColors.secondary }}>
               Estimated delivery:{" "}
               {new Date(
                 Date.now() + 7 * 24 * 60 * 60 * 1000
@@ -168,8 +157,8 @@ export default function CheckoutPage() {
               <Button
                 size="lg"
                 style={{
-                  backgroundColor: theme.secondaryColor,
-                  color: theme.backgroundColor,
+                  backgroundColor: initialColors.secondary,
+                  color: initialColors.accent,
                 }}
               >
                 Continue Shopping
@@ -179,8 +168,8 @@ export default function CheckoutPage() {
               <Button
                 size="lg"
                 style={{
-                  backgroundColor: theme.secondaryColor,
-                  color: theme.backgroundColor,
+                  backgroundColor: initialColors.secondary,
+                  color: initialColors.accent,
                 }}
               >
                 View Orders
@@ -194,11 +183,11 @@ export default function CheckoutPage() {
 
   return (
     <div
-      className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
+      className={cn("min-h-screen pt-20 px-8 bg-[#ffffff]")}
+      style={{ color: initialColors.primary }}
     >
       <div className="flex items-center pt-16 gap-4 mb-8">
-        <h1 className="text-3xl font-bold" style={{ color: theme.textColor }}>
+        <h1 className="text-3xl font-bold" style={{ color: initialColors.primary }}>
           Checkout
         </h1>
       </div>
@@ -209,39 +198,39 @@ export default function CheckoutPage() {
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center`}
             style={{
-              backgroundColor: step >= 1 ? theme.secondaryColor : "#e5e5e5",
-              color: step >= 1 ? theme.backgroundColor : theme.secondaryColor,
-              border: `2px solid ${theme.secondaryColor}`,
+              backgroundColor: step >= 1 ? initialColors.secondary : "#e5e5e5",
+              color: step >= 1 ? initialColors.accent : initialColors.secondary,
+              border: `2px solid ${initialColors.secondary}`,
             }}
           >
             1
           </div>
           <span
             className="ml-2 text-sm font-medium"
-            style={{ color: theme.secondaryColor }}
+            style={{ color: initialColors.secondary }}
           >
             Shipping
           </span>
         </div>
         <div
           className="w-16 h-px mx-4"
-          style={{ backgroundColor: theme.secondaryColor }}
+          style={{ backgroundColor: initialColors.secondary }}
         />
         <div className="flex items-center">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center"
             style={{
               backgroundColor:
-                step === 2 ? theme.secondaryColor : "transparent",
-              color: step === 2 ? theme.backgroundColor : theme.secondaryColor,
-              border: `2px solid ${theme.secondaryColor}`,
+                step === 2 ? initialColors.secondary : "transparent",
+              color: step === 2 ? initialColors.accent : initialColors.secondary,
+              border: `2px solid ${initialColors.secondary}`,
             }}
           >
             2
           </div>
           <span
             className="ml-2 text-sm font-medium"
-            style={{ color: theme.secondaryColor }}
+            style={{ color: initialColors.secondary }}
           >
             Payment
           </span>
@@ -255,7 +244,7 @@ export default function CheckoutPage() {
             <div className="space-y-6">
               <h2
                 className="text-xl font-semibold"
-                style={{ color: theme.secondaryColor }}
+                style={{ color: initialColors.secondary }}
               >
                 Shipping Information
               </h2>
@@ -370,8 +359,8 @@ export default function CheckoutPage() {
                 className="w-full"
                 size="lg"
                 style={{
-                  backgroundColor: theme.secondaryColor,
-                  color: theme.backgroundColor,
+                  backgroundColor: initialColors.secondary,
+                  color: initialColors.accent,
                 }}
               >
                 Continue to Payment
@@ -383,7 +372,7 @@ export default function CheckoutPage() {
             <div className="space-y-6">
               <h2
                 className="text-xl font-semibold"
-                style={{ color: theme.secondaryColor }}
+                style={{ color: initialColors.secondary }}
               >
                 Payment Information
               </h2>
@@ -396,7 +385,7 @@ export default function CheckoutPage() {
               >
                 <div
                   className="flex items-center space-x-2 p-4 border rounded-lg"
-                  style={{ borderColor: theme.secondaryColor }}
+                  style={{ borderColor: initialColors.secondary }}
                 >
                   <RadioGroupItem value="card" id="card" />
                   <Label htmlFor="card" className="flex items-center gap-2">
@@ -406,14 +395,14 @@ export default function CheckoutPage() {
                 </div>
                 <div
                   className="flex items-center space-x-2 p-4 border rounded-lg"
-                  style={{ borderColor: theme.secondaryColor }}
+                  style={{ borderColor: initialColors.secondary }}
                 >
                   <RadioGroupItem value="paypal" id="paypal" />
                   <Label htmlFor="paypal">PayPal</Label>
                 </div>
                 <div
                   className="flex items-center space-x-2 p-4 border rounded-lg"
-                  style={{ borderColor: theme.secondaryColor }}
+                  style={{ borderColor: initialColors.secondary }}
                 >
                   <RadioGroupItem value="cash" id="cash" />
                   <Label htmlFor="cash">Cash on Delivery</Label>
@@ -495,8 +484,8 @@ export default function CheckoutPage() {
                   onClick={() => setStep(1)}
                   className="flex-1"
                   style={{
-                    borderColor: theme.secondaryColor,
-                    color: theme.secondaryColor,
+                    borderColor: initialColors.secondary,
+                    color: initialColors.secondary,
                   }}
                 >
                   Back to Shipping
@@ -506,8 +495,8 @@ export default function CheckoutPage() {
                   className="flex-1"
                   size="lg"
                   style={{
-                    backgroundColor: theme.secondaryColor,
-                    color: theme.backgroundColor,
+                    backgroundColor: initialColors.secondary,
+                    color: initialColors.accent,
                   }}
                 >
                   Place Order
@@ -520,15 +509,15 @@ export default function CheckoutPage() {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div
-            className={cn("p-6 rounded-lg sticky top-24", theme.borderRadius)}
+            className={cn("p-6 rounded-lg sticky top-24")}
             style={{
-              backgroundColor: `${theme.secondaryColor}20`,
+              backgroundColor: `${initialColors.secondary}20`,
               boxShadow: "0 2px 16px 0 rgba(0,0,0,0.06)",
             }}
           >
             <h2
               className="text-xl font-semibold mb-6"
-              style={{ color: theme.secondaryColor }}
+              style={{ color: initialColors.secondary }}
             >
               Order Summary
             </h2>
@@ -538,7 +527,7 @@ export default function CheckoutPage() {
                 <div key={item.id} className="flex items-center gap-3">
                   <div
                     className="relative w-12 h-12 rounded overflow-hidden"
-                    style={{ backgroundColor: theme.backgroundColor }}
+                    style={{ backgroundColor: initialColors.accent }}
                   >
                     <Image
                       src={item.image || "/placeholder.png"}
@@ -550,20 +539,20 @@ export default function CheckoutPage() {
                   <div className="flex-1">
                     <p
                       className="text-sm font-medium"
-                      style={{ color: theme.textColor }}
+                      style={{ color: initialColors.primary }}
                     >
                       {item.name}
                     </p>
                     <p
                       className="text-xs"
-                      style={{ color: theme.secondaryColor }}
+                      style={{ color: initialColors.secondary }}
                     >
                       Qty: {item.quantity}
                     </p>
                   </div>
                   <p
                     className="text-sm font-medium"
-                    style={{ color: theme.textColor }}
+                    style={{ color: initialColors.primary }}
                   >
                     ${(item.price * item.quantity).toFixed(2)}
                   </p>
@@ -598,14 +587,14 @@ export default function CheckoutPage() {
             <div className="mt-6 space-y-3">
               <div
                 className="flex items-center gap-2 text-sm"
-                style={{ color: theme.secondaryColor }}
+                style={{ color: initialColors.secondary }}
               >
                 <Truck className="w-4 h-4" />
                 <span>Free shipping on orders over $500</span>
               </div>
               <div
                 className="flex items-center gap-2 text-sm"
-                style={{ color: theme.secondaryColor }}
+                style={{ color: initialColors.secondary }}
               >
                 <Shield className="w-4 h-4" />
                 <span>Secure checkout</span>
