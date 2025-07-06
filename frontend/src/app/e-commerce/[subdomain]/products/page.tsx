@@ -188,9 +188,11 @@ export default function ProductsPage({
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
     // Multi-category filter
     if (selectedCategories.length > 0) {
-      if (!product.categoryId) return false;
-      const category = categories.find((c) => c.id === product.categoryId);
-      if (!category || !selectedCategories.includes(category.name)) {
+      if (!product.categories || product.categories.length === 0) return false;
+      const hasMatchingCategory = product.categories.some((productCategory) => 
+        selectedCategories.includes(productCategory.name)
+      );
+      if (!hasMatchingCategory) {
         return false;
       }
     }
