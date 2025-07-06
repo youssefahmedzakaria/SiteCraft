@@ -68,6 +68,12 @@ export default function Home() {
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const initialSections: Section[] = [];
   const [sections, setSections] = useState<Section[]>(initialSections);
 
@@ -98,14 +104,14 @@ export default function Home() {
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     titleFont: "font-sans",
-    titleColor: "text-[primary]", // text-white
+    titleColor: `text-[${initialColors.primary}]`, // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: "text-[secondary]", // text-white
+    descriptionColor: `text-[${initialColors.secondary}]`, // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: "bg-[accent]", // bg-white
-    buttonTextColor: "text-[primary]", // text-black
+    buttonColor: `bg-[${initialColors.accent}]`, // bg-white
+    buttonTextColor: `text-[${initialColors.primary}]`, // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -121,14 +127,14 @@ export default function Home() {
     isClickable: true,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[secondary]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[accent]",
-    showMorebuttonTextColor: "text-[primary]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -136,7 +142,7 @@ export default function Home() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -213,14 +219,14 @@ export default function Home() {
     isClickable: true,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: "text-[secondary]",
+    textColor: `text-[${initialColors.secondary}]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: "bg-[accent]",
-    showMorebuttonTextColor: "text-[primary]",
+    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
+    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -228,7 +234,7 @@ export default function Home() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -309,7 +315,7 @@ export default function Home() {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: "text-[primary]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -328,7 +334,7 @@ export default function Home() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: "text-[secondary]",
+    sectionColor: `text-[${initialColors.secondary}]`,
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -365,15 +371,15 @@ export default function Home() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: "text-[primary]", // text-black
+    titleColor: `text-[${initialColors.primary}]`, // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: "text-[secondary]", // text-black
+    sectionTitleColor: `text-[${initialColors.secondary}]`, // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: "text-[secondary]", // text-black
+    sectionContentColor: `text-[${initialColors.secondary}]`, // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -408,10 +414,10 @@ export default function Home() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: "text-[primary]",
+    titleColor: `text-[${initialColors.primary}]`,
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: "text-[secondary]",
+    contentColor: `text-[${initialColors.secondary}]`,
     contentSize: "text-lg",
   };
 

@@ -12,15 +12,6 @@ import { cn } from "@/lib/utils";
 import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { usePathname } from "next/navigation";
 
-const defaultTheme: ThemeConfig = {
-  backgroundColor: "bg-white",
-  textColor: "text-black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
-
 export default function CartPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
@@ -29,7 +20,12 @@ export default function CartPage() {
   const { state, updateQuantity, removeFromCart, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
-  const theme = defaultTheme;
+
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity >= 1) {
@@ -53,32 +49,29 @@ export default function CartPage() {
   if (state.items.length === 0) {
     return (
       <div
-        className={cn("min-h-screen pt-20", theme.fontFamily)}
-        style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
-        }}
+        className={cn("min-h-screen pt-20 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
       >
         <div className="text-center py-16">
           <ShoppingBag
             className="w-24 h-24 mx-auto mb-6"
-            style={{ color: theme.secondaryColor }}
+            style={{ color: initialColors.primary }}
           />
           <h1
             className="text-3xl font-bold mb-4"
-            style={{ color: theme.textColor }}
+            style={{ color: initialColors.primary }}
           >
             Your cart is empty
           </h1>
-          <p className="mb-8" style={{ color: theme.secondaryColor }}>
+          <p className="mb-8" style={{ color: initialColors.secondary }}>
             Looks like you have not added any items to your cart yet.
           </p>
           <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
-                backgroundColor: theme.secondaryColor,
-                color: theme.backgroundColor,
+                backgroundColor: initialColors.accent,
+                color: initialColors.primary,
               }}
             >
               Continue Shopping
@@ -91,13 +84,13 @@ export default function CartPage() {
 
   return (
     <div
-      className={cn("min-h-screen pt-20 px-8", theme.fontFamily)}
-      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
+      className={cn("min-h-screen pt-20 px-8 bg-[#ffffff]")}
+      style={{ color: initialColors.primary }}
     >
       <div className="flex items-center gap-4  mb-8">
         <h1
           className="text-3xl pt-8  font-bold"
-          style={{ color: theme.textColor }}
+          style={{ color: initialColors.primary }}
         >
           Shopping Cart
         </h1>
@@ -109,7 +102,7 @@ export default function CartPage() {
           <div className="flex justify-between items-center">
             <h2
               className="text-xl font-semibold"
-              style={{ color: theme.secondaryColor }}
+              style={{ color: initialColors.secondary }}
             >
               Cart Items ({state.itemCount})
             </h2>
@@ -118,8 +111,8 @@ export default function CartPage() {
               size="sm"
               onClick={clearCart}
               style={{
-                borderColor: theme.secondaryColor,
-                color: theme.secondaryColor,
+                borderColor: initialColors.accent,
+                color: initialColors.primary,
               }}
             >
               Clear Cart
@@ -132,12 +125,12 @@ export default function CartPage() {
                 key={item.id}
                 className={cn(
                   "flex flex-col lg:flex-row items-center gap-4 p-4 border",
-                  theme.borderRadius
+                  "rounded-lg"
                 )}
                 style={{
-                  backgroundColor: `${theme.secondaryColor}20`,
-                  borderColor: theme.secondaryColor,
-                }}
+                  backgroundColor: `${initialColors.secondary}20`,
+                  borderColor: initialColors.secondary,
+                }}  
               >
                 <div className="relative w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                   <Image
@@ -154,19 +147,19 @@ export default function CartPage() {
                     <div>
                       <h3
                         className="font-medium text-base sm:text-lg"
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         {item.name}
                       </h3>
                       <p
                         className="text-xs sm:text-sm"
-                        style={{ color: theme.secondaryColor }}
+                        style={{ color: initialColors.secondary }}
                       >
                         SKU: {item.id}
                       </p>
                       <p
                         className="text-lg font-semibold mt-1"
-                        style={{ color: theme.textColor }}
+                        style={{ color: initialColors.primary }}
                       >
                         ${item.price}
                       </p>
@@ -179,8 +172,8 @@ export default function CartPage() {
                           handleQuantityChange(item.id, item.quantity - 1)
                         }
                         style={{
-                          borderColor: theme.secondaryColor,
-                          color: theme.secondaryColor,
+                          borderColor: initialColors.secondary,
+                          color: initialColors.primary,
                         }}
                         className="w-9 h-9 text-2xl"
                       >
@@ -196,29 +189,26 @@ export default function CartPage() {
                           handleQuantityChange(item.id, item.quantity + 1)
                         }
                         style={{
-                          borderColor: theme.secondaryColor,
-                          color: theme.secondaryColor,
+                          borderColor: initialColors.secondary,
+                          color: initialColors.primary,
                         }}
                         className="w-9 h-9 text-2xl"
                       >
                         <Plus className="w-6 h-6" />
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeFromCart(item.id)}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          color: initialColors.primary,
+                        }}
+                        className="w-9 h-9 text-2xl"
+                      >
+                        <Trash2 className="w-6 h-6" />
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span
-                      className="text-base font-bold"
-                      style={{ color: theme.textColor }}
-                    >
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </span>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                      aria-label="Remove item"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -229,12 +219,12 @@ export default function CartPage() {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div
-            className={cn("p-6 sticky top-24", theme.borderRadius)}
-            style={{ backgroundColor: `${theme.secondaryColor}20` }}
+            className={cn("p-6 sticky top-24", "rounded-lg")}
+            style={{ backgroundColor: `${initialColors.secondary}20` }}
           >
             <h2
               className="text-xl font-semibold mb-6"
-              style={{ color: theme.secondaryColor }}
+              style={{ color: initialColors.primary }}
             >
               Order Summary
             </h2>
@@ -248,7 +238,7 @@ export default function CartPage() {
               {discount > 0 && (
                 <div
                   className="flex justify-between"
-                  style={{ color: theme.secondaryColor }}
+                  style={{ color: initialColors.secondary }}
                 >
                   <span>Discount</span>
                   <span>-${discount.toFixed(2)}</span>
@@ -288,15 +278,15 @@ export default function CartPage() {
                   variant="outline"
                   onClick={handleApplyPromo}
                   style={{
-                    borderColor: theme.secondaryColor,
-                    color: theme.secondaryColor,
+                    borderColor: initialColors.secondary,
+                    color: initialColors.secondary,
                   }}
                 >
                   Apply
                 </Button>
               </div>
               {promoCode.toLowerCase() === "save10" && discount > 0 && (
-                <p className="text-sm" style={{ color: theme.secondaryColor }}>
+                <p className="text-sm" style={{ color: initialColors.secondary }}>
                   Promo code applied! 10% off
                 </p>
               )}
@@ -310,8 +300,8 @@ export default function CartPage() {
                 className="w-full"
                 size="lg"
                 style={{
-                  backgroundColor: theme.secondaryColor,
-                  color: theme.backgroundColor,
+                  backgroundColor: initialColors.secondary,
+                  color: initialColors.primary,
                 }}
               >
                 Proceed to Checkout
@@ -320,7 +310,7 @@ export default function CartPage() {
 
             <p
               className="text-xs mt-4 text-center"
-              style={{ color: theme.secondaryColor }}
+              style={{ color: initialColors.secondary }}
             >
               {shipping === 0
                 ? "Free shipping applied!"

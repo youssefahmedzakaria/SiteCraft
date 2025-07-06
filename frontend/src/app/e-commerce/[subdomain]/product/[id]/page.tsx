@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ProductImageGallery } from "@/components/e-commerce/product/product-image-gallery";
 import { ProductInfo } from "@/components/e-commerce/product/product-info";
 import { RelatedProducts } from "@/components/e-commerce/product/related-products";
-import type { ThemeConfig, RelatedProduct, VariantGroup } from "./product";
+import type { RelatedProduct, VariantGroup } from "./product";
 import { useCart } from "@/contexts/cart-context";
 import { useFavorites } from "@/contexts/favorites-context";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,22 +14,12 @@ import type { CartItem } from "@/contexts/cart-context";
 import type { FavoriteItem } from "@/contexts/favorites-context";
 import { getProduct, type Product, type ProductVariant, getProducts } from "@/lib/products";
 
-// Theme configuration
-const defaultTheme = {
-  backgroundColor: "white",
-  textColor: "black",
-  accentColor: "white",
-  secondaryColor: "black",
-  borderRadius: "rounded-lg",
-  fontFamily: "font-sans",
-};
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
   const productId = pathSegments[4];
-  const [theme] = useState<ThemeConfig>(defaultTheme);
   const [productData, setProductData] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +46,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
 
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
-
+   const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
@@ -351,10 +345,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <div
-        className={cn("min-h-screen pt-20", theme.fontFamily)}
+        className={cn("min-h-screen pt-20",`text-[${initialColors.primary}]`)}
         style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
+          backgroundColor: "bg-[#ffffff]",
+          color:  `text-[${initialColors.primary}]`,
         }}
       >
         <div className="container mx-auto px-4 py-8">
@@ -370,10 +364,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (error || !productData || !currentVariant) {
     return (
       <div
-        className={cn("min-h-screen pt-20", theme.fontFamily)}
+        className={cn("min-h-screen pt-20 font-sans")}
         style={{
-          backgroundColor: theme.backgroundColor,
-          color: theme.textColor,
+          backgroundColor: "bg-[#ffffff]",
+          color:  `text-[${initialColors.primary}]`,
         }}
       >
         <div className="container mx-auto px-4 py-8">
@@ -396,8 +390,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   return (
     <div
-      className={cn("min-h-screen pt-20", theme.fontFamily)}
-      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
+      className={cn("min-h-screen pt-20 font-sans")}
+      style={{ backgroundColor: "bg-[#ffffff]", color:  `text-[${initialColors.primary}]` }}
     >
       <div className="container mx-auto px-4 py-8">
         {/* Product Main Section */}
@@ -406,7 +400,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <ProductImageGallery
             images={currentImages}
             productName={productData.name}
-            theme={theme}
+            theme={initialColors}
           />
 
           {/* Product Info with Variants positioned under price */}
@@ -419,7 +413,6 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               onAddToCart={handleAddToCart}
               onAddToFavorites={handleAddToFavorites}
               onShare={handleShare}
-              theme={theme}
               selectedVariants={selectedVariants}
               onVariantChange={handleVariantChange}
               variantGroups={createVariantGroups()}
@@ -428,12 +421,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               justAddedToCart={justAddedToCart}
               justAddedToFavorites={justAddedToFavorites}
               shareClicked={shareClicked}
+              theme={initialColors}
             />
           </div>
         </div>
 
         {/* Related Products Section */}
-        <RelatedProducts products={relatedProducts} theme={theme} />
+        <RelatedProducts products={relatedProducts} theme={initialColors} />
       </div>
     </div>
   );
