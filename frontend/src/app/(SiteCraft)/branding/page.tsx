@@ -764,7 +764,6 @@ export default function BrandingPage() {
     if (!isClient || !existingStore?.logo) return;
 
     const logoUrl = getLogoUrl(existingStore.logo);
-    console.log("Loading existing logo from:", logoUrl);
 
     loadImageWithCors(logoUrl)
       .then((img) => {
