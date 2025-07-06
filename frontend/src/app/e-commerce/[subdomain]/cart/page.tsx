@@ -9,7 +9,6 @@ import { Button } from "@/components/e-commerce/ui/button";
 import { Input } from "@/components/e-commerce/ui/input";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
-import type { ThemeConfig } from "@/app/e-commerce/[subdomain]/product/[id]/product";
 import { usePathname } from "next/navigation";
 
 export default function CartPage() {
