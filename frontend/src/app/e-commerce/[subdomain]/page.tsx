@@ -421,6 +421,12 @@ export default function Home() {
     contentSize: "text-lg",
   };
 
+  const updateContactAttributes = (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => {
+    setContactAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
   // State for contact customization
   const [contactAttributes, setContactAttributes] =
     useState<ContactCustomizationAttributes>(initialContact);
@@ -543,6 +549,9 @@ export default function Home() {
               break;
             case "Categories":
               updateCategoryAttributes(section.value);
+              break;
+            case "ContactUs":
+              updateContactAttributes(section.value);
               break;
           }
         });

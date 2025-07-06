@@ -598,7 +598,7 @@ export default function ColorPalettePage() {
               template.Footer.socialMediaStyles.iconColor =
                 "text-[" + secondaryColor + "]";
               template.Footer.socialMediaStyles.hoverColor =
-                "bg-[" + accentColor + "]"; // ??
+                "bg-[" + secondaryColor + "]"; // ??
               template.Footer.copyrightStyles.fontColor =
                 "text-[" + secondaryColor + "]";
               if (
