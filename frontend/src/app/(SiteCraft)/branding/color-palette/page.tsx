@@ -522,31 +522,31 @@ export default function ColorPalettePage() {
         console.log("📡 Fetching images from Pixabay...");
 
         const imagePromises = [
-          // fetchPixabayImages(queries.promo, 3).catch((err) => {
-          //   console.warn("⚠️ Failed to fetch promo images:", err);
-          //   return [];
-          // }),
-          // fetchPixabayImages(queries.categories, 6).catch((err) => {
-          //   console.warn("⚠️ Failed to fetch category images:", err);
-          //   return [];
-          // }),
-          // fetchPixabayImages(queries.products, 8).catch((err) => {
-          //   console.warn("⚠️ Failed to fetch product images:", err);
-          //   return [];
-          // }),
-          // fetchPixabayImages(queries.about, 3).catch((err) => {
-          //   console.warn("⚠️ Failed to fetch about images:", err);
-          //   return [];
-          // }),
-          // fetchPixabayImages(queries.contact, 3).catch((err) => {
-          //   console.warn("⚠️ Failed to fetch contact images:", err);
-          //   return [];
-          // }),
-          [{ url: "/placeholder.png", alt: "Placeholder Image" }],
-          [{ url: "/placeholder.png", alt: "Placeholder Image" }],
-          [{ url: "/placeholder.png", alt: "Placeholder Image" }],
-          [{ url: "/placeholder.png", alt: "Placeholder Image" }],
-          [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          fetchPixabayImages(queries.promo, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch promo images:", err);
+            return [];
+          }),
+          fetchPixabayImages(queries.categories, 6).catch((err) => {
+            console.warn("⚠️ Failed to fetch category images:", err);
+            return [];
+          }),
+          fetchPixabayImages(queries.products, 8).catch((err) => {
+            console.warn("⚠️ Failed to fetch product images:", err);
+            return [];
+          }),
+          fetchPixabayImages(queries.about, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch about images:", err);
+            return [];
+          }),
+          fetchPixabayImages(queries.contact, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch contact images:", err);
+            return [];
+          }),
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
         ];
 
         const [
@@ -598,7 +598,7 @@ export default function ColorPalettePage() {
               template.Footer.socialMediaStyles.iconColor =
                 "text-[" + secondaryColor + "]";
               template.Footer.socialMediaStyles.hoverColor =
-                "bg-[" + accentColor + "]"; // ??
+                "bg-[" + secondaryColor + "]"; // ??
               template.Footer.copyrightStyles.fontColor =
                 "text-[" + secondaryColor + "]";
               if (
