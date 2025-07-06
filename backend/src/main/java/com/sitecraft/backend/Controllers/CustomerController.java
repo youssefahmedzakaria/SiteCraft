@@ -64,12 +64,13 @@ public class CustomerController {
     public ResponseEntity getCustomer(HttpSession session) {
         try {
             Long customerId = (Long) session.getAttribute("customerId");
+            Long storeId = (Long) session.getAttribute("storeId");
             if (customerId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("success", false, "message", "Customer ID not found in session."));
             }
 
-            Customer customer = customerService.getCustomer(customerId);
+            Customer customer = customerService.getCustomer(customerId,storeId);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -129,7 +130,7 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/updateCustomerInfo")
+    @PutMapping("/`updateCustomerInfo`")
     public ResponseEntity<?> updateCustomerInfo(@RequestBody Customer updatedCustomer, HttpSession session) {
         try {
             Long customerId = (Long) session.getAttribute("customerId");

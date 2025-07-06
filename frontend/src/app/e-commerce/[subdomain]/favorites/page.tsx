@@ -19,6 +19,7 @@ export default function FavoritesPage() {
     primary: "#000000",
     secondary: "#000000",
     accent: "#000000",
+    foreground: "#ffffff",
   });
 
   const { state, removeFromFavorites } = useFavorites();
@@ -58,7 +59,7 @@ export default function FavoritesPage() {
             <Button
               size="lg"
               style={{
-                backgroundColor: initialColors.accent,
+                backgroundColor: initialColors.foreground,
                 color: initialColors.primary,
               }}
             >

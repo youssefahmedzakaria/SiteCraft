@@ -3,6 +3,7 @@ package com.sitecraft.backend.Services;
 
 import com.sitecraft.backend.Models.Address;
 import com.sitecraft.backend.Models.Customer;
+import com.sitecraft.backend.Models.Order;
 import com.sitecraft.backend.Repositories.AddressRepo;
 import com.sitecraft.backend.Repositories.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,17 +205,28 @@ public class CustomerService {
         }
     }
 
-    public Customer getCustomer(Long id) {
+    public Customer getCustomer(Long customerId, Long storeId) {
         try {
-            Optional<Customer> customer = customerRepo.findById(id);
-            if (customer.isEmpty()) {
+            Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
+            if (optionalCustomer.isEmpty()) {
                 throw new RuntimeException("Customer not found");
             }
-            return customer.get();
-        }catch (Exception e) {
+
+            Customer customer = optionalCustomer.get();
+
+            List<Order> filteredOrders = customer.getOrders().stream()
+                    .filter(order -> order.getStore() != null && order.getStore().getId().equals(storeId))
+                    .toList();
+
+            customer.setOrders(filteredOrders);
+
+            return customer;
+
+        } catch (Exception e) {
             throw new RuntimeException("Failed to get customer: " + e.getMessage());
         }
     }
+
 
 //    public List<Order> getCustomerOrders(Long customerId) {
 //        /* Optional sanity-check that customer exists */

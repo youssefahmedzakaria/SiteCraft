@@ -24,6 +24,7 @@ export default function CartPage() {
     primary: "#000000",
     secondary: "#000000",
     accent: "#000000",
+    foreground: "#ffffff",
   });
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
@@ -69,7 +70,7 @@ export default function CartPage() {
             <Button
               size="lg"
               style={{
-                backgroundColor: initialColors.accent,
+                backgroundColor: initialColors.foreground,
                 color: initialColors.primary,
               }}
             >
@@ -129,7 +130,7 @@ export default function CartPage() {
                 style={{
                   backgroundColor: `${initialColors.secondary}20`,
                   borderColor: initialColors.secondary,
-                }}  
+                }}
               >
                 <div className="relative w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                   <Image
@@ -251,44 +252,12 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <div className="flex justify-between">
-                <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
-              </div>
-
               <hr />
 
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
                 <span>${finalTotal.toFixed(2)}</span>
               </div>
-            </div>
-
-            {/* Promo Code */}
-            <div className="mt-6 space-y-2">
-              <label className="text-sm font-medium">Promo Code</label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter code"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                />
-                <Button
-                  variant="outline"
-                  onClick={handleApplyPromo}
-                  style={{
-                    borderColor: initialColors.secondary,
-                    color: initialColors.secondary,
-                  }}
-                >
-                  Apply
-                </Button>
-              </div>
-              {promoCode.toLowerCase() === "save10" && discount > 0 && (
-                <p className="text-sm" style={{ color: initialColors.secondary }}>
-                  Promo code applied! 10% off
-                </p>
-              )}
             </div>
 
             <Link
@@ -299,8 +268,8 @@ export default function CartPage() {
                 className="w-full"
                 size="lg"
                 style={{
-                  backgroundColor: initialColors.secondary,
                   color: initialColors.primary,
+                  backgroundColor: initialColors.foreground,
                 }}
               >
                 Proceed to Checkout

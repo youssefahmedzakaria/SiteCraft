@@ -2,7 +2,10 @@ package com.sitecraft.backend.Models;
 
 // OrderProduct.java
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 
 @Entity
@@ -89,5 +92,11 @@ public class OrderProduct {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    @Transient
+    @JsonProperty("images")
+    public List<ProductImage> getImages() {
+        return product != null ? product.getImages() : null;
     }
 }

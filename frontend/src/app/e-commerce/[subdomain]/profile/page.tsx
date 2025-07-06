@@ -38,6 +38,7 @@ interface Order {
     name: string;
     quantity: number;
     price: number;
+    image: string;
   }>;
   shipping?: number;
 }
@@ -60,12 +61,12 @@ export default function ProfilePage() {
     secondary: "#000000",
     accent: "#000000",
   });
-  
+
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
 
-  const [mock,setMock] = useState<UserData | null>(null);
+  const [mock, setMock] = useState<UserData | null>(null);
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [profileData, setProfileData] = useState<UserData | null>(null);
   const [notifications, setNotifications] = useState({
@@ -136,6 +137,7 @@ export default function ProfilePage() {
         credentials: "include",
       });
       const data = await res.json();
+      console.log(data);
       if (data.success && data.customer) {
         // Split name into firstName and lastName if possible
         let firstName = "";
@@ -151,7 +153,8 @@ export default function ProfilePage() {
           lastName,
           email: data.customer.email,
           phone: data.customer.phone,
-          avatar: data.customer.avatar || "/placeholder.png?height=100&width=100",
+          avatar:
+            data.customer.avatar || "/placeholder.png?height=100&width=100",
         });
         // Map backend addresses to frontend Address type
         setAddresses(
@@ -179,6 +182,9 @@ export default function ProfilePage() {
               name: prod.sku || "Product",
               quantity: prod.quantity || 1,
               price: prod.price || 0,
+              image:
+                prod.images[0].imageUrl ||
+                "/placeholder.png?height=100&width=100",
             })),
           }))
         );
@@ -240,14 +246,17 @@ export default function ProfilePage() {
         email: profileData.email,
         phone: profileData.phone,
       };
-      const res = await fetch("http://localhost:8080/customer/updateCustomerInfo", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "http://localhost:8080/customer/updateCustomerInfo",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (data.success) {
         alert("Profile updated successfully!");
@@ -287,7 +296,15 @@ export default function ProfilePage() {
       const data = await res.json();
       if (data.success) {
         setShowAddAddress(false);
-        setNewAddress({ type: "", city: "", streetNum: "", buildingNum: "", floorNum: "", apartmentNum: "", landmark: "" });
+        setNewAddress({
+          type: "",
+          city: "",
+          streetNum: "",
+          buildingNum: "",
+          floorNum: "",
+          apartmentNum: "",
+          landmark: "",
+        });
         await fetchCustomerData();
         alert("Address added successfully!");
       } else {
@@ -301,13 +318,17 @@ export default function ProfilePage() {
   };
 
   const handleDeleteAddress = async (addressId: string) => {
-    if (!window.confirm("Are you sure you want to delete this address?")) return;
+    if (!window.confirm("Are you sure you want to delete this address?"))
+      return;
     setAddressLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/customer/deleteAddress/${addressId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `http://localhost:8080/customer/deleteAddress/${addressId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       if (data.success) {
         await fetchCustomerData();
@@ -351,16 +372,27 @@ export default function ProfilePage() {
         apartmentNum: editAddress.apartmentNum,
         landmark: editAddress.landmark,
       };
-      const res = await fetch(`http://localhost:8080/customer/updateAddress/${editingAddressId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `http://localhost:8080/customer/updateAddress/${editingAddressId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (data.success) {
         setEditingAddressId(null);
-        setEditAddress({ type: "", city: "", streetNum: "", buildingNum: "", floorNum: "", apartmentNum: "", landmark: "" });
+        setEditAddress({
+          type: "",
+          city: "",
+          streetNum: "",
+          buildingNum: "",
+          floorNum: "",
+          apartmentNum: "",
+          landmark: "",
+        });
         await fetchCustomerData();
         alert("Address updated successfully!");
       } else {
@@ -396,11 +428,40 @@ export default function ProfilePage() {
     setActiveTab("orders");
   };
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8080/order/cancelOrder/${orderId}`,
+        {
+          method: "PUT",
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        alert("Order cancelled successfully!");
+        await fetchCustomerData();
+        setActiveTab("orders");
+      } else {
+        alert(data.message || "Failed to cancel order.");
+      }
+    } catch (error) {
+      alert("An error occurred while cancelling the order.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div
         className={`min-h-screen flex items-center justify-center font-sans`}
-        style={{ backgroundColor: "bg-[#FFFFFF]", color: initialColors.primary }}
+        style={{
+          backgroundColor: "bg-[#FFFFFF]",
+          color: initialColors.primary,
+        }}
       >
         <div className="text-center">
           <div
@@ -420,7 +481,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#ffffff] pt-20`} style={{ color: initialColors.primary }}>
+    <div
+      className={`min-h-screen bg-[#ffffff] pt-20`}
+      style={{ color: initialColors.primary }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
@@ -486,9 +550,7 @@ export default function ProfilePage() {
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
-              <div
-                className={`bg-white rounded-lg shadow p-6`}
-              >
+              <div className={`bg-white rounded-lg shadow p-6`}>
                 <div className="mb-6">
                   <h2
                     className="text-xl font-semibold"
@@ -548,7 +610,9 @@ export default function ProfilePage() {
                       id="email"
                       type="email"
                       value={profileData?.email || ""}
-                      onChange={(e) => handleProfileUpdate("email", e.target.value)}
+                      onChange={(e) =>
+                        handleProfileUpdate("email", e.target.value)
+                      }
                       className={`border-2 rounded-lg`}
                       style={{ borderColor: initialColors.secondary }}
                       readOnly
@@ -582,9 +646,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div
-                className={`bg-white rounded-lg shadow p-6`}
-              >
+              <div className={`bg-white rounded-lg shadow p-6`}>
                 <div className="flex items-center gap-2 mb-6">
                   <MapPin
                     className="w-5 h-5"
@@ -632,7 +694,8 @@ export default function ProfilePage() {
                                 opacity: 0.7,
                               }}
                             >
-                              {address.city}<br />
+                              {address.city}
+                              <br />
                               {address.streetNum}
                             </p>
                           </div>
@@ -664,84 +727,159 @@ export default function ProfilePage() {
                       </div>
 
                       {editingAddressId === address.id && (
-                        <div className={`p-4 border rounded-lg`}
-                          style={{ borderColor: initialColors.accent, backgroundColor: initialColors.secondary }}>
-                          <h4 className="text-lg font-semibold mb-4" style={{ color: initialColors.primary }}>
+                        <div
+                          className={`p-4 border rounded-lg`}
+                          style={{ borderColor: initialColors.accent }}
+                        >
+                          <h4
+                            className="text-lg font-semibold mb-4"
+                            style={{ color: initialColors.primary }}
+                          >
                             Edit Address
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor="editAddressType" style={{ color: initialColors.primary }}>Title *</Label>
+                              <Label
+                                htmlFor="editAddressType"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Title *
+                              </Label>
                               <Input
                                 id="editAddressType"
                                 value={editAddress.type}
-                                onChange={e => setEditAddress({ ...editAddress, type: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    type: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Home, Work, Office"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editCity" style={{ color: initialColors.primary }}>City *</Label>
+                              <Label
+                                htmlFor="editCity"
+                                style={{ color: initialColors.primary }}
+                              >
+                                City *
+                              </Label>
                               <Input
                                 id="editCity"
                                 value={editAddress.city}
-                                onChange={e => setEditAddress({ ...editAddress, city: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    city: e.target.value,
+                                  })
+                                }
                                 placeholder="City"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editStreetNum" style={{ color: initialColors.primary }}>Street Number</Label>
+                              <Label
+                                htmlFor="editStreetNum"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Street Number
+                              </Label>
                               <Input
                                 id="editStreetNum"
                                 value={editAddress.streetNum}
-                                onChange={e => setEditAddress({ ...editAddress, streetNum: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    streetNum: e.target.value,
+                                  })
+                                }
                                 placeholder="Street Number"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editBuildingNum" style={{ color: initialColors.primary }}>Building Number</Label>
+                              <Label
+                                htmlFor="editBuildingNum"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Building Number
+                              </Label>
                               <Input
                                 id="editBuildingNum"
                                 value={editAddress.buildingNum}
-                                onChange={e => setEditAddress({ ...editAddress, buildingNum: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    buildingNum: e.target.value,
+                                  })
+                                }
                                 placeholder="Building Number"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editFloorNum" style={{ color: initialColors.primary }}>Floor Number</Label>
+                              <Label
+                                htmlFor="editFloorNum"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Floor Number
+                              </Label>
                               <Input
                                 id="editFloorNum"
                                 value={editAddress.floorNum}
-                                onChange={e => setEditAddress({ ...editAddress, floorNum: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    floorNum: e.target.value,
+                                  })
+                                }
                                 placeholder="Floor Number"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div>
-                              <Label htmlFor="editApartmentNum" style={{ color: initialColors.primary }}>Apartment Number</Label>
+                              <Label
+                                htmlFor="editApartmentNum"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Apartment Number
+                              </Label>
                               <Input
                                 id="editApartmentNum"
                                 value={editAddress.apartmentNum}
-                                onChange={e => setEditAddress({ ...editAddress, apartmentNum: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    apartmentNum: e.target.value,
+                                  })
+                                }
                                 placeholder="Apartment Number"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <Label htmlFor="editLandmark" style={{ color: initialColors.primary }}>Landmark</Label>
+                              <Label
+                                htmlFor="editLandmark"
+                                style={{ color: initialColors.primary }}
+                              >
+                                Landmark
+                              </Label>
                               <Input
                                 id="editLandmark"
                                 value={editAddress.landmark}
-                                onChange={e => setEditAddress({ ...editAddress, landmark: e.target.value })}
+                                onChange={(e) =>
+                                  setEditAddress({
+                                    ...editAddress,
+                                    landmark: e.target.value,
+                                  })
+                                }
                                 placeholder="Landmark"
                                 className={`border-2 rounded-lg`}
                                 style={{ borderColor: initialColors.secondary }}
@@ -749,12 +887,25 @@ export default function ProfilePage() {
                             </div>
                           </div>
                           <div className="flex gap-2 mt-4">
-                            <Button onClick={handleUpdateAddress} className={`text-white hover:opacity-90 rounded-lg`}
-                              style={{ backgroundColor: initialColors.secondary }} disabled={addressLoading}>
+                            <Button
+                              onClick={handleUpdateAddress}
+                              className={`text-white hover:opacity-90 rounded-lg`}
+                              style={{
+                                backgroundColor: initialColors.secondary,
+                              }}
+                              disabled={addressLoading}
+                            >
                               Update Address
                             </Button>
-                            <Button onClick={handleCancelEdit} variant="outline" className={`border-2 rounded-lg`}
-                              style={{ borderColor: initialColors.secondary, color: initialColors.primary }}>
+                            <Button
+                              onClick={handleCancelEdit}
+                              variant="outline"
+                              className={`border-2 rounded-lg`}
+                              style={{
+                                borderColor: initialColors.secondary,
+                                color: initialColors.primary,
+                              }}
+                            >
                               Cancel
                             </Button>
                           </div>
@@ -792,77 +943,147 @@ export default function ProfilePage() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="addressType" style={{ color: initialColors.primary }}>Title *</Label>
+                        <Label
+                          htmlFor="addressType"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Title *
+                        </Label>
                         <Input
                           id="addressType"
                           value={newAddress.type}
-                          onChange={e => setNewAddress({ ...newAddress, type: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              type: e.target.value,
+                            })
+                          }
                           placeholder="e.g., Home, Work, Office"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city" style={{ color: initialColors.primary }}>City *</Label>
+                        <Label
+                          htmlFor="city"
+                          style={{ color: initialColors.primary }}
+                        >
+                          City *
+                        </Label>
                         <Input
                           id="city"
                           value={newAddress.city}
-                          onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              city: e.target.value,
+                            })
+                          }
                           placeholder="City"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="streetNum" style={{ color: initialColors.primary }}>Street Number</Label>
+                        <Label
+                          htmlFor="streetNum"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Street Number
+                        </Label>
                         <Input
                           id="streetNum"
                           value={newAddress.streetNum}
-                          onChange={e => setNewAddress({ ...newAddress, streetNum: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              streetNum: e.target.value,
+                            })
+                          }
                           placeholder="Street Number"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="buildingNum" style={{ color: initialColors.primary }}>Building Number</Label>
+                        <Label
+                          htmlFor="buildingNum"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Building Number
+                        </Label>
                         <Input
                           id="buildingNum"
                           value={newAddress.buildingNum}
-                          onChange={e => setNewAddress({ ...newAddress, buildingNum: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              buildingNum: e.target.value,
+                            })
+                          }
                           placeholder="Building Number"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="floorNum" style={{ color: initialColors.primary }}>Floor Number</Label>
+                        <Label
+                          htmlFor="floorNum"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Floor Number
+                        </Label>
                         <Input
                           id="floorNum"
                           value={newAddress.floorNum}
-                          onChange={e => setNewAddress({ ...newAddress, floorNum: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              floorNum: e.target.value,
+                            })
+                          }
                           placeholder="Floor Number"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="apartmentNum" style={{ color: initialColors.primary }}>Apartment Number</Label>
+                        <Label
+                          htmlFor="apartmentNum"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Apartment Number
+                        </Label>
                         <Input
                           id="apartmentNum"
                           value={newAddress.apartmentNum}
-                          onChange={e => setNewAddress({ ...newAddress, apartmentNum: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              apartmentNum: e.target.value,
+                            })
+                          }
                           placeholder="Apartment Number"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor="landmark" style={{ color: initialColors.primary }}>Landmark</Label>
+                        <Label
+                          htmlFor="landmark"
+                          style={{ color: initialColors.primary }}
+                        >
+                          Landmark
+                        </Label>
                         <Input
                           id="landmark"
                           value={newAddress.landmark}
-                          onChange={e => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                          onChange={(e) =>
+                            setNewAddress({
+                              ...newAddress,
+                              landmark: e.target.value,
+                            })
+                          }
                           placeholder="Landmark"
                           className={`border-2 rounded-lg`}
                           style={{ borderColor: initialColors.secondary }}
@@ -895,9 +1116,7 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="orders" className="space-y-6">
-              <div
-                className={`bg-white rounded-lg shadow p-6`}
-              >
+              <div className={`bg-white rounded-lg shadow p-6`}>
                 <div className="mb-6">
                   <h2
                     className="text-xl font-semibold"
@@ -974,11 +1193,11 @@ export default function ProfilePage() {
                           style={{
                             borderColor: initialColors.secondary,
                             color: initialColors.primary,
-                              }}
-                            >
-                              View Details
+                          }}
+                        >
+                          View Details
                         </Button>
-                        {order.status === "Delivered" && (
+                        {/* {order.status === "Delivered" && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -990,6 +1209,23 @@ export default function ProfilePage() {
                           >
                             Reorder
                           </Button>
+                        )} */}
+                        {!["Shipped", "Delivered", "Cancelled"].includes(
+                          order.status
+                        ) && (
+                          <Button
+                            onClick={() => handleCancelOrder(order.id)}
+                            variant="outline"
+                            size="sm"
+                            className={`border-2 rounded-lg bg`}
+                            style={{
+                              borderColor: "#e53e3e",
+                              color: "#FFFFFF",
+                              backgroundColor: "#e53e3e",
+                            }}
+                          >
+                            Cancel Order
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -998,13 +1234,9 @@ export default function ProfilePage() {
               </div>
             </TabsContent>
 
-            
-
             <TabsContent value="order-details" className="space-y-6">
               {selectedOrderId && (
-                <div
-                  className={`bg-white rounded-lg shadow p-6`}
-                >
+                <div className={`bg-white rounded-lg shadow p-6`}>
                   <div className="flex items-center gap-4 mb-6">
                     <Button
                       onClick={handleBackToOrders}
@@ -1029,14 +1261,11 @@ export default function ProfilePage() {
                   </div>
 
                   {(() => {
-                    const order = orders.find(
-                      (o) => o.id === selectedOrderId
-                    );
+                    const order = orders.find((o) => o.id === selectedOrderId);
                     if (!order) return null;
 
                     const shipping = order.shipping ?? 0;
-                    const tax = order.total * 0.08;
-                    const subtotal = order.total - tax - shipping;
+                    const subtotal = order.total - shipping;
 
                     return (
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1055,7 +1284,6 @@ export default function ProfilePage() {
                                   key={index}
                                   className={`flex items-center gap-4 p-4 border rounded-lg`}
                                   style={{
-                                    backgroundColor: initialColors.secondary,
                                     borderColor: initialColors.secondary,
                                   }}
                                 >
@@ -1063,7 +1291,7 @@ export default function ProfilePage() {
                                     className={`relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden`}
                                   >
                                     <Image
-                                      src="/placeholder.png?height=80&width=80"
+                                      src={item.image}
                                       alt={item.name}
                                       width={80}
                                       height={80}
@@ -1112,7 +1340,7 @@ export default function ProfilePage() {
                           <div
                             className={`p-6 rounded-lg sticky top-24`}
                             style={{
-                              backgroundColor: initialColors.secondary,
+                              borderColor: initialColors.secondary,
                             }}
                           >
                             <h3
@@ -1135,16 +1363,9 @@ export default function ProfilePage() {
                               <div className="flex justify-between">
                                 <span style={{ color: initialColors.primary }}>
                                   Shipping
-                                  {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
-                                </span>
-                              </div>
-
-                              <div className="flex justify-between">
-                                <span style={{ color: initialColors.primary }}>
-                                  Tax
                                 </span>
                                 <span style={{ color: initialColors.primary }}>
-                                  ${tax.toFixed(2)}
+                                  ${shipping.toFixed(2)}
                                 </span>
                               </div>
 
@@ -1165,7 +1386,7 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="mt-6 space-y-4">
-                              <div>
+                              <div className="flex justify-between">
                                 <h4
                                   className="font-medium mb-2"
                                   style={{ color: initialColors.primary }}
@@ -1181,7 +1402,7 @@ export default function ProfilePage() {
                                 </span>
                               </div>
 
-                              <div>
+                              <div className="flex justify-between">
                                 <h4
                                   className="font-medium mb-2"
                                   style={{ color: initialColors.primary }}
@@ -1199,17 +1420,16 @@ export default function ProfilePage() {
                                 </p>
                               </div>
 
-                              {order.status === "Delivered" && (
+                              {/* {order.status === "Delivered" && (
                                 <Button
                                   className={`w-full text-white hover:opacity-90 rounded-lg`}
                                   style={{
-                                    backgroundColor:
-                                      initialColors.secondary,
+                                    backgroundColor: initialColors.secondary,
                                   }}
                                 >
                                   Reorder Items
                                 </Button>
-                              )}
+                              )} */}
                             </div>
                           </div>
                         </div>

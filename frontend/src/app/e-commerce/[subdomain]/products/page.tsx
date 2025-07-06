@@ -31,8 +31,8 @@ function normalize(str: string) {
 
 export default function ProductsPage({
   // Text configuration props
-  mainTitle = "Jewelry Products",
-  subtitle = "Discover our exquisite collection of handcrafted jewelry pieces, each designed to tell your unique story",
+  mainTitle = "Our Products",
+  subtitle = "Explore our diverse collection of high-quality items designed for a wide range of needs",
   ctaText = "View Product",
 
   // Background and styling props
