@@ -6,6 +6,7 @@ interface SessionData {
   storeId: number | null
   userId: number | null
   role: string | null
+  storeStatus?: string | null
 }
 
 interface AuthState {
@@ -37,7 +38,12 @@ export const useAuth = create<AuthState>((set, get) => ({
       if (session) {
         set({ 
           isAuthenticated: true, 
-          user: session,
+          user: {
+            storeId: session.storeId,
+            userId: session.userId,
+            role: session.role,
+            storeStatus: session.storeStatus || null
+          },
           loginError: null 
         })
         return true
@@ -99,7 +105,8 @@ export const useAuth = create<AuthState>((set, get) => ({
           user: {
             userId: response.userId,
             storeId: null, // No store created yet
-            role: null // No role assigned yet
+            role: null, // No role assigned yet
+            storeStatus: null // No store status assigned yet
           },
           signupError: null 
         })
@@ -144,7 +151,8 @@ export const useAuth = create<AuthState>((set, get) => ({
         user: {
           ...currentUser,
           storeId: storeId,
-          role: role
+          role: role,
+          storeStatus: null // No store status assigned yet
         }
       });
       
@@ -164,9 +172,16 @@ export const useAuth = create<AuthState>((set, get) => ({
       
       if (session && session.userId) {
         console.log('✅ Valid session found, updating auth state...');
+        const userData = {
+          storeId: session.storeId,
+          userId: session.userId,
+          role: session.role,
+          storeStatus: session.storeStatus || null
+        };
+        console.log('👤 User data to set:', userData);
         set({ 
           isAuthenticated: true, 
-          user: session 
+          user: userData
         })
         console.log('✅ Auth state updated with session data');
       } else {

@@ -5,11 +5,10 @@ import { Button } from "@/components/SiteCraft/ui/button";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { createStore } from "@/lib/auth";
 import { getStoreSettings, updateStoreInfo } from "@/lib/store-info";
-import { saveStoreColors, updateStoreColors } from "@/lib/store-colors";
 import { useRouter } from "next/navigation";
 import { RefreshCw, AlertCircle } from "lucide-react";
+import { siteCraftCache } from '@/lib/cache'
 
 interface StoreData {
   id: number;
@@ -706,8 +705,8 @@ export default function BrandingPage() {
   };
 
   const handleSaveChanges = async () => {
-    if (!isClient || !user?.userId) {
-      alert('User not authenticated');
+    if (!isClient) {
+      alert('Please wait for page to load');
       return;
     }
 
@@ -723,79 +722,34 @@ export default function BrandingPage() {
 
     setIsCreating(true);
     try {
-      if (existingStore) {
-        // Update existing store
-        console.log('🏪 Updating existing store with data:', {
-          storeName,
-          storeType,
-          logoFile: logoFile?.name
-        });
+      // Save store data to cache instead of creating in database
+      console.log('🏪 Saving store data to cache:', {
+        storeName,
+        storeType,
+        logoFile: logoFile?.name
+      });
 
-        const storeData = {
-          storeName: storeName.trim(),
-          storeType: storeType,
-          description: existingStore.description || `Store updated for ${storeName}`,
-          subdomain: subdomain.trim() || undefined
-        };
-
-        const result = await updateStoreInfo(storeData, logoFile || undefined);
-        console.log('✅ Store updated successfully:', result);
-        
-        // Update store colors in database
-        try {
-          await updateStoreColors({
-            primary: validPrimaryColor,
-            secondary: validSecondaryColor,
-            accent: validAccentColor
-          });
-          console.log('✅ Store colors updated in database');
-        } catch (colorError) {
-          console.error('⚠️ Failed to update colors in database:', colorError);
-          // Continue anyway, don't block the flow
+      const storeData = {
+        storeName: storeName.trim(),
+        storeType: storeType,
+        description: `Store created for ${storeName}`,
+        phoneNumber: '',
+        emailAddress: '',
+        address: '',
+        addressLink: '',
+        openingHours: '',
+        logo: logoFile || undefined,
+        colors: {
+          primary: validPrimaryColor,
+          secondary: validSecondaryColor,
+          accent: validAccentColor
         }
-        
-        // Show success message and redirect to color palette
-        alert('Store updated successfully!');
-        router.push('/branding/color-palette');
-      } else {
-        // Create new store
-        console.log('🏪 Creating new store with data:', {
-          storeName,
-          storeType,
-          logoFile: logoFile?.name
-        });
+      };
 
-        const storeData = {
-          storeName: storeName.trim(),
-          storeType: storeType,
-          description: `Store created for ${storeName}`,
-          logo: logoFile || undefined
-        };
+      siteCraftCache.saveStoreData(storeData);
+      console.log('💾 Store data saved to cache:', storeData);
 
-        const result = await createStore(storeData, user.userId);
-        console.log('✅ Store created successfully:', result);
-
-        // Update session with store information
-        if (result.store && result.store.id) {
-          await updateSessionAfterStoreCreation(result.store.id, 'owner');
-          console.log('✅ Session updated with store information');
-          
-          // Save store colors to database
-          try {
-            await saveStoreColors({
-              primary: validPrimaryColor,
-              secondary: validSecondaryColor,
-              accent: validAccentColor
-            });
-            console.log('✅ Store colors saved to database');
-          } catch (colorError) {
-            console.error('⚠️ Failed to save colors to database:', colorError);
-            // Continue anyway, don't block the flow
-          }
-        }
-      }
-
-      // Save validated colors to localStorage for the color-palette page
+      // Save colors to localStorage for the color-palette page
       localStorage.setItem("primaryColor", validPrimaryColor);
       localStorage.setItem("secondaryColor", validSecondaryColor);
       localStorage.setItem("accentColor", validAccentColor);
@@ -805,23 +759,8 @@ export default function BrandingPage() {
       // Navigate to the color-palette page
       router.push('/branding/color-palette');
     } catch (error) {
-      console.error('💥 Error saving store:', error);
-      
-      // Clear any existing errors
-      setErrors({});
-      
-      // Provide more specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes('subdomain') || error.message.includes('unique constraint') || error.message.includes('already taken')) {
-          setErrors({ storeName: 'A store with this name already exists. Please choose a different store name.' });
-        } else if (error.message.includes('duplicate key')) {
-          setErrors({ storeName: 'This store name is already taken. Please choose a different name.' });
-        } else {
-          setError(error.message);
-        }
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+      console.error('💥 Error saving store to cache:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsCreating(false);
     }

@@ -11,6 +11,7 @@ import { FilterButton } from "@/components/SiteCraft/dashboard/orders/ordersFilt
 import { format } from "date-fns";
 import { X, AlertCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
@@ -30,6 +31,7 @@ export default function OrdersPage() {
   } = useOrderManagement();
 
   const { isAuthenticated } = useAuth();
+  const { isInactive } = useStoreStatus();
   const router = useRouter();
 
   const orderStatuses = [
@@ -84,6 +86,30 @@ export default function OrdersPage() {
 
     return true;
   });
+
+  // Show inactive store message if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

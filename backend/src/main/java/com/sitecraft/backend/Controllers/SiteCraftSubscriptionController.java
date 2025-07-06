@@ -45,4 +45,28 @@ public class SiteCraftSubscriptionController {
         Optional<SiteCraftSubscription> sub = subscriptionService.getCurrentSubscription(storeId);
         return sub.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelSubscription(HttpSession session) {
+        Long storeId = (Long) session.getAttribute("storeId");
+        if (storeId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+        try {
+            subscriptionService.cancelSubscription(storeId);
+            return ResponseEntity.ok().body("Subscription cancelled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/check-expired")
+    public ResponseEntity<?> checkExpiredSubscriptions() {
+        try {
+            subscriptionService.checkAndUpdateExpiredSubscriptions();
+            return ResponseEntity.ok().body("Expired subscriptions checked and updated");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 } 

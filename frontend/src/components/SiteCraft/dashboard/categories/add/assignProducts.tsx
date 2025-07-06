@@ -12,7 +12,7 @@ import { useProductManagement } from "@/hooks/useProductManagement";
 interface AssignProductsProps {
   assignedProducts: SimplifiedProduct[];
   setAssignedProducts: (products: SimplifiedProduct[]) => void;
-  categoryId: number;
+  categoryId?: number;
 }
 
 export default function AssignProducts({ assignedProducts, setAssignedProducts, categoryId }: AssignProductsProps) {
@@ -37,7 +37,7 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts, 
       const filtered = products.filter(
         (product) =>
           product.name.toLowerCase().includes(lowercaseQuery) ||
-          (product.categories && product.categories.some(cat => cat.title.toLowerCase().includes(lowercaseQuery))) ||
+          (product.categories && product.categories.some(cat => cat.name.toLowerCase().includes(lowercaseQuery))) ||
           product.id.toString().includes(lowercaseQuery)
       );
       setFilteredProducts(filtered);
@@ -82,7 +82,9 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts, 
     e.preventDefault();
     e.stopPropagation();
     try {
-      await removeProductFromCategory(categoryId, productId);
+      if (categoryId) {
+        await removeProductFromCategory(categoryId, productId);
+      }
       setAssignedProducts(assignedProducts.filter((p) => p.id !== productId));
     } catch (err: any) {
       alert('Failed to remove product from category: ' + (err.message || err));
@@ -171,7 +173,7 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts, 
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
                       {product.categories && product.categories.length > 0
-                        ? product.categories.map(cat => cat.title).join(', ')
+                        ? product.categories.map(cat => cat.name).join(', ')
                         : 'Uncategorized'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 truncate text-left">
@@ -274,7 +276,7 @@ export default function AssignProducts({ assignedProducts, setAssignedProducts, 
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">
                             {product.categories && product.categories.length > 0
-                              ? product.categories.map(cat => cat.title).join(', ')
+                              ? product.categories.map(cat => cat.name).join(', ')
                               : 'Uncategorized'}
                           </td>
                           <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 truncate">

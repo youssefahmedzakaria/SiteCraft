@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/SiteCraft/ui/card";
 import { StoreInformationSection } from "@/components/SiteCraft/dashboard/account-settings/StoreInformationSection";
 import { StaffManagementSection } from "@/components/SiteCraft/dashboard/account-settings/StaffManagementSection";
 import { useAuth } from "@/hooks/useAuth";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/SiteCraft/ui/button";
@@ -17,6 +18,7 @@ export default function AccountSettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Store Information");
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isInactive } = useStoreStatus();
   const router = useRouter();
 
   // Show loading while checking authentication
@@ -60,6 +62,30 @@ export default function AccountSettingsPage() {
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
               <p className="text-gray-600">You don't have permission to access this page.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if store is inactive
+  if (isInactive) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
+              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <Button 
+                onClick={() => router.push('/pricing')}
+                className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
+              >
+                Subscribe Now
+              </Button>
             </div>
           </div>
         </main>
