@@ -17,11 +17,6 @@ import { useProductManagement } from "@/hooks/useProductManagement";
 import { getCategories, SimplifiedProduct } from "@/lib/products";
 import { useSearchParams, useRouter } from "next/navigation";
 
-const [initialColors, setInitialColors] = useState({
-  primary: "#000000",
-  secondary: "#000000",
-  accent: "#000000",
-});
 // Optionally, import ThemeConfig type from product page for type safety
 // import type { ThemeConfig } from "../product/[slug]/product"
 
@@ -75,6 +70,12 @@ export default function ProductsPage({
   enableSorting = true,
   maxPriceLimit = 1500,
 }) {
+  const [initialColors, setInitialColors] = useState({
+    primary: "#000000",
+    secondary: "#000000",
+    accent: "#000000",
+  });
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -319,10 +320,16 @@ export default function ProductsPage({
     <div className={`min-h-screen bg-[#ffffff] pt-20`}>
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className={`text-5xl font-bold mb-4`} style={{ color: initialColors.primary }}>
+          <h1
+            className={`text-5xl font-bold mb-4`}
+            style={{ color: initialColors.primary }}
+          >
             {mainTitle}
           </h1>
-          <p className={`text-xl font-light max-w-2xl mx-auto`} style={{ color: initialColors.primary }}>
+          <p
+            className={`text-xl font-light max-w-2xl mx-auto`}
+            style={{ color: initialColors.primary }}
+          >
             {subtitle}
           </p>
         </div>
@@ -667,7 +674,10 @@ export default function ProductsPage({
           <div className="flex-1">
             {/* Items per page selector and results info */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-              <div className={`text-sm`} style={{ color: initialColors.primary }}>
+              <div
+                className={`text-sm`}
+                style={{ color: initialColors.primary }}
+              >
                 {Math.min(endIndex, totalItems)} out of {totalItems} products
               </div>
 
@@ -869,7 +879,10 @@ export default function ProductsPage({
                   </button>
                 </div>
 
-                <div className={`text-sm`} style={{ color: initialColors.primary }}>
+                <div
+                  className={`text-sm`}
+                  style={{ color: initialColors.primary }}
+                >
                   Page {currentPage} of {totalPages}
                 </div>
               </div>
