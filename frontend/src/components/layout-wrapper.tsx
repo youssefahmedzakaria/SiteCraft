@@ -13,13 +13,11 @@ import {
 import React from "react";
 import { TemplateProvider } from "@/lib/templates";
 
-
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const pathSegments = pathname.split("/");
   const subdomain = pathSegments[2];
-
 
   const isAuthPage =
     pathname?.includes("/login") ||
@@ -29,8 +27,10 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     pathname?.includes("/templates") ||
     pathname?.includes("/forgot-password") ||
     pathname?.includes("/e-commerce");
- 
-    const [initialColors, setInitialColors] = useState({
+
+  const isEcommercePage = pathname?.startsWith("/e-commerce");
+
+  const [initialColors, setInitialColors] = useState({
     primary: "#000000",
     secondary: "#000000",
     accent: "#000000",
