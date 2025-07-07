@@ -6,7 +6,7 @@ import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { CardTitle } from "@/components/SiteCraft/ui/card";
 import Image from "next/image";
 import { ChevronDown, ChevronUp, Upload } from "lucide-react";
-import { deleteProductImage, getCategories } from '@/lib/products';
+import { deleteProductImage, getCategories } from "@/lib/products";
 
 interface BasicFormData {
   name: string;
@@ -24,14 +24,14 @@ interface ProductInfoSectionProps {
   setExistingImages?: (images: any[]) => void;
 }
 
-export function ProductInfoSection({ 
-  formData, 
-  updateFormData, 
-  imageFiles, 
+export function ProductInfoSection({
+  formData,
+  updateFormData,
+  imageFiles,
   updateImageFiles,
   existingImages = [],
   productId,
-  setExistingImages
+  setExistingImages,
 }: ProductInfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -50,7 +50,7 @@ export function ProductInfoSection({
         const data = await getCategories();
         setCategories(data);
       } catch {
-        setCategoriesError('Failed to fetch categories');
+        setCategoriesError("Failed to fetch categories");
       } finally {
         setCategoriesLoading(false);
       }
@@ -62,23 +62,25 @@ export function ProductInfoSection({
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateFormData({ name: e.target.value });
   };
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     updateFormData({ description: e.target.value });
   };
   const handleCategoryChange = (categoryId: number) => {
     const current = formData.categoryIds || [];
     const updated = current.includes(categoryId)
-      ? current.filter(id => id !== categoryId)
+      ? current.filter((id) => id !== categoryId)
       : [...current, categoryId];
     updateFormData({ categoryIds: updated });
   };
 
   // Image addition & preview
   const addImageFiles = (files: File[]) => {
-    files.forEach(file => {
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result as string]);
+        setImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
@@ -124,11 +126,11 @@ export function ProductInfoSection({
       const newImagePreviews = [...imagePreviews];
 
       // 2) remove the dragged item
-      const [movedFile]    = newImageFiles.splice(draggedIndex, 1);
+      const [movedFile] = newImageFiles.splice(draggedIndex, 1);
       const [movedPreview] = newImagePreviews.splice(draggedIndex, 1);
 
       // 3) re-insert at the new index
-      newImageFiles.splice(dragOverIndex,    0, movedFile);
+      newImageFiles.splice(dragOverIndex, 0, movedFile);
       newImagePreviews.splice(dragOverIndex, 0, movedPreview);
 
       // 4) update component state
@@ -145,9 +147,11 @@ export function ProductInfoSection({
   const getSelectedCategoryNames = () => {
     const ids = formData.categoryIds || [];
     if (!ids.length) return "Select categories";
-    const sel = categories.filter(c => ids.includes(c.id));
+    const sel = categories.filter((c) => ids.includes(c.id));
     if (!sel.length) return "Select categories";
-    return sel.length === 1 ? sel[0].name || sel[0].title : `${sel.length} categories selected`;
+    return sel.length === 1
+      ? sel[0].name || sel[0].title
+      : `${sel.length} categories selected`;
   };
   const isCategorySelected = (id: number) =>
     (formData.categoryIds || []).includes(id);
@@ -182,7 +186,9 @@ export function ProductInfoSection({
             className="flex w-full border border-input bg-white rounded h-9 px-3 py-1 items-center justify-between cursor-pointer"
             onClick={() => setOpenCategories(!openCategories)}
           >
-            <span className={!formData.categoryIds?.length ? "text-gray-500" : ""}>
+            <span
+              className={!formData.categoryIds?.length ? "text-gray-500" : ""}
+            >
               {getSelectedCategoryNames()}
             </span>
             {openCategories ? (
@@ -193,7 +199,7 @@ export function ProductInfoSection({
           </div>
           {openCategories && (
             <div className="absolute mt-2 w-full bg-white border border-input rounded shadow z-10 max-h-60 overflow-y-auto">
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <div
                   key={cat.id}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
@@ -249,7 +255,9 @@ export function ProductInfoSection({
                     onClick={async () => {
                       try {
                         await deleteProductImage(productId, img.id);
-                        setExistingImages(existingImages.filter(i => i.id !== img.id));
+                        setExistingImages(
+                          existingImages.filter((i) => i.id !== img.id)
+                        );
                       } catch {
                         alert("Failed to delete image");
                       }
@@ -270,7 +278,7 @@ export function ProductInfoSection({
                 }`}
                 draggable
                 onDragStart={() => handleImageDragStart(index)}
-                onDragOver={e => e.preventDefault()}
+                onDragOver={(e) => e.preventDefault()}
                 onDragEnter={() => handleImageDragEnter(index)}
                 onDragEnd={handleImageDragEnd}
               >
@@ -291,17 +299,20 @@ export function ProductInfoSection({
             ))}
 
             {/* Add Image Button */}
-            <div
-              className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
-              onClick={handleBrowseClick}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <div className="flex flex-col items-center">
-                <span className="text-2xl text-gray-400">+</span>
-                <span className="text-xs text-gray-500">Add</span>
-              </div>
-            </div>
+            {existingImages.length !== 0 ||
+              (imageFiles.length !== 0 && (
+                <div
+                  className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
+                  onClick={handleBrowseClick}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className="text-2xl text-gray-400">+</span>
+                    <span className="text-xs text-gray-500">Add</span>
+                  </div>
+                </div>
+              ))}
           </div>
 
           {/* Drop Area when no images */}
