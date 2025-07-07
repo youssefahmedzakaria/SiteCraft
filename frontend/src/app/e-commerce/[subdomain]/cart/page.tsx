@@ -86,18 +86,27 @@ export default function CartPage() {
     }
   };
 
+  const subtotal = state.items.reduce((sum, item) => {
+    const itemPrice = item.discountType !== null
+      ? item.discountType === "amount"
+        ? (item.originalPrice || 0) - Number(item.discountValue)
+        : (item.originalPrice || 0) * (1 - Number(item.discountValue))
+      : item.price || 0;
+    return sum + (itemPrice * item.quantity);
+  }, 0);
+
   const handleApplyPromo = () => {
     // Simple promo code logic - you can expand this
     if (promoCode.toLowerCase() === "save10") {
-      setDiscount(state.total * 0.1);
+      setDiscount(subtotal * 0.1);
     } else {
       setDiscount(0);
     }
   };
 
-  const shipping = state.total > 500 ? 0 : 25;
-  const tax = (state.total - discount) * 0.08;
-  const finalTotal = state.total - discount + shipping + tax;
+  const shipping = subtotal > 500 ? 0 : 25;
+  const tax = (subtotal - discount) * 0.08;
+  const finalTotal = subtotal - discount + shipping + tax;
 
   // Show loading state
   if (isLoading || state.loading) {
@@ -213,7 +222,7 @@ export default function CartPage() {
               className="text-xl font-semibold"
               style={{ color: initialColors.secondary }}
             >
-              Cart Items ({state.itemCount})
+              Cart Items ({state.items.reduce((sum, item) => sum + item.quantity, 0)})
             </h2>
             <Button
               variant="outline"
@@ -279,12 +288,35 @@ export default function CartPage() {
                           {item.variantInfo.attributes.map(attr => `${attr.name}: ${attr.value}`).join(", ")}
                         </p>
                       )}
-                      <p
-                        className="text-lg font-semibold mt-1"
-                        style={{ color: initialColors.primary }}
-                      >
-                        ${item.price}
-                      </p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span
+                          className="text-lg font-semibold"
+                          style={{ color: initialColors.primary }}
+                        >
+                          $
+          {item.discountType !== null
+            ? item.discountType === "amount"
+              ? (item.originalPrice || 0) - Number(item.discountValue)
+              : (item.originalPrice || 0) * (1 - Number(item.discountValue))
+            : item.price || 0}
+                        </span>
+                        {item.originalPrice && item.originalPrice > item.price && (
+                          <span
+                            className="text-sm opacity-75 line-through"
+                            style={{ color: initialColors.secondary }}
+                          >
+                            ${item.originalPrice}
+                          </span>
+                        )}
+                        {item.discountValue && item.discountValue > 0 && item.discountType && (
+                          <span
+                            className="text-xs font-medium"
+                            style={{ color: "#10B981" }}
+                          >
+                            Save ${item.discountType === "amount" ? item.discountValue : (item.originalPrice || 0) * item.discountValue}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 mt-2 sm:mt-0">
                       <Button
@@ -369,7 +401,7 @@ export default function CartPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${state.total.toFixed(2)}</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
 
               {discount > 0 && (
@@ -420,15 +452,6 @@ export default function CartPage() {
                 )}
               </Button>
             </Link>
-
-            <p
-              className="text-xs mt-4 text-center"
-              style={{ color: initialColors.secondary }}
-            >
-              {shipping === 0
-                ? "Free shipping applied!"
-                : "Free shipping on orders over $500"}
-            </p>
           </div>
         </div>
       </div>

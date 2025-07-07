@@ -13,6 +13,9 @@ export interface CartItem {
   sku: string
   productId: number
   cartProductId?: number // Backend cart product ID
+  originalPrice?: number
+  discountType?: string | null
+  discountValue?: number | null
   variantInfo?: {
     attributes: Array<{
       name: string
@@ -224,23 +227,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const cartProducts = await response.json();
       console.log('Loaded cart products from backend:', cartProducts);
 
-      // Transform backend data to CartItem format
-      const cartItems: CartItem[] = cartProducts.map((cp: any) => ({
-        id: cp.cartProductId?.toString() || cp.id?.toString() || Date.now().toString(),
-        cartProductId: cp.cartProductId || cp.id,
-        name: cp.product?.name || "Unknown Product",
-        price: Number(cp.variant?.discountedPrice || cp.variant?.price || 0),
-        quantity: cp.quantity || 1,
-        image: cp.product?.images?.[0]?.imageUrl || "/placeholder.png",
-        sku: cp.sku || "",
-        productId: cp.product?.id || 0,
-        variantInfo: {
-          attributes: cp.variant?.attributes?.map((attr: any) => ({
-            name: attr.name || "Unknown",
-            value: attr.value || "Unknown"
-          })) || []
-        }
-      }));
+      // Transform backend data to CartItem format with proper discount calculation
+      const cartItems: CartItem[] = cartProducts.map((cp: any) => {
+        const originalPrice = Number(cp.variant?.price || 0);
+        const discountedPrice = Number(cp.variant?.discountedPrice || originalPrice);
+        
+        return {
+          id: cp.cartProductId?.toString() || cp.id?.toString() || Date.now().toString(),
+          cartProductId: cp.cartProductId || cp.id,
+          name: cp.product?.name || "Unknown Product",
+          price: discountedPrice,
+          originalPrice: originalPrice,
+          discountType: cp.product?.discountType || null,
+          discountValue: cp.product?.discountValue || null,
+          quantity: cp.quantity || 1,
+          image: cp.product?.images?.[0]?.imageUrl || "/placeholder.png",
+          sku: cp.sku || "",
+          productId: cp.product?.id || 0,
+          variantInfo: {
+            attributes: cp.variant?.attributes?.map((attr: any) => ({
+              name: attr.name || "Unknown",
+              value: attr.value || "Unknown"
+            })) || []
+          }
+        };
+      });
 
       dispatch({ type: "LOAD_CART_FROM_BACKEND", payload: cartItems });
       return true;
@@ -411,11 +422,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Update local cart with backend response
+      const originalPrice = Number(cartProduct.variant?.price || 0);
+      const discountedPrice = Number(cartProduct.variant?.discountedPrice || originalPrice);
+      
       const cartItem: CartItem = {
         id: cartProduct.cartProductId?.toString() || cartProduct.id?.toString() || Date.now().toString(),
         cartProductId: cartProduct.cartProductId || cartProduct.id,
         name: cartProduct.product?.name || "Unknown Product",
-        price: Number(cartProduct.variant?.discountedPrice || cartProduct.variant?.price || 0),
+        price: discountedPrice,
+        originalPrice: originalPrice,
+        discountType: cartProduct.product?.discountType || null,
+        discountValue: cartProduct.product?.discountValue || null,
         quantity: cartProduct.quantity || 1,
         image: cartProduct.product?.images?.[0]?.imageUrl || "/placeholder.png",
         sku: cartProduct.sku || "",
