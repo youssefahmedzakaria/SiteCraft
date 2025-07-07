@@ -6,6 +6,7 @@ public class WishListProductDTO implements Serializable {
     private Long wishListProductId;
     private String sku;
     private ProductDTO product;
+    private VariantInfoDTO variantInfo;
 
     public WishListProductDTO() {}
 
@@ -23,4 +24,7 @@ public class WishListProductDTO implements Serializable {
 
     public ProductDTO getProduct() { return product; }
     public void setProduct(ProductDTO product) { this.product = product; }
+
+    public VariantInfoDTO getVariantInfo() { return variantInfo; }
+    public void setVariantInfo(VariantInfoDTO variantInfo) { this.variantInfo = variantInfo; }
 } 

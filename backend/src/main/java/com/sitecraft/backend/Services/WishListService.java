@@ -4,12 +4,17 @@ import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.*;
 import com.sitecraft.backend.DTOs.WishListProductDTO;
 import com.sitecraft.backend.DTOs.ProductDTO;
+import com.sitecraft.backend.DTOs.ProductImageDTO;
+import com.sitecraft.backend.DTOs.ProductVariantDTO;
+import com.sitecraft.backend.DTOs.VariantInfoDTO;
+import com.sitecraft.backend.DTOs.VariantAttributeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,21 +91,77 @@ public class WishListService {
 
     public WishListProductDTO createWishListProductDTO(WishListProduct wp) {
         ProductDTO productDTO = mapProductToDTO(wp.getProduct());
-        return new WishListProductDTO(wp.getId(), wp.getSku(), productDTO);
+        WishListProductDTO dto = new WishListProductDTO(wp.getId(), wp.getSku(), productDTO);
+        
+        // Extract variant information from SKU
+        VariantInfoDTO variantInfo = extractVariantInfoFromSku(wp.getSku(), wp.getProduct());
+        dto.setVariantInfo(variantInfo);
+        
+        return dto;
+    }
+
+    private VariantInfoDTO extractVariantInfoFromSku(String sku, Product product) {
+        try {
+            // SKU format: storeId|productId|attributename-attributevalue|...
+            String[] parts = sku.split("\\|");
+            if (parts.length < 3) {
+                return null;
+            }
+            
+            List<VariantAttributeDTO> attributes = new ArrayList<>();
+            
+            // Parse variant attributes (parts 2 onwards)
+            for (int i = 2; i < parts.length; i++) {
+                String[] attrParts = parts[i].split("-", 2);
+                if (attrParts.length == 2) {
+                    String attrName = attrParts[0];
+                    String attrValue = attrParts[1];
+                    attributes.add(new VariantAttributeDTO(attrName, attrValue));
+                }
+            }
+            
+            return new VariantInfoDTO(attributes);
+        } catch (Exception e) {
+            // If SKU parsing fails, return null
+            return null;
+        }
     }
 
     private ProductDTO mapProductToDTO(Product product) {
-        // You can expand this as needed, or use an existing mapper if available
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
         dto.setDiscountType(product.getDiscountType());
         dto.setDiscountValue(product.getDiscountValue());
-        dto.setMinCap(null); // minCap - no longer used for discounts
-        dto.setPercentageMax(null); // percentageMax - no longer used for discounts
-        dto.setMaxCap(null); // maxCap - no longer used for discounts
-        // Optionally map images and variants if needed
+        dto.setStoreId(product.getStore().getId());
+        
+        // Map images
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            dto.setImages(product.getImages().stream()
+                .map(img -> {
+                    ProductImageDTO imgDto = new ProductImageDTO();
+                    imgDto.setId(img.getId());
+                    imgDto.setImageUrl(img.getImageUrl());
+                    return imgDto;
+                })
+                .collect(Collectors.toList()));
+        }
+        
+        // Map variants if available
+        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+            dto.setVariants(product.getVariants().stream()
+                .map(variant -> {
+                    ProductVariantDTO variantDto = new ProductVariantDTO();
+                    variantDto.setId(variant.getId());
+                    variantDto.setPrice(variant.getPrice());
+                    variantDto.setStock(variant.getStock());
+                    return variantDto;
+                })
+                .collect(Collectors.toList()));
+        }
+        
         return dto;
     }
 } 

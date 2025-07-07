@@ -42,8 +42,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   const { addToCart, state: cartState, addToCartBackend } = useCart();
   const {
-    addToFavorites,
-    removeFromFavorites,
+    addToWishlistBackend,
+    removeFromWishlistBackend,
     state: favoritesState,
   } = useFavorites();
   const router = useRouter();
@@ -106,12 +106,30 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     const inCart = cartState.items.some(
       (item: CartItem) => item.productId === productData.id
     );
-    const inFavorites = favoritesState.items.some(
-      (item: FavoriteItem) => item.id === productId
-    );
+    
+    // Check if current variant is in favorites using SKU
+    const checkFavorites = async () => {
+      try {
+        const sessionData = await getSession();
+        if (sessionData?.storeId) {
+          const extractedVariants = extractSelectedVariants(productData, selectedVariants);
+          const sku = generateSku(sessionData.storeId, productData.id, extractedVariants);
+          const inFavorites = favoritesState.items.some(
+            (item: FavoriteItem) => item.sku === sku
+          );
+          setIsInFavorites(inFavorites);
+        } else {
+          setIsInFavorites(false);
+        }
+      } catch (error) {
+        console.error('Error checking favorites status:', error);
+        setIsInFavorites(false);
+      }
+    };
+    
+    checkFavorites();
     setIsInCart(inCart);
-    setIsInFavorites(inFavorites);
-  }, [cartState.items, favoritesState.items, productData, productId]);
+  }, [cartState.items, favoritesState.items, productData, productId, selectedVariants]);
 
   // Fetch and set related products from the same category (up to 4, excluding current product)
   useEffect(() => {
@@ -198,25 +216,66 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   };
 
   // Handle add to favorites
-  const handleAddToFavorites = () => {
+  const handleAddToFavorites = async () => {
     if (!productData || !currentVariant) return;
 
-    const productItem: FavoriteItem = {
-      name: productData.name,
-      price: currentVariant.price || 0,
-      image: currentImages[0] || "",
-      id: productId,
-    };
+    // Clear any previous errors
+    setVariantError(null);
+
+    // Validate variant combination if product has variants
+    if (productData.attributes && productData.attributes.length > 0) {
+      const validation = await validateVariantCombination(productData, selectedVariants);
+      
+      if (!validation.isValid) {
+        setVariantError(validation.error || "Please select all required options");
+        return;
+      }
+    }
+
+    // Generate SKU for wishlist
+    const extractedVariants = extractSelectedVariants(productData, selectedVariants);
+    const session = await getSession();
+    const sku = generateSku(session?.storeId || 1, productData.id, extractedVariants);
+
+    // Check if already in wishlist
     if (isInFavorites) {
-      removeFromFavorites(productId);
-      setIsInFavorites(false);
+      // Find the wishlist item to remove
+      const wishlistItem = favoritesState.items.find(item => item.sku === sku);
+      if (wishlistItem?.wishListProductId) {
+        const success = await removeFromWishlistBackend(wishlistItem.wishListProductId);
+        if (success) {
+          setIsInFavorites(false);
+        } else {
+          setVariantError("Failed to remove from wishlist. Please try again.");
+        }
+      }
     } else {
-      addToFavorites(productItem);
-      setIsInFavorites(true);
-      setJustAddedToFavorites(true);
-      setTimeout(() => {
-        setJustAddedToFavorites(false);
-      }, 2000);
+      // Add to wishlist via backend
+      const success = await addToWishlistBackend(productData.id, sku);
+      
+      if (success) {
+        setIsInFavorites(true);
+        setJustAddedToFavorites(true);
+        setTimeout(() => {
+          setJustAddedToFavorites(false);
+        }, 2000);
+      } else {
+        // Check if it's an authentication error
+        const sessionResponse = await fetch('http://localhost:8080/ecommerce/auth/getSession', {
+          credentials: 'include',
+        });
+        
+        if (!sessionResponse.ok || sessionResponse.status === 401) {
+          setVariantError("Please log in as a customer to add items to wishlist");
+        } else {
+          const sessionData = await sessionResponse.json();
+          if (!sessionData.customerId) {
+            setVariantError("Please log in as a customer to add items to wishlist");
+          } else {
+            setVariantError("Failed to add to wishlist. Please try again.");
+          }
+        }
+      }
     }
   };
 

@@ -1,8 +1,17 @@
 package com.sitecraft.backend.DTOs;
 
-public class VariantAttributeDTO {
+import java.io.Serializable;
+
+public class VariantAttributeDTO implements Serializable {
     private String name;
     private String value;
+
+    public VariantAttributeDTO() {}
+
+    public VariantAttributeDTO(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
     public String getName() {
         return name;

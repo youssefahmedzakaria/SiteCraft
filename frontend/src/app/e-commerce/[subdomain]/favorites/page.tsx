@@ -2,18 +2,19 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/e-commerce/ui/button";
 import { useFavorites } from "@/contexts/favorites-context";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function FavoritesPage() {
   const path = usePathname();
   const pathSegments = path.split("/");
   const subdomain = pathSegments[2];
+  const router = useRouter();
 
   const [initialColors, setInitialColors] = useState({
     primary: "#000000",
@@ -22,18 +23,151 @@ export default function FavoritesPage() {
     foreground: "#ffffff",
   });
 
-  const { state, removeFromFavorites } = useFavorites();
-  const { addToCart } = useCart();
+  const { 
+    state, 
+    loadWishlistFromBackend, 
+    removeFromWishlistBackend, 
+    clearWishlistBackend 
+  } = useFavorites();
+  const { addToCartBackend } = useCart();
 
-  const handleAddToCart = (item: any) => {
-    addToCart({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      image: item.image,
-    });
-    removeFromFavorites(item.id);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load wishlist from backend on mount
+  useEffect(() => {
+    const loadWishlist = async () => {
+      setIsLoading(true);
+      const success = await loadWishlistFromBackend();
+      setIsLoading(false);
+      
+      if (!success && state.error?.includes("log in")) {
+        // Redirect to login if authentication is required
+        router.push(`/e-commerce/${subdomain}/login`);
+      }
+    };
+
+    loadWishlist();
+  }, []); // Only run on mount
+
+  const handleAddToCart = async (item: any) => {
+    if (!item.sku) {
+      console.error("No SKU found for item:", item);
+      return;
+    }
+
+    setIsLoading(true);
+    const success = await addToCartBackend(parseInt(item.id), item.sku, 1);
+    setIsLoading(false);
+    
+    if (success) {
+      // Remove from wishlist after successfully adding to cart
+      if (item.wishListProductId) {
+        await removeFromWishlistBackend(item.wishListProductId);
+      }
+    } else {
+      // Check if it's an authentication error
+      if (state.error?.includes("log in")) {
+        router.push(`/e-commerce/${subdomain}/login`);
+      }
+    }
   };
+
+  const handleRemoveItem = async (wishListProductId: number) => {
+    setIsLoading(true);
+    const success = await removeFromWishlistBackend(wishListProductId);
+    setIsLoading(false);
+    
+    if (!success && state.error?.includes("log in")) {
+      router.push(`/e-commerce/${subdomain}/login`);
+    }
+  };
+
+  const handleClearWishlist = async () => {
+    if (window.confirm("Are you sure you want to clear your wishlist?")) {
+      setIsLoading(true);
+      const success = await clearWishlistBackend();
+      setIsLoading(false);
+      
+      if (!success && state.error?.includes("log in")) {
+        router.push(`/e-commerce/${subdomain}/login`);
+      }
+    }
+  };
+
+  // Show loading state
+  if (isLoading || state.loading) {
+    return (
+      <div
+        className={cn("min-h-screen pt-20 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
+      >
+        <div className="text-center py-16">
+          <Loader2 className="w-12 h-12 mx-auto mb-6 animate-spin" style={{ color: initialColors.primary }} />
+          <h1
+            className="text-2xl font-semibold mb-4"
+            style={{ color: initialColors.primary }}
+          >
+            Loading your wishlist...
+          </h1>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (state.error) {
+    return (
+      <div
+        className={cn("min-h-screen pt-20 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
+      >
+        <div className="text-center py-16">
+          <Heart
+            className="w-24 h-24 mx-auto mb-6"
+            style={{ color: initialColors.primary }}
+          />
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{ color: initialColors.primary }}
+          >
+            {state.error.includes("log in") ? "Authentication Required" : "Error Loading Wishlist"}
+          </h1>
+          <p className="mb-8 text-red-600">
+            {state.error}
+          </p>
+          {state.error.includes("log in") ? (
+            <div className="space-y-4">
+              <Link href={`/e-commerce/${subdomain}/login`}>
+                <Button
+                  size="lg"
+                  style={{
+                    backgroundColor: initialColors.foreground,
+                    color: initialColors.primary,
+                  }}
+                >
+                  Log In as Customer
+                </Button>
+              </Link>
+              <p className="text-sm" style={{ color: initialColors.secondary }}>
+                You need to be logged in as a customer to access your wishlist
+              </p>
+            </div>
+          ) : (
+            <Button
+              onClick={() => loadWishlistFromBackend()}
+              size="lg"
+              style={{
+                backgroundColor: initialColors.foreground,
+                color: initialColors.primary,
+              }}
+            >
+              Try Again
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (state.items.length === 0) {
     return (
@@ -50,7 +184,7 @@ export default function FavoritesPage() {
             className="text-3xl font-bold mb-4"
             style={{ color: initialColors.primary }}
           >
-            Your favorites list is empty
+            Your wishlist is empty
           </h1>
           <p className="mb-8" style={{ color: initialColors.secondary }}>
             Save items you love to easily find them later.
@@ -78,17 +212,35 @@ export default function FavoritesPage() {
     >
       <div className="flex justify-between items-center pt-8 mb-8">
         <h1 className="text-3xl font-bold" style={{ color: initialColors.primary }}>
-          My Favorites
+          My Wishlist
         </h1>
-        <p style={{ color: initialColors.secondary }}>
-          {state.items.length} items
-        </p>
+        <div className="flex items-center gap-4">
+          <p style={{ color: initialColors.secondary }}>
+            {state.items.length} items
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearWishlist}
+            disabled={isLoading}
+            style={{
+              borderColor: initialColors.accent,
+              color: initialColors.primary,
+            }}
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Clear All"
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {state.items.map((item) => (
           <div
-            key={item.id}
+            key={item.wishListProductId}
             className={cn(
               "group relative border overflow-hidden hover:shadow-lg transition-shadow rounded-lg"
             )}
@@ -105,18 +257,23 @@ export default function FavoritesPage() {
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <button
-                onClick={() => removeFromFavorites(item.id)}
+                onClick={() => item.wishListProductId && handleRemoveItem(item.wishListProductId)}
                 className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md transition-colors"
                 style={{ color: initialColors.secondary }}
+                disabled={isLoading}
               >
-                <Heart
-                  className="w-4 h-4"
-                  style={{
-                    stroke: initialColors.secondary,
-                    fill: initialColors.secondary,
-                    strokeWidth: 2,
-                  }}
-                />
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Heart
+                    className="w-4 h-4"
+                    style={{
+                      stroke: initialColors.secondary,
+                      fill: initialColors.secondary,
+                      strokeWidth: 2,
+                    }}
+                  />
+                )}
               </button>
             </div>
 
@@ -129,36 +286,91 @@ export default function FavoritesPage() {
                   {item.name}
                 </h3>
               </Link>
-              <p
-                className="text-lg font-semibold mt-2"
-                style={{ color: initialColors.primary }}
-              >
-                ${item.price}
-              </p>
+              
+              {/* SKU and Variant Info */}
+              {item.sku && (
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: initialColors.secondary }}
+                >
+                  SKU: {item.sku}
+                </p>
+              )}
+              {item.variantInfo?.attributes && item.variantInfo.attributes.length > 0 && (
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: initialColors.secondary }}
+                >
+                  {item.variantInfo.attributes.map(attr => `${attr.name}: ${attr.value}`).join(", ")}
+                </p>
+              )}
+
+              {/* Price Display with Discounts */}
+              <div className="flex items-baseline gap-2 mt-2">
+                <span
+                  className="text-lg font-semibold"
+                  style={{ color: initialColors.primary }}
+                >
+                  $
+                  {item.discountType !== null
+                    ? item.discountType === "amount"
+                      ? (item.originalPrice || 0) - Number(item.discountValue)
+                      : (item.originalPrice || 0) * (1 - Number(item.discountValue))
+                    : item.price || 0}
+                </span>
+                {item.originalPrice && item.originalPrice > item.price && (
+                  <span
+                    className="text-sm opacity-75 line-through"
+                    style={{ color: initialColors.secondary }}
+                  >
+                    ${item.originalPrice}
+                  </span>
+                )}
+                {item.discountValue && item.discountValue > 0 && item.discountType && (
+                  <span
+                    className="text-xs font-medium"
+                    style={{ color: "#10B981" }}
+                  >
+                    Save ${item.discountType === "amount" ? item.discountValue : (item.originalPrice || 0) * item.discountValue}
+                  </span>
+                )}
+              </div>
 
               <div className="flex gap-2 mt-4">
                 <Button
                   onClick={() => handleAddToCart(item)}
                   className="flex-1"
                   size="sm"
+                  disabled={isLoading}
                   style={{
                     backgroundColor: initialColors.secondary,
                     color: initialColors.accent,
                   }}
                 >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Cart
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Add to Cart
+                    </>
+                  )}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => removeFromFavorites(item.id)}
+                  onClick={() => item.wishListProductId && handleRemoveItem(item.wishListProductId)}
+                  disabled={isLoading}
                   style={{
                     borderColor: initialColors.secondary,
                     color: initialColors.secondary,
                   }}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
             </div>
