@@ -236,7 +236,7 @@ public class AuthController {
 
     @PostMapping("/commitRegistration")
     public ResponseEntity commitRegistration(@RequestParam("registrationData") String registrationDataJson,
-                                          @RequestParam(value = "logo", required = false) MultipartFile logo,
+                                          @RequestParam(value = "logo") MultipartFile logo,
                                           HttpSession session) throws Exception {
         try {
             System.out.println("🚀 Commit registration endpoint called");
@@ -290,23 +290,21 @@ public class AuthController {
             // Handle logo upload if present (using same logic as StoreController)
             if (logo != null && !logo.isEmpty()) {
                 System.out.println("🖼️ Uploading logo...");
-                String originalFilename = logo.getOriginalFilename();
-                String extension = originalFilename != null ?
-                        originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
                 String filename = "Store_Logo" + savedStore.getId() + "_" + logo.getOriginalFilename();
+                String relativePath = "/uploads/stores/" + savedStore.getId() + "/";
+                String uploadDir = System.getProperty("user.dir") + relativePath;
 
-                String uploadDir = System.getProperty("user.dir") + "/uploads/stores/" + savedStore.getId();
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
-
                 File destFile = new File(dir, filename);
                 logo.transferTo(destFile);
 
+                String imagePath = "http://localhost:8080" + relativePath + filename;
+
                 // Update store with complete logo URL including server address
-                String logoUrl = "http://localhost:8080/uploads/stores/" + savedStore.getId() + "/" + filename;
-                savedStore.setLogo(logoUrl);
+                savedStore.setLogo(imagePath);
                 savedStore = storeService.updateStorePartial(savedStore.getId(), savedStore);
-                System.out.println("✅ Logo uploaded successfully: " + logoUrl);
+                System.out.println("✅ Logo uploaded successfully: " + imagePath);
             }
             
             // 4. Set session data

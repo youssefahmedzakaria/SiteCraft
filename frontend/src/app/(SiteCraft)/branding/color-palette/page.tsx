@@ -565,47 +565,47 @@ export default function ColorPalettePage() {
           contact: contactImages.length,
         });
 
-        // Update all templates with new images (except header/footer logos)
+        // Update all templates with new images (except header/Footer logos)
         console.log("🔄 Updating templates with fetched images...");
         const updatedTemplates = initialTemplates.map(
           (template, templateIndex) => {
             console.log(`📝 Updating template ${templateIndex + 1}...`);
 
             // Header logo
-            if (template.header) {
-              template.header.logo = {
-                ...template.header.logo,
+            if (template.Header) {
+              template.Header.logo = {
+                ...template.Header.logo,
                 src: logoUrl || "/placeholder.png",
                 alt: "Brand Logo",
               };
-              template.header.brandName = storeName;
-              template.header.backgroundColor = "bg-[" + primaryColor + "]";
-              template.header.textColor = "text-[" + secondaryColor + "]";
-              template.header.dividerColor = "border-[" + secondaryColor + "]";
-              template.header.iconColor = "text-[" + secondaryColor + "]";
+              template.Header.brandName = storeName;
+              template.Header.backgroundColor = "bg-[" + primaryColor + "]";
+              template.Header.textColor = "text-[" + secondaryColor + "]";
+              template.Header.dividerColor = "border-[" + secondaryColor + "]";
+              template.Header.iconColor = "text-[" + secondaryColor + "]";
             }
 
             // Footer logo
-            if (template.footer) {
-              template.footer.logo = {
-                ...template.footer.logo,
+            if (template.Footer) {
+              template.Footer.logo = {
+                ...template.Footer.logo,
                 src: logoUrl || "/placeholder.png",
                 alt: "Brand Logo",
               };
-              template.footer.brandName = storeName;
-              template.footer.backgroundColor = "bg-[" + primaryColor + "]";
-              template.footer.textColor = "text-[" + secondaryColor + "]";
-              template.footer.socialMediaStyles.iconColor =
+              template.Footer.brandName = storeName;
+              template.Footer.backgroundColor = "bg-[" + primaryColor + "]";
+              template.Footer.textColor = "text-[" + secondaryColor + "]";
+              template.Footer.socialMediaStyles.iconColor =
                 "text-[" + secondaryColor + "]";
-              template.footer.socialMediaStyles.hoverColor =
-                "bg-[" + accentColor + "]"; // ??
-              template.footer.copyrightStyles.fontColor =
+              template.Footer.socialMediaStyles.hoverColor =
+                "bg-[" + secondaryColor + "]"; // ??
+              template.Footer.copyrightStyles.fontColor =
                 "text-[" + secondaryColor + "]";
               if (
-                template.footer.aboutLinks &&
-                template.footer.aboutLinks.length > 0
+                template.Footer.aboutLinks &&
+                template.Footer.aboutLinks.length > 0
               ) {
-                template.footer.aboutLinks.map((link) => ({
+                template.Footer.aboutLinks.map((link) => ({
                   ...link,
                   fontColor: "text-[" + secondaryColor + "]",
                 }));
@@ -735,7 +735,7 @@ export default function ColorPalettePage() {
       // Navigate to templates page
       router.push("/branding/templates");
     } catch (error) {
-      console.error("💥 Error saving colors/images to cache:", error);
+      console.log("💥 Error saving colors/images to cache:", error);
       alert("Failed to save colors or images. Please try again.");
     } finally {
       setIsLoading(false);

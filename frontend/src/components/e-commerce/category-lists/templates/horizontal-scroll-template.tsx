@@ -259,7 +259,7 @@ export function HorizontalScrollCategoryTemplate({
         {showMoreButton && (
           <div className="flex justify-end mt-6">
             <Link
-              href={isClickable ? `/e-commerce/${subdomain}/products` : "#"}
+              href={isClickable ? `/e-commerce/${subdomain}/categories` : "#"}
               className={cn(
                 "inline-flex items-center px-6 py-2",
                 "hover:bg-opacity-80 transition-colors duration-300",

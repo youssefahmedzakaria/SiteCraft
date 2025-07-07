@@ -53,7 +53,7 @@ export default function ProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as
+  cardVariant = "default" as
     | "default"
     | "minimal"
     | "hover"
@@ -187,11 +187,23 @@ export default function ProductsPage({
 
   // Filtering logic: multi-category
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
+    // If discounted filter is active, only show products with a valid discountType and discountValue
+    const discountedParam = searchParams.get("discounted");
+    const isDiscounted =
+      typeof product.discountType === "string" &&
+      product.discountType.trim() !== "" &&
+      typeof product.discountValue === "number" &&
+      product.discountValue > 0;
+    if (discountedParam === "true" && !isDiscounted) {
+      return false;
+    }
     // Multi-category filter
     if (selectedCategories.length > 0) {
-      if (!product.categoryId) return false;
-      const category = categories.find((c) => c.id === product.categoryId);
-      if (!category || !selectedCategories.includes(category.name)) {
+      if (!product.categories || product.categories.length === 0) return false;
+      const hasMatchingCategory = product.categories.some((productCategory) => 
+        selectedCategories.includes(productCategory.name)
+      );
+      if (!hasMatchingCategory) {
         return false;
       }
     }
@@ -201,6 +213,10 @@ export default function ProductsPage({
       if (productStatus !== stockFilter) {
         return false;
       }
+    }
+    // Filter by 'In Stock Only' checkbox
+    if (showInStockOnly && product.stock <= 0) {
+      return false;
     }
     // Filter by max price
     if (product.price > maxPrice) {
@@ -319,7 +335,7 @@ export default function ProductsPage({
 
   return (
     <div className={`min-h-screen bg-[#ffffff] pt-20`}>
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 pb-20">
         <div className="text-center mb-12">
           <h1
             className={`text-5xl font-bold mb-4`}

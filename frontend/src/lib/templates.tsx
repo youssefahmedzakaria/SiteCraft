@@ -5,7 +5,7 @@ import { CustomizedTemplate } from "./customization";
 const initialTemplates: CustomizedTemplate[] = [
   {
     id: "template1",
-    header: {
+    Header: {
       template: "template1",
       brandName: "Brand Name",
       backgroundColor: "bg-[#fffff]",
@@ -292,7 +292,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-[#000000]",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "brand name",
       backgroundColor: "bg-[#ffffff]",
       textColor: "text-[#000000]",
@@ -347,7 +347,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 2
   {
     id: "template2",
-    header: {
+    Header: {
       template: "template2",
       brandName: "Brand Name",
       backgroundColor: "bg-[#ffffff]",
@@ -631,7 +631,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-[#000000]",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-[#000000]",
@@ -678,7 +678,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 3
   {
     id: "template3",
-    header: {
+    Header: {
       template: "template3",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -955,7 +955,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-[#000000]",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -1002,7 +1002,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 4
   {
     id: "template4",
-    header: {
+    Header: {
       template: "template4",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -1248,7 +1248,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -1303,7 +1303,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 5
   {
     id: "template5",
-    header: {
+    Header: {
       template: "template5",
       brandName: "Fashion Boutique",
       backgroundColor: "bg-[#fff0f5]",
@@ -1324,7 +1324,7 @@ const initialTemplates: CustomizedTemplate[] = [
       dividerColor: "border-[#ffb6c1]",
       fontFamily: "font-sans",
     },
-    footer: {
+    Footer: {
       brandName: "Fashion Boutique",
       backgroundColor: "bg-[#fff0f5]",
       textColor: "text-[#ff1493]",
@@ -1371,7 +1371,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 6
   {
     id: "template6",
-    header: {
+    Header: {
       template: "template6",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -1568,7 +1568,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFont: "font-serif",
       sectionContentFontWeight: "font-medium",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -1615,7 +1615,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 7
   {
     id: "template7",
-    header: {
+    Header: {
       template: "template7",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -1863,7 +1863,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -1910,7 +1910,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 8
   {
     id: "template8",
-    header: {
+    Header: {
       template: "template8",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -2219,7 +2219,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -2266,7 +2266,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 9
   {
     id: "template9",
-    header: {
+    Header: {
       template: "template1",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -2447,7 +2447,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -2502,7 +2502,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 10
   {
     id: "template10",
-    header: {
+    Header: {
       template: "template8",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -2702,7 +2702,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -2749,7 +2749,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 11
   {
     id: "template11",
-    header: {
+    Header: {
       template: "template5",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -2962,7 +2962,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -3009,7 +3009,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 12
   {
     id: "template12",
-    header: {
+    Header: {
       template: "template2",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -3185,7 +3185,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentColor: "text-black",
       contentSize: "text-sm",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -3232,7 +3232,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 13
   {
     id: "template13",
-    header: {
+    Header: {
       template: "template3",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -3312,7 +3312,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -3359,7 +3359,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 14
   {
     id: "template14",
-    header: {
+    Header: {
       template: "template6",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -3401,7 +3401,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",
@@ -3456,7 +3456,7 @@ const initialTemplates: CustomizedTemplate[] = [
   // Template 15
   {
     id: "template15",
-    header: {
+    Header: {
       template: "template4",
       brandName: "Brand Name",
       backgroundColor: "#ffffff",
@@ -3529,7 +3529,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionSize: "text-lg",
       sectionFontWeight: "font-normal",
     },
-    footer: {
+    Footer: {
       brandName: "Jewelry",
       backgroundColor: "#ffffff",
       textColor: "text-black",

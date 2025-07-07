@@ -297,19 +297,7 @@ export default function FlexibleCard({
   const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!isClickable || !href || href === "#") return <>{children}</>;
     return (
-      <Link
-        href={href}
-        target={openInNewTab ? "_blank" : undefined}
-        className="block w-full h-full"
-        onClick={(e) => {
-          // Prevent navigation if clicking on buttons or interactive elements
-          const target = e.target as HTMLElement;
-          if (target.closest('button') || target.closest('[role="button"]') || target.closest('a')) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }}
-      >
+      <Link href={href} className="block w-full h-full">
         {children}
       </Link>
     );
@@ -388,8 +376,6 @@ export default function FlexibleCard({
 
   // Use titleColor if provided, otherwise fall back to textColor
   const finalTitleFont = titleFont || fontFamily;
-
-
 
   // Render different card variants
   switch (variant) {
@@ -510,79 +496,49 @@ export default function FlexibleCard({
           fontFamily: getFontFamily(fontFamily),       
         }}
         >
-          <ContentWrapper>
-            <div
-              className={cn(
-                "relative overflow-hidden mb-3",
-                aspectRatioClass,
-                radiusClass,
-                cardShadow,
-                imageClassName
-              )}
-            >
-              <Image
-                src={item.images[0]?.url || "/placeholder.png"}
-                alt={item.images[0]?.alt || "Item image"}
-                fill
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          <div className="relative overflow-hidden mb-3">
+            <ContentWrapper>
+              <div
                 className={cn(
-                  "object-cover",
-                  hoverEffect &&
-                    "transition-opacity duration-300 group-hover:opacity-75"
+                  "relative overflow-hidden mb-3",
+                  aspectRatioClass,
+                  radiusClass,
+                  cardShadow,
+                  imageClassName
                 )}
-              />
-              {secondaryImageUrl && hoverEffect && (
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Image
-                    src={item.images[0]?.url || "/placeholder.png"}
-                alt={item.images[0]?.alt || "Item image"}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              {type === "product" && hoverEffect && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleAddToCartAction}
-                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                      title={isInCart ? "Remove from Cart" : "Add to Cart"}
-                    >
-                      <ShoppingCart
-                        className={`w-5 h-5 ${
-                          isInCart ? "fill-blue-500 text-blue-500" : ""
-                        }`}
-                      />
-                    </button>
-                    <button
-                      onClick={handleFavoritesAction}
-                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                      title={
-                        isInFavorites
-                          ? "Remove from Favorites"
-                          : "Add to Favorites"
-                      }
-                    >
-                      <Heart
-                        className={`w-5 h-5 ${
-                          isInFavorites ? "fill-red-500 text-red-500" : ""
-                        }`}
-                      />
-                    </button>
-                    <button
-                      onClick={handleViewAction}
-                      className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                      title="View Product"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
+              >
+                <Image
+                  src={item.images[0]?.url || "/placeholder.png"}
+                  alt={item.images[0]?.alt || "Item image"}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  className={cn(
+                    "object-cover",
+                    hoverEffect &&
+                      "transition-opacity duration-300 group-hover:opacity-75"
+                  )}
+                />
+                {secondaryImageUrl && hoverEffect && (
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Image
+                      src={item.images[0]?.url || "/placeholder.png"}
+                      alt={item.images[0]?.alt || "Item image"}
+                      fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      className="object-cover"
+                    />
                   </div>
+                )}
+              </div>
+            </ContentWrapper>
+            {type === "product" && hoverEffect && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="flex gap-2 pointer-events-auto">
+                  {/* No action buttons - only the card itself is clickable */}
                 </div>
-              )}
-            </div>
-          </ContentWrapper>
+              </div>
+            )}
+          </div>
           <div className={cn("space-y-1", contentClassName)}>
             {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
              style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
@@ -685,11 +641,11 @@ export default function FlexibleCard({
 
     default: // default variant
       return (
-        <div className={cn("group" ,className)}
-         style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
-                   fontFamily: getFontFamily(fontFamily),}}
-        >
-          <ContentWrapper>
+        <ContentWrapper>
+          <div className={cn("group", className)}
+            style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                      fontFamily: getFontFamily(fontFamily),}}
+          >
             <div
               className={cn(
                 "relative overflow-hidden mb-3",
@@ -710,63 +666,47 @@ export default function FlexibleCard({
                     "transition-transform duration-300 group-hover:scale-105"
                 )}
               />
-              {type === "product" && (
-                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={handleFavoritesAction}
-                    className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                    title={
-                      isInFavorites
-                        ? "Remove from Favorites"
-                        : "Add to Favorites"
-                    }
+            </div>
+            <div className={cn("space-y-1", contentClassName)}>
+              {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
+                style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                        fontSize: getFontSize(fontFamily),
+                        }}
+              >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>}
+              {showSubtitle && <p className={cn("text-sm")}
+                style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
+                        }}>{description}</p>}
+              <div className="flex justify-between items-center">
+                <PriceDisplay />
+                {showCta && type === "category" && (
+                  <Link
+                    href={href}
+                    className={cn(
+                      "text-xs text-white bg-blue-500 px-3 py-1 rounded-full hover:bg-blue-600 transition-colors duration-300 ",
+                    )}
                   >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        isInFavorites ? "fill-red-500 text-red-500" : ""
-                      }`}
-                    />
+                    {ctaText}
+                  </Link>
+                )}
+                {showCta && type === "product" && (
+                  <button
+                    onClick={handleViewAction}
+                    className={cn(
+                      "text-xs text-white bg-blue-500 px-3 py-1 rounded-full hover:bg-blue-600 transition-colors duration-300 ",
+                    )}
+                  >
+                    {ctaText}
                   </button>
+                )}
+              </div>
+              {showSku && type === "product" && (
+                <div className="text-xs text-gray-400">
+                  SKU: {item.sku || "N/A"}
                 </div>
               )}
             </div>
-          </ContentWrapper>
-          <div className={cn("space-y-1", contentClassName)}>
-            {showTitle && <h3 className={cn("font-medium", "flex items-center gap-2")}
-             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
-                    fontSize: getFontSize(fontFamily),
-                    }}
-            >{item.name}<DiscountBadge /><OutOfStockBadge /></h3>}
-            {showSubtitle && <p className={cn("text-sm")}
-             style={{color: textColor?.includes("[") ? textColor.split("-[")[1]?.slice(0, -1) || "#ffffff" : textColor,
-                    }}>{description}</p>}
-            <div className="flex justify-between items-center">
-              <PriceDisplay />
-              {showCta && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (type === "product") {
-                      handleAddToCartAction(e);
-                    } else {
-                      ctaAction?.();
-                    }
-                  }}
-                  className={cn(
-                    "text-xs text-white bg-blue-500 px-3 py-1 rounded-full hover:bg-blue-600 transition-colors duration-300 ",
-                  )}
-                >
-                  {ctaText}
-                </button>
-              )}
-            </div>
-            {showSku && type === "product" && (
-              <div className="text-xs text-gray-400">
-                SKU: {item.sku || "N/A"}
-              </div>
-            )}
           </div>
-        </div>
+        </ContentWrapper>
       );
   }
 }

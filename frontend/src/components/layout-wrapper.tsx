@@ -168,7 +168,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
           );
           sortedTemplate.forEach((section: any, idx: number) => {
             switch (section.title) {
-              case "Header&Menu":
+              case "Header":
                 setHeaderAttributes(section.value);
                 break;
               case "Footer":

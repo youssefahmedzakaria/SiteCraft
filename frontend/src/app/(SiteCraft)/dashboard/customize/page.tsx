@@ -72,12 +72,6 @@ interface Section {
 const initialSections: Section[] = [];
 
 export default function CustomizeTemplatePage() {
-  const [initialColors, setInitialColors] = useState({
-    primary: "#000000",
-    secondary: "#000000",
-    accent: "#000000",
-  });
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [aboutImage, setAboutImage] = useState<File | undefined>();
@@ -97,10 +91,14 @@ export default function CustomizeTemplatePage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
-              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
-              <Button 
-                onClick={() => router.push('/pricing')}
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                Store Inactive
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Your store is inactive. Please subscribe to activate your store.
+              </p>
+              <Button
+                onClick={() => router.push("/pricing")}
                 className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
               >
                 Subscribe Now
@@ -115,8 +113,8 @@ export default function CustomizeTemplatePage() {
   const initialHeader: HeaderCustomizationAttributes = {
     template: "template1",
     brandName: "Brand Name",
-    backgroundColor: `bg-[${initialColors.primary}]`, // bg-black/50
-    textColor: `text-[${initialColors.secondary}]`, // text-white
+    backgroundColor: `bg-[#000000]`, // bg-black/50
+    textColor: `text-[#FFFFFF]`, // text-white
     logo: {
       src: "/placeholder.png",
       alt: "Custom Logo",
@@ -130,8 +128,8 @@ export default function CustomizeTemplatePage() {
       { label: "About Us", isShown: true },
       { label: "Contact Us", isShown: true },
     ],
-    iconColor: `text-[${initialColors.secondary}]`, // text-white
-    dividerColor: `border-[${initialColors.accent}]`, // border-gray-200
+    iconColor: `text-[#FFFFFF]`, // text-white
+    dividerColor: `border-[#E5E7EB]`, // border-gray-200
     fontFamily: "font-sans",
   };
 
@@ -176,11 +174,11 @@ export default function CustomizeTemplatePage() {
     titleColor: "text-[primary]", // text-white
     titleSize: "text-4xl",
     descriptionFont: "font-sans",
-    descriptionColor: `text-[${initialColors.secondary}]`, // text-white
+    descriptionColor: `text-[#FFFFFF]`, // text-white
     descriptionSize: "text-lg",
     buttonFont: "font-sans",
-    buttonColor: `bg-[${initialColors.accent}]`, // bg-white
-    buttonTextColor: `text-[${initialColors.primary}]`, // text-black
+    buttonColor: `bg-[#FFFFFF]`, // bg-white
+    buttonTextColor: `text-[#000000]`, // text-black
     buttonSize: "text-lg",
     buttonRadius: "rounded-md",
     imageObjectFit: "cover",
@@ -203,14 +201,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "categories",
     bgColor: "bg-[#FFFFFF]",
-    textColor: `text-[${initialColors.secondary}]`,
+    textColor: `text-[#000000]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
-    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
+    showMorebuttonBgColor: `bg-[#FFFFFF]`,
+    showMorebuttonTextColor: `text-[#000000]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -218,7 +216,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showCategoryTitle: true,
-    titleColor: `text-[${initialColors.primary}]`,
+    titleColor: `text-[#000000]`,
     titleFontSize: "text-2xl",
     categoryTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -295,14 +293,14 @@ export default function CustomizeTemplatePage() {
     isClickable: false,
     title: "products",
     bgColor: "bg-[#FFFFFF]",
-    textColor: `text-[${initialColors.secondary}]`,
+    textColor: `text-[#000000]`,
     fontFamily: "font-mono",
     titleFont: "font-bold",
     showTitle: true,
     showMoreButton: true,
     showMoreText: "Show More",
-    showMorebuttonBgColor: `bg-[${initialColors.accent}]`,
-    showMorebuttonTextColor: `text-[${initialColors.primary}]`,
+    showMorebuttonBgColor: `bg-[#000000]`,
+    showMorebuttonTextColor: `text-[#FFFFFF]`,
     ctaText: "Shop Now",
     cornerRadius: "small",
     showCta: true,
@@ -310,7 +308,7 @@ export default function CustomizeTemplatePage() {
     showSubtitle: true,
     overlayColor: "bg-[#00000080]",
     showProductTitle: true,
-    titleColor: `text-[${initialColors.primary}]`,
+    titleColor: `text-[#000000]`,
     titleFontSize: "text-2xl",
     productTitleFontSize: "text-lg",
     // cardTextColor: "text-[#000000]", // Added a reasonable default value
@@ -397,7 +395,7 @@ export default function CustomizeTemplatePage() {
     template: "TopImageAbout",
     id: "about",
     title: "About Us",
-    titleColor: `text-[${initialColors.primary}]`, // text-black
+    titleColor: `text-[#000000]`, // text-black
     backgroundColor: "bg-[#FFFFFF]", // bg-white
     image: "/placeholder.png",
     imageAlt: "About our company",
@@ -417,7 +415,7 @@ export default function CustomizeTemplatePage() {
           "With years of experience in the industry, we understand what our customers need and strive to exceed their expectations.",
       },
     ],
-    sectionColor: `text-[${initialColors.secondary}]`,
+    sectionColor: `text-[#000000]`,
     sectionSize: "text-lg",
     sectionFont: "font-sans",
     sectionFontWeight: "normal",
@@ -455,15 +453,15 @@ export default function CustomizeTemplatePage() {
       },
     ],
     backgroundColor: "bg-[#FFFFFF]", // bg-white
-    titleColor: `text-[${initialColors.primary}]`, // text-black
+    titleColor: `text-[#000000]`, // text-black
     titleSize: "text-xl",
     titleFont: "font-sans",
     titleFontWeight: "font-normal",
-    sectionTitleColor: `text-[${initialColors.secondary}]`, // text-black
+    sectionTitleColor: `text-[#000000]`, // text-black
     sectionTitleSize: "text-lg",
     sectionTitleFont: "font-sans",
     sectionTitleFontWeight: "font-normal",
-    sectionContentColor: `text-[${initialColors.secondary}]`, // text-black
+    sectionContentColor: `text-[#000000]`, // text-black
     sectionContentSize: "text-xl",
     sectionContentFont: "font-sans",
     sectionContentFontWeight: "font-normal",
@@ -499,10 +497,10 @@ export default function CustomizeTemplatePage() {
     showMap: true,
     backgroundColor: "bg-[#FFFFFF]",
     titleFont: "font-bold",
-    titleColor: `text-[${initialColors.primary}]`,
+    titleColor: `text-[#000000]`,
     titleSize: "text-3xl",
     contentFont: "font-semibold",
-    contentColor: `text-[${initialColors.secondary}]`,
+    contentColor: `text-[#000000]`,
     contentSize: "text-lg",
   };
 
@@ -519,8 +517,8 @@ export default function CustomizeTemplatePage() {
 
   const initialFooter: FooterCustomizationAttributes = {
     brandName: "Brand Name",
-    backgroundColor: `bg-[${initialColors.primary}]`,
-    textColor: `text-[${initialColors.secondary}]`,
+    backgroundColor: `bg-[#FFFFFF]`,
+    textColor: `text-[#000000]`,
     logo: {
       src: "/placeholder.png",
       alt: "Brand Logo",
@@ -532,7 +530,7 @@ export default function CustomizeTemplatePage() {
         href: "/contact",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: `text-[${initialColors.secondary}]`,
+        fontColor: `text-[#000000]`,
         isShown: true,
       },
       {
@@ -540,7 +538,7 @@ export default function CustomizeTemplatePage() {
         href: "/about",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: `text-[${initialColors.secondary}]`,
+        fontColor: `text-[#000000]`,
         isShown: true,
       },
       {
@@ -548,7 +546,7 @@ export default function CustomizeTemplatePage() {
         href: "/policies",
         font: "font-serif",
         fontSize: "text-lg",
-        fontColor: `text-[${initialColors.secondary}]`,
+        fontColor: `text-[#000000]`,
         isShown: true,
       },
     ],
@@ -558,14 +556,14 @@ export default function CustomizeTemplatePage() {
     },
     socialMediaStyles: {
       iconSize: 20,
-    iconColor: `text-[${initialColors.secondary}]`,
-    hoverColor: `text-[${initialColors.accent}]`,
+      iconColor: `text-[#000000]`,
+      hoverColor: `text-[#000000]`,
     },
     copyrightStyles: {
       font: "font-sans",
       fontSize: "text-sm",
       fontWeight: "font-light",
-      fontColor: `text-[${initialColors.secondary}]`,
+      fontColor: `text-[#000000]`,
     },
   };
 
@@ -713,7 +711,7 @@ export default function CustomizeTemplatePage() {
           });
 
           switch (section.title) {
-            case "Header&Menu":
+            case "Header":
               updateHeaderAttributes(section.value);
               break;
             case "PromoSlider":
@@ -835,7 +833,12 @@ export default function CustomizeTemplatePage() {
             description: product.description,
             discountType: product.discountType,
             discountValue: product.discountValue,
-            price: product.variants && product.variants.length > 0 && product.variants[0]?.price ? product.variants[0].price : 0.0,
+            price:
+              product.variants &&
+              product.variants.length > 0 &&
+              product.variants[0]?.price
+                ? product.variants[0].price
+                : 0.0,
             images: [
               {
                 id:
@@ -918,7 +921,7 @@ export default function CustomizeTemplatePage() {
   // Helper to remove backend fields from each section's value
   const stripBackendFields = (sectionId: string, value: any) => {
     switch (sectionId) {
-      case "Header&Menu": {
+      case "Header": {
         const { brandName, logo, ...rest } = value;
         return {
           ...rest,
@@ -1069,7 +1072,7 @@ export default function CustomizeTemplatePage() {
       const dtoList = sections.map((section, idx) => {
         let value = {};
         switch (section.id) {
-          case "Header&Menu":
+          case "Header":
             value = headerAttributes;
             break;
           case "PromoSlider":

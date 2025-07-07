@@ -421,6 +421,12 @@ export default function Home() {
     contentSize: "text-lg",
   };
 
+  const updateContactAttributes = (
+    updates: Partial<ContactCustomizationAttributes>
+  ) => {
+    setContactAttributes((prev) => ({ ...prev, ...updates }));
+  };
+
   // State for contact customization
   const [contactAttributes, setContactAttributes] =
     useState<ContactCustomizationAttributes>(initialContact);
@@ -543,6 +549,9 @@ export default function Home() {
               break;
             case "Categories":
               updateCategoryAttributes(section.value);
+              break;
+            case "ContactUs":
+              updateContactAttributes(section.value);
               break;
           }
         });
@@ -680,7 +689,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-24">
       {/* Render middle sections dynamically */}
       {sections.slice(1, sections.length - 1).map((section, index) => {
         const sectionId = section.id as keyof typeof sectionComponents;

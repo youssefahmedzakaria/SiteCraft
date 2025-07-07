@@ -487,7 +487,7 @@ export default function ProfilePage() {
     >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div className="flex items-center gap-4">
               <div
                 className={`w-16 h-16 rounded-lg flex items-center justify-center`}
@@ -512,7 +512,7 @@ export default function ProfilePage() {
             <Button
               onClick={handleLogout}
               variant="outline"
-              className={`flex items-center gap-2 rounded-lg border-2`}
+              className={`flex items-center gap-2 rounded-lg border-2 mt-4 md:mt-0`}
               style={{
                 backgroundColor: "bg-[#FFFFFF]",
                 borderColor: initialColors.secondary,

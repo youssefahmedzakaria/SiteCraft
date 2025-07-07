@@ -151,7 +151,7 @@ export function Sidebar({
 
   // Modified section to make the entire section clickable
   const toggleSection = (sectionId: string) => {
-    // For Header&Menu section, instead of toggling expansion, open the detailed view
+    // For Header section, instead of toggling expansion, open the detailed view
     const section = sections.find((s) => s.id === sectionId);
     if (section) {
       // Toggle expansion
@@ -185,7 +185,7 @@ export function Sidebar({
     if (!result.destination) return;
     const start = result.source.index;
     const end = result.destination.index;
-    // Only reorder the middle sections (excluding Header&Menu and Footer)
+    // Only reorder the middle sections (excluding Header and Footer)
     const fixedTop = sections[0];
     const fixedBottom = sections[sections.length - 1];
     const middle = sections.slice(1, sections.length - 1);
@@ -197,7 +197,7 @@ export function Sidebar({
 
   const [addSectionDialogOpen, setAddSectionDialogOpen] = useState(false);
 
-  // List of available sections to add (excluding Header&Menu and Footer)
+  // List of available sections to add (excluding Header and Footer)
   const availableSections: {
     id: keyof typeof sectionPreviews;
     title: string;
@@ -310,7 +310,7 @@ export function Sidebar({
   // Handler to delete a section and go back to the list
   const handleDeleteSection = (sectionId: string) => {
     // Only allow deleting non-header/footer
-    if (sectionId === "Header&Menu" || sectionId === "Footer") return;
+    if (sectionId === "Header" || sectionId === "Footer") return;
     setSections(sections.filter((s) => s.id !== sectionId));
     setDetailedSection(null);
   };
@@ -372,7 +372,7 @@ export function Sidebar({
 
           {/* Detailed Section Content */}
           <div className="flex-1 min-h-0 flex flex-col">
-            {detailedSection.id === "Header&Menu" ? (
+            {detailedSection.id === "Header" ? (
               <RenderHeaderSection
                 detailedSectionTab={detailedSectionTab}
                 headerAttributes={headerAttributes}
@@ -566,7 +566,7 @@ export function Sidebar({
                   onClick={() => toggleSection(sections[0].id)}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">Header & Menu</span>
+                    <span className="font-medium">Header</span>
                   </div>
                   {sections[0].expanded ? (
                     <ChevronDown size={18} />

@@ -259,14 +259,14 @@ export interface FooterCustomizationAttributes {
 
 export interface CustomizedTemplate {
   id: string;
-  header: HeaderCustomizationAttributes;
+  Header: HeaderCustomizationAttributes;
   PromoSlider?: PromoCustomizationAttributes;
   Categories?: CategoryCustomizationAttributes;
   Products?: ProductCustomizationAttributes;
   AboutUs?: AboutCustomizationAttributes;
   Policies?: PoliciesCustomizationAttributes;
   ContactUs?: ContactCustomizationAttributes;
-  footer: FooterCustomizationAttributes;
+  Footer: FooterCustomizationAttributes;
 }
 
 export interface ColorTheme {
