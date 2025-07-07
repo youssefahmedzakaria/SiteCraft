@@ -1284,6 +1284,7 @@ export default function ProfilePage() {
                                   key={index}
                                   className={`flex items-center gap-4 p-4 border rounded-lg`}
                                   style={{
+                                    backgroundColor: initialColors.secondary,
                                     borderColor: initialColors.secondary,
                                   }}
                                 >
@@ -1340,6 +1341,7 @@ export default function ProfilePage() {
                           <div
                             className={`p-6 rounded-lg sticky top-24`}
                             style={{
+                              backgroundColor: initialColors.secondary,
                               borderColor: initialColors.secondary,
                             }}
                           >
