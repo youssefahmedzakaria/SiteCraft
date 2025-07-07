@@ -104,7 +104,7 @@ export default function TemplateView() {
 
   if (isLoading || !params) {
     return (
-      <div className="flex-1 bg-gray-100 rounded-lg overflow-y-auto">
+      <div className="flex-1 w-full h-full rounded-lg overflow-y-auto">
         <div className="flex items-center justify-center h-64">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
@@ -193,7 +193,7 @@ export default function TemplateView() {
   };
 
   return (
-    <div className="flex-1 bg-gray-100 rounded-lg overflow-y-auto">
+    <div className="flex-1 w-full h-full bg-gray-100 rounded-lg overflow-y-auto">
       <div
         className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-4`}
       >

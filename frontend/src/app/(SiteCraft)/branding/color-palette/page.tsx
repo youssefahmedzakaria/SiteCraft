@@ -502,18 +502,17 @@ export default function ColorPalettePage() {
           accent: validAccentColor,
         };
 
+        const primaryColor = cachedData.store.colors.primary;
+        const secondaryColor = cachedData.store.colors.secondary;
+        const accentColor = cachedData.store.colors.accent;
+
         // Get store type and logo
         const storeType = cachedData.store.storeType || "store";
         const storeName = cachedData.store.storeName || "My Store";
-        const logoFile = siteCraftCache.getCachedLogoFile();
-        let logoUrl = "";
-        if (logoFile) {
-          logoUrl = URL.createObjectURL(logoFile);
-          console.log(`🖼️ Logo URL: ${logoUrl}`);
-        }
+        const logoUrl = cachedData.logo;
 
+        console.log(`🏪 Logo Url: ${logoUrl}`);
         console.log(`🏪 Store type: ${storeType}`);
-        console.log(`🖼️ Logo file: ${logoFile ? "Found" : "Not found"}`);
 
         // Map store type to queries
         const queries = storeTypeToQueries(storeType);
@@ -523,26 +522,31 @@ export default function ColorPalettePage() {
         console.log("📡 Fetching images from Pixabay...");
 
         const imagePromises = [
-          fetchPixabayImages(queries.promo, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch promo images:', err);
+          fetchPixabayImages(queries.promo, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch promo images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.categories, 6).catch(err => {
-            console.warn('⚠️ Failed to fetch category images:', err);
+          fetchPixabayImages(queries.categories, 6).catch((err) => {
+            console.warn("⚠️ Failed to fetch category images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.products, 8).catch(err => {
-            console.warn('⚠️ Failed to fetch product images:', err);
+          fetchPixabayImages(queries.products, 8).catch((err) => {
+            console.warn("⚠️ Failed to fetch product images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.about, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch about images:', err);
+          fetchPixabayImages(queries.about, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch about images:", err);
             return [];
           }),
-          fetchPixabayImages(queries.contact, 3).catch(err => {
-            console.warn('⚠️ Failed to fetch contact images:', err);
+          fetchPixabayImages(queries.contact, 3).catch((err) => {
+            console.warn("⚠️ Failed to fetch contact images:", err);
             return [];
-          })
+          }),
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
+          // [{ url: "/placeholder.png", alt: "Placeholder Image" }],
         ];
 
         const [
@@ -571,73 +575,138 @@ export default function ColorPalettePage() {
             if (template.header) {
               template.header.logo = {
                 ...template.header.logo,
-                src: logoUrl,
+                src: logoUrl || "/placeholder.png",
                 alt: "Brand Logo",
               };
               template.header.brandName = storeName;
+              template.header.backgroundColor = "bg-[" + primaryColor + "]";
+              template.header.textColor = "text-[" + secondaryColor + "]";
+              template.header.dividerColor = "border-[" + secondaryColor + "]";
+              template.header.iconColor = "text-[" + secondaryColor + "]";
             }
 
             // Footer logo
             if (template.footer) {
               template.footer.logo = {
                 ...template.footer.logo,
-                src: logoUrl,
+                src: logoUrl || "/placeholder.png",
                 alt: "Brand Logo",
               };
               template.footer.brandName = storeName;
+              template.footer.backgroundColor = "bg-[" + primaryColor + "]";
+              template.footer.textColor = "text-[" + secondaryColor + "]";
+              template.footer.socialMediaStyles.iconColor =
+                "text-[" + secondaryColor + "]";
+              template.footer.socialMediaStyles.hoverColor =
+                "bg-[" + accentColor + "]"; // ??
+              template.footer.copyrightStyles.fontColor =
+                "text-[" + secondaryColor + "]";
+              if (
+                template.footer.aboutLinks &&
+                template.footer.aboutLinks.length > 0
+              ) {
+                template.footer.aboutLinks.map((link) => ({
+                  ...link,
+                  fontColor: "text-[" + secondaryColor + "]",
+                }));
+              }
             }
 
             // PromoSlider images
-            if (template.PromoSlider && promoImages.length > 0) {
-              template.PromoSlider.slides = template.PromoSlider.slides.map(
-                (slide, idx) => ({
-                  ...slide,
-                  image: promoImages[idx % promoImages.length].url,
-                  imageAlt: promoImages[idx % promoImages.length].alt,
-                })
-              );
+            if (template.PromoSlider) {
+              if (promoImages.length > 0) {
+                template.PromoSlider.slides = template.PromoSlider.slides.map(
+                  (slide, idx) => ({
+                    ...slide,
+                    image: promoImages[idx % promoImages.length].url,
+                    imageAlt: promoImages[idx % promoImages.length].alt,
+                  })
+                );
+              }
+
+              // template.PromoSlider.backgroundColor = primaryColor;
+              template.PromoSlider.titleColor = "text-[" + primaryColor + "]";
+              template.PromoSlider.descriptionColor =
+                "text-[" + secondaryColor + "]";
+              template.PromoSlider.buttonColor = "bg-[" + accentColor + "]";
+              template.PromoSlider.buttonTextColor =
+                "text-[" + primaryColor + "]";
             }
 
             // Categories images
-            if (template.Categories && categoryImages.length > 0) {
-              template.Categories.categories =
-                template.Categories.categories.map((cat, idx) => ({
-                  ...cat,
-                  images: [
-                    {
-                      id: 1,
-                      url: categoryImages[idx % categoryImages.length].url,
-                      alt: categoryImages[idx % categoryImages.length].alt,
-                    },
-                  ],
-                }));
+            if (template.Categories) {
+              if (categoryImages.length > 0) {
+                template.Categories.categories =
+                  template.Categories.categories.map((cat, idx) => ({
+                    ...cat,
+                    images: [
+                      {
+                        id: 1,
+                        url: categoryImages[idx % categoryImages.length].url,
+                        alt: categoryImages[idx % categoryImages.length].alt,
+                      },
+                    ],
+                  }));
+              }
+
+              template.Categories.showMorebuttonBgColor =
+                "bg-[" + accentColor + "]";
+              template.Categories.showMorebuttonTextColor =
+                "text-[" + primaryColor + "]";
+              template.Categories.titleColor = "text-[" + primaryColor + "]";
+              template.Categories.textColor = "text-[" + secondaryColor + "]";
             }
 
             // Products images
-            if (template.Products && productImages.length > 0) {
-              template.Products.products = template.Products.products.map(
-                (prod, idx) => ({
-                  ...prod,
-                  images: [
-                    {
-                      id: 1,
-                      url: productImages[idx % productImages.length].url,
-                      alt: productImages[idx % productImages.length].alt,
-                    },
-                  ],
-                })
-              );
+            if (template.Products) {
+              if (productImages.length > 0) {
+                template.Products.products = template.Products.products.map(
+                  (prod, idx) => ({
+                    ...prod,
+                    images: [
+                      {
+                        id: 1,
+                        url: productImages[idx % productImages.length].url,
+                        alt: productImages[idx % productImages.length].alt,
+                      },
+                    ],
+                  })
+                );
+              }
+
+              template.Products.showMorebuttonBgColor =
+                "bg-[" + accentColor + "]";
+              template.Products.showMorebuttonTextColor =
+                "text-[" + primaryColor + "]";
+              template.Products.titleColor = "text-[" + primaryColor + "]";
+              template.Products.textColor = "text-[" + secondaryColor + "]";
             }
 
             // AboutUs image
-            if (template.AboutUs && aboutImages.length > 0) {
-              template.AboutUs.image = aboutImages[0].url;
-              template.AboutUs.imageAlt = aboutImages[0].alt;
+            if (template.AboutUs) {
+              if (aboutImages.length > 0) {
+                template.AboutUs.image = aboutImages[0].url;
+                template.AboutUs.imageAlt = aboutImages[0].alt;
+              }
+              template.AboutUs.titleColor = "text-[" + primaryColor + "]";
+              template.AboutUs.sectionColor = "text-[" + secondaryColor + "]";
             }
 
             // ContactUs image
-            if (template.ContactUs && contactImages.length > 0) {
-              template.ContactUs.image = contactImages[0].url;
+            if (template.ContactUs) {
+              if (contactImages.length > 0) {
+                template.ContactUs.image = contactImages[0].url;
+              }
+              template.ContactUs.titleColor = "text-[" + primaryColor + "]";
+              template.ContactUs.contentColor = "text-[" + secondaryColor + "]";
+            }
+
+            if (template.Policies) {
+              template.Policies.titleColor = "text-[" + primaryColor + "]";
+              template.Policies.sectionContentColor =
+                "text-[" + secondaryColor + "]";
+              template.Policies.sectionTitleColor =
+                "text-[" + secondaryColor + "]";
             }
 
             console.log(`📝 Updated template ${templateIndex + 1}:`, template);

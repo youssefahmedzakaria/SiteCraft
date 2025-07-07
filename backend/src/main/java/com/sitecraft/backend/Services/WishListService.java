@@ -100,7 +100,21 @@ public class WishListService {
         dto.setMinCap(null); // minCap - no longer used for discounts
         dto.setPercentageMax(null); // percentageMax - no longer used for discounts
         dto.setMaxCap(null); // maxCap - no longer used for discounts
-        // Optionally map images and variants if needed
+        
+        // Map images - include all product images
+        dto.setImages(product.getImages());
+        
+        // Map variants - include all product variants
+        dto.setVariants(product.getVariants());
+        
+        // Map other existing fields
+        dto.setAttributes(product.getAttributes());
+        dto.setReviews(product.getReviews());
+        dto.setLowStockNotificationEnabled(product.isLowStockNotificationEnabled());
+        dto.setCurrentTotalStock(product.getCurrentTotalStock());
+        dto.setAtLowStockLevel(product.isAtLowStockLevel());
+        dto.setCategories(product.getCategories());
+        
         return dto;
     }
 } 

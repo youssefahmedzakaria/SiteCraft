@@ -31,47 +31,46 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
   const handleTemplateSelect = async () => {
     setIsCommitting(true);
     try {
-      console.log('🎯 Template selected:', template);
-      
+      console.log("🎯 Template selected:", template);
+
       // Get cached data
       const cachedData = siteCraftCache.getData();
       if (!cachedData.user || !cachedData.store) {
-        throw new Error('Missing cached registration data');
+        throw new Error("Missing cached registration data");
       }
-      
+
       // Validate required store fields
       if (!cachedData.store.storeName || !cachedData.store.storeType) {
-        throw new Error('Store name and type are required');
+        throw new Error("Store name and type are required");
       }
-      
-      console.log('📦 Cached data found:', cachedData);
-      
+
+      console.log("📦 Cached data found:", cachedData);
+
       // Commit all cached data to database
       const result = await commitCachedRegistration({
         user: cachedData.user,
         store: {
           ...cachedData.store,
           storeName: cachedData.store.storeName,
-          storeType: cachedData.store.storeType
+          storeType: cachedData.store.storeType,
         },
-        template: template // Pass template info but don't save to cache
+        template: template, // Pass template info but don't save to cache
       });
-      
-      console.log('✅ Registration committed successfully:', result);
-      
+
+      console.log("✅ Registration committed successfully:", result);
+
       // Clear cache after successful commit
       siteCraftCache.clearCache();
-      
+
       // Refresh session to get updated store status
-      console.log('🔄 Refreshing session after registration...');
-      console.log('✅ Session refreshed with updated store status');
-      
+      console.log("🔄 Refreshing session after registration...");
+      console.log("✅ Session refreshed with updated store status");
+
       // Redirect to dashboard
-      router.push('/dashboard');
-      
+      router.push("/dashboard");
     } catch (error) {
-      console.error('❌ Error committing registration:', error);
-      alert('Failed to complete registration. Please try again.');
+      console.error("❌ Error committing registration:", error);
+      alert("Failed to complete registration. Please try again.");
     } finally {
       setIsCommitting(false);
     }
@@ -79,21 +78,19 @@ export function TemplateCard({ template }: { template: CustomizedTemplate }) {
 
   return (
     <div className="space-y-4 border border-black-border rounded-lg overflow-hidden shadow-sm bg-background transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
-      <div className="relative w-full h-40 overflow-hidden items-center justify-center">
-        <div>
-          <iframe
-            src={`/branding/templates/${template.id}`}
-            scrolling="no"
-            style={{
-              width: "1024px",
-              height: "768px",
-              transform: "scale(0.4)", // Adjust scale to fit h-40
-              transformOrigin: "top left",
-              border: "none",
-            }}
-            className="absolute top-0 left-0"
-          />
-        </div>
+      <div className="relative w-full h-40 overflow-hidden flex items-center justify-center">
+        <iframe
+          src={`/branding/templates/${template.id}`}
+          scrolling="no"
+          style={{
+            width: "1024px",
+            height: "768px",
+            transform: "scale(0.4)", // Adjust scale to fit h-40
+            transformOrigin: "top left",
+            border: "none",
+          }}
+          className="absolute top-0 left-0 w-full h-full"
+        />
       </div>
       <div className="p-4">
         <div className="flex items-center justify-end">
