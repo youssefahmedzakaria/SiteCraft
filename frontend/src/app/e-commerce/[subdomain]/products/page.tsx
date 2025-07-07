@@ -53,7 +53,7 @@ export default function ProductsPage({
   cornerRadius = "large" as "large" | "small" | "none" | "medium",
   cardShadow = "shadow-xl hover:shadow-2xl",
   showSubtitle = false,
-  cardVariant = "hover" as
+  cardVariant = "default" as
     | "default"
     | "minimal"
     | "hover"
@@ -203,6 +203,10 @@ export default function ProductsPage({
         return false;
       }
     }
+    // Filter by 'In Stock Only' checkbox
+    if (showInStockOnly && product.stock <= 0) {
+      return false;
+    }
     // Filter by max price
     if (product.price > maxPrice) {
       return false;
@@ -320,7 +324,7 @@ export default function ProductsPage({
 
   return (
     <div className={`min-h-screen bg-[#ffffff] pt-20`}>
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 pb-20">
         <div className="text-center mb-12">
           <h1
             className={`text-5xl font-bold mb-4`}

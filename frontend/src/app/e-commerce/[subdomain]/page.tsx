@@ -689,7 +689,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-24">
       {/* Render middle sections dynamically */}
       {sections.slice(1, sections.length - 1).map((section, index) => {
         const sectionId = section.id as keyof typeof sectionComponents;
