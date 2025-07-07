@@ -1,5 +1,8 @@
 package com.sitecraft.backend.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CartProductDTO implements java.io.Serializable {
     private Long cartProductId;
     private int quantity;

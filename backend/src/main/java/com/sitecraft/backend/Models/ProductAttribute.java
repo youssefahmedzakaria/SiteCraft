@@ -1,11 +1,13 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "productattribute")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductAttribute {
 
     @Id

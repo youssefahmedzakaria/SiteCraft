@@ -166,17 +166,25 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     // Clear any previous errors
     setVariantError(null);
 
+    // Log product and selection details for debugging
+    console.log("[AddToCart] Product Data:", productData);
+    console.log("[AddToCart] Selected Variants:", selectedVariants);
+    console.log("[AddToCart] Quantity:", quantity);
+
     // Validate variant combination
     const validation = await validateVariantCombination(productData, selectedVariants);
+    console.log("[AddToCart] Validation Result:", validation);
     
     if (!validation.isValid) {
       setVariantError(validation.error || "Invalid variant combination");
+      console.log("[AddToCart] Validation failed:", validation.error);
       return;
     }
 
     const matchingVariant = validation.matchingVariant;
     if (!matchingVariant) {
       setVariantError("No matching variant found");
+      console.log("[AddToCart] No matching variant found");
       return;
     }
 
@@ -186,9 +194,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     const extractedVariants = extractSelectedVariants(productData, selectedVariants);
     const session = await getSession();
     const sku = generateSku(session?.storeId || 1, productData.id, extractedVariants);
+    console.log("[AddToCart] Extracted Variants:", extractedVariants);
+    console.log("[AddToCart] Session:", session);
+    console.log("[AddToCart] SKU:", sku);
 
     // Add to cart via backend (requires customer authentication)
     const success = await addToCartBackend(productData.id, sku, quantity);
+    console.log("[AddToCart] Add to cart backend result:", success);
     
     if (success) {
       setIsInCart(true);
@@ -204,12 +216,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       
       if (!sessionResponse.ok || sessionResponse.status === 401) {
         setVariantError("Please log in as a customer to add items to cart");
+        console.log("[AddToCart] Not logged in as customer");
       } else {
         const sessionData = await sessionResponse.json();
         if (!sessionData.customerId) {
           setVariantError("Please log in as a customer to add items to cart");
+          console.log("[AddToCart] Session data missing customerId:", sessionData);
         } else {
           setVariantError("Failed to add to cart. Please try again.");
+          console.log("[AddToCart] Unknown failure. Session data:", sessionData);
         }
       }
     }

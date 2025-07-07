@@ -2,7 +2,9 @@ package com.sitecraft.backend.DTOs;
 
 import java.math.BigDecimal;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductVariantDTO {
     private Long id;
     private String sku;

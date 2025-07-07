@@ -1,11 +1,13 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "productvariants")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductVariants {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

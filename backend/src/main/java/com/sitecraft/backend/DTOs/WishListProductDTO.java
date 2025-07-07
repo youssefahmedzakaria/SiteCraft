@@ -1,7 +1,9 @@
 package com.sitecraft.backend.DTOs;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class WishListProductDTO implements Serializable {
     private Long wishListProductId;
     private String sku;

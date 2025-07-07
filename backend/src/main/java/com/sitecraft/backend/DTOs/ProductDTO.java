@@ -5,11 +5,13 @@ import com.sitecraft.backend.Models.ProductImage;
 import com.sitecraft.backend.Models.ProductVariants;
 import com.sitecraft.backend.Models.ProductAttribute;
 import com.sitecraft.backend.Models.Review;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductDTO {
     private Long id;
     private String name;

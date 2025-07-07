@@ -2,6 +2,7 @@ package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "product")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
 
     @Id

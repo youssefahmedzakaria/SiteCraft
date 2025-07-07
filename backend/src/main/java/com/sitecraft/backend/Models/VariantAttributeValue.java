@@ -1,10 +1,12 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "variantattributevalue")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class VariantAttributeValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

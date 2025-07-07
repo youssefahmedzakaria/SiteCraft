@@ -1,10 +1,12 @@
 package com.sitecraft.backend.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "productimage")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
