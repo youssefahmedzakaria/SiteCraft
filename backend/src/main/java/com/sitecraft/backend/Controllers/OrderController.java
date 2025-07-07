@@ -2,6 +2,7 @@ package com.sitecraft.backend.Controllers;
 import com.sitecraft.backend.Models.Order;
 import com.sitecraft.backend.Models.Store;
 import com.sitecraft.backend.Services.OrderService;
+import com.sitecraft.backend.Services.PaymobService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,9 @@ import java.util.Map;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PaymobService paymobService;
 
     @GetMapping("/getAllOrders")
     public ResponseEntity<?> getAllOrdersForStore(HttpSession session) {
@@ -163,6 +167,30 @@ public class OrderController {
                     "success", false,
                     "message", "Failed to export orders: " + e.getMessage()
             ));
+        }
+    }
+
+    @PostMapping("/paymob/create-session")
+    public ResponseEntity<?> createPaymobSession(@RequestBody Map<String, Object> body) {
+        try {
+            // Extract parameters from request body
+            String paymentMethod = (String) body.get("paymentMethod");
+            String wallet = (String) body.get("wallet");
+            String mobile = (String) body.get("mobile");
+            Double amount = body.get("amount") != null ? Double.valueOf(body.get("amount").toString()) : null;
+            // Add any other required parameters
+
+            // Call PaymobService to create session and get iframe URL
+            // (Assume PaymobService is implemented)
+            String iframeUrl = paymobService.createPaymentSession(paymentMethod, wallet, mobile, amount);
+            System.out.println(iframeUrl);
+            if (iframeUrl != null) {
+                return ResponseEntity.ok(Map.of("success", true, "iframeUrl", iframeUrl));
+            } else {
+                return ResponseEntity.status(500).body(Map.of("success", false, "message", "Failed to create Paymob session"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

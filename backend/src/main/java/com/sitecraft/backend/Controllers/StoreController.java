@@ -5,6 +5,7 @@ import com.sitecraft.backend.Models.*;
 import com.sitecraft.backend.Repositories.StoreRepo;
 import com.sitecraft.backend.Services.StoreService;
 import com.sitecraft.backend.Services.UserService;
+import com.sitecraft.backend.Repositories.ShippingInfoRepo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,8 @@ public class StoreController {
     private UserService userService;
     @Autowired
     private StoreRepo storeRepo;
+    @Autowired
+    private ShippingInfoRepo shippingInfoRepo;
 
     @PostMapping("/{userId}")
     public ResponseEntity<?> createStore(
@@ -770,5 +773,21 @@ public class StoreController {
     // Helper method to validate hex color format
     private boolean isValidHexColor(String color) {
         return color != null && color.matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+    }
+
+    @GetMapping("/shippingPrice")
+    public ResponseEntity<?> getShippingPrice(@RequestParam Long storeId, @RequestParam String city) {
+        try {
+            ShippingInfo shippingInfo = shippingInfoRepo.findByStoreIdAndGovernmentName(storeId, city);
+            if (shippingInfo == null) {
+                return ResponseEntity.status(404).body(Map.of("success", false, "message", "Shipping info not found for this city."));
+            }
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "shippingPrice", shippingInfo.getShippingPrice()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", e.getMessage()));
+        }
     }
 }
