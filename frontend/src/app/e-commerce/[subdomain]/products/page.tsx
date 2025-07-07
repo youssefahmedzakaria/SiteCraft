@@ -186,6 +186,16 @@ export default function ProductsPage({
 
   // Filtering logic: multi-category
   const filteredProducts = products.filter((product: SimplifiedProduct) => {
+    // If discounted filter is active, only show products with a valid discountType and discountValue
+    const discountedParam = searchParams.get("discounted");
+    const isDiscounted =
+      typeof product.discountType === "string" &&
+      product.discountType.trim() !== "" &&
+      typeof product.discountValue === "number" &&
+      product.discountValue > 0;
+    if (discountedParam === "true" && !isDiscounted) {
+      return false;
+    }
     // Multi-category filter
     if (selectedCategories.length > 0) {
       if (!product.categories || product.categories.length === 0) return false;

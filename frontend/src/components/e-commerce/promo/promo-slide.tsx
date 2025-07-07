@@ -167,7 +167,12 @@ export function PromoSlide({
   const handlePromoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isClickable && subdomain) {
-      router.push(`/e-commerce/${subdomain}/products`);
+      if (buttonLink === "#discount") {
+        // Go to products page with discount filter
+        router.push(`/e-commerce/${subdomain}/products?discounted=true`);
+      } else {
+        router.push(`/e-commerce/${subdomain}/products`);
+      }
     }
   };
 
