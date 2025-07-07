@@ -53,6 +53,12 @@ public class CartController {
                 return ResponseEntity.status(401).build();
             }
             
+            // Validate request parameters
+            if (req.productId == null || req.sku == null || req.quantity <= 0) {
+                System.err.println("Invalid request parameters: productId=" + req.productId + ", sku=" + req.sku + ", quantity=" + req.quantity);
+                return ResponseEntity.badRequest().build();
+            }
+            
             CartProduct cp = cartService.addProductToCart(customerId, req.productId, req.sku, req.quantity);
             if (cp == null) {
                 System.err.println("Failed to add product to cart - service returned null");

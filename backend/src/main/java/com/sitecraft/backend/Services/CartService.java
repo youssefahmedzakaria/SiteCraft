@@ -6,6 +6,7 @@ import com.sitecraft.backend.DTOs.CartProductDTO;
 import com.sitecraft.backend.DTOs.ProductDTO;
 import com.sitecraft.backend.DTOs.ProductImageDTO;
 import com.sitecraft.backend.DTOs.ProductVariantDTO;
+import com.sitecraft.backend.DTOs.VariantAttributeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,8 @@ public class CartService {
     private ProductVariantsRepo productVariantsRepo;
     @Autowired
     private CustomerRepo customerRepo;
+    @Autowired
+    private VariantAttributeValueRepo variantAttributeValueRepo;
 
     public ShoppingCart getCartByCustomerId(Long customerId) {
         Optional<Customer> customerOpt = customerRepo.findById(customerId);
@@ -44,10 +47,22 @@ public class CartService {
         
         ShoppingCart cart = getCartByCustomerId(customerId);
         if (cart == null) return null;
+        
         Product product = productRepo.findById(productId).orElse(null);
         if (product == null) return null;
-        ProductVariants variant = productVariantsRepo.findAll().stream().filter(v -> v.getSku().equals(sku)).findFirst().orElse(null);
-        if (variant == null) return null;
+        
+        // Find variant by SKU
+        ProductVariants variant = findVariantBySku(sku);
+        if (variant == null) {
+            System.err.println("Variant not found for SKU: " + sku);
+            return null;
+        }
+        
+        // Verify the variant belongs to the specified product
+        if (!variant.getProduct().getId().equals(productId)) {
+            System.err.println("Variant SKU " + sku + " does not belong to product " + productId);
+            return null;
+        }
         
         // Check if product already in cart
         CartProduct existing = cart.getCartProducts().stream().filter(cp -> cp.getSku().equals(sku)).findFirst().orElse(null);
@@ -59,7 +74,10 @@ public class CartService {
         }
         
         // Check if total quantity doesn't exceed available stock
-        if (variant.getStock() < totalQuantity) return null;
+        if (variant.getStock() < totalQuantity) {
+            System.err.println("Insufficient stock for SKU " + sku + ". Available: " + variant.getStock() + ", Requested: " + totalQuantity);
+            return null;
+        }
         
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + quantity);
@@ -76,6 +94,13 @@ public class CartService {
         recalculateCartTotal(cart);
         shoppingCartRepo.save(cart);
         return cart.getCartProducts().stream().filter(cp -> cp.getSku().equals(sku)).findFirst().orElse(null);
+    }
+
+    /**
+     * Find product variant by SKU
+     */
+    public ProductVariants findVariantBySku(String sku) {
+        return productVariantsRepo.findBySku(sku);
     }
 
     @Transactional
@@ -260,7 +285,23 @@ public class CartService {
             // Calculate discounted price
             BigDecimal discountedPrice = calculateDiscountedPrice(product, variant.getPrice());
             
-            return new ProductVariantDTO(
+            // Get variant attributes
+            List<VariantAttributeDTO> attributes = null;
+            if (variant.getId() != null) {
+                List<VariantAttributeValue> variantAttributeValues = variantAttributeValueRepo.findByVariant(variant);
+                if (variantAttributeValues != null && !variantAttributeValues.isEmpty()) {
+                    attributes = variantAttributeValues.stream()
+                        .map(vav -> {
+                            VariantAttributeDTO dto = new VariantAttributeDTO();
+                            dto.setName(vav.getAttributeValue().getProductAttribute().getAttributeName());
+                            dto.setValue(vav.getAttributeValue().getAttributeValue());
+                            return dto;
+                        })
+                        .collect(java.util.stream.Collectors.toList());
+                }
+            }
+            
+            ProductVariantDTO dto = new ProductVariantDTO(
                 variant.getId(),
                 variant.getSku(),
                 variant.getStock(),
@@ -268,6 +309,8 @@ public class CartService {
                 discountedPrice,
                 variant.getProductionCost()
             );
+            dto.setAttributes(attributes);
+            return dto;
         } catch (Exception e) {
             System.err.println("Error creating simplified ProductVariantDTO: " + e.getMessage());
             e.printStackTrace();

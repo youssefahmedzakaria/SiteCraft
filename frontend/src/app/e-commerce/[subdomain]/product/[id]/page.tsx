@@ -13,6 +13,8 @@ import { usePathname, useRouter } from "next/navigation";
 import type { CartItem } from "@/contexts/cart-context";
 import type { FavoriteItem } from "@/contexts/favorites-context";
 import { getProduct, type Product, type ProductVariant, getProducts } from "@/lib/products";
+import { validateVariantCombination, generateSku, extractSelectedVariants, getSession } from "@/lib/sku-generator";
+import type { ThemeConfig } from "./product";
 
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -36,8 +38,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [justAddedToCart, setJustAddedToCart] = useState(false);
   const [justAddedToFavorites, setJustAddedToFavorites] = useState(false);
   const [shareClicked, setShareClicked] = useState(false);
+  const [variantError, setVariantError] = useState<string | null>(null);
 
-  const { addToCart, state: cartState } = useCart();
+  const { addToCart, state: cartState, addToCartBackend } = useCart();
   const {
     addToFavorites,
     removeFromFavorites,
@@ -46,10 +49,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
 
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
-   const [initialColors, setInitialColors] = useState({
-    primary: "#000000",
-    secondary: "#000000",
-    accent: "#000000",
+  const [initialColors, setInitialColors] = useState<ThemeConfig>({
+    primaryColor: "#000000",
+    secondaryColor: "#000000",
+    backgroundColor: "#ffffff",
+    borderRadius: "rounded-md",
   });
   // Fetch product data
   useEffect(() => {
@@ -58,6 +62,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         setLoading(true);
         setError(null);
         const product = await getProduct(parseInt(productId));
+        console.log("Product data:",product);
         setProductData(product);
 
         // Set initial images and variant
@@ -99,7 +104,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     if (!productData) return;
 
     const inCart = cartState.items.some(
-      (item: CartItem) => item.id === productId
+      (item: CartItem) => item.productId === productData.id
     );
     const inFavorites = favoritesState.items.some(
       (item: FavoriteItem) => item.id === productId
@@ -137,24 +142,59 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }, [productData]);
 
   // Handle add to cart
-  const handleAddToCart = () => {
-    if (!productData || !currentVariant) return;
+  const handleAddToCart = async () => {
+    if (!productData) return;
 
-    if (isInCart) {
-      router.push(`/e-commerce/${subdomain}/cart`);
+    // Clear any previous errors
+    setVariantError(null);
+
+    // Validate variant combination
+    const validation = await validateVariantCombination(productData, selectedVariants);
+    
+    if (!validation.isValid) {
+      setVariantError(validation.error || "Invalid variant combination");
       return;
     }
-    addToCart({
-      id: productId,
-      name: productData.name,
-      price: currentVariant.price || 0,
-      image: currentImages[0] || "",
-    });
-    setIsInCart(true);
-    setJustAddedToCart(true);
-    setTimeout(() => {
-      setJustAddedToCart(false);
-    }, 2000);
+
+    const matchingVariant = validation.matchingVariant;
+    if (!matchingVariant) {
+      setVariantError("No matching variant found");
+      return;
+    }
+
+    // Note: Removed the "View Cart" redirect functionality - button always shows "Add to Cart"
+
+    // Generate SKU
+    const extractedVariants = extractSelectedVariants(productData, selectedVariants);
+    const session = await getSession();
+    const sku = generateSku(session?.storeId || 1, productData.id, extractedVariants);
+
+    // Add to cart via backend (requires customer authentication)
+    const success = await addToCartBackend(productData.id, sku, quantity);
+    
+    if (success) {
+      setIsInCart(true);
+      setJustAddedToCart(true);
+      setTimeout(() => {
+        setJustAddedToCart(false);
+      }, 2000);
+    } else {
+      // Check if it's an authentication error
+      const sessionResponse = await fetch('http://localhost:8080/ecommerce/auth/getSession', {
+        credentials: 'include',
+      });
+      
+      if (!sessionResponse.ok || sessionResponse.status === 401) {
+        setVariantError("Please log in as a customer to add items to cart");
+      } else {
+        const sessionData = await sessionResponse.json();
+        if (!sessionData.customerId) {
+          setVariantError("Please log in as a customer to add items to cart");
+        } else {
+          setVariantError("Failed to add to cart. Please try again.");
+        }
+      }
+    }
   };
 
   // Handle add to favorites
@@ -310,7 +350,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   };
 
   // Handle variant change
-  const handleVariantChange = (
+  const handleVariantChange = async (
     groupId: string,
     optionId: string,
     productImages?: string[]
@@ -320,23 +360,23 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       [groupId]: optionId,
     }));
 
+    // Clear any previous errors when user changes selection
+    setVariantError(null);
+
     // Update images if this variant changes them
     if (productImages) {
       setCurrentImages(productImages);
     }
 
-    // Try to find a matching variant based on selected attributes
-    if (productData && productData.variants) {
-      // For now, we'll just use the first variant
-      // In a more complex implementation, you could match variants based on attribute combinations
-      const matchingVariant = productData.variants.find(variant => {
-        // This is a simplified matching logic
-        // In a real implementation, you'd match based on the actual variant attributes
-        return variant.stock > 0; // Just find the first available variant
+    // Update current variant based on new selection
+    if (productData) {
+      const validation = await validateVariantCombination(productData, {
+        ...selectedVariants,
+        [groupId]: optionId,
       });
       
-      if (matchingVariant) {
-        setCurrentVariant(matchingVariant);
+      if (validation.isValid && validation.matchingVariant) {
+        setCurrentVariant(validation.matchingVariant);
       }
     }
   };
@@ -345,10 +385,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <div
-        className={cn("min-h-screen pt-20",`text-[${initialColors.primary}]`)}
+        className={cn("min-h-screen pt-20",`text-[${initialColors.primaryColor}]`)}
         style={{
           backgroundColor: "bg-[#ffffff]",
-          color:  `text-[${initialColors.primary}]`,
+          color:  `text-[${initialColors.primaryColor}]`,
         }}
       >
         <div className="container mx-auto px-4 py-8">
@@ -367,7 +407,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         className={cn("min-h-screen pt-20 font-sans")}
         style={{
           backgroundColor: "bg-[#ffffff]",
-          color:  `text-[${initialColors.primary}]`,
+          color:  `text-[${initialColors.primaryColor}]`,
         }}
       >
         <div className="container mx-auto px-4 py-8">
@@ -391,7 +431,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   return (
     <div
       className={cn("min-h-screen pt-20 font-sans")}
-      style={{ backgroundColor: "bg-[#ffffff]", color:  `text-[${initialColors.primary}]` }}
+      style={{ backgroundColor: "bg-[#ffffff]", color:  `text-[${initialColors.primaryColor}]` }}
     >
       <div className="container mx-auto px-4 py-8">
         {/* Product Main Section */}
@@ -422,6 +462,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               justAddedToFavorites={justAddedToFavorites}
               shareClicked={shareClicked}
               theme={initialColors}
+              variantError={variantError}
             />
           </div>
         </div>

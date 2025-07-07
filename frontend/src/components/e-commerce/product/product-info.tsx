@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  ShoppingCart,
-  Heart,
-  Share2,
-  Check,
-  ShoppingBag,
-} from "lucide-react";
+import { ShoppingCart, Heart, Share2, Check, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/e-commerce/ui/button";
 import {
   Tabs,
@@ -41,6 +35,7 @@ interface ProductInfoProps {
   justAddedToCart: boolean;
   justAddedToFavorites: boolean;
   shareClicked: boolean;
+  variantError?: string | null;
 }
 
 export function ProductInfo({
@@ -60,9 +55,8 @@ export function ProductInfo({
   justAddedToCart,
   justAddedToFavorites,
   shareClicked,
+  variantError,
 }: ProductInfoProps) {
- 
-
   return (
     <div className="space-y-8">
       {/* Product Title and Rating */}
@@ -72,18 +66,25 @@ export function ProductInfo({
 
       {/* Price Section */}
       <div className="flex items-baseline gap-4">
-        <span className="text-3xl font-bold">${currentVariant.price || 0}</span>
-        {product.discountValue && product.discountValue > 0 && (
+        <span className="text-3xl font-bold">
+          $
+          {product.discountType !== null
+            ? product.discountType === "amount"
+              ? (currentVariant.price || 0) - Number(product.discountValue)
+              : (currentVariant.price || 0) * (1 - Number(product.discountValue))
+            : currentVariant.price || 0}
+        </span>
+        {product.discountValue && product.discountValue > 0 && product.discountType && (
           <span className="text-xl opacity-75 line-through">
-            ${(currentVariant.price || 0) + Number(product.discountValue)}
+            ${currentVariant.price || 0}
           </span>
         )}
-        {product.discountValue && product.discountValue > 0 && (
+        {product.discountValue && product.discountValue > 0 && product.discountType && (
           <span
             className="text-sm font-medium"
             style={{ color: theme.secondaryColor }}
           >
-            Save ${product.discountValue}
+            Save ${product.discountType === "amount" ? product.discountValue : (currentVariant.price || 0) * product.discountValue}
           </span>
         )}
       </div>
@@ -137,14 +138,11 @@ export function ProductInfo({
             onClick={onAddToCart}
             className={cn(
               "flex-1 h-12 text-base group relative transition-all duration-300",
-              justAddedToCart && "scale-105",
-              isInCart && "ring-2 ring-green-400"
+              justAddedToCart && "scale-105"
             )}
             style={{
               backgroundColor: justAddedToCart
                 ? "#10B981"
-                : isInCart
-                ? "#059669"
                 : theme.secondaryColor,
               color: theme.backgroundColor,
             }}
@@ -155,15 +153,12 @@ export function ProductInfo({
                 <Check className="w-5 h-5 mr-2" />
                 Added to Cart!
               </>
-            ) : isInCart ? (
-              <>
-                <ShoppingBag className="w-5 h-5 mr-2" />
-                View Cart
-              </>
             ) : (
               <>
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {currentVariant.stock && currentVariant.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                {currentVariant.stock && currentVariant.stock > 0
+                  ? "Add to Cart"
+                  : "Out of Stock"}
               </>
             )}
             <div
@@ -234,6 +229,28 @@ export function ProductInfo({
 
         {/* Status Messages */}
         <div className="min-h-[24px]">
+          {variantError && (
+            <div className="flex items-center gap-2 text-red-600 font-medium animate-fade-in">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{variantError}</span>
+              {variantError.includes("log in") && (
+                <a
+                  href={`/e-commerce/${
+                    window.location.pathname.split("/")[2]
+                  }/login`}
+                  className="text-blue-600 hover:text-blue-800 underline ml-2"
+                >
+                  Log In as Customer
+                </a>
+              )}
+            </div>
+          )}
           {justAddedToCart && (
             <div className="flex items-center gap-2 text-green-600 font-medium animate-fade-in">
               <Check className="w-4 h-4" />
@@ -249,37 +266,43 @@ export function ProductInfo({
         </div>
 
         {/* Product Features - Show attributes if available */}
-        {product.attributes && product.attributes.length > 0 && variantGroups.length === 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            {product.attributes.map((attribute, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "flex items-center gap-3 p-4 group relative",
-                  theme.borderRadius
-                )}
-                style={{ backgroundColor: `${theme.secondaryColor}20` }}
-              >
-                <div className="w-5 h-5 flex items-center justify-center">
-                  <span className="text-xs font-bold">A</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-sm">{attribute.attributeName}</h4>
-                  <p className="text-sm opacity-75">
-                    {attribute.attributeValues.map(v => v.attributeValue).join(", ")}
-                  </p>
-                </div>
+        {product.attributes &&
+          product.attributes.length > 0 &&
+          variantGroups.length === 0 && (
+            <div className="grid grid-cols-3 gap-4">
+              {product.attributes.map((attribute, index) => (
                 <div
+                  key={index}
                   className={cn(
-                    "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
-                    theme.borderRadius,
-                    "bg-black/5"
+                    "flex items-center gap-3 p-4 group relative",
+                    theme.borderRadius
                   )}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+                  style={{ backgroundColor: `${theme.secondaryColor}20` }}
+                >
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    <span className="text-xs font-bold">A</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">
+                      {attribute.attributeName}
+                    </h4>
+                    <p className="text-sm opacity-75">
+                      {attribute.attributeValues
+                        .map((v) => v.attributeValue)
+                        .join(", ")}
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                      theme.borderRadius,
+                      "bg-black/5"
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* Product Information Tabs */}
@@ -317,12 +340,14 @@ export function ProductInfo({
           <div className="space-y-4 opacity-90 whitespace-pre-line">
             {variantGroups.length > 0 ? (
               <div className="space-y-4">
-                <h4 className="font-semibold text-lg">Product Specifications</h4>
+                <h4 className="font-semibold text-lg">
+                  Product Specifications
+                </h4>
                 {variantGroups.map((group) => {
                   const selectedOption = group.options.find(
                     (option) => option.id === selectedVariants[group.id]
                   );
-                  
+
                   return (
                     <div key={group.id} className="border-b pb-4">
                       <h5 className="font-medium mb-2">{group.name}</h5>
@@ -343,7 +368,10 @@ export function ProductInfo({
                       </div>
                       {selectedOption && (
                         <p className="text-sm text-gray-600 mt-2">
-                          Selected: <span className="font-medium">{selectedOption.label}</span>
+                          Selected:{" "}
+                          <span className="font-medium">
+                            {selectedOption.label}
+                          </span>
                         </p>
                       )}
                     </div>
@@ -354,7 +382,10 @@ export function ProductInfo({
               <div className="space-y-2">
                 {product.attributes.map((attr, index) => (
                   <div key={index}>
-                    <strong>{attr.attributeName}:</strong> {attr.attributeValues.map(v => v.attributeValue).join(", ")}
+                    <strong>{attr.attributeName}:</strong>{" "}
+                    {attr.attributeValues
+                      .map((v) => v.attributeValue)
+                      .join(", ")}
                   </div>
                 ))}
               </div>

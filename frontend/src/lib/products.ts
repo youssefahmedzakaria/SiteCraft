@@ -16,6 +16,7 @@ export interface Product {
     lowStockNotificationEnabled?: boolean
     currentTotalStock?: number
     atLowStockLevel?: boolean
+    storeId?: number
 }
 
 export interface ProductImage {
@@ -146,7 +147,7 @@ export const getProducts = async (): Promise<SimplifiedProduct[]> => {
 
         const data = await response.json();
         console.log('✅ Products fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             // Transform the complex backend data to simplified frontend format
             return data.data.map((product: any) => transformProduct(product));
@@ -176,7 +177,7 @@ export const getProduct = async (productId: number): Promise<Product> => {
 
         const data = await response.json();
         console.log('✅ Product fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data; // Return the full product structure
         } else {
@@ -193,10 +194,10 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
         console.log('📞 Creating product...');
         console.log('📤 Product data:', JSON.stringify(productData, null, 2));
         console.log('📤 Images count:', images?.length || 0);
-        
+
         const formData = new FormData();
         formData.append('product', JSON.stringify(productData));
-        
+
         if (images && images.length > 0) {
             images.forEach((image, index) => {
                 formData.append('images', image);
@@ -234,7 +235,7 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
 
         const data = await response.json();
         console.log('✅ Product created successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data;
         } else {
@@ -249,10 +250,10 @@ export const createProduct = async (productData: ProductCreateDTO, images?: File
 export const updateProduct = async (productId: number, productData: ProductCreateDTO, images?: File[]): Promise<Product> => {
     try {
         console.log('📞 Updating product:', productId);
-        
+
         const formData = new FormData();
         formData.append('product', JSON.stringify(productData));
-        
+
         if (images && images.length > 0) {
             images.forEach((image, index) => {
                 formData.append('images', image);
@@ -266,23 +267,23 @@ export const updateProduct = async (productId: number, productData: ProductCreat
         });
 
         if (!response.ok) {
-             if (response.status === 413) {
-    // 413 Payload Too Large
-             throw new Error(
-                 "Image is too large. Please upload files smaller than 5 MB each."
-            );
-  }
-  // for other errors, pull the server’s message if available
+            if (response.status === 413) {
+                // 413 Payload Too Large
+                throw new Error(
+                    "Image is too large. Please upload files smaller than 5 MB each."
+                );
+            }
+            // for other errors, pull the server's message if available
             const errText = await response.text().catch(() => response.statusText);
             throw new Error(
-            `Failed to update product: ${errText} (status ${response.status})`
-  );
-}
+                `Failed to update product: ${errText} (status ${response.status})`
+            );
+        }
 
 
         const data = await response.json();
         console.log('✅ Product updated successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data;
         } else {
@@ -311,7 +312,7 @@ export const deleteProduct = async (productId: number): Promise<void> => {
 
         const data = await response.json();
         console.log('✅ Product deleted successfully:', data);
-        
+
         if (!data.success) {
             throw new Error(data.message || 'Failed to delete product');
         }
@@ -338,7 +339,7 @@ export const getProductStatistics = async (): Promise<ProductStatistics> => {
 
         const data = await response.json();
         console.log('✅ Product statistics fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data;
         } else {
@@ -365,7 +366,7 @@ export const getLowStockNotificationStatistics = async (): Promise<ProductStatis
         }
 
         const data = await response.json();
-        
+
         if (data.success && data.data) {
             // Transform the low stock notification data to match ProductStatistics interface
             return {
@@ -399,7 +400,7 @@ export const getLowStockProducts = async (): Promise<SimplifiedProduct[]> => {
 
         const data = await response.json();
         console.log('✅ Low stock products fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data.map((product: any) => transformProduct(product));
         } else {
@@ -428,7 +429,7 @@ export const getOutOfStockProducts = async (): Promise<SimplifiedProduct[]> => {
 
         const data = await response.json();
         console.log('✅ Out of stock products fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data.map((product: any) => transformProduct(product));
         } else {
@@ -457,7 +458,7 @@ export const getProductImages = async (productId: number): Promise<ProductImage[
 
         const data = await response.json();
         console.log('✅ Product images fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data;
         } else {
@@ -485,13 +486,13 @@ export const deleteProductImage = async (productId: number, imageId: number): Pr
 // Helper function to transform backend product to simplified frontend format
 export const transformProduct = (product: any): SimplifiedProduct => {
     // Use backend's calculated stock if available, otherwise calculate from variants
-    const totalStock = product.currentTotalStock ?? 
+    const totalStock = product.currentTotalStock ??
         (product.variants?.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0) || 0);
-    
+
     // Get the first variant with a price as the main price
     const mainVariant = product.variants?.find((v: any) => v.price !== null);
     const mainPrice = mainVariant?.price || 0;
-    
+
     // Transform images
     const transformedImages: SimplifiedProductImage[] = product.images?.map((img: any) => ({
         id: img.id,
@@ -535,7 +536,7 @@ export const getCategories = async (): Promise<any[]> => {
 
         const data = await response.json();
         console.log('✅ Categories fetched successfully:', data);
-        
+
         if (data.success && data.data) {
             return data.data;
         } else {

@@ -74,6 +74,7 @@ export default function ProductsPage({
     primary: "#000000",
     secondary: "#000000",
     accent: "#000000",
+    foreground: "#ffffff",
   });
 
   const searchParams = useSearchParams();
@@ -753,8 +754,8 @@ export default function ProductsPage({
                   onClick={clearAllFilters}
                   className={`rounded-xl px-8 py-3 font-semibold`}
                   style={{
-                    backgroundColor: initialColors.accent,
                     color: initialColors.primary,
+                    backgroundColor: initialColors.foreground,
                   }}
                 >
                   Clear Filters
