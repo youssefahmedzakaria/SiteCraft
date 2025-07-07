@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function SiteCraftFooter() {
+  const { t, isRTL } = useTranslation();
+
   return (
-    <footer className="bg-background border-t border-logo-border">
+    <footer className="bg-background border-t border-logo-border" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">SiteCraft</h3>
             <p className="text-sm text-muted-foreground">
-              Empowering Egyptian businesses with powerful e-commerce solutions.
+              {t('footer.companyDescription')}
             </p>
             <div className="flex space-x-4">
               <Link
@@ -44,14 +47,14 @@ export function SiteCraftFooter() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/about"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  About Us
+                  {t('navigation.home')}
                 </Link>
               </li>
               <li>
@@ -59,7 +62,7 @@ export function SiteCraftFooter() {
                   href="/features"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Features
+                  {t('navigation.features')}
                 </Link>
               </li>
               <li>
@@ -67,7 +70,7 @@ export function SiteCraftFooter() {
                   href="/pricing"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Pricing
+                  {t('navigation.pricing')}
                 </Link>
               </li>
               <li>
@@ -75,7 +78,7 @@ export function SiteCraftFooter() {
                   href="/contact"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Contact
+                  {t('navigation.contact')}
                 </Link>
               </li>
             </ul>
@@ -83,14 +86,14 @@ export function SiteCraftFooter() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.support')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/help"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Help Center
+                  {t('footer.helpCenter')}
                 </Link>
               </li>
               <li>
@@ -98,7 +101,7 @@ export function SiteCraftFooter() {
                   href="/docs"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Documentation
+                  {t('footer.documentation')}
                 </Link>
               </li>
               <li>
@@ -106,7 +109,7 @@ export function SiteCraftFooter() {
                   href="/faq"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  FAQ
+                  {t('footer.faq')}
                 </Link>
               </li>
             </ul>
@@ -114,16 +117,16 @@ export function SiteCraftFooter() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('navigation.contact')}</h3>
             <ul className="space-y-2">
               <li className="text-sm text-muted-foreground">
-                Cairo University, Giza, Egypt
+                {t('footer.address')}
               </li>
               <li className="text-sm text-muted-foreground">
-                Email: support@sitecraft.com
+                {t('footer.email')}
               </li>
               <li className="text-sm text-muted-foreground">
-                Phone: +20 123 456 7890
+                {t('footer.phone')}
               </li>
             </ul>
           </div>
@@ -131,8 +134,7 @@ export function SiteCraftFooter() {
 
         <div className="border-t mt-8 pt-8 border-logo-border">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} SiteCraft. All rights reserved. A
-            project by Cairo University FCAI students.
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

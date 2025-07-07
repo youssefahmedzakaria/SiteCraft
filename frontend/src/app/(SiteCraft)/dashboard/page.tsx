@@ -17,44 +17,51 @@ import { GeneralAnalyticsCard } from "@/components/SiteCraft/dashboard/analytics
 import { RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useTranslation } from "@/contexts/translation-context";
 
 // ─── Table Headers ─────────────────────────────────────────────────────────────
 
-const OrdersTableHeader: FC = () => (
-  <thead>
-    <tr className="min-w-full divide-y">
-      {["Order ", "Customer", "Total", "Status"].map((label) => (
+const OrdersTableHeader: FC = () => {
+  const { t } = useTranslation();
+  return (
+    <thead>
+      <tr className="min-w-full divide-y">
+        {[t('common.order'), t('common.customer'), t('common.total'), t('common.status')].map((label) => (
+          <th
+            key={label}
+            scope="col"
+            className="px-4 py-4 text-center text-xs font-semibold text-logo-txt uppercase tracking-wider"
+          >
+            {label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+};
+
+const ProductsTableHeader: FC = () => {
+  const { t } = useTranslation();
+  return (
+    <thead>
+      <tr className="min-w-full divide-y">
+        {/* Center 'Product', keep 'Sales' left */}
         <th
-          key={label}
           scope="col"
           className="px-4 py-4 text-center text-xs font-semibold text-logo-txt uppercase tracking-wider"
         >
-          {label}
+          {t('common.product')}
         </th>
-      ))}
-    </tr>
-  </thead>
-);
-
-const ProductsTableHeader: FC = () => (
-  <thead>
-    <tr className="min-w-full divide-y">
-      {/* Center 'Product', keep 'Sales' left */}
-      <th
-        scope="col"
-        className="px-4 py-4 text-center text-xs font-semibold text-logo-txt uppercase tracking-wider"
-      >
-        Product
-      </th>
-      <th
-        scope="col"
-        className="px-4 py-4 text-left  text-xs font-semibold text-logo-txt uppercase tracking-wider"
-      >
-        Sales
-      </th>
-    </tr>
-  </thead>
-);
+        <th
+          scope="col"
+          className="px-4 py-4 text-left  text-xs font-semibold text-logo-txt uppercase tracking-wider"
+        >
+          {t('common.sales')}
+        </th>
+      </tr>
+    </thead>
+  );
+};
 
 // ─── Row Components ────────────────────────────────────────────────────────────
 
@@ -104,6 +111,7 @@ const ProductRecord: FC<{ product: TopProduct }> = ({ product }) => (
 // ─── Page Component ────────────────────────────────────────────────────────────
 
 export default function OverviewPage() {
+  const { t } = useTranslation();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { isInactive } = useStoreStatus();
   const router = useRouter();
@@ -149,13 +157,13 @@ export default function OverviewPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please log in to view the overview dashboard.</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('common.authenticationRequired')}</h2>
+            <p className="text-gray-600 mb-4">{t('common.pleaseLoginToView')}</p>
             <Button 
               onClick={() => router.push('/login')}
               className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
             >
-              Login
+              {t('common.login')}
             </Button>
           </div>
         </div>
@@ -172,8 +180,8 @@ export default function OverviewPage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
-              <p className="text-gray-600">You don't have permission to access this page.</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('common.accessDenied')}</h2>
+              <p className="text-gray-600">{t('common.noPermission')}</p>
             </div>
           </div>
         </main>
@@ -190,13 +198,13 @@ export default function OverviewPage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Store Inactive</h2>
-              <p className="text-gray-600 mb-4">Your store is inactive. Please subscribe to activate your store.</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('common.storeInactive')}</h2>
+              <p className="text-gray-600 mb-4">{t('common.pleaseSubscribeToActivate')}</p>
               <Button 
                 onClick={() => router.push('/pricing')}
                 className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover"
               >
-                Subscribe Now
+                {t('common.subscribeNow')}
               </Button>
             </div>
           </div>
@@ -214,7 +222,7 @@ export default function OverviewPage() {
           <div className="flex items-center justify-center h-64">
             <div className="flex items-center space-x-2">
               <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="text-lg text-gray-600">Loading overview data...</span>
+              <span className="text-lg text-gray-600">{t('common.loadingOverviewData')}</span>
             </div>
           </div>
         </main>
@@ -229,10 +237,10 @@ export default function OverviewPage() {
       <main className="flex-1 p-4 md:p-6 lg:ml-80 pt-20 md:pt-20 lg:pt-6 bg-gray-100 space-y-6">
         {/* Header section with title and subtitle */}
         <div className="mb-6 space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Overview</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('common.overview')}</h1>
           <div className="flex justify-between items-center">
             <h2 className="text-lg md:text-xl font-semibold text-gray-600">
-              Get an overview of your store's performance
+              {t('common.getOverviewOfStorePerformance')}
             </h2>
             <Button
               variant="outline"
@@ -242,7 +250,7 @@ export default function OverviewPage() {
               className="text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${overviewLoading ? 'animate-spin' : ''}`} />
-              Refresh
+              {t('common.refresh')}
             </Button>
           </div>
         </div>
@@ -270,17 +278,17 @@ export default function OverviewPage() {
           <GeneralAnalyticsCard
             analytic={{
               id: 'orders',
-              title: "Today's Orders",
+              title: t('common.todaysOrders'),
               value: orderCount?.toString() ?? '-',
-              subtitle: 'Placed today',
+              subtitle: t('common.placedToday'),
             }}
           />
           <GeneralAnalyticsCard
             analytic={{
               id: 'sales',
-              title: "Today's Sales",
+              title: t('common.todaysSales'),
               value: `EGP ${salesTotal?.toFixed(2) ?? '-'}`,
-              subtitle: 'Revenue today',
+              subtitle: t('common.revenueToday'),
             }}
           />
         </div>
@@ -288,7 +296,7 @@ export default function OverviewPage() {
         {/* 1) Today's Orders */}
         <section>
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold">Today's Orders</h2>
+            <h2 className="text-lg font-semibold">{t('common.todaysOrders')}</h2>
           </div>
           <div className="border rounded-lg border-logo-border overflow-x-auto">
             <table className="min-w-full divide-y divide-logo-border">
@@ -301,7 +309,7 @@ export default function OverviewPage() {
                 ) : (
                   <tr>
                     <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                      No orders today
+                      {t('common.noOrdersToday')}
                     </td>
                   </tr>
                 )}
@@ -313,12 +321,12 @@ export default function OverviewPage() {
         <div className="flex flex-col gap-4 md:flex-row">
           {/* Last 7 Days Sales */}
           <section className="flex-1 flex flex-col">
-            <h2 className="text-lg font-semibold mb-2">Last 7 Days</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('common.last7Days')}</h2>
             <div className="flex-1 border rounded-lg border-logo-border bg-white p-1 md:p-2 flex items-center justify-center">
               <div className="w-full max-w-md">
                 {dailySales.length === 0 ? (
                   <div className="w-full h-64 flex items-center justify-center text-gray-500 text-lg">
-                    No Sales to preview
+                      {t('common.noSalesToPreview')}
                   </div>
                 ) : (
                   <AnimatedChartWrapper delay={0}>
@@ -341,7 +349,7 @@ export default function OverviewPage() {
 
           {/* Top Selling Products */}
           <section className="flex-1 flex flex-col">
-            <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('common.topSellingProducts')}</h2>
             <div className="flex-1 border rounded-lg border-logo-border overflow-x-auto">
               <table className="min-w-full divide-y divide-logo-border">
                 <ProductsTableHeader />
@@ -354,7 +362,7 @@ export default function OverviewPage() {
                     <tr>
                       <td colSpan={2} className="h-64">
                         <div className="flex items-center justify-center h-full w-full text-gray-500 text-lg">
-                          No products sold yet
+                          {t('common.noProductsSoldYet')}
                         </div>
                       </td>
                     </tr>

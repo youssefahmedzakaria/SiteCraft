@@ -1,0 +1,367 @@
+{
+  "common": {
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "about": "About",
+    "signup": "Sign Up",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "search": "Search",
+    "cart": "Cart",
+    "favorites": "Favorites",
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "order": "Order",
+    "customer": "Customer",
+    "total": "Total",
+    "status": "Status",
+    "product": "Product",
+    "sales": "Sales",
+    "authenticationRequired": "Authentication Required",
+    "pleaseLoginToView": "Please log in to view the overview dashboard.",
+    "accessDenied": "Access Denied",
+    "noPermission": "You don't have permission to access this page.",
+    "storeInactive": "Store Inactive",
+    "pleaseSubscribeToActivate": "Your store is inactive. Please subscribe to activate your store.",
+    "subscribeNow": "Subscribe Now",
+    "loadingOverviewData": "Loading overview data...",
+    "overview": "Overview",
+    "getOverviewOfStorePerformance": "Get an overview of your store's performance",
+    "refresh": "Refresh",
+    "todaysOrders": "Today's Orders",
+    "placedToday": "Placed today",
+    "todaysSales": "Today's Sales",
+    "revenueToday": "Revenue today",
+    "noOrdersToday": "No orders today",
+    "last7Days": "Last 7 Days",
+    "noSalesToPreview": "No Sales to preview",
+    "topSellingProducts": "Top Selling Products",
+    "noProductsSoldYet": "No products sold yet",
+    "confirmDeletion": "Confirm Deletion",
+    "confirmDeletionDescription": "Are you sure you want to delete this item? This action cannot be undone.",
+    "suspendCustomer": "Suspend Customer",
+    "suspendCustomerDescription": "Are you sure you want to suspend this customer? They will no longer be able to place orders or access their account.",
+    "suspend": "Suspend"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Your brand, Your store, Your way.",
+      "subtitle": "Create stunning websites without writing a single line of code. Our intuitive platform makes web design accessible to everyone."
+    },
+    "features": {
+      "dragDrop": {
+        "title": "Drag & Drop",
+        "description": "Build your website by simply dragging and dropping elements. No coding required."
+      },
+      "responsive": {
+        "title": "Responsive Design",
+        "description": "Your website will look great on any device, from desktop to mobile."
+      },
+      "customizable": {
+        "title": "Customizable",
+        "description": "Choose from hundreds of templates and customize them to match your brand."
+      }
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "branding": "Branding",
+    "templates": "Templates"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "signInButton": "Sign In",
+      "orDivider": "or",
+      "continueWithGoogle": "Continue with Google"
+    },
+    "signup": {
+      "title": "Create account",
+      "subtitle": "Sign up for your account",
+      "firstNameLabel": "First Name",
+      "lastNameLabel": "Last Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "termsAgreement": "I agree to the",
+      "termsLink": "Terms of Service",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "signUpButton": "Create Account",
+      "orDivider": "or",
+      "continueWithGoogle": "Continue with Google"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email to reset your password",
+      "emailLabel": "Email",
+      "resetButton": "Reset Password",
+      "backToLogin": "Back to login"
+    },
+    "branding": {
+      "title": "Your brand, Your store, Your way.",
+      "subtitle": "Create stunning websites and grow your online presence with our intuitive platform designed for Egyptian businesses."
+    }
+  },
+  "about": {
+    "title": "About SiteCraft",
+    "subtitle": "SiteCraft is a low-code e-commerce platform designed specifically for Egyptian small businesses and regional brands, offering a comprehensive solution that combines ease of use with powerful features.",
+    "missions": {
+      "mission": {
+        "title": "Our Mission",
+        "description": "To empower small businesses and regional brands in Egypt with an accessible, feature-rich e-commerce platform that bridges the gap between global solutions and local market needs."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "description": "To become the leading e-commerce platform for small to medium-sized businesses in Egypt, providing innovative solutions that drive digital transformation and economic growth."
+      },
+      "values": {
+        "title": "Our Values",
+        "description": "We believe in making e-commerce accessible to all, providing excellent local support, and maintaining high standards of security and reliability."
+      }
+    },
+    "whyChoose": {
+      "title": "Why Choose SiteCraft?",
+      "description": "SiteCraft stands out by addressing the unique challenges faced by Egyptian businesses in the digital space. We offer local payment integration, high-quality Arabic translation, and competitive pricing tailored to the local market. Our platform combines the power of modern e-commerce tools with the simplicity of a low-code interface, making it accessible to businesses of all technical skill levels."
+    },
+    "story": {
+      "title": "Our Story",
+      "description": "Born from a graduation project at Cairo University's Faculty of Computers and Artificial Intelligence, SiteCraft was developed by a team of passionate students who recognized the need for a localized e-commerce solution. Our platform is the result of extensive research, market analysis, and collaboration with local businesses to understand and address their specific needs."
+    },
+    "commitment": {
+      "title": "Our Commitment",
+      "description": "We are committed to continuous improvement and innovation, regularly updating our platform with new features and enhancements based on user feedback. Our dedicated support team ensures that every business owner has the resources and assistance they need to succeed in the digital marketplace."
+    }
+  },
+  "features": {
+    "title": "Features",
+    "subtitle": "Everything you need to create and grow your online store",
+    "list": {
+      "templates": {
+        "title": "Templates & Customization",
+        "description": "Choose from a variety of templates and customize every aspect of your store, from colors and fonts to layouts and buttons."
+      },
+      "hosting": {
+        "title": "Secure Hosting",
+        "description": "Worry-free hosting with top-tier security and reliability for your online store."
+      },
+      "payments": {
+        "title": "Local Payment Integration",
+        "description": "Support for multiple payment methods including ValU, Meeza, MasterCard, and Fawry."
+      },
+      "inventory": {
+        "title": "Inventory Management",
+        "description": "Efficiently manage products, track stock levels, and import products from external sources."
+      },
+      "support": {
+        "title": "24/7 Customer Support",
+        "description": "Access to comprehensive help resources, email support, and knowledge base."
+      },
+      "analytics": {
+        "title": "Advanced Analytics",
+        "description": "Real-time insights into sales, visitor behavior, and business performance metrics."
+      },
+      "arabic": {
+        "title": "Arabic Translation",
+        "description": "Full Arabic language support for enhanced accessibility and local market reach."
+      },
+      "orders": {
+        "title": "Order Management",
+        "description": "Streamlined order processing and fulfillment tracking system."
+      },
+      "receipts": {
+        "title": "Receipt & Policies",
+        "description": "Customizable receipts and easy management of business policies."
+      },
+      "customers": {
+        "title": "Customer Management",
+        "description": "Tools to manage customer relationships and track purchase histories."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the perfect plan for your business. No hidden fees, no surprises.",
+    "choosePlan": "Choose Your Subscription Plan",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "discount": "15% off",
+    "annualDescription": "Save money with annual billing",
+    "monthlyDescription": "Pay month-to-month with no long-term commitment",
+    "year": "year",
+    "month": "month",
+    "youSave": "You save",
+    "selectPlan": "Select Plan",
+    "poweredBy": "Powered by Paymob",
+    "pciCompliant": "PCI DSS Compliant",
+    "cbeLicensed": "CBE Licensed",
+    "basic": {
+      "title": "Basic",
+      "features": {
+        "products": "Up to 50 products",
+        "users": "1 user account",
+        "multipleUsers": "Multiple user accounts"
+      }
+    },
+    "pro": {
+      "title": "Pro",
+      "popular": "Most Popular",
+      "features": {
+        "products": "Up to 200 products",
+        "reports": "Reports",
+        "users": "5 user accounts"
+      }
+    },
+    "allPlansInclude": "All Plans Include",
+    "benefits": {
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Track visitors, sales metrics, and store performance"
+      },
+      "hosting": {
+        "title": "Secure Hosting",
+        "description": "Enterprise-grade security and reliable hosting infrastructure"
+      },
+      "payments": {
+        "title": "Local Payment Methods",
+        "description": "Support for ValU, Meeza, MasterCard, and Fawry"
+      },
+      "arabic": {
+        "title": "Arabic Support",
+        "description": "Full Arabic language support and RTL compatibility"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Access to our dedicated support team"
+      },
+      "mobile": {
+        "title": "Mobile Optimization",
+        "description": "Fully responsive design for all devices"
+      }
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "stores": {
+      "title": "Stores Overview",
+      "search": "Search stores...",
+      "filter": {
+        "all": "All",
+        "active": "Active",
+        "suspended": "Suspended"
+      },
+      "columns": {
+        "storeName": "Store Name",
+        "status": "Status",
+        "subscriptionType": "Subscription",
+        "lastMonthSales": "Last Month Sales",
+        "lastMonthOrders": "Last Month Orders",
+        "ownerEmail": "Owner Email",
+        "actions": "Actions"
+      },
+      "actions": {
+        "suspend": "Suspend",
+        "unsuspend": "Unsuspend",
+        "sendMail": "Send Mail",
+        "view": "View Store"
+      }
+    },
+    "mail": {
+      "title": "Send Mail to Store Owner",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Mail",
+      "sending": "Sending...",
+      "success": "Mail sent successfully!",
+      "error": "Failed to send mail."
+    },
+    "admins": {
+      "title": "Admin Management",
+      "addAdmin": "Add Admin",
+      "adminEmail": "Admin Email",
+      "add": "Add",
+      "adding": "Adding...",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "success": "Admin added successfully!",
+      "error": "Failed to add admin."
+    },
+    "stats": {
+      "totalStores": "Total Stores",
+      "activeStores": "Active Stores",
+      "suspendedStores": "Suspended Stores"
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 SiteCraft. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "companyDescription": "Empowering Egyptian businesses with powerful e-commerce solutions.",
+    "quickLinks": "Quick Links",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "documentation": "Documentation",
+    "faq": "FAQ",
+    "address": "Cairo University, Giza, Egypt",
+    "email": "Email: support@sitecraft.com",
+    "phone": "Phone: +20 123 456 7890"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "customizeTemplate": "Customize Template",
+    "categories": "Categories",
+    "products": "Products",
+    "orders": "Orders",
+    "customers": "Customers",
+    "analytics": "Analytics",
+    "storeInfo": "Store Info",
+    "shippingInfo": "Shipping Info",
+    "accountSettings": "Account Settings",
+    "logOut": "Log Out",
+    "reports": "Reports"
+  },
+  "payment": {
+    "success": {
+      "title": "Thank you for your subscription!",
+      "subtitle": "Your plan is now active.",
+      "transactionId": "Transaction ID",
+      "continueToDashboard": "Continue to Dashboard",
+      "confirmationEmail": "A confirmation email has been sent to your registered email address."
+    }
+  }
+} 

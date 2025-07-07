@@ -12,67 +12,70 @@ import {
   FileText,
   Users
 } from "lucide-react"
-
-const features = [
-  {
-    title: "Templates & Customization",
-    description: "Choose from a variety of templates and customize every aspect of your store, from colors and fonts to layouts and buttons.",
-    icon: Palette
-  },
-  {
-    title: "Secure Hosting",
-    description: "Worry-free hosting with top-tier security and reliability for your online store.",
-    icon: Server
-  },
-  {
-    title: "Local Payment Integration",
-    description: "Support for multiple payment methods including ValU, Meeza, MasterCard, and Fawry.",
-    icon: CreditCard
-  },
-  {
-    title: "Inventory Management",
-    description: "Efficiently manage products, track stock levels, and import products from external sources.",
-    icon: Package
-  },
-  {
-    title: "24/7 Customer Support",
-    description: "Access to comprehensive help resources, email support, and knowledge base.",
-    icon: HeadphonesIcon
-  },
-  {
-    title: "Advanced Analytics",
-    description: "Real-time insights into sales, visitor behavior, and business performance metrics.",
-    icon: BarChart3
-  },
-  {
-    title: "Arabic Translation",
-    description: "Full Arabic language support for enhanced accessibility and local market reach.",
-    icon: Languages
-  },
-  {
-    title: "Order Management",
-    description: "Streamlined order processing and fulfillment tracking system.",
-    icon: ShoppingCart
-  },
-  {
-    title: "Receipt & Policies",
-    description: "Customizable receipts and easy management of business policies.",
-    icon: FileText
-  },
-  {
-    title: "Customer Management",
-    description: "Tools to manage customer relationships and track purchase histories.",
-    icon: Users
-  }
-]
+import { useTranslation } from "@/contexts/translation-context";
 
 export default function FeaturesPage() {
+  const { t, isRTL } = useTranslation();
+
+  const features = [
+    {
+      title: t('features.list.templates.title'),
+      description: t('features.list.templates.description'),
+      icon: Palette
+    },
+    {
+      title: t('features.list.hosting.title'),
+      description: t('features.list.hosting.description'),
+      icon: Server
+    },
+    {
+      title: t('features.list.payments.title'),
+      description: t('features.list.payments.description'),
+      icon: CreditCard
+    },
+    {
+      title: t('features.list.inventory.title'),
+      description: t('features.list.inventory.description'),
+      icon: Package
+    },
+    {
+      title: t('features.list.support.title'),
+      description: t('features.list.support.description'),
+      icon: HeadphonesIcon
+    },
+    {
+      title: t('features.list.analytics.title'),
+      description: t('features.list.analytics.description'),
+      icon: BarChart3
+    },
+    {
+      title: t('features.list.arabic.title'),
+      description: t('features.list.arabic.description'),
+      icon: Languages
+    },
+    {
+      title: t('features.list.orders.title'),
+      description: t('features.list.orders.description'),
+      icon: ShoppingCart
+    },
+    {
+      title: t('features.list.receipts.title'),
+      description: t('features.list.receipts.description'),
+      icon: FileText
+    },
+    {
+      title: t('features.list.customers.title'),
+      description: t('features.list.customers.description'),
+      icon: Users
+    }
+  ]
+
   return (
-    <div className="container pt-24 pb-16">
+    <div className="container pt-24 pb-16" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Features</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('features.title')}</h1>
         <p className="text-xl text-muted-foreground">
-          Everything you need to create and grow your online store
+          {t('features.subtitle')}
         </p>
       </div>
       

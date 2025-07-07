@@ -6,6 +6,7 @@ import { LayoutWrapper } from "@/components/layout-wrapper";
 import { CartProvider } from "@/contexts/cart-context";
 import { FavoritesProvider } from "@/contexts/favorites-context";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { TranslationProvider } from "@/contexts/translation-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,13 +36,15 @@ export default function RootLayout({
           inter.className
         )}
       >
-<SessionProvider>        
-<CartProvider>
-          <FavoritesProvider>
-            <LayoutWrapper> {children}</LayoutWrapper>
-          </FavoritesProvider>
-        </CartProvider>
-        </SessionProvider>
+        <TranslationProvider>
+          <SessionProvider>        
+            <CartProvider>
+              <FavoritesProvider>
+                <LayoutWrapper> {children}</LayoutWrapper>
+              </FavoritesProvider>
+            </CartProvider>
+          </SessionProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

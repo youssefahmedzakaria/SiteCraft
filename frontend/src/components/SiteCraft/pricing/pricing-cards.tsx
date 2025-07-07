@@ -15,8 +15,10 @@ import SimulatedPaymobIframe from "./SimulatedPaymobIframe";
 import PaymentSuccessMessage from "./PaymentSuccessMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function PricingCards() {
+  const { t, isRTL } = useTranslation();
   const [isAnnual, setIsAnnual] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<null | {name: string, price: number, period: string}>(null);
   const [paymobUrl, setPaymobUrl] = useState<string | null>(null);
@@ -81,16 +83,16 @@ export function PricingCards() {
           />
           {loading && (
             <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
-              <div className="text-lg font-semibold text-primary">Processing subscription...</div>
+              <div className="text-lg font-semibold text-primary">{t('common.loading')}</div>
             </div>
           )}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-              <span>Powered by Paymob</span>
+              <span>{t('pricing.poweredBy')}</span>
               <span>•</span>
-              <span>PCI DSS Compliant</span>
+              <span>{t('pricing.pciCompliant')}</span>
               <span>•</span>
-              <span>CBE Licensed</span>
+              <span>{t('pricing.cbeLicensed')}</span>
             </div>
           </div>
         </div>
@@ -118,9 +120,9 @@ export function PricingCards() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10" dir={isRTL ? 'rtl' : 'ltr'}>
       <h2 className="text-3xl font-bold text-center mb-6">
-        Choose Your Subscription Plan
+        {t('pricing.choosePlan')}
       </h2>
 
       {/* Enhanced Billing toggle */}
@@ -137,7 +139,7 @@ export function PricingCards() {
                 : "text-foreground/70 hover:text-foreground"
             }`}
           >
-            Monthly
+            {t('pricing.monthly')}
           </button>
           <button
             onClick={() => setIsAnnual(true)}
@@ -147,23 +149,25 @@ export function PricingCards() {
                 : "text-foreground/70 hover:text-foreground"
             }`}
           >
-            Annual{" "}
+            {t('pricing.annual')}{" "}
             <span className="bg-green-100 text-green-700 text-xs px-1.5 py-0.5 rounded-full ml-1">
-              15% off
+              {t('pricing.discount')}
             </span>
           </button>
           <div
             className="absolute top-1 bottom-1 rounded-full bg-primary shadow-md transition-all duration-300 ease-in-out"
             style={{
               width: "50%",
-              left: isAnnual ? "50%" : "0%",
+              left: isRTL ? "auto" : 0,
+              right: isRTL ? 0 : "auto",
+              transform: isAnnual ? `translateX(${isRTL ? '-100%' : '100%'})` : "translateX(0%)",
             }}
           />
         </div>
         <p className="text-sm text-muted-foreground">
           {isAnnual
-            ? "Save money with annual billing"
-            : "Pay month-to-month with no long-term commitment"}
+            ? t('pricing.annualDescription')
+            : t('pricing.monthlyDescription')}
         </p>
       </div>
 
@@ -177,7 +181,7 @@ export function PricingCards() {
           <Card className="border-logo-border h-full hover:border-primary/50 hover:shadow-md transition-all duration-300">
             <CardHeader>
               <CardTitle>
-                <h3 className="text-2xl font-bold">Basic</h3>
+                <h3 className="text-2xl font-bold">{t('pricing.basic.title')}</h3>
                 <motion.div
                   key={isAnnual ? "annual" : "monthly"}
                   initial={{ opacity: 0, y: -10 }}
@@ -189,14 +193,14 @@ export function PricingCards() {
                     <>
                       {basicAnnual}EGP
                       <span className="text-lg font-normal text-muted-foreground">
-                        /year
+                        /{t('pricing.year')}
                       </span>
                     </>
                   ) : (
                     <>
                       {basicMonthly}EGP
                       <span className="text-lg font-normal text-muted-foreground">
-                        /month
+                        /{t('pricing.month')}
                       </span>
                     </>
                   )}
@@ -205,7 +209,7 @@ export function PricingCards() {
                   <p className="text-sm text-muted-foreground mt-1">
                     <span className="line-through">{basicMonthly * 12}EGP</span>
                     <span className="ml-2 text-green-600 font-medium">
-                      You save {basicMonthly * 12 - basicAnnual}EGP
+                      {t('pricing.youSave')} {basicMonthly * 12 - basicAnnual}EGP
                     </span>
                   </p>
                 )}
@@ -215,28 +219,16 @@ export function PricingCards() {
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span>Up to 50 products</span>
+                  <span>{t('pricing.basic.features.products')}</span>
                 </li>
-                {/* <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Analytics</span>
-                </li> */}
-                {/* <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Standard support</span>
-                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span>1 user account</span>
+                  <span>{t('pricing.basic.features.users')}</span>
                 </li>
-                {/* <li className="flex items-center gap-2">
-                  <X className="h-5 w-5 text-red-500" />
-                  <span className="text-muted-foreground">Reports</span>
-                </li> */}
                 <li className="flex items-center gap-2">
                   <X className="h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground">
-                    Multiple user accounts
+                    {t('pricing.basic.features.multipleUsers')}
                   </span>
                 </li>
               </ul>
@@ -255,7 +247,7 @@ export function PricingCards() {
                   setPaymobUrl("https://accept.paymob.com/api/acceptance/iframes/your_iframe_id?payment_token=your_token");
                 }}
               >
-                Select Plan
+                {t('pricing.selectPlan')}
               </Button>
             </CardContent>
           </Card>
@@ -271,10 +263,10 @@ export function PricingCards() {
             <CardHeader>
               <CardTitle>
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-bold">Pro</h3>
+                  <h3 className="text-2xl font-bold">{t('pricing.pro.title')}</h3>
                   <div className="ml-3 bg-primary text-primary-foreground rounded-full px-3 py-0.5 text-xs font-medium shadow-sm flex items-center">
                     <Star className="h-3 w-3 mr-1 fill-current" />
-                    Most Popular
+                    {t('pricing.pro.popular')}
                   </div>
                 </div>
                 <motion.div
@@ -288,14 +280,14 @@ export function PricingCards() {
                     <>
                       {proAnnual}EGP
                       <span className="text-lg font-normal text-muted-foreground">
-                        /year
+                        /{t('pricing.year')}
                       </span>
                     </>
                   ) : (
                     <>
                       {proMonthly}EGP
                       <span className="text-lg font-normal text-muted-foreground">
-                        /month
+                        /{t('pricing.month')}
                       </span>
                     </>
                   )}
@@ -304,7 +296,7 @@ export function PricingCards() {
                   <p className="text-sm text-muted-foreground mt-1">
                     <span className="line-through">{proMonthly * 12}EGP</span>
                     <span className="ml-2 text-green-600 font-medium">
-                      You save {proMonthly * 12 - proAnnual}EGP
+                      {t('pricing.youSave')} {proMonthly * 12 - proAnnual}EGP
                     </span>
                   </p>
                 )}
@@ -314,28 +306,16 @@ export function PricingCards() {
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span>Up to 200 products</span>
+                  <span>{t('pricing.pro.features.products')}</span>
                 </li>
-                {/* <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Analytics</span>
-                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span>Reports</span>
+                  <span>{t('pricing.pro.features.reports')}</span>
                 </li>
-                {/* <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Priority support</span>
-                </li> */}
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span>5 user accounts</span>
+                  <span>{t('pricing.pro.features.users')}</span>
                 </li>
-                {/* <li className="flex items-center gap-2">
-                  <X className="h-5 w-5 text-red-500" />
-                  <span className="text-muted-foreground">Unlimited products</span>
-                </li> */}
               </ul>
               <Button
                 className="w-full bg-primary hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all duration-200"
@@ -352,7 +332,7 @@ export function PricingCards() {
                   setPaymobUrl("https://accept.paymob.com/api/acceptance/iframes/your_iframe_id?payment_token=your_token");
                 }}
               >
-                Select Plan
+                {t('pricing.selectPlan')}
               </Button>
             </CardContent>
           </Card>

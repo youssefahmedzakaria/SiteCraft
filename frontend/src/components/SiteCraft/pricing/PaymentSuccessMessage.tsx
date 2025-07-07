@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/contexts/translation-context";
 
 interface PaymentSuccessMessageProps {
   planName: string | undefined;
@@ -10,6 +11,7 @@ interface PaymentSuccessMessageProps {
 
 const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName, transactionId, onBack }) => {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleContinueToDashboard = () => {
     router.push('/dashboard');
@@ -22,11 +24,11 @@ const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName,
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Thank you for your subscription!</h2>
-          <p className="text-gray-600">Your {planName} plan is now active.</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{t('payment.success.title')}</h2>
+          <p className="text-gray-600">{t('payment.success.subtitle')} {planName}</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <div className="text-sm text-gray-600 mb-1">Transaction ID</div>
+          <div className="text-sm text-gray-600 mb-1">{t('payment.success.transactionId')}</div>
           <div className="font-mono text-sm text-gray-900">
             {transactionId ? `#PMB${transactionId}` : `#PMB${Math.random().toString(36).substr(2, 9).toUpperCase()}`}
           </div>
@@ -35,10 +37,10 @@ const PaymentSuccessMessage: React.FC<PaymentSuccessMessageProps> = ({ planName,
           className="w-full bg-gradient-to-r from-[#00B4D8] to-[#0077B6] hover:from-[#0096C7] hover:to-[#005577] text-white"
           onClick={handleContinueToDashboard}
         >
-          Continue to Dashboard
+          {t('payment.success.continueToDashboard')}
         </Button>
         <p className="text-xs text-gray-500 mt-4">
-          A confirmation email has been sent to your registered email address.
+          {t('payment.success.confirmationEmail')}
         </p>
       </div>
     </div>

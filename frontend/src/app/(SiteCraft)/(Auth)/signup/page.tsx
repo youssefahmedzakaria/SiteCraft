@@ -3,10 +3,13 @@
 import { SignupForm } from "@/components/SiteCraft/auth/Signup/Signup-form";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslation } from "@/contexts/translation-context";
 
 export default function SignupPage() {
+  const { t, isRTL } = useTranslation();
+
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container px-4 py-8 flex flex-col md:flex-row items-center justify-between max-w-6xl">
         {/* Left Side - Branding */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0">
@@ -30,13 +33,10 @@ export default function SignupPage() {
             />
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 text-center md:text-left">
-            Your brand, Your store,
-            <br />
-            Your way.
+            {t('auth.branding.title')}
           </h1>
           <p className="text-muted-foreground text-center md:text-left max-w-md text-lg">
-            Create stunning websites and grow your online presence with our
-            intuitive platform designed for Egyptian businesses.
+            {t('auth.branding.subtitle')}
           </p>
           <div className="mt-4 md:mt-8 flex justify-center md:justify-start w-full">
             <Image
