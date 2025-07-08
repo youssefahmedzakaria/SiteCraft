@@ -14,9 +14,9 @@ export interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({ brandName, logo, textColor }) => {
   return (
-    <div className="flex items-center space-x-3 min-h-0 min-w-0">
+    <div className="flex items-center space-x-3 min-h-0 min-w-0 overflow-hidden">
       {logo && (
-        <div className="h-12 md:h-16 max-h-full max-w-full flex-shrink-0 flex items-center" style={{height: '100%'}}>
+        <div className="h-12 md:h-16 max-h-full max-w-full flex-shrink-0 flex items-center">
           <Image
             src={logo.src || "/placeholder.png"}
             alt={logo.alt}
