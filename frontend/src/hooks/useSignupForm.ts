@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "./useAuth";
 import { useRouter } from "next/navigation";
 import { siteCraftCache } from "@/lib/cache";
+import { checkEmail } from "@/lib/auth";
 
 export const useSignupForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export const useSignupForm = () => {
     gender: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailAvailabilityError, setEmailAvailabilityError] = useState<string>("");
   const { signupError, isLoading, clearError } = useAuth();
   const router = useRouter();
 
@@ -49,12 +51,17 @@ export const useSignupForm = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+    // Clear email availability error when email field changes
+    if (field === 'email' && emailAvailabilityError) {
+      setEmailAvailabilityError("");
+    }
   };
 
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     console.log("📝 Form submitted with data:", formData);
     clearError();
+    setEmailAvailabilityError("");
     siteCraftCache.clearCache();
 
     if (!validateForm()) {
@@ -62,7 +69,19 @@ export const useSignupForm = () => {
       return;
     }
 
-    console.log("✅ Form validation passed, saving to cache...");
+    console.log("✅ Form validation passed, checking email availability...");
+    
+    try {
+      // Check email availability
+      await checkEmail(formData.email);
+      console.log("✅ Email is available");
+    } catch (error: any) {
+      console.log("❌ Email availability check failed:", error);
+      setEmailAvailabilityError(error.message || "User with this email already exists.");
+      return;
+    }
+
+    console.log("✅ Email availability check passed, saving to cache...");
     try {
       // Save user data to cache instead of registering immediately
       const userData = {
@@ -88,6 +107,7 @@ export const useSignupForm = () => {
     formData,
     handleInputChange,
     errors,
+    emailAvailabilityError,
     signupError,
     isLoading,
     onSubmit,

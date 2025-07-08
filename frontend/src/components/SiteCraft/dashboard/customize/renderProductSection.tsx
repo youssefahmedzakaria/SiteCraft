@@ -65,16 +65,25 @@ export function RenderProductSection({
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = ["Grid", "FeaturedGrid", "HorizontalScroll"];
     const templateName = templateNames[layoutId - 1] || "Grid";
-    updateProductAttributes({ template: templateName });
+    updateProductAttributes({
+      template: templateName as "Grid" | "FeaturedGrid" | "HorizontalScroll",
+    });
     updateProductAttributes({ cardVariant: "default" });
   };
 
   // Auto-switch to Grid if Featured Grid is selected but less than 3 products
   React.useEffect(() => {
-    if (productAttributes.template === "FeaturedGrid" && (productAttributes.products?.length || 0) < 3) {
+    if (
+      productAttributes.template === "FeaturedGrid" &&
+      (productAttributes.products?.length || 0) < 3
+    ) {
       updateProductAttributes({ template: "Grid" });
     }
-  }, [productAttributes.products?.length, productAttributes.template, updateProductAttributes]);
+  }, [
+    productAttributes.products?.length,
+    productAttributes.template,
+    updateProductAttributes,
+  ]);
 
   return (
     <div className="flex flex-col h-full w-full min-h-0">

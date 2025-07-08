@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/SiteCraft/ui/button";
 import { ContactLayoutItems } from "./contactLayoutItems";
 import { ContactCustomizationAttributes } from "@/lib/customization";
+import { compressImage } from "@/lib/imageCompression";
 
 // design sections
 type DesignSectionName = "background" | "title" | "content";
@@ -49,11 +50,20 @@ export function RenderContactSection({
   }
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setContactImage(file);
-      updateContactAttributes({ image: URL.createObjectURL(file) });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setContactImage(compressedFile);
+        updateContactAttributes({ image: URL.createObjectURL(compressedFile) });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setContactImage(file);
+        updateContactAttributes({ image: URL.createObjectURL(file) });
+      }
     }
   };
 
@@ -65,12 +75,21 @@ export function RenderContactSection({
     e.preventDefault();
   };
 
-  const handleDropImage = (e: React.DragEvent) => {
+  const handleDropImage = async (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setContactImage(file);
-      updateContactAttributes({ image: URL.createObjectURL(file) });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setContactImage(compressedFile);
+        updateContactAttributes({ image: URL.createObjectURL(compressedFile) });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setContactImage(file);
+        updateContactAttributes({ image: URL.createObjectURL(file) });
+      }
     }
   };
 
@@ -84,7 +103,14 @@ export function RenderContactSection({
       "CenteredContact",
     ];
     const templateName = templateNames[layoutId - 1] || "RightAlignedContact";
-    updateContactAttributes({ template: templateName });
+    updateContactAttributes({
+      template: templateName as
+        | "RightAlignedContact"
+        | "LeftAlignedContact"
+        | "MinimalLeftContact"
+        | "MinimalRightContact"
+        | "CenteredContact",
+    });
   };
 
   {

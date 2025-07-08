@@ -521,3 +521,38 @@ export async function commitCachedRegistration(cachedData: {
     throw error;
   }
 }
+
+export async function checkEmail(email: string) {
+  console.log("📧 Checking email availability for:", email);
+
+  const res = await fetch("http://localhost:8080/auth/checkEmail", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+
+  console.log("📡 Check email response status:", res.status);
+  console.log("📡 Check email response ok:", res.ok);
+
+  if (!res.ok) {
+    let msg = "Email check failed";
+    try {
+      const data = await res.json();
+      msg = data.message || data || msg;
+      console.log("❌ Check email error response:", data);
+    } catch {
+      try {
+        msg = (await res.text()) || msg;
+        console.log("❌ Check email error text:", msg);
+      } catch {
+        console.log("❌ Check email failed with unknown error");
+      }
+    }
+    throw msg;
+  }
+
+  const data = await res.json();
+  console.log("✅ Email check successful! Response data:", data);
+  return data;
+}

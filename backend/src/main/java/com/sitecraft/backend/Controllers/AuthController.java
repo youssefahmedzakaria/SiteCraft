@@ -234,6 +234,26 @@ public class AuthController {
         System.out.println("✅ Session attributes set - userId: " + in.get("userId") + ", storeId: " + in.get("storeId") + ", role: " + in.get("role"));
     }
 
+    @PostMapping("/checkEmail")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> body) {
+        try {
+            if (userService.isAnyUserExists(body.get("email"))) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("User with this email already exists.");
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Continue to store creation"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Failed to fetch orders: " + e.getMessage()
+            ));
+        }
+    }
+
     @PostMapping("/commitRegistration")
     public ResponseEntity commitRegistration(@RequestParam("registrationData") String registrationDataJson,
                                           @RequestParam(value = "logo") MultipartFile logo,

@@ -65,16 +65,25 @@ export function RenderCategorySection({
   const handleLayoutSelection = (layoutId: number) => {
     const templateNames = ["Grid", "FeaturedGrid", "HorizontalScroll"];
     const templateName = templateNames[layoutId - 1] || "Grid";
-    updateCategoryAttributes({ template: templateName });
+    updateCategoryAttributes({
+      template: templateName as "Grid" | "FeaturedGrid" | "HorizontalScroll",
+    });
     updateCategoryAttributes({ cardVariant: "default" });
   };
 
   // Auto-switch to Grid if Featured Grid is selected but less than 3 categories
   React.useEffect(() => {
-    if (categoryAttributes.template === "FeaturedGrid" && (categoryAttributes.categories?.length || 0) < 3) {
+    if (
+      categoryAttributes.template === "FeaturedGrid" &&
+      (categoryAttributes.categories?.length || 0) < 3
+    ) {
       updateCategoryAttributes({ template: "Grid" });
     }
-  }, [categoryAttributes.categories?.length, categoryAttributes.template, updateCategoryAttributes]);
+  }, [
+    categoryAttributes.categories?.length,
+    categoryAttributes.template,
+    updateCategoryAttributes,
+  ]);
 
   return (
     <div className="flex flex-col h-full w-full min-h-0">

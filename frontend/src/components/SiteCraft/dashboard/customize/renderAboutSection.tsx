@@ -22,6 +22,7 @@ import {
 } from "@/components/SiteCraft/ui/dropdown-menu";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { AboutCustomizationAttributes } from "@/lib/customization";
+import { compressImage } from "@/lib/imageCompression";
 
 type DesignSectionName = "image" | "title" | "description" | "background";
 
@@ -85,7 +86,13 @@ export function RenderAboutSection({
       "LeftAlignedAbout",
     ];
     const templateName = templateNames[layoutId - 1] || "TopImageAbout";
-    updateAboutAttributes({ template: templateName });
+    updateAboutAttributes({
+      template: templateName as
+        | "TopImageAbout"
+        | "CenteredAbout"
+        | "RightAlignedAbout"
+        | "LeftAlignedAbout",
+    });
   };
 
   {
@@ -93,11 +100,20 @@ export function RenderAboutSection({
   }
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setAboutImage(file);
-      updateAboutAttributes({ image: URL.createObjectURL(file) });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setAboutImage(compressedFile);
+        updateAboutAttributes({ image: URL.createObjectURL(compressedFile) });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setAboutImage(file);
+        updateAboutAttributes({ image: URL.createObjectURL(file) });
+      }
     }
   };
 
@@ -109,12 +125,21 @@ export function RenderAboutSection({
     e.preventDefault();
   };
 
-  const handleDropImage = (e: React.DragEvent) => {
+  const handleDropImage = async (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setAboutImage(file);
-      updateAboutAttributes({ image: URL.createObjectURL(file) });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setAboutImage(compressedFile);
+        updateAboutAttributes({ image: URL.createObjectURL(compressedFile) });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setAboutImage(file);
+        updateAboutAttributes({ image: URL.createObjectURL(file) });
+      }
     }
   };
 
@@ -380,7 +405,8 @@ export function RenderAboutSection({
                   <input
                     type="color"
                     value={
-                      aboutAttributes.titleColor && aboutAttributes.titleColor.includes("-[")
+                      aboutAttributes.titleColor &&
+                      aboutAttributes.titleColor.includes("-[")
                         ? aboutAttributes.titleColor.split("-[")[1].slice(0, -1)
                         : "#000000"
                     }
@@ -394,7 +420,8 @@ export function RenderAboutSection({
                   <input
                     type="text"
                     value={
-                      aboutAttributes.titleColor && aboutAttributes.titleColor.includes("-[")
+                      aboutAttributes.titleColor &&
+                      aboutAttributes.titleColor.includes("-[")
                         ? aboutAttributes.titleColor.split("-[")[1].slice(0, -1)
                         : "#000000"
                     }
@@ -583,8 +610,7 @@ export function RenderAboutSection({
                             ? "Inter"
                             : aboutAttributes.sectionFont === "font-roboto"
                             ? "Roboto"
-                            : aboutAttributes.sectionFont ===
-                              "font-open-sans"
+                            : aboutAttributes.sectionFont === "font-open-sans"
                             ? "Open Sans"
                             : aboutAttributes.sectionFont === "font-poppins"
                             ? "Poppins"
@@ -647,8 +673,11 @@ export function RenderAboutSection({
                   <input
                     type="color"
                     value={
-                      aboutAttributes.sectionColor && aboutAttributes.sectionColor.includes("-[")
-                        ? aboutAttributes.sectionColor.split("-[")[1].slice(0, -1)
+                      aboutAttributes.sectionColor &&
+                      aboutAttributes.sectionColor.includes("-[")
+                        ? aboutAttributes.sectionColor
+                            .split("-[")[1]
+                            .slice(0, -1)
                         : "#000000"
                     }
                     className="w-8 h-8 cursor-pointer bg-transparent"
@@ -661,8 +690,11 @@ export function RenderAboutSection({
                   <input
                     type="text"
                     value={
-                      aboutAttributes.sectionColor && aboutAttributes.sectionColor.includes("-[")
-                        ? aboutAttributes.sectionColor.split("-[")[1].slice(0, -1)
+                      aboutAttributes.sectionColor &&
+                      aboutAttributes.sectionColor.includes("-[")
+                        ? aboutAttributes.sectionColor
+                            .split("-[")[1]
+                            .slice(0, -1)
                         : "#000000"
                     }
                     className="flex-1 border-none bg-transparent focus:outline-none"
@@ -781,8 +813,11 @@ export function RenderAboutSection({
                   <input
                     type="color"
                     value={
-                      aboutAttributes.backgroundColor && aboutAttributes.backgroundColor.includes("-[")
-                        ? aboutAttributes.backgroundColor.split("-[")[1].slice(0, -1)
+                      aboutAttributes.backgroundColor &&
+                      aboutAttributes.backgroundColor.includes("-[")
+                        ? aboutAttributes.backgroundColor
+                            .split("-[")[1]
+                            .slice(0, -1)
                         : "#000000"
                     }
                     className="w-8 h-8 cursor-pointer bg-transparent"
@@ -795,8 +830,11 @@ export function RenderAboutSection({
                   <input
                     type="text"
                     value={
-                      aboutAttributes.backgroundColor && aboutAttributes.backgroundColor.includes("-[")
-                        ? aboutAttributes.backgroundColor.split("-[")[1].slice(0, -1)
+                      aboutAttributes.backgroundColor &&
+                      aboutAttributes.backgroundColor.includes("-[")
+                        ? aboutAttributes.backgroundColor
+                            .split("-[")[1]
+                            .slice(0, -1)
                         : "#000000"
                     }
                     className="flex-1 border-none bg-transparent focus:outline-none"

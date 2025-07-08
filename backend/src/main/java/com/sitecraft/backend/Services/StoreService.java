@@ -65,7 +65,7 @@ public class StoreService {
             System.out.println("✅ Store status set to inactive");
 
             // Generate subdomain before saving
-            String subdomain = generateSubdomain(store.getStoreName(), null);
+            String subdomain = generateSubdomain(store.getStoreName(), userId);
             store.setSubdomain(subdomain);
             
             // Save the store with all data including colors

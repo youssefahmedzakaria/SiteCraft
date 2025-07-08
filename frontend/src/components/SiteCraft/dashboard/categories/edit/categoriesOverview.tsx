@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Upload } from "lucide-react";
+import { compressImage } from "@/lib/imageCompression";
 // import { Category } from "@/lib/categories";
 
 const BACKEND_BASE_URL = "http://localhost:8080"; // Change if your backend runs elsewhere
@@ -42,34 +43,50 @@ export default function CategorysOverview({
   setImageFile,
   imagePreview,
   setImagePreview,
-  existingImageUrl
+  existingImageUrl,
 }: CategorysOverviewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isClient, setIsClient] = useState(false);
-  useEffect(() => { setIsClient(true); }, []);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleImageChange triggered'); // Debug log
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleImageChange triggered"); // Debug log
     const file = e.target.files?.[0] || null;
     if (file) {
-      console.log('File selected:', file.name, file.size); // Debug log
-      setImageFile?.(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview?.(reader.result as string);
-        console.log('Image preview set'); // Debug log
-      };
-      reader.readAsDataURL(file);
+      console.log("File selected:", file.name, file.size); // Debug log
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setImageFile?.(compressedFile);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview?.(reader.result as string);
+          console.log("Image preview set"); // Debug log
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setImageFile?.(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview?.(reader.result as string);
+          console.log("Image preview set"); // Debug log
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
   const handleBrowseClick = () => {
-    console.log('Browse clicked'); // Debug log
-    console.log('File input ref:', fileInputRef.current); // Debug log
+    console.log("Browse clicked"); // Debug log
+    console.log("File input ref:", fileInputRef.current); // Debug log
     if (fileInputRef.current) {
       fileInputRef.current.click();
     } else {
-      console.error('File input ref is null');
+      console.error("File input ref is null");
     }
   };
 
@@ -77,16 +94,29 @@ export default function CategorysOverview({
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      setImageFile?.(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview?.(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+        setImageFile?.(compressedFile);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview?.(reader.result as string);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        setImageFile?.(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview?.(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -96,12 +126,12 @@ export default function CategorysOverview({
   };
 
   const handleChangeImage = () => {
-    console.log('Change Image button clicked'); // Debug log
-    console.log('File input ref:', fileInputRef.current); // Debug log
+    console.log("Change Image button clicked"); // Debug log
+    console.log("File input ref:", fileInputRef.current); // Debug log
     if (fileInputRef.current) {
       fileInputRef.current.click();
     } else {
-      console.error('File input ref is null');
+      console.error("File input ref is null");
     }
   };
 
@@ -109,13 +139,15 @@ export default function CategorysOverview({
     setCategoryName?.(e.target.value);
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setCategoryDescription?.(e.target.value);
   };
 
   // Determine which image to show
   const displayImage = imagePreview || getFullImageUrl(existingImageUrl);
-  const displayImageName = imageFile?.name || 'Current image';
+  const displayImageName = imageFile?.name || "Current image";
 
   return (
     <>

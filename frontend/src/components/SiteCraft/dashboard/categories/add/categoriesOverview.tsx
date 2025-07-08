@@ -4,6 +4,7 @@ import React, { useState, useRef, forwardRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/SiteCraft/ui/button";
 import { Upload } from "lucide-react";
+import { compressImage } from "@/lib/imageCompression";
 
 interface CategorysOverviewProps {
   nameRef?: React.RefObject<HTMLInputElement | null>;
@@ -20,30 +21,48 @@ interface CategorysOverviewProps {
 }
 
 const CategorysOverview = forwardRef<HTMLDivElement, CategorysOverviewProps>(
-  ({ 
-    nameRef, 
-    descriptionRef, 
-    imageRef, 
-    imageFile, 
-    setImageFile, 
-    imagePreview, 
-    setImagePreview,
-    categoryName,
-    setCategoryName,
-    categoryDescription,
-    setCategoryDescription
-  }, ref) => {
+  (
+    {
+      nameRef,
+      descriptionRef,
+      imageRef,
+      imageFile,
+      setImageFile,
+      imagePreview,
+      setImagePreview,
+      categoryName,
+      setCategoryName,
+      categoryDescription,
+      setCategoryDescription,
+    },
+    ref
+  ) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (
+      e: React.ChangeEvent<HTMLInputElement>
+    ) => {
       const file = e.target.files?.[0] || null;
       if (file) {
-        setImageFile?.(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview?.(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        try {
+          // Compress the image
+          const compressedFile = await compressImage(file);
+          setImageFile?.(compressedFile);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreview?.(reader.result as string);
+          };
+          reader.readAsDataURL(compressedFile);
+        } catch (error) {
+          console.error("Failed to compress image:", error);
+          // Fallback to original file if compression fails
+          setImageFile?.(file);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreview?.(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        }
       }
     };
 
@@ -56,16 +75,29 @@ const CategorysOverview = forwardRef<HTMLDivElement, CategorysOverviewProps>(
       e.preventDefault();
     };
 
-    const handleDrop = (e: React.DragEvent) => {
+    const handleDrop = async (e: React.DragEvent) => {
       e.preventDefault();
       const file = e.dataTransfer.files?.[0] || null;
       if (file) {
-        setImageFile?.(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview?.(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        try {
+          // Compress the image
+          const compressedFile = await compressImage(file);
+          setImageFile?.(compressedFile);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreview?.(reader.result as string);
+          };
+          reader.readAsDataURL(compressedFile);
+        } catch (error) {
+          console.error("Failed to compress image:", error);
+          // Fallback to original file if compression fails
+          setImageFile?.(file);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreview?.(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        }
       }
     };
 
@@ -78,12 +110,14 @@ const CategorysOverview = forwardRef<HTMLDivElement, CategorysOverviewProps>(
       setCategoryName?.(e.target.value);
     };
 
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleDescriptionChange = (
+      e: React.ChangeEvent<HTMLTextAreaElement>
+    ) => {
       setCategoryDescription?.(e.target.value);
     };
 
     return (
-      <div ref={ref}>
+      <div ref={ref} className="space-y-4">
         {/* Category Name */}
         <div className="space-y-2">
           <label
@@ -185,8 +219,8 @@ const CategorysOverview = forwardRef<HTMLDivElement, CategorysOverviewProps>(
             onChange={handleDescriptionChange}
           />
           <p className="text-xs text-gray-400">
-            A brief description of this category to help customers understand what
-            products to expect.
+            A brief description of this category to help customers understand
+            what products to expect.
           </p>
         </div>
       </div>

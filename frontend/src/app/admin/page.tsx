@@ -251,7 +251,7 @@ export default function AdminDashboard() {
   if (user.role !== 'admin') return <div>Not an admin. Your role: {user.role}</div>;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 mt-12">
       <main className="flex-1 p-4 md:p-6 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
         {/* Header section with title and subtitle */}
         <div className="mb-6 space-y-2 flex flex-col md:flex-row md:items-center md:justify-between">

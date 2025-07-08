@@ -89,8 +89,8 @@ export function CustomVariationSection({
     >
       <div className="flex items-center justify-between group">
         <div className="flex items-center gap-2">
-          <span className="cursor-move text-gray-400">
-            <GripVertical size={20} />
+          <span className="text-white">
+            <GripVertical size={16} />
           </span>
           <Input
             value={name}
@@ -108,12 +108,14 @@ export function CustomVariationSection({
             </button>
           )}
         </div>
-        <button
-          onClick={onDelete}
-          className="text-logo-txt hover:text-logo-txt-hover"
-        >
-          <X size={20} />
-        </button>
+        {index !== 0 && (
+          <button
+            onClick={onDelete}
+            className="text-logo-txt hover:text-logo-txt-hover"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       <div className="px-3 space-y-2">
