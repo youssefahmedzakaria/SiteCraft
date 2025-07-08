@@ -99,7 +99,13 @@ export function RenderPoliciesSection({
     ];
     const templateName =
       templateNames[layoutId - 1] || "TitleLeftContentCenterPolicies";
-    updatePoliciesAttributes({ template: templateName });
+    updatePoliciesAttributes({
+      template: templateName as
+        | "DefaultPolicies"
+        | "CenteredPolicies"
+        | "LeftPolicies"
+        | "TitleLeftContentCenterPolicies",
+    });
   };
 
   const handleTitleChange = (newTitle: string) => {
@@ -107,24 +113,27 @@ export function RenderPoliciesSection({
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full w-full min-h-0">
       {detailedSectionTab === "content" ? (
-        <div className="p-4 space-y-6">
+        <div className="flex flex-col flex-1 min-h-0 p-4">
           {/* Title */}
-          <div className="space-y-3">
-            <h1 className="text-lg font-semibold tracking-tight">Title</h1>
-            <Input
-              value={policiesAttributes.title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Enter section title"
-            />
+          <div className="space-y-8 flex-1 min-h-0 overflow-y-auto">
+            <div className="space-y-1">
+              <h1 className="text-lg font-semibold tracking-tight">Title</h1>
+              <Input
+                value={policiesAttributes.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Enter section title"
+              />
+            </div>
           </div>
-          <div className="pt-8 flex justify-end">
+          <div className="pt-8 flex justify-start">
             {onDeleteSection && (
               <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                className="flex justify-start items-center w-full gap-2 px-4 py-2 text-[#FF0000] border-t border-t-[#FF0000] hover:bg-red-100 transition"
                 onClick={onDeleteSection}
               >
+                <Trash2 size={16} />
                 Delete Section
               </button>
             )}

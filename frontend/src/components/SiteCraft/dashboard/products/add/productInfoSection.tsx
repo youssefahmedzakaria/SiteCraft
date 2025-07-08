@@ -7,6 +7,7 @@ import { CardTitle } from "@/components/SiteCraft/ui/card";
 import Image from "next/image";
 import { ChevronDown, ChevronUp, Upload } from "lucide-react";
 import { deleteProductImage, getCategories } from "@/lib/products";
+import { compressImages } from "@/lib/imageCompression";
 
 interface BasicFormData {
   name: string;
@@ -76,27 +77,45 @@ export function ProductInfoSection({
   };
 
   // Image addition & preview
-  const addImageFiles = (files: File[]) => {
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-    updateImageFiles([...imageFiles, ...files]);
+  const addImageFiles = async (files: File[]) => {
+    try {
+      // Compress all images
+      const compressedFiles = await compressImages(files);
+
+      // Create previews for compressed files
+      compressedFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      updateImageFiles([...imageFiles, ...compressedFiles]);
+    } catch (error) {
+      console.error("Failed to compress images:", error);
+      // Fallback to original files if compression fails
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+      updateImageFiles([...imageFiles, ...files]);
+    }
   };
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length) {
-      addImageFiles(Array.from(e.target.files));
+      await addImageFiles(Array.from(e.target.files));
     }
   };
   const handleBrowseClick = () => fileInputRef.current?.click();
   const handleDragOver = (e: React.DragEvent) => e.preventDefault();
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files.length) {
-      addImageFiles(Array.from(e.dataTransfer.files));
+      await addImageFiles(Array.from(e.dataTransfer.files));
     }
   };
 
@@ -263,7 +282,7 @@ export function ProductInfoSection({
                       }
                     }}
                   >
-                    ×
+                    ✕
                   </button>
                 )}
               </div>
@@ -297,22 +316,21 @@ export function ProductInfoSection({
                 </button>
               </div>
             ))}
-
+            
             {/* Add Image Button */}
-            {existingImages.length !== 0 ||
-              (imageFiles.length !== 0 && (
-                <div
-                  className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
-                  onClick={handleBrowseClick}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                >
-                  <div className="flex flex-col items-center">
-                    <span className="text-2xl text-gray-400">+</span>
-                    <span className="text-xs text-gray-500">Add</span>
-                  </div>
+            {(existingImages.length > 0 || imageFiles.length > 0) && (
+              <div
+                className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50"
+                onClick={handleBrowseClick}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl text-gray-400">+</span>
+                  <span className="text-xs text-gray-500">Add</span>
                 </div>
-              ))}
+              </div>
+            )}
           </div>
 
           {/* Drop Area when no images */}

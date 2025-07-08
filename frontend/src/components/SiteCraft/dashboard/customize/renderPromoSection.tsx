@@ -29,6 +29,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { PromoCustomizationAttributes } from "@/lib/customization";
+import { compressImage } from "@/lib/imageCompression";
 
 type SectionName = "image" | "title" | "description" | "button" | "arrows";
 
@@ -98,7 +99,16 @@ export function RenderPromoSection({
       "LeftAlignedPromo",
     ];
     const templateName = templateNames[layoutId - 1] || "CenteredPromo";
-    updatePromoAttributes({ template: templateName });
+    updatePromoAttributes({
+      template: templateName as
+        | "CenteredPromo"
+        | "OverlayPromo"
+        | "MinimalRightPromo"
+        | "MinimalLeftPromo"
+        | "SplitPromo"
+        | "RightAlignedPromo"
+        | "LeftAlignedPromo",
+    });
   };
 
   {
@@ -127,24 +137,42 @@ export function RenderPromoSection({
   }
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const handleImageChange = (
+  const handleImageChange = async (
     indexStr: string,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const index = parseInt(indexStr);
     const file = e.target.files?.[0] || null;
     if (file) {
-      // Update promoImages
-      const updatedPromoImages = promoImages ? [...promoImages] : [];
-      updatedPromoImages[index] = file;
-      setPromoImages(updatedPromoImages);
-      // Update preview
-      const updatedSlides = [...promoAttributes.slides];
-      updatedSlides[index] = {
-        ...updatedSlides[index],
-        image: URL.createObjectURL(file),
-      };
-      updatePromoAttributes({ slides: updatedSlides });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+
+        // Update promoImages with compressed file
+        const updatedPromoImages = promoImages ? [...promoImages] : [];
+        updatedPromoImages[index] = compressedFile;
+        setPromoImages(updatedPromoImages);
+
+        // Update preview
+        const updatedSlides = [...promoAttributes.slides];
+        updatedSlides[index] = {
+          ...updatedSlides[index],
+          image: URL.createObjectURL(compressedFile),
+        };
+        updatePromoAttributes({ slides: updatedSlides });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        const updatedPromoImages = promoImages ? [...promoImages] : [];
+        updatedPromoImages[index] = file;
+        setPromoImages(updatedPromoImages);
+        const updatedSlides = [...promoAttributes.slides];
+        updatedSlides[index] = {
+          ...updatedSlides[index],
+          image: URL.createObjectURL(file),
+        };
+        updatePromoAttributes({ slides: updatedSlides });
+      }
     }
   };
 
@@ -156,20 +184,37 @@ export function RenderPromoSection({
     e.preventDefault();
   };
 
-  const handleDropImage = (indexStr: string, e: React.DragEvent) => {
+  const handleDropImage = async (indexStr: string, e: React.DragEvent) => {
     e.preventDefault();
     const index = parseInt(indexStr);
     const file = e.dataTransfer.files?.[0] || null;
     if (file) {
-      const updatedPromoImages = promoImages ? [...promoImages] : [];
-      updatedPromoImages[index] = file;
-      setPromoImages(updatedPromoImages);
-      const updatedSlides = [...promoAttributes.slides];
-      updatedSlides[index] = {
-        ...updatedSlides[index],
-        image: URL.createObjectURL(file),
-      };
-      updatePromoAttributes({ slides: updatedSlides });
+      try {
+        // Compress the image
+        const compressedFile = await compressImage(file);
+
+        const updatedPromoImages = promoImages ? [...promoImages] : [];
+        updatedPromoImages[index] = compressedFile;
+        setPromoImages(updatedPromoImages);
+        const updatedSlides = [...promoAttributes.slides];
+        updatedSlides[index] = {
+          ...updatedSlides[index],
+          image: URL.createObjectURL(compressedFile),
+        };
+        updatePromoAttributes({ slides: updatedSlides });
+      } catch (error) {
+        console.error("Failed to compress image:", error);
+        // Fallback to original file if compression fails
+        const updatedPromoImages = promoImages ? [...promoImages] : [];
+        updatedPromoImages[index] = file;
+        setPromoImages(updatedPromoImages);
+        const updatedSlides = [...promoAttributes.slides];
+        updatedSlides[index] = {
+          ...updatedSlides[index],
+          image: URL.createObjectURL(file),
+        };
+        updatePromoAttributes({ slides: updatedSlides });
+      }
     }
   };
 

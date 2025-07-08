@@ -7,29 +7,37 @@ import { CardTitle } from "@/components/SiteCraft/ui/card";
 import { Input } from "@/components/SiteCraft/ui/input";
 import { Textarea } from "@/components/SiteCraft/ui/textarea";
 import { Button } from "@/components/SiteCraft/ui/button";
-import { Facebook, Instagram, Twitter, Youtube, Loader2, AlertCircle } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { Store } from "@/lib/store-info";
+import { compressImage } from "@/lib/imageCompression";
 
 export function StoreInformationSection() {
   const { store, loading, error, updating, updateStore } = useStoreSettings();
-  
+
   const [formData, setFormData] = useState<Partial<Store>>({
-    storeName: '',
-    description: '',
-    phoneNumber: '',
-    emailAddress: '',
-    address: '',
-    addressLink: '',
-    openingHours: '',
-    subdomain: '',
+    storeName: "",
+    description: "",
+    phoneNumber: "",
+    emailAddress: "",
+    address: "",
+    addressLink: "",
+    openingHours: "",
+    subdomain: "",
   });
 
   const [socialMedia, setSocialMedia] = useState({
-    facebook: '',
-    instagram: '',
-    twitter: '',
-    youtube: '',
+    facebook: "",
+    instagram: "",
+    twitter: "",
+    youtube: "",
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -40,14 +48,14 @@ export function StoreInformationSection() {
   useEffect(() => {
     if (store) {
       setFormData({
-        storeName: store.storeName || '',
-        description: store.description || '',
-        phoneNumber: store.phoneNumber || '',
-        emailAddress: store.emailAddress || '',
-        address: store.address || '',
-        addressLink: store.addressLink || '',
-        openingHours: store.openingHours || '',
-        subdomain: store.subdomain || '',
+        storeName: store.storeName || "",
+        description: store.description || "",
+        phoneNumber: store.phoneNumber || "",
+        emailAddress: store.emailAddress || "",
+        address: store.address || "",
+        addressLink: store.addressLink || "",
+        openingHours: store.openingHours || "",
+        subdomain: store.subdomain || "",
       });
 
       // Set logo preview if exists
@@ -58,21 +66,30 @@ export function StoreInformationSection() {
       // Set social media data
       if (store.socialMediaAccounts) {
         const socialData = {
-          facebook: '',
-          instagram: '',
-          twitter: '',
-          youtube: '',
+          facebook: "",
+          instagram: "",
+          twitter: "",
+          youtube: "",
         };
 
-        store.socialMediaAccounts.forEach(account => {
-          if (account.platform.toLowerCase() === 'facebook') {
-            socialData.facebook = account.url.replace('https://facebook.com/', '');
-          } else if (account.platform.toLowerCase() === 'instagram') {
-            socialData.instagram = account.url.replace('https://instagram.com/', '');
-          } else if (account.platform.toLowerCase() === 'twitter') {
-            socialData.twitter = account.url.replace('https://x.com/', '');
-          } else if (account.platform.toLowerCase() === 'youtube') {
-            socialData.youtube = account.url.replace('https://youtube.com/', '');
+        store.socialMediaAccounts.forEach((account) => {
+          if (account.platform.toLowerCase() === "facebook") {
+            socialData.facebook = account.url.replace(
+              "https://facebook.com/",
+              ""
+            );
+          } else if (account.platform.toLowerCase() === "instagram") {
+            socialData.instagram = account.url.replace(
+              "https://instagram.com/",
+              ""
+            );
+          } else if (account.platform.toLowerCase() === "twitter") {
+            socialData.twitter = account.url.replace("https://x.com/", "");
+          } else if (account.platform.toLowerCase() === "youtube") {
+            socialData.youtube = account.url.replace(
+              "https://youtube.com/",
+              ""
+            );
           }
         });
 
@@ -82,9 +99,9 @@ export function StoreInformationSection() {
   }, [store]);
 
   const handleInputChange = (field: keyof Store, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // Clear errors when user starts typing
     if (submitError) {
@@ -93,83 +110,106 @@ export function StoreInformationSection() {
   };
 
   const handleSocialMediaChange = (platform: string, value: string) => {
-    setSocialMedia(prev => ({
+    setSocialMedia((prev) => ({
       ...prev,
-      [platform]: value
+      [platform]: value,
     }));
   };
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
-      setLogoFile(file);
-      // Clear errors when a new logo is selected
-      if (submitError) {
-        setSubmitError(null);
+      try {
+        // Compress the logo image
+        const compressedFile = await compressImage(file);
+        setLogoFile(compressedFile);
+        // Clear errors when a new logo is selected
+        if (submitError) {
+          setSubmitError(null);
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setLogoPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Failed to compress logo:", error);
+        // Fallback to original file if compression fails
+        setLogoFile(file);
+        if (submitError) {
+          setSubmitError(null);
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setLogoPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setLogoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     // Clear any existing submit errors
     setSubmitError(null);
-    
+
     try {
       // Prepare social media accounts
       const socialMediaAccounts = [];
       if (socialMedia.facebook) {
         socialMediaAccounts.push({
-          platform: 'Facebook',
-          url: `https://facebook.com/${socialMedia.facebook}`
+          platform: "Facebook",
+          url: `https://facebook.com/${socialMedia.facebook}`,
         });
       }
       if (socialMedia.instagram) {
         socialMediaAccounts.push({
-          platform: 'Instagram',
-          url: `https://instagram.com/${socialMedia.instagram}`
+          platform: "Instagram",
+          url: `https://instagram.com/${socialMedia.instagram}`,
         });
       }
       if (socialMedia.twitter) {
         socialMediaAccounts.push({
-          platform: 'Twitter',
-          url: `https://x.com/${socialMedia.twitter}`
+          platform: "Twitter",
+          url: `https://x.com/${socialMedia.twitter}`,
         });
       }
       if (socialMedia.youtube) {
         socialMediaAccounts.push({
-          platform: 'YouTube',
-          url: `https://youtube.com/${socialMedia.youtube}`
+          platform: "YouTube",
+          url: `https://youtube.com/${socialMedia.youtube}`,
         });
       }
 
       const updateData = {
         ...formData,
-        socialMediaAccounts
+        socialMediaAccounts,
       };
 
       await updateStore(updateData, logoFile || undefined);
-      
+
       // Show success message (you can add a toast notification here)
-      console.log('✅ Store information updated successfully!');
+      console.log("✅ Store information updated successfully!");
     } catch (error) {
-      console.error('❌ Failed to update store information:', error);
-      
+      console.error("❌ Failed to update store information:", error);
+
       // Handle specific error types
       if (error instanceof Error) {
-        if (error.message.includes('File size too large') || error.message.includes('image is too large')) {
-          setSubmitError('The logo image you uploaded is too large. Please choose a smaller image (under 5MB) and try again.');
+        if (
+          error.message.includes("File size too large") ||
+          error.message.includes("image is too large")
+        ) {
+          setSubmitError(
+            "The logo image you uploaded is too large. Please choose a smaller image (under 5MB) and try again."
+          );
         } else {
           setSubmitError(error.message);
         }
       } else {
-        setSubmitError('An unexpected error occurred. Please try again.');
+        setSubmitError("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -204,7 +244,7 @@ export function StoreInformationSection() {
           </div>
         </div>
       )}
-      
+
       {/* Store Information */}
       <div>
         <CardTitle className="font-bold text-2xl mb-6">
@@ -224,7 +264,7 @@ export function StoreInformationSection() {
               required
               placeholder="Your Store Name"
               value={formData.storeName}
-              onChange={(e) => handleInputChange('storeName', e.target.value)}
+              onChange={(e) => handleInputChange("storeName", e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               This will be displayed on your storefront and receipts
@@ -249,7 +289,7 @@ export function StoreInformationSection() {
                 className="rounded-l-none"
                 placeholder="yourstore.example.com"
                 value={formData.subdomain}
-                onChange={(e) => handleInputChange('subdomain', e.target.value)}
+                onChange={(e) => handleInputChange("subdomain", e.target.value)}
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">
@@ -271,7 +311,7 @@ export function StoreInformationSection() {
               rows={4}
               className="w-full"
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               A short description that appears in search results (150 characters
@@ -325,7 +365,7 @@ export function StoreInformationSection() {
               required
               placeholder="Your Phone Number"
               value={formData.phoneNumber}
-              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
             />
             <p className="text-xs text-gray-400 mt-1">
               This number will be visible on your storefront and can help
@@ -345,7 +385,9 @@ export function StoreInformationSection() {
               required
               placeholder="youremail@example.com"
               value={formData.emailAddress}
-              onChange={(e) => handleInputChange('emailAddress', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("emailAddress", e.target.value)
+              }
             />
             <p className="text-xs text-gray-400 mt-1">
               This email will be visible on your storefront and can help
@@ -365,7 +407,7 @@ export function StoreInformationSection() {
               name="address"
               placeholder="Your Store Address"
               value={formData.address}
-              onChange={(e) => handleInputChange('address', e.target.value)}
+              onChange={(e) => handleInputChange("address", e.target.value)}
             />
           </div>
 
@@ -381,7 +423,7 @@ export function StoreInformationSection() {
               name="addressLink"
               placeholder="https://maps.google.com/..."
               value={formData.addressLink}
-              onChange={(e) => handleInputChange('addressLink', e.target.value)}
+              onChange={(e) => handleInputChange("addressLink", e.target.value)}
             />
           </div>
 
@@ -397,7 +439,9 @@ export function StoreInformationSection() {
               name="openingHours"
               placeholder="Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"
               value={formData.openingHours}
-              onChange={(e) => handleInputChange('openingHours', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("openingHours", e.target.value)
+              }
             />
           </div>
         </div>
@@ -431,7 +475,9 @@ export function StoreInformationSection() {
                 placeholder="yourstorepage"
                 className="rounded-l-none"
                 value={socialMedia.facebook}
-                onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
+                onChange={(e) =>
+                  handleSocialMediaChange("facebook", e.target.value)
+                }
               />
             </div>
           </div>
@@ -454,7 +500,9 @@ export function StoreInformationSection() {
                 placeholder="yourstorehandle"
                 className="rounded-l-none"
                 value={socialMedia.instagram}
-                onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
+                onChange={(e) =>
+                  handleSocialMediaChange("instagram", e.target.value)
+                }
               />
             </div>
           </div>
@@ -477,7 +525,9 @@ export function StoreInformationSection() {
                 placeholder="yourstorehandle"
                 className="rounded-l-none"
                 value={socialMedia.twitter}
-                onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
+                onChange={(e) =>
+                  handleSocialMediaChange("twitter", e.target.value)
+                }
               />
             </div>
           </div>
@@ -500,7 +550,9 @@ export function StoreInformationSection() {
                 placeholder="yourchannel"
                 className="rounded-l-none"
                 value={socialMedia.youtube}
-                onChange={(e) => handleSocialMediaChange('youtube', e.target.value)}
+                onChange={(e) =>
+                  handleSocialMediaChange("youtube", e.target.value)
+                }
               />
             </div>
           </div>
@@ -520,7 +572,7 @@ export function StoreInformationSection() {
               Saving...
             </>
           ) : (
-            'Save Changes'
+            "Save Changes"
           )}
         </Button>
         <Link href="/dashboard/account-settings">
