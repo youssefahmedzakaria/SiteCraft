@@ -25,6 +25,7 @@ import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { getSession } from "@/lib/e-commerce/ecommerceAuth";
+import SimulatedPaymobIframe from "@/components/SiteCraft/pricing/SimulatedPaymobIframe";
 
 interface Address {
   id: string;
@@ -107,6 +108,7 @@ export default function CheckoutPage() {
 
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [showPaymentFrame, setShowPaymentFrame] = useState(false);
 
   const subtotal = state.items.reduce((sum, item) => {
     const itemPrice =
@@ -134,6 +136,7 @@ export default function CheckoutPage() {
 
   // Removed handlePaymentSuccess function
 
+  // Modified handleCreateOrder to be called only after payment confirmation
   const handleCreateOrder = async () => {
     if (!selectedAddressId) {
       setOrderError("Please select a shipping address");
@@ -491,7 +494,7 @@ export default function CheckoutPage() {
         <div className="max-w-2xl pt-16 mx-auto text-center">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ backgroundColor: initialColors.accent }}
+            style={{ backgroundColor: initialColors.foreground }}
           >
             <Check
               className="w-8 h-8"
@@ -1117,7 +1120,6 @@ export default function CheckoutPage() {
                 value={formData.paymentMethod}
                 onValueChange={(value: string | boolean) => {
                   handleInputChange("paymentMethod", value);
-                  // Removed Paymob wallet selection and mobile number handling
                 }}
               >
                 <div
@@ -1171,10 +1173,9 @@ export default function CheckoutPage() {
                 {/* Proceed to Payment button logic */}
                 {(formData.paymentMethod === "card" ||
                   formData.paymentMethod === "valu" ||
-                  formData.paymentMethod === "ewallet" ||
-                  formData.paymentMethod === "cod") && (
+                  formData.paymentMethod === "ewallet") && (
                   <Button
-                    onClick={handleCreateOrder}
+                    onClick={() => setShowPaymentFrame(true)}
                     className="flex-1"
                     size="lg"
                     style={{
@@ -1186,11 +1187,48 @@ export default function CheckoutPage() {
                     Proceed to Payment
                   </Button>
                 )}
+                {formData.paymentMethod === "cod" && (
+                  <Button
+                    onClick={handleCreateOrder}
+                    className="flex-1"
+                    size="lg"
+                    style={{
+                      backgroundColor: initialColors.secondary,
+                      color: initialColors.foreground,
+                    }}
+                    disabled={orderLoading}
+                  >
+                    Place Order
+                  </Button>
+                )}
               </div>
               {/* Error Display */}
               {orderError && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-600 text-sm">{orderError}</p>
+                </div>
+              )}
+              {/* Payment Frame Modal */}
+              {showPaymentFrame && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                  <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden relative max-w-lg w-full">
+                    <SimulatedPaymobIframe
+                      planName={"Order Payment"}
+                      planPrice={total}
+                      onSuccess={() => {
+                        setShowPaymentFrame(false);
+                        handleCreateOrder();
+                      }}
+                      onCancel={() => setShowPaymentFrame(false)}
+                    />
+                    <button
+                      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                      onClick={() => setShowPaymentFrame(false)}
+                      aria-label="Close"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

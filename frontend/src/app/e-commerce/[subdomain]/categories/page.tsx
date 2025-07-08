@@ -8,8 +8,8 @@ import { BackendCategory, getCategories } from "@/lib/categories";
 
 export default function CategoriesPage({
   // Text configuration props
-  mainTitle = "Jewelry Collections",
-  subtitle = "Discover our exquisite range of handcrafted jewelry pieces, each telling its own unique story",
+  mainTitle = "Our Categories",
+  subtitle = "Explore our diverse collection of high-quality items designed for a wide range of needs",
   ctaText = "Explore Collection",
 
   // Pagination props
