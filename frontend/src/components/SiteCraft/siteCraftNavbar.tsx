@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -32,7 +32,10 @@ export function SiteCraftNavbar() {
   const activeIndex = getActiveIndex();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b" dir={isRTL ? 'rtl' : 'ltr'}>
+    <header
+      className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link
@@ -69,9 +72,15 @@ export function SiteCraftNavbar() {
                       : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover/10"
                   }`}
               >
-                {t('navigation.home')}
-                <span className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
-                  ${pathname === "/about" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-75"}`} />
+                {t("navigation.home")}
+                <span
+                  className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
+                  ${
+                    pathname === "/about"
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-75"
+                  }`}
+                />
               </Link>
               <Link
                 href="/features"
@@ -82,9 +91,15 @@ export function SiteCraftNavbar() {
                       : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover/10"
                   }`}
               >
-                {t('navigation.features')}
-                <span className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
-                  ${pathname === "/features" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-75"}`} />
+                {t("navigation.features")}
+                <span
+                  className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
+                  ${
+                    pathname === "/features"
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-75"
+                  }`}
+                />
               </Link>
               <Link
                 href="/pricing"
@@ -95,23 +110,38 @@ export function SiteCraftNavbar() {
                       : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover/10"
                   }`}
               >
-                {t('navigation.pricing')}
-                <span className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
-                  ${pathname === "/pricing" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-75"}`} />
-              </Link>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-all duration-300 relative px-2 py-1 rounded-md group
-                  ${pathname === "/dashboard" 
-                    ? "text-logo-txt-hover bg-logo-light-button-hover/20" 
-                    : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover/10"
+                {t("navigation.pricing")}
+                <span
+                  className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
+                  ${
+                    pathname === "/pricing"
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-75"
                   }`}
-              >
-                {t('navigation.dashboard')}
-                <span className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
-                  ${pathname === "/dashboard" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-75"}`} />
+                />
               </Link>
               {isAuthenticated && user?.role !== "admin" && (
+                <Link
+                  href="/dashboard"
+                  className={`text-sm font-medium transition-all duration-300 relative px-2 py-1 rounded-md group
+                  ${
+                    pathname === "/dashboard"
+                      ? "text-logo-txt-hover bg-logo-light-button-hover/20"
+                      : "text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover/10"
+                  }`}
+                >
+                  {t("navigation.dashboard")}
+                  <span
+                    className={`absolute inset-x-0 -bottom-1 h-0.5 bg-logo-txt-hover rounded-full transition-all duration-300
+                  ${
+                    pathname === "/dashboard"
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-75"
+                  }`}
+                  />
+                </Link>
+              )}
+              {/* {isAuthenticated && user?.role !== "admin" && (
                 <Link
                   href="/dashboard"
                   className={`text-sm font-medium transition-all duration-300 relative px-2 py-1 rounded-md group
@@ -131,7 +161,7 @@ export function SiteCraftNavbar() {
                   }`}
                   />
                 </Link>
-              )}
+              )} */}
             </div>
           </nav>
         </div>
@@ -143,7 +173,7 @@ export function SiteCraftNavbar() {
               onClick={logout}
               className="font-medium text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-bg-hover transition-colors"
             >
-              {t('common.logout')}
+              {t("common.logout")}
             </Button>
           ) : (
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -153,12 +183,12 @@ export function SiteCraftNavbar() {
                   size="sm"
                   className="font-medium text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover transition-colors sm:size-md"
                 >
-                  {t('common.login')}
+                  {t("common.login")}
                 </Button>
               </Link>
               <Link href="/signup" className="hidden sm:block">
                 <Button className="bg-logo-dark-button text-primary-foreground hover:bg-logo-dark-button-hover">
-                  {t('common.signup')}
+                  {t("common.signup")}
                 </Button>
               </Link>
             </div>
