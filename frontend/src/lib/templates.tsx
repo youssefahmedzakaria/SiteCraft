@@ -30,7 +30,7 @@ const initialTemplates: CustomizedTemplate[] = [
       id: "promo",
       slides: [
         {
-          title: "Exclusive Jewelry Collection",
+          title: "Exclusive Collection",
           description: "Discover our amazing products .",
           buttonText: "Shop Now",
           buttonLink: "/products",
@@ -632,7 +632,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "Brand Name",
       backgroundColor: "#ffffff",
       textColor: "text-[#000000]",
       logo: {
@@ -703,7 +703,7 @@ const initialTemplates: CustomizedTemplate[] = [
       id: "promo",
       slides: [
         {
-          title: "Exclusive Jewelry Collection",
+          title: "Exclusive Collection",
           description: "Discover our amazing products .",
           buttonText: "Shop Now",
           buttonLink: "/products",
@@ -956,7 +956,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -1249,7 +1249,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -1306,8 +1306,8 @@ const initialTemplates: CustomizedTemplate[] = [
     Header: {
       template: "template5",
       brandName: "Fashion Boutique",
-      backgroundColor: "bg-[#fff0f5]",
-      textColor: "text-[#ff1493]",
+      backgroundColor: "bg-[#ffffff]",
+      textColor: "text-[#000000]",
       logo: {
         src: "",
         alt: "Fashion Boutique Logo",
@@ -1320,14 +1320,108 @@ const initialTemplates: CustomizedTemplate[] = [
         { label: "Accessories", isShown: true },
         { label: "Contact", isShown: true },
       ],
-      iconColor: "text-[#ff1493]",
-      dividerColor: "border-[#ffb6c1]",
+      iconColor: "text-[#000000]",
+      dividerColor: "border-[#000000]",
       fontFamily: "font-sans",
+    },
+    Products: {
+      id: "products",
+      template: "FeaturedGrid",
+      isClickable: true,
+      title: "Featured Products",
+      bgColor: "bg-[#ffffff]",
+      textColor: "text-[#000000]",
+      fontFamily: "font-sans",
+      titleFont: "font-bold",
+      showTitle: true,
+      showMoreButton: true,
+      showMoreText: "Show More",
+      showMorebuttonBgColor: "bg-[#1d4ed8]",
+      showMorebuttonTextColor: "text-[#ffffff]",
+      ctaText: "View Product",
+      cornerRadius: "medium",
+      showCta: true,
+      cardVariant: "default",
+      showSubtitle: false,
+      overlayColor: "bg-[#000000]/50",
+      showProductTitle: true,
+      titleColor: "text-[#000000]",
+      titleFontSize: "text-3xl",
+      productTitleFontSize: "text-lg",
+      products: [
+        {
+          id: "product1",
+          name: "product1",
+          description: "description of product1",
+          price: 49.99,
+          images: [{ id: 1, url: "", alt: "product1" }],
+        },
+        {
+          id: "product2",
+          name: "product2",
+          description: "description of product2",
+          price: 59.99,
+          images: [{ id: 2, url: "", alt: "product2" }],
+        },
+        {
+          id: "product3",
+          name: "product3",
+          description: "description of product3",
+          price: 39.99,
+          images: [{ id: 3, url: "", alt: "product3" }],
+        },
+        {
+          id: "product4",
+          name: "product4",
+          description: "description of product4",
+          price: 59.99,
+          images: [{ id: 4, url: "", alt: "product4" }],
+        },
+        {
+          id: "product5",
+          name: "product5",
+          description: "description of product5",
+          price: 59.99,
+          images: [{ id: 5, url: "", alt: "product5" }],
+        },
+        {
+          id: "product6",
+          name: "product6",
+          description: "description of product6",
+          price: 59.99,
+          images: [{ id: 6, url: "", alt: "product6" }],
+        },
+      ],
+    },
+    Policies: {
+      template: "CenteredPolicies",
+      id: "policies",
+      title: "Policies",
+      sections: [
+        {
+          title: "Return Policy",
+          content:
+            "If you are not satisfied, you may return the item within 30 days of receipt for a full refund.",
+        },
+      ],
+      backgroundColor: "bg-white",
+      titleColor: "text-black",
+      titleSize: "text-4xl",
+      titleFont: "font-sans",
+      titleFontWeight: "font-bold",
+      sectionTitleColor: "text-black",
+      sectionTitleSize: "text-2xl",
+      sectionTitleFont: "font-serif",
+      sectionTitleFontWeight: "font-medium",
+      sectionContentColor: "text-gray-600",
+      sectionContentSize: "text-lg",
+      sectionContentFont: "font-serif",
+      sectionContentFontWeight: "font-medium",
     },
     Footer: {
       brandName: "Fashion Boutique",
-      backgroundColor: "bg-[#fff0f5]",
-      textColor: "text-[#ff1493]",
+      backgroundColor: "bg-[#ffffff]",
+      textColor: "text-[#000000]",
       logo: {
         src: null,
         alt: "Fashion Boutique Logo",
@@ -1339,7 +1433,7 @@ const initialTemplates: CustomizedTemplate[] = [
           href: "#about",
           font: "font-sans",
           fontSize: "text-base",
-          fontColor: "text-[#ff1493]",
+          fontColor: "text-[#000000]",
           isShown: true,
         },
         {
@@ -1347,7 +1441,7 @@ const initialTemplates: CustomizedTemplate[] = [
           href: "#contact",
           font: "font-sans",
           fontSize: "text-base",
-          fontColor: "text-[#ff1493]",
+          fontColor: "text-[#000000]",
           isShown: true,
         },
       ],
@@ -1357,14 +1451,14 @@ const initialTemplates: CustomizedTemplate[] = [
       },
       socialMediaStyles: {
         iconSize: 24,
-        iconColor: "text-[#ff1493]",
-        hoverColor: "text-[#ff69b4]",
+        iconColor: "text-[#000000]",
+        hoverColor: "text-[#000000]",
       },
       copyrightStyles: {
         font: "font-sans",
         fontSize: "text-sm",
         fontWeight: "font-normal",
-        fontColor: "text-[#c71585]",
+        fontColor: "text-[#000000]",
       },
     },
   },
@@ -1569,7 +1663,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionContentFontWeight: "font-medium",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -1641,7 +1735,7 @@ const initialTemplates: CustomizedTemplate[] = [
       id: "promo",
       slides: [
         {
-          title: "Exclusive Jewelry Collection",
+          title: "Exclusive brand Collection",
           description: "Discover our amazing products .",
           buttonText: "Shop Now",
           buttonLink: "/products",
@@ -1864,7 +1958,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -1936,7 +2030,7 @@ const initialTemplates: CustomizedTemplate[] = [
       id: "promo",
       slides: [
         {
-          title: "Exclusive Jewelry Collection",
+          title: "Exclusive Product Collection",
           description: "Discover our amazing products .",
           buttonText: "Shop Now",
           buttonLink: "/products",
@@ -2220,7 +2314,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "Brand Name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -2448,7 +2542,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "Brand Name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -2703,7 +2797,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "Brand Name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -2963,7 +3057,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionFontWeight: "font-normal",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -3186,7 +3280,7 @@ const initialTemplates: CustomizedTemplate[] = [
       contentSize: "text-sm",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -3313,7 +3407,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionFontWeight: "font-normal",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -3402,7 +3496,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionFontWeight: "font-normal",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
@@ -3530,7 +3624,7 @@ const initialTemplates: CustomizedTemplate[] = [
       sectionFontWeight: "font-normal",
     },
     Footer: {
-      brandName: "Jewelry",
+      brandName: "brand name",
       backgroundColor: "#ffffff",
       textColor: "text-black",
       logo: {
