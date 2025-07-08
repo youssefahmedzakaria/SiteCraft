@@ -592,7 +592,7 @@ export default function EditProductPage() {
         name: basicFormData.name,
         description: basicFormData.description,
         categoryIds: basicFormData.categoryIds,
-        discountType: discountSettings.discountType,
+        discountType: discountSettings.discountType ,
         discountValue: discountSettings.discountValue,
         attributes: attributes.length > 0 ? attributes : [],
         variants: finalVariants,
@@ -856,7 +856,7 @@ export default function EditProductPage() {
               {/* Submit Button */}
               <div className="flex justify-end space-x-4 pt-6 border-t">
                 <Link href="/dashboard/products">
-                  <Button type="button" variant="outline">
+                  <Button variant="outline">
                     Cancel
                   </Button>
                 </Link>

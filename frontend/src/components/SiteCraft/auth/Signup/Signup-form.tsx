@@ -14,10 +14,11 @@ export function SignupForm() {
     formData,
     handleInputChange,
     errors,
+    emailAvailabilityError,
     signupError,
     isLoading,
     onSubmit,
-    clearError
+    clearError,
   } = useSignupForm();
 
   return (
@@ -35,6 +36,15 @@ export function SignupForm() {
         <Alert variant="destructive" className="text-sm">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{signupError}</AlertDescription>
+        </Alert>
+      )}
+
+      {emailAvailabilityError && (
+        <Alert variant="destructive" className="flex text-sm items-center">
+          <AlertCircle className="h-3 w-3 flex items-center" />
+          <AlertDescription className="flex items-center">
+            {emailAvailabilityError}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -57,8 +67,8 @@ export function SignupForm() {
               disabled={isLoading}
               value={formData.name}
               onChange={(e) => {
-                handleInputChange('name', e.target.value)
-                if (errors.name) clearError()
+                handleInputChange("name", e.target.value);
+                if (errors.name) clearError();
               }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
@@ -84,8 +94,8 @@ export function SignupForm() {
               disabled={isLoading}
               value={formData.email}
               onChange={(e) => {
-                handleInputChange('email', e.target.value)
-                if (errors.email) clearError()
+                handleInputChange("email", e.target.value);
+                if (errors.email) clearError();
               }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
@@ -111,8 +121,8 @@ export function SignupForm() {
               disabled={isLoading}
               value={formData.password}
               onChange={(e) => {
-                handleInputChange('password', e.target.value)
-                if (errors.password) clearError()
+                handleInputChange("password", e.target.value);
+                if (errors.password) clearError();
               }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
@@ -138,8 +148,8 @@ export function SignupForm() {
               disabled={isLoading}
               value={formData.confirmPassword}
               onChange={(e) => {
-                handleInputChange('confirmPassword', e.target.value)
-                if (errors.confirmPassword) clearError()
+                handleInputChange("confirmPassword", e.target.value);
+                if (errors.confirmPassword) clearError();
               }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
@@ -165,8 +175,8 @@ export function SignupForm() {
               disabled={isLoading}
               value={formData.phone}
               onChange={(e) => {
-                handleInputChange('phone', e.target.value)
-                if (errors.phone) clearError()
+                handleInputChange("phone", e.target.value);
+                if (errors.phone) clearError();
               }}
               className="h-10 px-4 bg-background border border-logo-border hover:border-logo-border/80 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
             />
@@ -190,10 +200,10 @@ export function SignupForm() {
                   name="gender"
                   value="male"
                   disabled={isLoading}
-                  checked={formData.gender === 'male'}
+                  checked={formData.gender === "male"}
                   onChange={(e) => {
-                    handleInputChange('gender', e.target.value)
-                    if (errors.gender) clearError()
+                    handleInputChange("gender", e.target.value);
+                    if (errors.gender) clearError();
                   }}
                   className="h-4 w-4 accent-logo-dark-button focus:ring-logo-dark-button"
                 />
@@ -205,10 +215,10 @@ export function SignupForm() {
                   name="gender"
                   value="female"
                   disabled={isLoading}
-                  checked={formData.gender === 'female'}
+                  checked={formData.gender === "female"}
                   onChange={(e) => {
-                    handleInputChange('gender', e.target.value)
-                    if (errors.gender) clearError()
+                    handleInputChange("gender", e.target.value);
+                    if (errors.gender) clearError();
                   }}
                   className="h-4 w-4 accent-logo-dark-button focus:ring-logo-dark-button"
                 />

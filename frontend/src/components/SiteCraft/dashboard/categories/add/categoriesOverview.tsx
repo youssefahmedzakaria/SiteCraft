@@ -83,7 +83,7 @@ const CategorysOverview = forwardRef<HTMLDivElement, CategorysOverviewProps>(
     };
 
     return (
-      <div ref={ref}>
+      <div ref={ref} className="space-y-4">
         {/* Category Name */}
         <div className="space-y-2">
           <label

@@ -191,10 +191,15 @@ public class ProductService {
 
         if (productDTO.getName() != null) product.setName(productDTO.getName());
         if (productDTO.getDescription() != null) product.setDescription(productDTO.getDescription());
-        if (productDTO.getDiscountType() != null) product.setDiscountType(productDTO.getDiscountType());
-        if (productDTO.getDiscountValue() != null) product.setDiscountValue(
-            productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
-        );
+        product.setDiscountType(productDTO.getDiscountType());
+        if (productDTO.getDiscountType() == null) {
+            product.setDiscountValue(null);
+        } else {
+            if (productDTO.getDiscountValue() != null) product.setDiscountValue(
+                    productDTO.getDiscountValue() == null ? null : BigDecimal.valueOf(productDTO.getDiscountValue())
+            );
+        }
+
         
         List<Long> categoryIds = productDTO.getAllCategoryIds();
         if (categoryIds != null && !categoryIds.isEmpty()) {
