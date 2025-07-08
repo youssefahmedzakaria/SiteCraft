@@ -152,7 +152,7 @@ public class OrderService {
 
     // -------------------------------------Create Order-------------------------------------------
 
-    public void createOrder(Long customerId, Long addressId, Long storeId) {
+    public void createOrder(Long customerId, Long addressId, Long storeId, Map<String, Object> paymentDetails) {
         try {
             // 1. Get Customer Data
             Customer customer = new Customer();
@@ -215,15 +215,28 @@ public class OrderService {
             shipping.setShippingDate(null);
             shippingRepo.save(shipping);
 
-            // 7. Process Payment
-//            TODO
-//            PaymentLog paymentLog = new PaymentLog();
-//            paymentLog.setTransactionId(paymentId);
-//            paymentLogRepo.save(paymentLog);
+            // 7. Process Payment and Create PaymentLog
+            PaymentLog paymentLog = null;
+            if (paymentDetails != null) {
+                String paymentMethod = (String) paymentDetails.get("paymentMethod");
+                Double amount = paymentDetails.get("amount") != null ? Double.valueOf(paymentDetails.get("amount").toString()) : null;
+                String transactionId = (String) paymentDetails.get("transactionId");
+                String status = (String) paymentDetails.get("status");
+
+                if (paymentMethod != null && amount != null) {
+                    paymentLog = new PaymentLog();
+                    paymentLog.setAmount(amount);
+                    paymentLog.setTimestamp(LocalDateTime.now());
+                    paymentLog.setStatus(status != null ? status : "success");
+                    paymentLog.setMethod(getPaymentMethodString(paymentMethod));
+                    paymentLog.setStore(store);
+                    paymentLogRepo.save(paymentLog);
+                }
+            }
 
             // 8. Add Order Data
             order.setPrice(cart.getTotalPrice().doubleValue());
-//            order.setPaymentLog(paymentLog);
+            order.setPaymentLog(paymentLog);
             order.setShipping(shipping);
             order.setOrderProducts(orderProducts);
 
@@ -248,6 +261,19 @@ public class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
+    }
+
+    // Overloaded method for backward compatibility
+    public void createOrder(Long customerId, Long addressId, Long storeId) {
+        createOrder(customerId, addressId, storeId, null);
+    }
+
+    private String getPaymentMethodString(String paymentMethod) {
+        if ("card".equals(paymentMethod)) return "Credit Card";
+        if ("valu".equals(paymentMethod)) return "Valu";
+        if ("ewallet".equals(paymentMethod)) return "E-Wallet";
+        if("cod".equals(paymentMethod)) return "Cash On Delivery";
+        return "Unknown";
     }
 
     public List<Order> getOrdersByStoreAndDateRange(Long storeId, java.time.LocalDate start, java.time.LocalDate end) {

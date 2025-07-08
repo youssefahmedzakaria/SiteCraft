@@ -20,6 +20,26 @@ export interface FavoriteItem {
   discountType?: string | null
   discountValue?: number | null
   storeId?: number
+  product?: {
+    id: number
+    name: string
+    description: string
+    discountType: string | null
+    discountValue: number | null
+    images: Array<{
+      id: number
+      alt: string
+      imageUrl: string
+    }>
+    variants: Array<{
+      id: number
+      sku: string
+      stock: number
+      price: number
+      productionCost: number
+    }>
+    attributes: Array<any>
+  }
 }
 
 interface FavoritesState {
@@ -136,7 +156,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         discountType: wp.product.discountType,
         discountValue: wp.product.discountValue,
         storeId: wp.product.storeId,
-        variantInfo: wp.variantInfo
+        variantInfo: wp.variantInfo,
+        product: wp.product // Include the full product object
       }))
 
       dispatch({ type: "LOAD_FAVORITES", payload: transformedItems })
@@ -203,7 +224,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         discountType: wishlistProduct.product.discountType,
         discountValue: wishlistProduct.product.discountValue,
         storeId: wishlistProduct.product.storeId,
-        variantInfo: wishlistProduct.variantInfo
+        variantInfo: wishlistProduct.variantInfo,
+        product: wishlistProduct.product // Include the full product object
       }
 
       dispatch({ type: "ADD_FAVORITE", payload: newItem })

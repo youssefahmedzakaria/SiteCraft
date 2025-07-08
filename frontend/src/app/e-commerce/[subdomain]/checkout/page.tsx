@@ -45,9 +45,10 @@ export default function CheckoutPage() {
   const subdomain = pathSegments[2];
 
   const [initialColors, setInitialColors] = useState({
-    primary: "#000000",
-    secondary: "#000000",
-    accent: "#000000",
+    primary: "#000000", // Pure black for primary text and headings
+    secondary: "#000000", // Pure black for secondary text and borders
+    accent: "#000000", // Pure black for accents and highlights
+    foreground: "#ffffff", // Pure white for backgrounds and buttons
   });
 
   const { state, clearCart } = useCart();
@@ -104,13 +105,8 @@ export default function CheckoutPage() {
     null
   );
 
-  const [showPaymobIframe, setShowPaymobIframe] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  const [mobileNumber, setMobileNumber] = useState("");
-
-  const [paymobIframeUrl, setPaymobIframeUrl] = useState<string | null>(null);
-  const [paymobLoading, setPaymobLoading] = useState(false);
-  const [paymobError, setPaymobError] = useState<string | null>(null);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   const subtotal = state.items.reduce((sum, item) => {
     const itemPrice =
@@ -133,6 +129,56 @@ export default function CheckoutPage() {
     };
     fetchStoreId();
   }, []);
+
+  // Removed Paymob iframe message listener
+
+  // Removed handlePaymentSuccess function
+
+  const handleCreateOrder = async () => {
+    if (!selectedAddressId) {
+      setOrderError("Please select a shipping address");
+      return;
+    }
+
+    setOrderLoading(true);
+    setOrderError(null);
+
+    try {
+      const payload = {
+        paymentMethod: formData.paymentMethod,
+        amount: total,
+        transactionId: Date.now().toString(),
+        status: "success",
+      };
+
+      console.log("Creating order with payload:", payload);
+
+      const res = await fetch(
+        `http://localhost:8080/order/create/${selectedAddressId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+      console.log("Order creation response:", data);
+
+      if (data.success) {
+        clearCart();
+        setStep(3);
+      } else {
+        setOrderError(data.message || "Failed to create order");
+      }
+    } catch (error) {
+      console.error("Order creation error:", error);
+      setOrderError("Failed to create order");
+    } finally {
+      setOrderLoading(false);
+    }
+  };
 
   // Fetch shipping price when address changes
   useEffect(() => {
@@ -401,36 +447,7 @@ export default function CheckoutPage() {
     setStep(3);
   };
 
-  async function handleProceedToPayment() {
-    setPaymobLoading(true);
-    setPaymobError(null);
-    try {
-      // Call your backend endpoint to create a Paymob payment session
-      // Pass paymentMethod, selectedWallet, mobileNumber, total, etc.
-      const res = await fetch("http://localhost:8080/order/paymob/create-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paymentMethod: formData.paymentMethod,
-          wallet: selectedWallet,
-          mobile: mobileNumber,
-          amount: total,
-          // Add any other required info (cart, address, etc.)
-        }),
-      });
-      const data = await res.json();
-      if (data.success && data.iframeUrl) {
-        setPaymobIframeUrl(data.iframeUrl);
-        setShowPaymobIframe(true);
-      } else {
-        setPaymobError(data.message || "Failed to create payment session");
-      }
-    } catch (err) {
-      setPaymobError("Failed to create payment session");
-    } finally {
-      setPaymobLoading(false);
-    }
-  }
+  // Removed handleProceedToPayment function
 
   if (state.items.length === 0 && step !== 3) {
     return (
@@ -453,7 +470,7 @@ export default function CheckoutPage() {
               size="lg"
               style={{
                 backgroundColor: initialColors.secondary,
-                color: initialColors.accent,
+                color: initialColors.foreground,
               }}
             >
               Continue Shopping
@@ -493,7 +510,7 @@ export default function CheckoutPage() {
           </p>
           <div
             className="p-6 rounded-lg mb-8"
-            style={{ backgroundColor: initialColors.accent }}
+            style={{ backgroundColor: initialColors.foreground }}
           >
             <h2 className="font-semibold mb-2">Order Details</h2>
             <p className="text-sm" style={{ color: initialColors.secondary }}>
@@ -515,7 +532,7 @@ export default function CheckoutPage() {
                 size="lg"
                 style={{
                   backgroundColor: initialColors.secondary,
-                  color: initialColors.accent,
+                  color: initialColors.foreground,
                 }}
               >
                 Continue Shopping
@@ -526,7 +543,7 @@ export default function CheckoutPage() {
                 size="lg"
                 style={{
                   backgroundColor: initialColors.secondary,
-                  color: initialColors.accent,
+                  color: initialColors.foreground,
                 }}
               >
                 View Orders
@@ -559,7 +576,8 @@ export default function CheckoutPage() {
             className={`w-8 h-8 rounded-full flex items-center justify-center`}
             style={{
               backgroundColor: step >= 1 ? initialColors.secondary : "#e5e5e5",
-              color: step >= 1 ? initialColors.accent : initialColors.secondary,
+              color:
+                step >= 1 ? initialColors.foreground : initialColors.secondary,
               border: `2px solid ${initialColors.secondary}`,
             }}
           >
@@ -567,7 +585,7 @@ export default function CheckoutPage() {
           </div>
           <span
             className="ml-2 text-sm font-medium"
-            style={{ color: initialColors.secondary }}
+            style={{ color: initialColors.accent }}
           >
             Shipping
           </span>
@@ -583,7 +601,7 @@ export default function CheckoutPage() {
               backgroundColor:
                 step === 2 ? initialColors.secondary : "transparent",
               color:
-                step === 2 ? initialColors.accent : initialColors.secondary,
+                step === 2 ? initialColors.foreground : initialColors.secondary,
               border: `2px solid ${initialColors.secondary}`,
             }}
           >
@@ -860,7 +878,7 @@ export default function CheckoutPage() {
                   className="mt-4 border-2 rounded-lg"
                   style={{
                     borderColor: initialColors.secondary,
-                    color: initialColors.primary,
+                    color: initialColors.secondary,
                   }}
                 >
                   Add New Address
@@ -870,7 +888,7 @@ export default function CheckoutPage() {
                   className="mt-6 p-4 border rounded-lg"
                   style={{
                     borderColor: initialColors.secondary,
-                    backgroundColor: initialColors.accent,
+                    backgroundColor: initialColors.foreground,
                   }}
                 >
                   <h3
@@ -895,7 +913,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="e.g., Home, Work, Office"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div>
@@ -913,7 +935,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="City"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div>
@@ -934,7 +960,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="Street Number"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div>
@@ -955,7 +985,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="Building Number"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div>
@@ -976,7 +1010,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="Floor Number"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div>
@@ -997,7 +1035,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="Apartment Number"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -1018,7 +1060,11 @@ export default function CheckoutPage() {
                         }
                         placeholder="Landmark"
                         className="border-2 rounded-lg"
-                        style={{ borderColor: initialColors.secondary }}
+                        style={{
+                          borderColor: initialColors.secondary,
+                          backgroundColor: initialColors.foreground,
+                          color: initialColors.primary,
+                        }}
                       />
                     </div>
                   </div>
@@ -1036,7 +1082,7 @@ export default function CheckoutPage() {
                       className="border-2 rounded-lg"
                       style={{
                         borderColor: initialColors.secondary,
-                        color: initialColors.primary,
+                        color: initialColors.secondary,
                       }}
                     >
                       Cancel
@@ -1050,7 +1096,7 @@ export default function CheckoutPage() {
                 size="lg"
                 style={{
                   backgroundColor: initialColors.secondary,
-                  color: initialColors.accent,
+                  color: initialColors.foreground,
                 }}
                 disabled={!selectedAddressId}
               >
@@ -1071,131 +1117,80 @@ export default function CheckoutPage() {
                 value={formData.paymentMethod}
                 onValueChange={(value: string | boolean) => {
                   handleInputChange("paymentMethod", value);
-                  setSelectedWallet(null);
-                  setMobileNumber("");
+                  // Removed Paymob wallet selection and mobile number handling
                 }}
               >
-                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: initialColors.secondary }}>
+                <div
+                  className="flex items-center space-x-2 p-4 border rounded-lg"
+                  style={{ borderColor: initialColors.secondary }}
+                >
                   <RadioGroupItem value="card" id="card" />
                   <Label htmlFor="card" className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
                     Credit Card
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: initialColors.secondary }}>
+                <div
+                  className="flex items-center space-x-2 p-4 border rounded-lg"
+                  style={{ borderColor: initialColors.secondary }}
+                >
                   <RadioGroupItem value="valu" id="valu" />
                   <Label htmlFor="valu">Valu</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg" style={{ borderColor: initialColors.secondary }}>
+                <div
+                  className="flex items-center space-x-2 p-4 border rounded-lg"
+                  style={{ borderColor: initialColors.secondary }}
+                >
                   <RadioGroupItem value="ewallet" id="ewallet" />
                   <Label htmlFor="ewallet">E-Wallets</Label>
                 </div>
+                <div
+                  className="flex items-center space-x-2 p-4 border rounded-lg"
+                  style={{ borderColor: initialColors.secondary }}
+                >
+                  <RadioGroupItem value="cod" id="cod" />
+                  <Label htmlFor="cod" className="flex items-center gap-2">
+                    Cash on Delivery
+                  </Label>
+                </div>
               </RadioGroup>
-              {/* Valu mobile input */}
-              {formData.paymentMethod === "valu" && (
-                <Input
-                  placeholder="Mobile Number"
-                  value={mobileNumber}
-                  onChange={e => setMobileNumber(e.target.value)}
-                />
-              )}
-              {/* E-Wallets wallet selection and mobile input */}
-              {formData.paymentMethod === "ewallet" && (
-                <>
-                  <div className="flex gap-2 mb-2">
-                    <Button
-                      variant={selectedWallet === "vodafone" ? "default" : "outline"}
-                      onClick={() => setSelectedWallet("vodafone")}
-                    >
-                      Vodafone Cash
-                    </Button>
-                    <Button
-                      variant={selectedWallet === "etisalat" ? "default" : "outline"}
-                      onClick={() => setSelectedWallet("etisalat")}
-                    >
-                      Etisalat Cash
-                    </Button>
-                    <Button
-                      variant={selectedWallet === "orange" ? "default" : "outline"}
-                      onClick={() => setSelectedWallet("orange")}
-                    >
-                      Orange Cash
-                    </Button>
-                  </div>
-                  {selectedWallet && (
-                    <Input
-                      placeholder="Mobile Number"
-                      value={mobileNumber}
-                      onChange={e => setMobileNumber(e.target.value)}
-                    />
-                  )}
-                </>
-              )}
+              {/* Removed Valu mobile input */}
+              {/* Removed E-Wallets wallet selection and mobile input */}
               <div className="flex gap-4">
                 <Button
                   variant="outline"
                   onClick={() => setStep(1)}
                   className="flex-1"
-                  style={{ borderColor: initialColors.secondary, color: initialColors.secondary }}
+                  style={{
+                    borderColor: initialColors.secondary,
+                    color: initialColors.secondary,
+                  }}
                 >
                   Back to Shipping
                 </Button>
                 {/* Proceed to Payment button logic */}
-                {formData.paymentMethod === "card" && (
+                {(formData.paymentMethod === "card" ||
+                  formData.paymentMethod === "valu" ||
+                  formData.paymentMethod === "ewallet" ||
+                  formData.paymentMethod === "cod") && (
                   <Button
-                    onClick={handleProceedToPayment}
+                    onClick={handleCreateOrder}
                     className="flex-1"
                     size="lg"
-                    style={{ backgroundColor: initialColors.secondary, color: initialColors.accent }}
-                  >
-                    Proceed to Payment
-                  </Button>
-                )}
-                {formData.paymentMethod === "valu" && mobileNumber && (
-                  <Button
-                    onClick={handleProceedToPayment}
-                    className="flex-1"
-                    size="lg"
-                    style={{ backgroundColor: initialColors.secondary, color: initialColors.accent }}
-                  >
-                    Proceed to Payment
-                  </Button>
-                )}
-                {formData.paymentMethod === "ewallet" && selectedWallet && mobileNumber && (
-                  <Button
-                    onClick={handleProceedToPayment}
-                    className="flex-1"
-                    size="lg"
-                    style={{ backgroundColor: initialColors.secondary, color: initialColors.accent }}
+                    style={{
+                      backgroundColor: initialColors.secondary,
+                      color: initialColors.foreground,
+                    }}
+                    disabled={orderLoading}
                   >
                     Proceed to Payment
                   </Button>
                 )}
               </div>
-              {/* Paymob Iframe Modal */}
-              {showPaymobIframe && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full relative">
-                    {paymobLoading && <div className="text-center">Loading payment...</div>}
-                    {paymobError && <div className="text-red-600 text-center mb-2">{paymobError}</div>}
-                    {paymobIframeUrl && !paymobLoading && !paymobError && (
-                      <iframe
-                        src={paymobIframeUrl}
-                        width="100%"
-                        height="600"
-                        frameBorder="0"
-                        allowFullScreen
-                        title="Paymob Payment"
-                      />
-                    )}
-                    <Button
-                      onClick={() => { setShowPaymobIframe(false); setPaymobIframeUrl(null); }}
-                      className="absolute top-2 right-2"
-                      variant="outline"
-                    >
-                      Close
-                    </Button>
-                  </div>
+              {/* Error Display */}
+              {orderError && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{orderError}</p>
                 </div>
               )}
             </div>
@@ -1228,7 +1223,7 @@ export default function CheckoutPage() {
               >
                 <h3
                   className="text-base font-semibold mb-1"
-                  style={{ color: initialColors.primary }}
+                  style={{ color: initialColors.secondary }}
                 >
                   Shipping To:
                 </h3>
@@ -1240,7 +1235,7 @@ export default function CheckoutPage() {
                   return (
                     <div
                       className="text-sm"
-                      style={{ color: initialColors.primary }}
+                      style={{ color: initialColors.secondary }}
                     >
                       <div>
                         <span className="font-medium">{addr.type}</span>
@@ -1275,7 +1270,7 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex items-center gap-3">
                     <div
                       className="relative w-12 h-12 rounded overflow-hidden"
-                      style={{ backgroundColor: initialColors.accent }}
+                      style={{ backgroundColor: initialColors.secondary }}
                     >
                       <Image
                         src={item.image || "/placeholder.png"}
@@ -1288,7 +1283,7 @@ export default function CheckoutPage() {
                     <div className="flex-1">
                       <p
                         className="text-sm font-medium"
-                        style={{ color: initialColors.primary }}
+                        style={{ color: initialColors.secondary }}
                       >
                         {item.name}
                       </p>
@@ -1308,7 +1303,7 @@ export default function CheckoutPage() {
                     </div>
                     <p
                       className="text-sm font-medium"
-                      style={{ color: initialColors.primary }}
+                      style={{ color: initialColors.secondary }}
                     >
                       ${(itemPrice * item.quantity).toFixed(2)}
                     </p>

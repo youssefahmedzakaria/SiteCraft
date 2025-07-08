@@ -17,10 +17,9 @@ export default function FavoritesPage() {
   const router = useRouter();
 
   const [initialColors, setInitialColors] = useState({
-    primary: "#000000",
-    secondary: "#000000",
+    primary: "#ffffff",
+    secondary: "#ffffff",
     accent: "#000000",
-    foreground: "#ffffff",
   });
 
   const { 
@@ -39,6 +38,18 @@ export default function FavoritesPage() {
       setIsLoading(true);
       const success = await loadWishlistFromBackend();
       setIsLoading(false);
+      
+      // Print the fetched wishlist data for debugging
+      console.log("Fetched wishlist data:", state.items);
+      console.log("Wishlist state:", state);
+      
+      // Log each item's structure
+      state.items.forEach((item, index) => {
+        console.log(`Item ${index}:`, item);
+        console.log(`Item ${index} product:`, item.product);
+        console.log(`Item ${index} variants:`, item.product?.variants);
+        console.log(`Item ${index} SKU:`, item.sku);
+      });
       
       if (!success && state.error?.includes("log in")) {
         // Redirect to login if authentication is required
@@ -141,7 +152,7 @@ export default function FavoritesPage() {
                 <Button
                   size="lg"
                   style={{
-                    backgroundColor: initialColors.foreground,
+                    backgroundColor: initialColors.primary,
                     color: initialColors.primary,
                   }}
                 >
@@ -157,7 +168,7 @@ export default function FavoritesPage() {
               onClick={() => loadWishlistFromBackend()}
               size="lg"
               style={{
-                backgroundColor: initialColors.foreground,
+                backgroundColor: initialColors.primary,
                 color: initialColors.primary,
               }}
             >
@@ -178,23 +189,23 @@ export default function FavoritesPage() {
         <div className="text-center py-16">
           <Heart
             className="w-24 h-24 mx-auto mb-6"
-            style={{ color: initialColors.secondary }}
+            style={{ color: initialColors.accent }}
           />
           <h1
             className="text-3xl font-bold mb-4"
-            style={{ color: initialColors.primary }}
+            style={{ color: initialColors.accent }}
           >
             Your wishlist is empty
           </h1>
-          <p className="mb-8" style={{ color: initialColors.secondary }}>
+          <p className="mb-8" style={{ color: initialColors.accent }}>
             Save items you love to easily find them later.
           </p>
           <Link href={`/e-commerce/${subdomain}/products`}>
             <Button
               size="lg"
               style={{
-                backgroundColor: initialColors.foreground,
-                color: initialColors.primary,
+                backgroundColor: initialColors.primary,
+                color: initialColors.accent,
               }}
             >
               Browse Products
@@ -225,7 +236,7 @@ export default function FavoritesPage() {
             disabled={isLoading}
             style={{
               borderColor: initialColors.accent,
-              color: initialColors.primary,
+              color: initialColors.accent,
             }}
           >
             {isLoading ? (
@@ -269,7 +280,7 @@ export default function FavoritesPage() {
                     className="w-4 h-4"
                     style={{
                       stroke: initialColors.secondary,
-                      fill: initialColors.secondary,
+                      fill: initialColors.accent,
                       strokeWidth: 2,
                     }}
                   />
@@ -312,28 +323,62 @@ export default function FavoritesPage() {
                   style={{ color: initialColors.primary }}
                 >
                   $
-                  {item.discountType !== null
-                    ? item.discountType === "amount"
-                      ? (item.originalPrice || 0) - Number(item.discountValue)
-                      : (item.originalPrice || 0) * (1 - Number(item.discountValue))
-                    : item.price || 0}
+                  {(() => {
+                    // Find the variant that matches the SKU
+                    const matchingVariant = item.product?.variants?.find(variant => variant.sku === item.sku);
+                    const variantPrice = matchingVariant?.price || 0;
+                    
+                    // Apply discount if available
+                    if (item.product?.discountType && item.product?.discountValue) {
+                      if (item.product.discountType === "amount") {
+                        return (variantPrice - Number(item.product.discountValue)).toFixed(2);
+                      } else {
+                        return (variantPrice * (1 - Number(item.product.discountValue))).toFixed(2);
+                      }
+                    }
+                    
+                    return variantPrice.toFixed(2);
+                  })()}
                 </span>
-                {item.originalPrice && item.originalPrice > item.price && (
-                  <span
-                    className="text-sm opacity-75 line-through"
-                    style={{ color: initialColors.secondary }}
-                  >
-                    ${item.originalPrice}
-                  </span>
-                )}
-                {item.discountValue && item.discountValue > 0 && item.discountType && (
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "#10B981" }}
-                  >
-                    Save ${item.discountType === "amount" ? item.discountValue : (item.originalPrice || 0) * item.discountValue}
-                  </span>
-                )}
+                {(() => {
+                  // Find the variant that matches the SKU
+                  const matchingVariant = item.product?.variants?.find(variant => variant.sku === item.sku);
+                  const variantPrice = matchingVariant?.price || 0;
+                  
+                  // Show original price if there's a discount
+                  if (item.product?.discountType && item.product?.discountValue && variantPrice > 0) {
+                    return (
+                      <span
+                        className="text-sm opacity-75 line-through"
+                        style={{ color: initialColors.secondary }}
+                      >
+                        ${variantPrice.toFixed(2)}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
+                {(() => {
+                  // Show discount amount if available
+                  const matchingVariant = item.product?.variants?.find(variant => variant.sku === item.sku);
+                  const variantPrice = matchingVariant?.price || 0;
+                  
+                  if (item.product?.discountType && item.product?.discountValue && variantPrice > 0) {
+                    const discountAmount = item.product.discountType === "amount" 
+                      ? item.product.discountValue 
+                      : (variantPrice * item.product.discountValue);
+                    
+                    return (
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: "#10B981" }}
+                      >
+                        Save ${discountAmount.toFixed(2)}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               <div className="flex gap-2 mt-4">
@@ -363,7 +408,7 @@ export default function FavoritesPage() {
                   disabled={isLoading}
                   style={{
                     borderColor: initialColors.secondary,
-                    color: initialColors.secondary,
+                    color: initialColors.accent,
                   }}
                 >
                   {isLoading ? (

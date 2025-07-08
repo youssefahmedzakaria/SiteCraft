@@ -42,11 +42,6 @@ export default function CartPage() {
       setIsLoading(true);
       const success = await loadCartFromBackend();
       setIsLoading(false);
-      
-      if (!success && state.error?.includes("log in")) {
-        // Redirect to login if authentication is required
-        router.push(`/e-commerce/${subdomain}/login`);
-      }
     };
 
     loadCart();
@@ -57,10 +52,6 @@ export default function CartPage() {
       setIsLoading(true);
       const success = await updateQuantityBackend(cartProductId, newQuantity);
       setIsLoading(false);
-      
-      if (!success && state.error?.includes("log in")) {
-        router.push(`/e-commerce/${subdomain}/login`);
-      }
     }
   };
 
@@ -68,10 +59,6 @@ export default function CartPage() {
     setIsLoading(true);
     const success = await removeFromCartBackend(cartProductId);
     setIsLoading(false);
-    
-    if (!success && state.error?.includes("log in")) {
-      router.push(`/e-commerce/${subdomain}/login`);
-    }
   };
 
   const handleClearCart = async () => {
@@ -79,10 +66,6 @@ export default function CartPage() {
       setIsLoading(true);
       const success = await clearCartBackend();
       setIsLoading(false);
-      
-      if (!success && state.error?.includes("log in")) {
-        router.push(`/e-commerce/${subdomain}/login`);
-      }
     }
   };
 
@@ -128,7 +111,49 @@ export default function CartPage() {
     );
   }
 
-  // Show error state
+  // Show authentication required state (same as favorites page)
+  if (state.error && state.error.includes("log in")) {
+    return (
+      <div
+        className={cn("min-h-screen pt-20 bg-[#ffffff]")}
+        style={{ color: initialColors.primary }}
+      >
+        <div className="text-center py-16">
+          <ShoppingBag
+            className="w-24 h-24 mx-auto mb-6"
+            style={{ color: initialColors.primary }}
+          />
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{ color: initialColors.primary }}
+          >
+            Authentication Required
+          </h1>
+          <p className="mb-8 text-red-600">
+            {state.error}
+          </p>
+          <div className="space-y-4">
+            <Link href={`/e-commerce/${subdomain}/login`}>
+              <Button
+                size="lg"
+                style={{
+                  backgroundColor: initialColors.foreground,
+                  color: initialColors.primary,
+                }}
+              >
+                Log In as Customer
+              </Button>
+            </Link>
+            <p className="text-sm" style={{ color: initialColors.secondary }}>
+              You need to be logged in as a customer to access your cart
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state for other errors
   if (state.error && !state.error.includes("log in")) {
     return (
       <div

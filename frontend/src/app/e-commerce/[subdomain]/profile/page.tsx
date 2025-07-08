@@ -59,7 +59,7 @@ export default function ProfilePage() {
   const [initialColors, setInitialColors] = useState({
     primary: "#000000",
     secondary: "#000000",
-    accent: "#000000",
+    accent: "#ffffff",
   });
 
   const path = usePathname();
@@ -932,7 +932,7 @@ export default function ProfilePage() {
                     className={`mt-6 p-4 border rounded-lg`}
                     style={{
                       borderColor: initialColors.secondary,
-                      backgroundColor: initialColors.accent,
+                      backgroundColor: "#ffffff",
                     }}
                   >
                     <h3
@@ -1166,7 +1166,7 @@ export default function ProfilePage() {
                             className="text-lg font-semibold mt-1"
                             style={{ color: initialColors.primary }}
                           >
-                            ${order.total}
+                            ${order.total + (order.shipping || 0)}
                           </p>
                         </div>
                       </div>
@@ -1265,7 +1265,8 @@ export default function ProfilePage() {
                     if (!order) return null;
 
                     const shipping = order.shipping ?? 0;
-                    const subtotal = order.total - shipping;
+                    const subtotal = order.total;
+                    const total = subtotal + shipping;
 
                     return (
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1284,7 +1285,7 @@ export default function ProfilePage() {
                                   key={index}
                                   className={`flex items-center gap-4 p-4 border rounded-lg`}
                                   style={{
-                                    backgroundColor: initialColors.secondary,
+                                    backgroundColor: initialColors.accent,
                                     borderColor: initialColors.secondary,
                                   }}
                                 >
@@ -1341,7 +1342,7 @@ export default function ProfilePage() {
                           <div
                             className={`p-6 rounded-lg sticky top-24`}
                             style={{
-                              backgroundColor: initialColors.secondary,
+                              backgroundColor: initialColors.accent,
                               borderColor: initialColors.secondary,
                             }}
                           >
@@ -1382,7 +1383,7 @@ export default function ProfilePage() {
                                   Total
                                 </span>
                                 <span style={{ color: initialColors.primary }}>
-                                  ${order.total.toFixed(2)}
+                                  ${total.toFixed(2)}
                                 </span>
                               </div>
                             </div>
