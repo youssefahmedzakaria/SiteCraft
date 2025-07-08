@@ -11,8 +11,10 @@ import { Icons } from "../../icons";
 import { Alert, AlertDescription } from "../../ui/alert";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function LoginForm() {
+  const { t } = useTranslation();
   const {
     email,
     setEmail,
@@ -27,9 +29,9 @@ export function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="w-full space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('auth.login.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Enter your email to sign in to your account
+          {t('auth.login.subtitle')}
         </p>
       </div>
 
@@ -48,7 +50,7 @@ export function LoginForm() {
             htmlFor="email"
             className="text-sm font-medium text-foreground/90"
           >
-            Email address
+            {t('auth.login.emailLabel')}
           </Label>
           <Input
             id="email"
@@ -73,7 +75,7 @@ export function LoginForm() {
               htmlFor="password"
               className="text-sm font-medium text-foreground/90"
             >
-              Password
+              {t('auth.login.passwordLabel')}
             </Label>
             <Button
               variant="link"
@@ -81,7 +83,7 @@ export function LoginForm() {
               type="button"
               asChild
             >
-              <Link href="/forgot-password">Forgot password?</Link>
+              <Link href="/forgot-password">{t('auth.login.forgotPassword')}</Link>
             </Button>
           </div>
           <Input
@@ -115,21 +117,21 @@ export function LoginForm() {
         {isLoading ? (
           <>
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            Signing in...
+            {t('common.loading')}
           </>
         ) : (
-          "Sign in"
+          t('auth.login.signInButton')
         )}
       </Button>
 
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
-          Don't have an account?{" "}
+          {t('auth.login.noAccount')}{" "}
           <Link
             href="/signup"
             className="text-primary hover:text-primary/90 font-medium hover:underline"
           >
-            Sign up
+            {t('auth.login.signUpLink')}
           </Link>
         </p>
       </div>
@@ -141,14 +143,14 @@ export function LoginForm() {
             variant="link"
             className="text-primary hover:text-primary/90 px-1 h-auto text-xs"
           >
-            Terms of Service
+            {t('footer.terms')}
           </Button>{" "}
           and{" "}
           <Button
             variant="link"
             className="text-primary hover:text-primary/90 px-1 h-auto text-xs"
           >
-            Privacy Policy
+            {t('footer.privacy')}
           </Button>
         </p>
       </div>

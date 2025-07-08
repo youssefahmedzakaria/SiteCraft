@@ -8,8 +8,10 @@ import { Icons } from "../../icons";
 import { Alert, AlertDescription } from "../../ui/alert";
 import { AlertCircle, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function ForgotPasswordForm() {
+  const { t } = useTranslation();
   const {
     step,
     email,
@@ -35,10 +37,10 @@ export function ForgotPasswordForm() {
       <form onSubmit={handleSendOTP} className="w-full space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Forgot password
+            {t('auth.forgotPassword.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Enter your email address and we'll send you a verification code
+            {t('auth.forgotPassword.subtitle')}
           </p>
         </div>
 
@@ -55,7 +57,7 @@ export function ForgotPasswordForm() {
               htmlFor="email"
               className="text-sm font-medium text-foreground/90"
             >
-              Email address
+              {t('auth.forgotPassword.emailLabel')}
             </Label>
             <Input
               id="email"
@@ -88,10 +90,10 @@ export function ForgotPasswordForm() {
           {isLoading ? (
             <>
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-              Sending code...
+              {t('common.loading')}
             </>
           ) : (
-            "Send verification code"
+            t('auth.forgotPassword.resetButton')
           )}
         </Button>
 
@@ -102,7 +104,7 @@ export function ForgotPasswordForm() {
               href="/login"
               className="text-primary hover:text-primary/90 font-medium hover:underline"
             >
-              Sign in
+              {t('auth.forgotPassword.backToLogin')}
             </Link>
           </p>
         </div>

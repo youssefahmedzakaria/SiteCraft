@@ -11,21 +11,34 @@ import { getFilteredSidebarElements } from "@/lib/sidebarElements";
 import { SidebarElementComponent } from "./sidebarElementComponent";
 import { CornerDownRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
+  const { t, isRTL } = useTranslation();
 
   const isReportsActive = pathname === "/dashboard/analytics/reports";
   
   // Filter sidebar elements based on user role
   const filteredSidebarElements = getFilteredSidebarElements(user?.role || null);
 
+  // Sidebar positioning classes
+  const sidebarPosition = isRTL
+    ? 'right-0 left-auto'
+    : 'left-0 right-auto';
+  const sidebarTranslate = isRTL
+    ? (isOpen ? 'translate-x-0' : 'translate-x-full')
+    : (isOpen ? 'translate-x-0' : '-translate-x-full');
+  const sidebarLgPosition = isRTL
+    ? 'lg:right-0 lg:left-auto'
+    : 'lg:left-0 lg:right-auto';
+
   return (
     <div>
       {/* Hamburger Button (Mobile Only) */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-logo-left-nav text-logo-txt fixed w-full z-50">
+      <div className={`lg:hidden flex items-center justify-between px-4 py-2 bg-logo-left-nav text-logo-txt fixed w-full z-50 ${isRTL ? 'right-0 left-auto' : 'left-0 right-auto'}`}>
         <Link href="/" className="flex items-center space-x-2">
           <Image src="/logo.png" alt="SiteCraft Logo" width={28} height={28} />
           <Image src="/font.png" alt="SiteCraft" width={100} height={20} />
@@ -49,8 +62,7 @@ export function Sidebar() {
 
       <aside
         className={`fixed h-full w-64 md:w-80 bg-logo-left-nav text-logo-txt pt-1 space-y-1 transition-transform duration-300 ease-in-out shadow-lg z-50
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:shadow-none lg:z-30`}
+          ${sidebarPosition} ${sidebarTranslate} ${sidebarLgPosition} lg:translate-x-0 lg:shadow-none lg:z-30`}
       >
         {/* Logo */}
         <div className="flex justify-center mt-4 lg:mt-1">
@@ -82,18 +94,18 @@ export function Sidebar() {
           {filteredSidebarElements.map((element, index) => (
             <div key={element.id}>
               {/* Add a divider before Logout button for all users */}
-              {element.title === 'Log Out' && (
+              {element.titleKey === 'sidebar.logOut' && (
                 <div className="border-t border-primary-foreground my-2 mx-4"></div>
               )}
 
               {/* Handle logout differently - don't wrap in Link */}
-              {element.title === 'Log Out' ? (
+              {element.titleKey === 'sidebar.logOut' ? (
                 <div onClick={() => setIsOpen(false)}>
-                  <SidebarElementComponent element={element} />
+                  <SidebarElementComponent element={{...element, title: t(element.titleKey)}} />
                 </div>
               ) : (
                 <Link href={element.destination} onClick={() => setIsOpen(false)}>
-                  <SidebarElementComponent element={element} />
+                  <SidebarElementComponent element={{...element, title: t(element.titleKey)}} />
                 </Link>
               )}
               
@@ -111,7 +123,7 @@ export function Sidebar() {
                   >
                     <div className="flex items-center space-x-2">
                       <CornerDownRight size={18} />
-                      <span>Reports</span>
+                      <span>{t('sidebar.reports')}</span>
                     </div>
                   </Link>
                 )}

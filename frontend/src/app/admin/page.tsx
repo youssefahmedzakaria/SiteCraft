@@ -11,6 +11,7 @@ import { ChevronDown, Store, StarOff, Store as StoreIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { useTranslation } from '@/contexts/translation-context';
 
 // Type for store overview
 interface StoreOverviewDTO {
@@ -49,6 +50,7 @@ type StatusFilter = 'All' | 'Active' | 'Suspended';
 export default function AdminDashboard() {
   const router = useRouter();
   const { isAuthenticated, user, isLoading: authLoading, checkSession } = useAuth();
+  const { t, isRTL } = useTranslation();
   const [stores, setStores] = useState<StoreOverviewDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -149,13 +151,13 @@ export default function AdminDashboard() {
         body: JSON.stringify({ subject: mailDialog.subject, message: mailDialog.message })
       });
       if (res.ok) {
-        setMailSuccess('Mail sent successfully!');
+        setMailSuccess(t('admin.mail.success'));
         setMailDialog({ ...mailDialog, open: false });
       } else {
-        setMailError('Failed to send mail.');
+        setMailError(t('admin.mail.error'));
       }
     } catch {
-      setMailError('Failed to send mail.');
+      setMailError(t('admin.mail.error'));
     }
     setMailSending(false);
   };
@@ -199,6 +201,7 @@ export default function AdminDashboard() {
 
   // Add admin
   const handleAddAdmin = async () => {
+    if (!addAdminEmail.trim()) return;
     setAddAdminLoading(true);
     setAddAdminError('');
     setAddAdminSuccess('');
@@ -207,350 +210,302 @@ export default function AdminDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: addAdminEmail })
+        body: JSON.stringify({ email: addAdminEmail.trim() })
       });
       if (res.ok) {
-        setAddAdminSuccess('Admin added successfully!');
+        setAddAdminSuccess(t('admin.admins.success'));
         setAddAdminEmail('');
+        setAdminDialogOpen(false);
       } else {
-        const msg = await res.text();
-        setAddAdminError(msg || 'Failed to add admin.');
+        setAddAdminError(t('admin.admins.error'));
       }
     } catch {
-      setAddAdminError('Failed to add admin.');
+      setAddAdminError(t('admin.admins.error'));
     }
     setAddAdminLoading(false);
   };
 
-  // Remove admin
   const handleRemoveAdmin = async (userId: number) => {
-    if (!window.confirm('Are you sure you want to remove this admin?')) return;
-    setAdminLoading(true);
-    setAdminError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/stores/admins/${userId}`, {
+      await fetch(`http://localhost:8080/api/admin/stores/admins/${userId}`, {
         method: 'DELETE',
-        credentials: 'include',
+        credentials: 'include'
       });
-      if (res.ok) {
-        setAdmins(admins => admins.filter(a => a.id !== userId));
-      } else {
-        setAdminError('Failed to remove admin.');
-      }
+      setAdmins(admins => admins.filter(admin => admin.id !== userId));
     } catch {
-      setAdminError('Failed to remove admin.');
+      console.error('Failed to remove admin');
     }
-    setAdminLoading(false);
   };
 
-  console.log('authLoading:', authLoading, 'isAuthenticated:', isAuthenticated, 'user:', user);
+  if (!sessionChecked || authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (authLoading) return <div>Loading auth...</div>;
-  if (!isAuthenticated) return <div>Not authenticated</div>;
-  if (!user) return <div>No user data</div>;
-  if (user.role !== 'admin') return <div>Not an admin. Your role: {user.role}</div>;
+  if (!isAuthenticated || user?.role !== 'admin') {
+    return null; // Will redirect
+  }
 
   return (
-    <div className="flex min-h-screen bg-gray-100 mt-12">
-      <main className="flex-1 p-4 md:p-6 pt-20 md:pt-20 lg:pt-6 bg-gray-100">
-        {/* Header section with title and subtitle */}
-        <div className="mb-6 space-y-2 flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Stores</h1>
-            <h2 className="text-lg md:text-xl font-semibold text-gray-600">
-              Manage all business stores in the system
-            </h2>
-          </div>
-          <Button
-            className="mt-4 md:mt-0"
-            variant="default"
-            onClick={() => setAdminDialogOpen(true)}
-          >
-            Manage Admins
+    <div className="min-h-screen bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">{t('admin.title')}</h1>
+          <Button onClick={() => setAdminDialogOpen(true)}>
+            {t('admin.admins.addAdmin')}
           </Button>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-red-800">{error}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setError('')}
-                className="text-red-600 hover:text-red-800"
-              >
-                ×
-              </Button>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-card p-6 rounded-lg border">
+            <div className="flex items-center">
+              <StoreIcon className="h-8 w-8 text-primary mr-3" />
+              <div>
+                <p className="text-sm text-muted-foreground">{t('admin.stats.totalStores')}</p>
+                <p className="text-2xl font-bold">{totalCount}</p>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Stats row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="rounded-full bg-blue-100 p-3 mr-4">
-              <StoreIcon className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Stores</p>
-              <p className="text-2xl font-bold">{totalCount}</p>
+          <div className="bg-card p-6 rounded-lg border">
+            <div className="flex items-center">
+              <Store className="h-8 w-8 text-green-500 mr-3" />
+              <div>
+                <p className="text-sm text-muted-foreground">{t('admin.stats.activeStores')}</p>
+                <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+              </div>
             </div>
           </div>
-
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="rounded-full bg-green-100 p-3 mr-4">
-              <Store className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Active Stores</p>
-              <p className="text-2xl font-bold">{activeCount}</p>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="rounded-full bg-red-100 p-3 mr-4">
-              <StarOff className="h-6 w-6 text-red-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Suspended Stores</p>
-              <p className="text-2xl font-bold">{suspendedCount}</p>
+          <div className="bg-card p-6 rounded-lg border">
+            <div className="flex items-center">
+              <StarOff className="h-8 w-8 text-red-500 mr-3" />
+              <div>
+                <p className="text-sm text-muted-foreground">{t('admin.stats.suspendedStores')}</p>
+                <p className="text-2xl font-bold text-red-600">{suspendedCount}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filters and search */}
-        <div className="border-t border-logo-border mt-6 mb-3 space-y-2 pt-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            {/* Search Bar */}
-            <div className="flex-grow">
+        {/* Stores Table */}
+        <div className="bg-card rounded-lg border">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-semibold mb-4">{t('admin.stores.title')}</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
               <SearchBar
-                placeholder="Search by store name or owner email..."
+                placeholder={t('admin.stores.search')}
                 value={searchQuery}
                 onChange={setSearchQuery}
+                className="flex-1"
               />
-            </div>
-            {/* Status Filter */}
-            <div className="flex-shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full sm:w-auto text-logo-txt hover:text-logo-txt-hover hover:bg-logo-light-button-hover border-logo-border"
-                  >
-                    <span className="ml-2">{statusFilter}</span>
-                    <ChevronDown size={16} />
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    {t('admin.stores.filter.all')} <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setStatusFilter('All')}>All</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('Active')}>Active</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('Suspended')}>Suspended</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('All')}>
+                    {t('admin.stores.filter.all')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('Active')}>
+                    {t('admin.stores.filter.active')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('Suspended')}>
+                    {t('admin.stores.filter.suspended')}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
-        </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto rounded-lg shadow-sm bg-white">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-logo-light-button">
-              <tr>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('storeName')}
-                >
-                  Store Name {sortKey === 'storeName' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider"
-                >
-                  Subscription
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('lastMonthSales')}
-                >
-                  Last Month Sales {sortKey === 'lastMonthSales' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('lastMonthOrders')}
-                >
-                  Last Month Orders {sortKey === 'lastMonthOrders' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('status')}
-                >
-                  Status {sortKey === 'status' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider"
-                >
-                  Owner Email
-                </th>
-                <th
-                  className="px-3 md:px-6 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sortedStores.map(store => (
-                <tr key={store.id}>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm font-medium text-gray-900">{store.storeName}</div>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">{store.subscriptionType}</div>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">EGP {store.lastMonthSales.toLocaleString()}</div>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">{store.lastMonthOrders}</div>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${store.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{store.status === 'active' ? 'Active' : 'Suspended'}</span>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">{store.ownerEmail}</div>
-                  </td>
-                  <td className="px-3 md:px-6 py-4 whitespace-nowrap text-center">
-                    <div className="flex items-center justify-center space-x-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={store.status === 'suspended' ? 'text-green-600 hover:text-green-900' : 'text-red-600 hover:text-red-900'}
-                        onClick={() => handleSuspend(store.id, store.status !== 'suspended')}
-                      >
-                        {store.status === 'suspended' ? 'Unsuspend' : 'Suspend'}
-                      </Button>
-                      <Link href={`/admin/stores/${store.id}`} passHref>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-2 text-muted-foreground">{t('common.loading')}</p>
+            </div>
+          ) : error ? (
+            <div className="p-8">
+              <Alert variant="destructive">
+                <p>{error}</p>
+              </Alert>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-4 font-medium cursor-pointer" onClick={() => handleSort('storeName')}>
+                      {t('admin.stores.columns.storeName')}
+                    </th>
+                    <th className="text-left p-4 font-medium cursor-pointer" onClick={() => handleSort('status')}>
+                      {t('admin.stores.columns.status')}
+                    </th>
+                    <th className="text-left p-4 font-medium">
+                      {t('admin.stores.columns.subscriptionType')}
+                    </th>
+                    <th className="text-left p-4 font-medium cursor-pointer" onClick={() => handleSort('lastMonthSales')}>
+                      {t('admin.stores.columns.lastMonthSales')}
+                    </th>
+                    <th className="text-left p-4 font-medium cursor-pointer" onClick={() => handleSort('lastMonthOrders')}>
+                      {t('admin.stores.columns.lastMonthOrders')}
+                    </th>
+                    <th className="text-left p-4 font-medium">
+                      {t('admin.stores.columns.ownerEmail')}
+                    </th>
+                    <th className="text-left p-4 font-medium">
+                      {t('admin.stores.columns.actions')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedStores.map((store) => (
+                    <tr key={store.id} className="border-b hover:bg-muted/50">
+                      <td className="p-4">{store.storeName}</td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          store.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {store.status}
+                        </span>
+                      </td>
+                      <td className="p-4">{store.subscriptionType}</td>
+                      <td className="p-4">${store.lastMonthSales}</td>
+                      <td className="p-4">{store.lastMonthOrders}</td>
+                      <td className="p-4">{store.ownerEmail}</td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          {store.status === 'active' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSuspend(store.id, true)}
+                            >
+                              {t('admin.stores.actions.suspend')}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSuspend(store.id, false)}
+                            >
+                              {t('admin.stores.actions.unsuspend')}
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenMail(store.id)}
+                          >
+                            {t('admin.stores.actions.sendMail')}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                          >
+                            <Link href={`/e-commerce/${store.storeName.toLowerCase().replace(/\s+/g, '-')}`}>
+                              {t('admin.stores.actions.view')}
+                            </Link>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Mail Dialog */}
-        <Dialog open={mailDialog.open} onOpenChange={open => setMailDialog(d => ({ ...d, open }))}>
+        <Dialog open={mailDialog.open} onOpenChange={(open) => setMailDialog({ ...mailDialog, open })}>
           <DialogContent>
-            <DialogTitle>Send Mail to Store Owner</DialogTitle>
-            <div className="mb-2">
-              <label className="block mb-1 font-medium">Predefined Mails</label>
-              <div className="flex gap-2 mb-2">
-                {PREDEFINED_MAILS.map((mail, idx) => (
-                  <Button
-                    key={idx}
-                    variant="outline"
-                    onClick={() => setMailDialog(d => ({ ...d, subject: mail.subject, message: mail.message }))}
-                  >
-                    {mail.subject}
-                  </Button>
-                ))}
+            <DialogTitle>{t('admin.mail.title')}</DialogTitle>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('admin.mail.subject')}</label>
+                <Input
+                  value={mailDialog.subject}
+                  onChange={(e) => setMailDialog({ ...mailDialog, subject: e.target.value })}
+                  placeholder="Enter subject..."
+                />
               </div>
-              <label className="block mb-1 font-medium">Subject</label>
-              <Input
-                value={mailDialog.subject}
-                onChange={e => setMailDialog(d => ({ ...d, subject: e.target.value }))}
-                placeholder="Subject"
-              />
-              <label className="block mb-1 font-medium mt-2">Message</label>
-              <Textarea
-                value={mailDialog.message}
-                onChange={e => setMailDialog(d => ({ ...d, message: e.target.value }))}
-                placeholder="Type your message..."
-                rows={5}
-              />
-            </div>
-            {mailError && <Alert variant="destructive">{mailError}</Alert>}
-            {mailSuccess && <Alert variant="default">{mailSuccess}</Alert>}
-            <div className="flex gap-2 justify-end mt-4">
-              <Button onClick={handleSendMail} disabled={mailSending || !mailDialog.subject || !mailDialog.message}>
-                {mailSending ? 'Sending...' : 'Send Mail'}
-              </Button>
-              <Button variant="secondary" onClick={() => setMailDialog(d => ({ ...d, open: false }))}>Cancel</Button>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('admin.mail.message')}</label>
+                <Textarea
+                  value={mailDialog.message}
+                  onChange={(e) => setMailDialog({ ...mailDialog, message: e.target.value })}
+                  placeholder="Enter message..."
+                  rows={6}
+                />
+              </div>
+              {mailSuccess && (
+                <Alert>
+                  <p>{mailSuccess}</p>
+                </Alert>
+              )}
+              {mailError && (
+                <Alert variant="destructive">
+                  <p>{mailError}</p>
+                </Alert>
+              )}
+              <div className="flex gap-2">
+                <Button onClick={handleSendMail} disabled={mailSending}>
+                  {mailSending ? t('admin.mail.sending') : t('admin.mail.send')}
+                </Button>
+                <Button variant="outline" onClick={() => setMailDialog({ ...mailDialog, open: false })}>
+                  {t('common.cancel')}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
 
         {/* Admin Management Dialog */}
         <Dialog open={adminDialogOpen} onOpenChange={setAdminDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogTitle>Admin Management</DialogTitle>
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-              <form
-                onSubmit={e => {
-                  e.preventDefault();
-                  handleAddAdmin();
-                }}
-                className="flex flex-col sm:flex-row gap-2 items-center"
-              >
+          <DialogContent>
+            <DialogTitle>{t('admin.admins.title')}</DialogTitle>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('admin.admins.adminEmail')}</label>
                 <Input
-                  type="email"
-                  placeholder="Enter email to add admin"
                   value={addAdminEmail}
-                  onChange={e => setAddAdminEmail(e.target.value)}
-                  required
-                  className="flex-1"
+                  onChange={(e) => setAddAdminEmail(e.target.value)}
+                  placeholder="admin@example.com"
+                  type="email"
                 />
-                <Button type="submit" disabled={addAdminLoading || !addAdminEmail}>
-                  {addAdminLoading ? 'Adding...' : 'Add Admin'}
+              </div>
+              {addAdminSuccess && (
+                <Alert>
+                  <p>{addAdminSuccess}</p>
+                </Alert>
+              )}
+              {addAdminError && (
+                <Alert variant="destructive">
+                  <p>{addAdminError}</p>
+                </Alert>
+              )}
+              <div className="flex gap-2">
+                <Button onClick={handleAddAdmin} disabled={addAdminLoading}>
+                  {addAdminLoading ? t('admin.admins.adding') : t('admin.admins.add')}
                 </Button>
-              </form>
-              {addAdminError && <Alert variant="destructive" className="mt-2">{addAdminError}</Alert>}
-              {addAdminSuccess && <Alert variant="default" className="mt-2">{addAdminSuccess}</Alert>}
-            </div>
-            <div className="overflow-x-auto rounded-lg shadow-sm bg-white">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-logo-light-button">
-                  <tr>
-                    <th className="px-3 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider">Name</th>
-                    <th className="px-3 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider">Email</th>
-                    <th className="px-3 py-3 text-center text-xs font-medium text-logo-txt uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {adminLoading ? (
-                    <tr><td colSpan={3} className="text-center py-4">Loading...</td></tr>
-                  ) : admins.length === 0 ? (
-                    <tr><td colSpan={3} className="text-center py-4">No admins found.</td></tr>
-                  ) : (
-                    admins.map(admin => (
-                      <tr key={admin.id}>
-                        <td className="px-3 py-4 text-center">{admin.name}</td>
-                        <td className="px-3 py-4 text-center">{admin.email}</td>
-                        <td className="px-3 py-4 text-center">
-                          <Button variant="destructive" size="sm" onClick={() => handleRemoveAdmin(admin.id)}>
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-              {adminError && <Alert variant="destructive" className="mt-2">{adminError}</Alert>}
+                <Button variant="outline" onClick={() => setAdminDialogOpen(false)}>
+                  {t('common.cancel')}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
-      </main>
+      </div>
     </div>
   );
 } 

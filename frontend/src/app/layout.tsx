@@ -8,6 +8,7 @@ import { FavoritesProvider } from "@/contexts/favorites-context";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TranslationProvider } from "@/contexts/translation-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,25 +38,28 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <SessionProvider>        
-<CartProvider>
-          <FavoritesProvider>
-            <LayoutWrapper> {children}</LayoutWrapper>
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
-          </FavoritesProvider>
-        </CartProvider>
-        </SessionProvider>
+        <TranslationProvider>
+          {" "}
+          <SessionProvider>
+            <CartProvider>
+              <FavoritesProvider>
+                <LayoutWrapper> {children}</LayoutWrapper>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                />
+              </FavoritesProvider>
+            </CartProvider>
+          </SessionProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

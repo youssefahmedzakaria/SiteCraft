@@ -8,8 +8,10 @@ import { Icons } from "../../icons";
 import { Alert, AlertDescription } from "../../ui/alert";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/contexts/translation-context";
 
 export function SignupForm() {
+  const { t } = useTranslation();
   const {
     formData,
     handleInputChange,
@@ -25,10 +27,10 @@ export function SignupForm() {
     <form onSubmit={onSubmit} className="w-full space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Create an account
+          {t('auth.signup.title')}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Enter your details below to create your account and store
+          {t('auth.signup.subtitle')}
         </p>
       </div>
 
@@ -55,7 +57,7 @@ export function SignupForm() {
               htmlFor="name"
               className="text-sm font-medium text-foreground/90"
             >
-              Name
+              {t('common.firstName')}
             </Label>
             <Input
               id="name"
@@ -82,7 +84,7 @@ export function SignupForm() {
               htmlFor="email"
               className="text-sm font-medium text-foreground/90"
             >
-              Email address
+              {t('auth.signup.emailLabel')}
             </Label>
             <Input
               id="email"
@@ -109,7 +111,7 @@ export function SignupForm() {
               htmlFor="password"
               className="text-sm font-medium text-foreground/90"
             >
-              Password
+              {t('auth.signup.passwordLabel')}
             </Label>
             <Input
               id="password"
@@ -136,7 +138,7 @@ export function SignupForm() {
               htmlFor="confirmPassword"
               className="text-sm font-medium text-foreground/90"
             >
-              Confirm Password
+              {t('auth.signup.confirmPasswordLabel')}
             </Label>
             <Input
               id="confirmPassword"
@@ -245,40 +247,40 @@ export function SignupForm() {
         {isLoading ? (
           <>
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            Creating account...
+            {t('common.loading')}
           </>
         ) : (
-          "Create account"
+          t('auth.signup.signUpButton')
         )}
       </Button>
 
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
-          Already have an account?{" "}
+          {t('auth.signup.hasAccount')}{" "}
           <Link
             href="/login"
             className="text-primary hover:text-primary/90 font-medium hover:underline"
           >
-            Sign in
+            {t('auth.signup.signInLink')}
           </Link>
         </p>
       </div>
 
       <div className="text-center text-xs text-muted-foreground">
         <p>
-          By continuing, you agree to our{" "}
+          {t('auth.signup.termsAgreement')}{" "}
           <Button
             variant="link"
             className="text-primary hover:text-primary/90 px-1 h-auto text-xs"
           >
-            Terms of Service
+            {t('auth.signup.termsLink')}
           </Button>{" "}
-          and{" "}
+          {t('auth.signup.and')}{" "}
           <Button
             variant="link"
             className="text-primary hover:text-primary/90 px-1 h-auto text-xs"
           >
-            Privacy Policy
+            {t('auth.signup.privacyLink')}
           </Button>
         </p>
       </div>

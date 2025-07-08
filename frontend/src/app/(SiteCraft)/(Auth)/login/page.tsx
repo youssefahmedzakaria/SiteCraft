@@ -3,10 +3,13 @@
 import { LoginForm } from "@/components/SiteCraft/auth/Login/login-form";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslation } from "@/contexts/translation-context";
 
 export default function LoginPage() {
+  const { t, isRTL } = useTranslation();
+
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Background Pattern */}
       {/* <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
@@ -36,13 +39,10 @@ export default function LoginPage() {
             />
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 text-center md:text-left">
-            Your brand, Your store,
-            <br />
-            Your way.
+            {t('auth.branding.title')}
           </h1>
           <p className="text-muted-foreground text-center md:text-left max-w-md text-lg">
-            Create stunning websites and grow your online presence with our
-            intuitive platform designed for Egyptian businesses.
+            {t('auth.branding.subtitle')}
           </p>
           <div className="mt-4 md:mt-8 flex justify-center md:justify-start w-full">
             <Image

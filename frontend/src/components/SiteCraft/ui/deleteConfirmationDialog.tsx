@@ -7,6 +7,7 @@ import {
   ModalDescription,
   ModalFooter,
 } from "@/components/SiteCraft/ui/modal";
+import { useTranslation } from "@/contexts/translation-context";
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -21,16 +22,18 @@ export function DeleteConfirmationDialog({
   isOpen,
   onClose,
   onConfirm,
-  title = "Confirm Deletion",
-  description = "Are you sure you want to delete this item? This action cannot be undone.",
+  title,
+  description,
   itemName,
 }: DeleteConfirmationDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalHeader>
-        <ModalTitle>{title}</ModalTitle>
+        <ModalTitle>{title || t('common.confirmDeletion')}</ModalTitle>
         <ModalDescription>
-          {description}
+          {description || t('common.confirmDeletionDescription')}
           {itemName && (
             <span className="font-medium block mt-1">"{itemName}"</span>
           )}
@@ -43,7 +46,7 @@ export function DeleteConfirmationDialog({
           onClick={onConfirm}
           className="bg-red-600 hover:bg-red-700"
         >
-          Delete
+          {t('common.delete')}
         </Button>
         <Button
           type="button"
@@ -51,7 +54,7 @@ export function DeleteConfirmationDialog({
           onClick={onClose}
           className="border-logo-border text-logo-txt hover:text-logo-txt-hover"
         >
-          Cancel
+          {t('common.cancel')}
         </Button>
       </ModalFooter>
     </Modal>

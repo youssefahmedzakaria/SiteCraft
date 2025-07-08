@@ -14,7 +14,7 @@ export type IconName =
 export interface SidebarElement {
     id: string
     iconName: IconName 
-    title: string
+    titleKey: string
     destination: string
 }
 
@@ -22,67 +22,67 @@ export const sidebarElements: SidebarElement[] = [
   {
     id: '1',
     iconName: 'Home',
-    title: 'Overview',
+    titleKey: 'sidebar.overview',
     destination: '/dashboard',
   },
   {
     id: '2',
     iconName: 'Layout',
-    title: 'Customize Template',
+    titleKey: 'sidebar.customizeTemplate',
     destination: '/dashboard/customize',
   },
   {
     id: '3',
     iconName: 'Tags',
-    title: 'Categories',
+    titleKey: 'sidebar.categories',
     destination: '/dashboard/categories',
   },
   {
     id: '4',
     iconName: 'ShoppingBag',
-    title: 'Products',
+    titleKey: 'sidebar.products',
     destination: '/dashboard/products',
   },
   {
     id: '5',
     iconName: 'ShoppingCart',
-    title: 'Orders',
+    titleKey: 'sidebar.orders',
     destination: '/dashboard/orders',
   },
   {
     id: '6',
     iconName: 'Users',
-    title: 'Customers',
+    titleKey: 'sidebar.customers',
     destination: '/dashboard/customers',
   },
   {
     id: '7',
     iconName: 'BarChart2',
-    title: 'Analytics',
+    titleKey: 'sidebar.analytics',
     destination: '/dashboard/analytics',
   },
   {
     id: '8',
     iconName: 'Store',
-    title: 'Store Info',
+    titleKey: 'sidebar.storeInfo',
     destination: '/dashboard/store-info',
   },
   {
     id: '9',
     iconName: 'Truck',
-    title: 'Shipping Info',
+    titleKey: 'sidebar.shippingInfo',
     destination: '/dashboard/shipping',
   },
   {
     id: '10',
     iconName: 'Settings',
-    title: 'Account Settings',
+    titleKey: 'sidebar.accountSettings',
     destination: '/dashboard/account-settings',
   },
   {
     id: '11',
     iconName: 'LogOut',
-    title: 'Log Out',
+    titleKey: 'sidebar.logOut',
     destination: '/',
   },
 ]
@@ -91,7 +91,7 @@ export function getFilteredSidebarElements(role: string | null): SidebarElement[
   if (role === 'staff') {
     // Staff users can access specific pages
     return sidebarElements.filter(element => 
-      ['Categories', 'Products', 'Orders', 'Customers', 'Store Info', 'Shipping Info', 'Log Out'].includes(element.title)
+      ['sidebar.categories', 'sidebar.products', 'sidebar.orders', 'sidebar.customers', 'sidebar.storeInfo', 'sidebar.shippingInfo', 'sidebar.logOut'].includes(element.titleKey)
     );
   }
   
